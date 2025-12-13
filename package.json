@@ -1,0 +1,19 @@
+{
+  "name": "rom-file-picker",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "run": "npm run build && node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.0",
+  "devDependencies": {
+    "@types/node": "^25.0.1",
+    "typescript": "^5.9.3"
+  }
+}
