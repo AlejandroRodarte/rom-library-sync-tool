@@ -1,5 +1,6 @@
 import { readdir } from "node:fs/promises";
 import type { Groups } from "./types.js";
+import unselectByCountry from "./unselect-by-country.js";
 
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
@@ -62,117 +63,14 @@ const main = async () => {
       if (romHasUnwantedLabel) rom.selected = false;
     }
 
-    // check if any ROM in a group has USA in its labels
-    let groupHasUSALabel = false;
-
-    for (const rom of roms) {
-      for (const label of rom.labels) {
-        if (label.includes("USA")) {
-          groupHasUSALabel = true;
-          break;
-        }
-      }
-      if (groupHasUSALabel) break;
-    }
-
-    if (groupHasUSALabel) {
-      // unselect all ROMS that do NOT have a USA in its labels
-      for (const rom of roms) {
-        let romHasUSALabel = false;
-        for (const label of rom.labels) {
-          if (label.includes("USA")) {
-            romHasUSALabel = true;
-            break;
-          }
-        }
-        if (!romHasUSALabel) rom.selected = false;
-      }
-      continue;
-    }
-
-    // check if any ROM in a group has Europe in its labels
-    let groupHasEuropeLabel = false;
-
-    for (const rom of roms) {
-      for (const label of rom.labels) {
-        if (label.includes("Europe")) {
-          groupHasEuropeLabel = true;
-          break;
-        }
-      }
-      if (groupHasEuropeLabel) break;
-    }
-
-    if (groupHasEuropeLabel) {
-      // unselect all ROMS that do NOT have a Europe in its labels
-      for (const rom of roms) {
-        let romHasEuropeLabel = false;
-        for (const label of rom.labels) {
-          if (label.includes("Europe")) {
-            romHasEuropeLabel = true;
-            break;
-          }
-        }
-        if (!romHasEuropeLabel) rom.selected = false;
-      }
-      continue;
-    }
-
-    // check if any ROM in a group has Japan in its labels
-    let groupHasJapanLabel = false;
-
-    for (const rom of roms) {
-      for (const label of rom.labels) {
-        if (label.includes("Japan")) {
-          groupHasJapanLabel = true;
-          break;
-        }
-      }
-      if (groupHasJapanLabel) break;
-    }
-
-    if (groupHasJapanLabel) {
-      // unselect all ROMS that do NOT have a Japan in its labels
-      for (const rom of roms) {
-        let romHasJapanLabel = false;
-        for (const label of rom.labels) {
-          if (label.includes("Japan")) {
-            romHasJapanLabel = true;
-            break;
-          }
-        }
-        if (!romHasJapanLabel) rom.selected = false;
-      }
-      continue;
-    }
-
-    // check if any ROM in a group has World in its labels
-    let groupHasWorldLabel = false;
-
-    for (const rom of roms) {
-      for (const label of rom.labels) {
-        if (label.includes("World")) {
-          groupHasWorldLabel = true;
-          break;
-        }
-      }
-      if (groupHasWorldLabel) break;
-    }
-
-    if (groupHasWorldLabel) {
-      // unselect all ROMS that do NOT have a World in its labels
-      for (const rom of roms) {
-        let romHasWorldLabel = false;
-        for (const label of rom.labels) {
-          if (label.includes("World")) {
-            romHasWorldLabel = true;
-            break;
-          }
-        }
-        if (!romHasWorldLabel) rom.selected = false;
-      }
-      continue;
-    }
+    // prioritize USA ROMs
+    let countryLabelFound = unselectByCountry(roms, "USA");
+    // if USA ROM is not found, try to find a World ROM
+    countryLabelFound = unselectByCountry(roms, "World", countryLabelFound);
+    // if World ROM is not found, try to find a Europe ROM
+    countryLabelFound = unselectByCountry(roms, "Europe", countryLabelFound);
+    // if Europe ROM is not found, try to find a Japan ROM
+    countryLabelFound = unselectByCountry(roms, "Japan", countryLabelFound);
   }
 
   let zeroSelectedRomsCount = 0;
