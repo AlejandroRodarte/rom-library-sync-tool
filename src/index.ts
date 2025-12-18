@@ -41,9 +41,9 @@ const main = async () => {
     // group ROMs by title
     if (title === previousTitle) {
       const group = groups[title];
-      if (group) group.push({ filename, labels, selected: false });
+      if (group) group.push({ filename, labels, selected: true });
     } else {
-      groups[title] = [{ filename, labels, selected: false }];
+      groups[title] = [{ filename, labels, selected: true }];
     }
 
     previousTitle = title;
