@@ -92,6 +92,43 @@ const main = async () => {
       }
     }
   }
+
+  let zeroSelectedRomsCount = 0;
+  let moreThanOneSelectedRomCount = 0;
+  let oneSelectedRomCount = 0;
+
+  for (const [title, roms] of Object.entries(groups)) {
+    let selectedCount = 0;
+
+    for (const rom of roms) {
+      if (rom.selected) selectedCount++;
+    }
+
+    if (selectedCount === 0) {
+      console.log("---------");
+      zeroSelectedRomsCount++;
+      console.log(`ROM title ${title} has 0 selected ROMs. Printing group.`);
+      console.log(roms);
+    } else if (selectedCount > 1) {
+      console.log("---------");
+      moreThanOneSelectedRomCount++;
+      console.log(
+        `ROM title ${title} has more than 1 selected ROMs. Printing group.`,
+      );
+      console.log(roms);
+    } else oneSelectedRomCount++;
+  }
+
+  console.log(`There is a total of ${Object.keys(groups).length} ROM titles.`);
+  console.log(
+    `There are ${oneSelectedRomCount} ROM titles with only one ROM selected.`,
+  );
+  console.log(
+    `There are ${moreThanOneSelectedRomCount} ROM titles with more than one ROM selected.`,
+  );
+  console.log(
+    `There are ${zeroSelectedRomsCount} ROM titles with zero ROMs selected.`,
+  );
 };
 
 main();
