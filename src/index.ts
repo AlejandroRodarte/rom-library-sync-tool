@@ -30,12 +30,20 @@ const main = async () => {
       continue;
     }
 
+    const labels: string[] = [];
+    const labelsRegexp = /\((.*?)\)/g;
+    const matches = filename.matchAll(labelsRegexp);
+    for (const match of matches) {
+      const [, label] = match;
+      if (label) labels.push(label);
+    }
+
     // group ROMs by title
     if (title === previousTitle) {
       const group = groups[title];
-      if (group) group.push({ filename, labels: [], selected: false });
+      if (group) group.push({ filename, labels, selected: false });
     } else {
-      groups[title] = [{ filename, labels: [], selected: false }];
+      groups[title] = [{ filename, labels, selected: false }];
     }
 
     previousTitle = title;
@@ -44,7 +52,7 @@ const main = async () => {
   for (const [_, roms] of Object.entries(groups)) {
     console.log("----------");
     for (const rom of roms) {
-      console.log(rom.filename);
+      console.log(rom);
     }
   }
 };
