@@ -1,12 +1,22 @@
 import { readdir } from "node:fs/promises";
 
+interface Rom {
+  filename: string;
+  labels: string[];
+  selected: boolean;
+}
+
+type Groups = {
+  [title: string]: Rom[];
+};
+
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
 const main = async () => {
   // NOTE: output already sorts filenames in ascending order
   const roms = await readdir(dirPath);
 
-  const groups: string[][] = [];
+  const groups: Groups = {};
   let previousTitle = "";
 
   for (const rom of roms) {
@@ -22,20 +32,19 @@ const main = async () => {
 
     // group ROMs by title
     if (title === previousTitle) {
-      const lastGroup = groups[groups.length - 1];
-      if (lastGroup) lastGroup.push(rom);
+      const group = groups[title];
+      if (group) group.push({ filename: rom, labels: [], selected: false });
     } else {
-      const newGroup = [rom];
-      groups.push(newGroup);
+      groups[title] = [{ filename: rom, labels: [], selected: false }];
     }
 
     previousTitle = title;
   }
 
-  for (const group of groups) {
+  for (const [_, roms] of Object.entries(groups)) {
     console.log("----------");
-    for (const rom of group) {
-      console.log(rom);
+    for (const rom of roms) {
+      console.log(rom.filename);
     }
   }
 };
