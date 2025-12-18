@@ -49,10 +49,11 @@ const main = async () => {
     // unselect ROMs with undesired labels
     unselectByUnwanted(roms, [
       "Beta",
-      "Virtual Console",
-      "Rev",
       "Demo",
+      "Proto",
+      "Rev",
       "Sample",
+      "Virtual Console",
     ]);
 
     // prioritize USA ROMs
