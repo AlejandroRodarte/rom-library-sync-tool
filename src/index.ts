@@ -51,6 +51,9 @@ const main = async () => {
 
   for (const [_, roms] of Object.entries(groups)) {
     console.log("----------");
+    // if there is only one entry in the ROM group, skip
+    if (roms.length === 1) continue;
+
     for (const rom of roms) {
       console.log(rom);
     }
