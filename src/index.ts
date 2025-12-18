@@ -1,6 +1,7 @@
 import { readdir } from "node:fs/promises";
 import type { Groups } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
+import unselectByUnwanted from "./unselect-by-unwanted.js";
 
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
@@ -45,23 +46,14 @@ const main = async () => {
     // if there is only one entry in the ROM group, skip
     if (roms.length === 1) continue;
 
-    // unselect all ROMs that have any of the following labels on them: `Beta`, `Virtual Console`, `Rev X`
-    for (const rom of roms) {
-      let romHasUnwantedLabel = false;
-      for (const label of rom.labels) {
-        if (
-          label.includes("Beta") ||
-          label.includes("Virtual Console") ||
-          label.includes("Rev") ||
-          label.includes("Demo") ||
-          label.includes("Sample")
-        ) {
-          romHasUnwantedLabel = true;
-          break;
-        }
-      }
-      if (romHasUnwantedLabel) rom.selected = false;
-    }
+    // unselect ROMs with undesired labels
+    unselectByUnwanted(roms, [
+      "Beta",
+      "Virtual Console",
+      "Rev",
+      "Demo",
+      "Sample",
+    ]);
 
     // prioritize USA ROMs
     let countryLabelFound = unselectByCountry(roms, "USA");
