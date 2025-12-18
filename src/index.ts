@@ -53,11 +53,17 @@ const main = async () => {
     // if there is only one entry in the ROM group, skip
     if (roms.length === 1) continue;
 
-    // unselect all ROMs that have any of the following labels on them: `Beta`, `Virtual Console`
+    // unselect all ROMs that have any of the following labels on them: `Beta`, `Virtual Console`, `Rev X`
     for (const rom of roms) {
       let romHasUnwantedLabel = false;
       for (const label of rom.labels) {
-        if (label.includes("Beta") || label.includes("Virtual Console")) {
+        if (
+          label.includes("Beta") ||
+          label.includes("Virtual Console") ||
+          label.includes("Rev") ||
+          label.includes("Demo") ||
+          label.includes("Sample")
+        ) {
           romHasUnwantedLabel = true;
           break;
         }
