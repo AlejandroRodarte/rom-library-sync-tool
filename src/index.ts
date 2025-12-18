@@ -57,6 +57,33 @@ const main = async () => {
     for (const rom of roms) {
       console.log(rom);
     }
+
+    // check if any ROM in a group has USA in its labels
+    let groupHasUSALabel = false;
+
+    for (const rom of roms) {
+      for (const label of rom.labels) {
+        if (label.includes("USA")) {
+          groupHasUSALabel = true;
+          break;
+        }
+      }
+      if (groupHasUSALabel) break;
+    }
+
+    if (groupHasUSALabel) {
+      // unselect all ROMS that do NOT have a USA in its labels
+      for (const rom of roms) {
+        let romHasUSALabel = false;
+        for (const label of rom.labels) {
+          if (label.includes("USA")) {
+            romHasUSALabel = true;
+            break;
+          }
+        }
+        if (!romHasUSALabel) rom.selected = false;
+      }
+    }
   }
 };
 
