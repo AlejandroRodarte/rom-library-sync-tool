@@ -1,14 +1,5 @@
 import { readdir } from "node:fs/promises";
-
-interface Rom {
-  filename: string;
-  labels: string[];
-  selected: boolean;
-}
-
-type Groups = {
-  [title: string]: Rom[];
-};
+import type { Groups } from "./types.js";
 
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
