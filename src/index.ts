@@ -50,12 +50,19 @@ const main = async () => {
   }
 
   for (const [_, roms] of Object.entries(groups)) {
-    console.log("----------");
     // if there is only one entry in the ROM group, skip
     if (roms.length === 1) continue;
 
+    // unselect all ROMs that have any of the following labels on them: `Beta`, `Virtual Console`
     for (const rom of roms) {
-      console.log(rom);
+      let romHasUnwantedLabel = false;
+      for (const label of rom.labels) {
+        if (label.includes("Beta") || label.includes("Virtual Console")) {
+          romHasUnwantedLabel = true;
+          break;
+        }
+      }
+      if (romHasUnwantedLabel) rom.selected = false;
     }
 
     // check if any ROM in a group has USA in its labels
