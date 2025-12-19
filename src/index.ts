@@ -3,6 +3,7 @@ import type { Groups } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
+import unselectPAL from "./unselect-pal.js";
 
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
@@ -65,6 +66,8 @@ const main = async () => {
     countryLabelFound = unselectByCountry(roms, "Europe", countryLabelFound);
     // if Europe ROM is not found, try to find a Japan ROM
     countryLabelFound = unselectByCountry(roms, "Japan", countryLabelFound);
+
+    unselectPAL(roms);
 
     let versionLabelFound = selectByVersion(
       roms,
