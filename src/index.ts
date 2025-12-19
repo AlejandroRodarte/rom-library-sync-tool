@@ -53,9 +53,11 @@ const main = async () => {
     unselectByUnwanted(roms, [
       "Beta",
       "Demo",
+      "Muted",
       "Proto",
-      "Rev",
       "Sample",
+      "Source Code",
+      "Two Player",
       "Virtual Console",
     ]);
 
