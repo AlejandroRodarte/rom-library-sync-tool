@@ -155,13 +155,42 @@ const main = async () => {
         },
         versionLabelFound,
       );
+
+      const romsSelected = roms.reduce((acc, rom) => {
+        if (rom.selected) acc++;
+        return acc;
+      }, 0);
+
+      if (romsSelected === 0) konsole.info.selected.none[title] = roms;
+      else if (romsSelected > 1) konsole.info.selected.multiple[title] = roms;
+      else konsole.info.selected.one[title] = roms;
+    }
   }
 
+  let totalNoneSelected = 0;
+  let totalOneSelected = 0;
+  let totalMultipleSelected = 0;
 
+  for (const konsole of consoles) {
+    console.log(`===== Report for console ${konsole.name} =====`);
 
+    const noneSelected = Object.keys(konsole.info.selected.none).length;
+    const oneSelected = Object.keys(konsole.info.selected.one).length;
+    const multipleSelected = Object.keys(konsole.info.selected.multiple).length;
 
+    console.log(`ROMs with 0 selections: ${noneSelected}`);
+    console.log(`ROMs with 1 selection: ${oneSelected}`);
+    console.log(`ROMs with >1 selections: ${multipleSelected}`);
+
+    totalNoneSelected += noneSelected;
+    totalOneSelected += oneSelected;
+    totalMultipleSelected += multipleSelected;
   }
 
+  console.log(`===== Global Report =====`);
+  console.log(`ROMs with 0 selections: ${totalNoneSelected}`);
+  console.log(`ROMs with 1 selection: ${totalOneSelected}`);
+  console.log(`ROMs with >1 selections: ${totalMultipleSelected}`);
 };
 
 main();
