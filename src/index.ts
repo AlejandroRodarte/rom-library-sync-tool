@@ -6,6 +6,7 @@ import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import unselectPAL from "./unselect-pal.js";
+import selectByVersionOnNonReleasedGames from "./select-by-version-on-non-released-games.js";
 
 const consoles: Console[] = [
   "atari2600",
@@ -155,6 +156,8 @@ const main = async () => {
         },
         versionLabelFound,
       );
+
+      selectByVersionOnNonReleasedGames(roms, ["Proto", "Demo", "Beta"]);
 
       const romsSelected = roms.reduce((acc, rom) => {
         if (rom.selected) acc++;
