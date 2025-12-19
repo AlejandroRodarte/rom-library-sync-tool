@@ -5,7 +5,8 @@ import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import unselectPAL from "./unselect-pal.js";
 
-const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
+const CONSOLE_NAME = "gamegear";
+const dirPath = `/home/alejandro/Downloads/myrient/${CONSOLE_NAME}`;
 
 const main = async () => {
   // NOTE: output already sorts filenames in ascending order
