@@ -101,10 +101,10 @@ const main = async () => {
     );
     versionLabelFound = selectByVersion(
       roms,
-      /((Demo|Proto|Rev) [0-9])|(R[0-9]+)/,
+      /(Rev [0-9]+)|(R[0-9]+)/,
       (label1, label2) => {
-        const num1 = +label1.replace(/(Demo|Proto|Rev) /, "").replace(/R/, "");
-        const num2 = +label2.replace(/(Demo|Proto|Rev) /, "").replace(/R/, "");
+        const num1 = +label1.replace(/Rev /, "").replace(/R/, "");
+        const num2 = +label2.replace(/Rev /, "").replace(/R/, "");
         if (num1 > num2) return 1;
         else if (num1 < num2) return -1;
         else return 0;
