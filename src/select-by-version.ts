@@ -3,24 +3,23 @@ import type { Rom } from "./types.js";
 const selectByVersion = (
   roms: Rom[],
   versionFormat: RegExp,
-  versionParser: (label: string) => number,
+  compare: (label1: string, label2: string) => number,
   shortCircuit = false,
 ): boolean => {
   if (shortCircuit) return shortCircuit;
 
   let groupHasVersionFormat = false;
-  let [highestVersionIndex, highestVersion]: [number, number] = [-1, -1];
+  let [highestVersionIndex, highestVersion]: [number, string] = [-1, ""];
 
   for (const [index, rom] of roms.entries()) {
     for (const label of rom.labels) {
       if (label.match(versionFormat)) {
         groupHasVersionFormat = true;
-        const version = versionParser(label);
 
-        const firstVersion = highestVersion === -1;
-        const newHighestVersionFound = firstVersion
-          ? false
-          : version > highestVersion;
+        const result = compare(label, highestVersion);
+
+        const firstVersion = highestVersionIndex === -1;
+        const newHighestVersionFound = firstVersion ? false : result === 1;
 
         if (newHighestVersionFound) {
           const lowerVersionRom = roms[highestVersionIndex];
@@ -28,7 +27,7 @@ const selectByVersion = (
         }
 
         if (firstVersion || newHighestVersionFound) {
-          highestVersion = version;
+          highestVersion = label;
           highestVersionIndex = index;
           rom.selected = true;
         }

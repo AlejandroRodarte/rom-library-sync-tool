@@ -75,21 +75,55 @@ const main = async () => {
     let versionLabelFound = selectByVersion(
       roms,
       /^v[0-9]+\.[0-9]+$/,
-      (label) => +label.substring(1).replace(".", ""),
+      (label1, label2) => {
+        const nums1 = label1
+          .substring(1)
+          .split(".")
+          .map((n) => +n);
+        const nums2 = label2
+          .substring(1)
+          .split(".")
+          .map((n) => +n);
+
+        const shortestNumsList = nums1.length < nums2.length ? nums1 : nums2;
+        const lengthDiff = Math.abs(nums1.length - nums2.length);
+        [...Array(lengthDiff)]
+          .fill(undefined)
+          .forEach((_) => shortestNumsList.push(0));
+
+        for (const [index, num1] of nums1.entries()) {
+          const num2 = nums2[index] || -1;
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+        }
+        return 0;
+      },
     );
     versionLabelFound = selectByVersion(
       roms,
       /((Demo|Proto|Rev) [0-9])|(R[0-9]+)/,
-      (label) => +label.replace(/(Demo|Proto|Rev) /, "").replace(/R/, ""),
+      (label1, label2) => {
+        const num1 = +label1.replace(/(Demo|Proto|Rev) /, "").replace(/R/, "");
+        const num2 = +label2.replace(/(Demo|Proto|Rev) /, "").replace(/R/, "");
+        if (num1 > num2) return 1;
+        else if (num1 < num2) return -1;
+        else return 0;
+      },
       versionLabelFound,
     );
     versionLabelFound = selectByVersion(
       roms,
       /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,
-      (label) => {
-        const [year, month, day] = label.split("-");
-        if (year && month && day) return +day + +month * 30 + +year * 365;
-        else return -1;
+      (label1, label2) => {
+        const nums1 = label1.split("-");
+        const nums2 = label2.split("-");
+
+        for (const [index, num1] of nums1.entries()) {
+          const num2 = nums2[index] || -1;
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+        }
+        return 0;
       },
       versionLabelFound,
     );
