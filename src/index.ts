@@ -2,6 +2,7 @@ import { readdir } from "node:fs/promises";
 import type { Groups } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
+import selectByVersion from "./select-by-version.js";
 
 const dirPath = "/home/alejandro/Downloads/myrient/gamegear";
 
@@ -64,6 +65,28 @@ const main = async () => {
     countryLabelFound = unselectByCountry(roms, "Europe", countryLabelFound);
     // if Europe ROM is not found, try to find a Japan ROM
     countryLabelFound = unselectByCountry(roms, "Japan", countryLabelFound);
+
+    let versionLabelFound = selectByVersion(
+      roms,
+      /^v[0-9]+\.[0-9]+$/,
+      (label) => +label.substring(1).replace(".", ""),
+    );
+    versionLabelFound = selectByVersion(
+      roms,
+      /((Demo|Proto|Rev) [0-9])|(R[0-9]+)/,
+      (label) => +label.replace(/(Demo|Proto|Rev) /, "").replace(/R/, ""),
+      versionLabelFound,
+    );
+    versionLabelFound = selectByVersion(
+      roms,
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,
+      (label) => {
+        const [year, month, day] = label.split("-");
+        if (year && month && day) return +day + +month * 30 + +year * 365;
+        else return -1;
+      },
+      versionLabelFound,
+    );
   }
 
   let zeroSelectedRomsCount = 0;
