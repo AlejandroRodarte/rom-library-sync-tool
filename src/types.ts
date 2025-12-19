@@ -9,12 +9,15 @@ export type Groups = {
 };
 
 export interface Console {
-  name: string;
-  info: {
+  roms: {
     selected: {
       none: Groups;
       one: Groups;
       multiple: Groups;
     };
   };
+}
+
+export interface Consoles {
+  [name: string]: Console;
 }

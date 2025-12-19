@@ -1,14 +1,14 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, Console } from "./types.js";
+import type { Groups, Consoles } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import unselectPAL from "./unselect-pal.js";
 import selectByVersionOnNonReleasedGames from "./select-by-version-on-non-released-games.js";
 
-const consoles: Console[] = [
+const CONSOLE_NAMES = [
   "atari2600",
   "atari7800",
   "gamegear",
@@ -18,22 +18,27 @@ const consoles: Console[] = [
   "mastersystem",
   "nes",
   "snes",
-].map((name) => ({
-  name,
-  info: {
-    selected: {
-      none: {},
-      one: {},
-      multiple: {},
+];
+
+const consoles: Consoles = {};
+
+for (const name of CONSOLE_NAMES) {
+  consoles[name] = {
+    roms: {
+      selected: {
+        none: {},
+        one: {},
+        multiple: {},
+      },
     },
-  },
-}));
+  };
+}
 
 const dirBasePath = "/home/alejandro/Downloads/myrient";
 
 const main = async () => {
-  for (const konsole of consoles) {
-    const dirPath = path.join(dirBasePath, konsole.name);
+  for (const [name, konsole] of Object.entries(consoles)) {
+    const dirPath = path.join(dirBasePath, name);
 
     // NOTE: output already sorts filenames in ascending order
     const filenames = await readdir(dirPath);
@@ -74,7 +79,7 @@ const main = async () => {
     for (const [title, roms] of Object.entries(groups)) {
       // if there is only one entry in the ROM group, skip
       if (roms.length === 1) {
-        konsole.info.selected.one[title] = roms;
+        konsole.roms.selected.one[title] = roms;
         continue;
       }
 
@@ -164,9 +169,9 @@ const main = async () => {
         return acc;
       }, 0);
 
-      if (romsSelected === 0) konsole.info.selected.none[title] = roms;
-      else if (romsSelected > 1) konsole.info.selected.multiple[title] = roms;
-      else konsole.info.selected.one[title] = roms;
+      if (romsSelected === 0) konsole.roms.selected.none[title] = roms;
+      else if (romsSelected > 1) konsole.roms.selected.multiple[title] = roms;
+      else konsole.roms.selected.one[title] = roms;
     }
   }
 
@@ -174,12 +179,12 @@ const main = async () => {
   let totalOneSelected = 0;
   let totalMultipleSelected = 0;
 
-  for (const konsole of consoles) {
-    console.log(`===== Report for console ${konsole.name} =====`);
+  for (const [name, konsole] of Object.entries(consoles)) {
+    console.log(`===== Report for console ${name} =====`);
 
-    const noneSelected = Object.keys(konsole.info.selected.none).length;
-    const oneSelected = Object.keys(konsole.info.selected.one).length;
-    const multipleSelected = Object.keys(konsole.info.selected.multiple).length;
+    const noneSelected = Object.keys(konsole.roms.selected.none).length;
+    const oneSelected = Object.keys(konsole.roms.selected.one).length;
+    const multipleSelected = Object.keys(konsole.roms.selected.multiple).length;
 
     console.log(`ROMs with 0 selections: ${noneSelected}`);
     console.log(`ROMs with 1 selection: ${oneSelected}`);
