@@ -13,6 +13,7 @@ const selectByVersion = (
 
   for (const [index, rom] of roms.entries()) {
     let versionLabelFound = false;
+    let firstVersion = true;
 
     for (const label of rom.labels) {
       if (versionLabelFound) break;
@@ -21,12 +22,17 @@ const selectByVersion = (
         if (!groupHasVersionFormat) groupHasVersionFormat = true;
         versionLabelFound = true;
 
+        if (firstVersion) {
+          highestVersion = label;
+          highestVersionIndex = index;
+          firstVersion = false;
+          break;
+        }
+
         const result = compare(label, highestVersion);
+        const newHighestVersionFound = result === 1;
 
-        const firstVersion = highestVersionIndex === -1;
-        const newHighestVersionFound = firstVersion ? false : result === 1;
-
-        if (firstVersion || newHighestVersionFound) {
+        if (newHighestVersionFound) {
           highestVersion = label;
           highestVersionIndex = index;
         }
@@ -38,7 +44,7 @@ const selectByVersion = (
     const highestVersionRom = roms[highestVersionIndex];
     if (highestVersionRom) highestVersionRom.selected = true;
 
-    for (const rom of roms) {
+    for (const [index, rom] of roms.entries()) {
       let romHasVersionLabel = false;
       for (const label of rom.labels) {
         if (label.match(versionFormat)) {
@@ -46,7 +52,8 @@ const selectByVersion = (
           break;
         }
       }
-      if (!romHasVersionLabel) rom.selected = false;
+      if (romHasVersionLabel && index !== highestVersionIndex)
+        rom.selected = false;
     }
   }
 

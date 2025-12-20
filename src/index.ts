@@ -108,7 +108,7 @@ const main = async () => {
 
       let versionLabelFound = selectByVersion(
         roms,
-        /^v[0-9]+\.[0-9]+$/,
+        /^v([0-9]+\.*)+$/,
         (label1, label2) => {
           const nums1 = label1
             .substring(1)
