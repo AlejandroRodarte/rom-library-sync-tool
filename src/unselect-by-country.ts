@@ -24,6 +24,7 @@ const unselectByCountry = (
   // country label found: unselect all ROMs in group that do NOT have it
   if (groupHasCountryLabel) {
     for (const rom of roms) {
+      if (!rom.selected) continue;
       let romHasCountryLabel = false;
       for (const label of rom.labels) {
         if (label.includes(country)) {

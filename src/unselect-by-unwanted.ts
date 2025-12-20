@@ -5,8 +5,8 @@ const unselectByUnwanted = (roms: Rom[], unwantedLabels: string[]): void => {
 
   for (const unwantedLabel of unwantedLabels) {
     for (const rom of roms) {
-      let romHasUnwantedLabel = false;
       if (!rom.selected) continue;
+      let romHasUnwantedLabel = false;
       for (const label of rom.labels) {
         if (label.includes(unwantedLabel)) {
           romHasUnwantedLabel = true;
