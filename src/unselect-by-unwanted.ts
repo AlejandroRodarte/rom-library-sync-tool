@@ -2,19 +2,9 @@ import type { Rom } from "./types.js";
 
 const unselectByUnwanted = (roms: Rom[], unwantedLabels: string[]): void => {
   if (unwantedLabels.length === 0) return;
-
   for (const unwantedLabel of unwantedLabels) {
-    for (const rom of roms) {
-      if (!rom.selected) continue;
-      let romHasUnwantedLabel = false;
-      for (const label of rom.labels) {
-        if (label.includes(unwantedLabel)) {
-          romHasUnwantedLabel = true;
-          break;
-        }
-      }
-      if (romHasUnwantedLabel) rom.selected = false;
-    }
+    const unwantedRoms = roms.filter((rom) => rom.labels.some((label) => label.includes(unwantedLabel)));
+    unwantedRoms.forEach((rom) => rom.selected = false);
   }
 };
 
