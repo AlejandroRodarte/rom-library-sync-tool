@@ -95,14 +95,11 @@ const main = async () => {
         "Virtual Console",
       ]);
 
-      // prioritize USA ROMs
-      let countryLabelFound = unselectByCountry(roms, "USA");
-      // if USA ROM is not found, try to find a World ROM
-      countryLabelFound = unselectByCountry(roms, "World", countryLabelFound);
-      // if World ROM is not found, try to find a Europe ROM
-      countryLabelFound = unselectByCountry(roms, "Europe", countryLabelFound);
-      // if Europe ROM is not found, try to find a Japan ROM
-      countryLabelFound = unselectByCountry(roms, "Japan", countryLabelFound);
+      // country priorities: USA, World, Europe, Japan
+      let [countryLabelFound, countryLabel] = unselectByCountry(roms, "USA");
+      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "World");
+      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "Europe");
+      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "Japan");
 
       unselectPAL(roms);
 
