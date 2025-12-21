@@ -189,8 +189,6 @@ const main = async () => {
       // unselect ROMs with undesired labels
       unselectByUnwanted(roms, unwantedLabels, countryLabel);
 
-      unselectPAL(roms);
-
       let versionLabelFound = selectByVersion(
         roms,
         /^[vV]([0-9]+\.*)+$/,
