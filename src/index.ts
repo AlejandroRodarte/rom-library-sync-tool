@@ -132,6 +132,7 @@ const main = async () => {
           }
           return 0;
         },
+        countryLabel,
       );
       versionLabelFound = selectByVersion(
         roms,
@@ -143,6 +144,7 @@ const main = async () => {
           else if (num1 < num2) return -1;
           else return 0;
         },
+        countryLabel,
         versionLabelFound,
       );
       versionLabelFound = selectByVersion(
@@ -159,10 +161,15 @@ const main = async () => {
           }
           return 0;
         },
+        countryLabel,
         versionLabelFound,
       );
 
-      selectByVersionOnNonReleasedGames(roms, ["Proto", "Demo", "Beta"]);
+      selectByVersionOnNonReleasedGames(
+        roms,
+        ["Proto", "Demo", "Beta"],
+        countryLabel,
+      );
 
       const romsSelected = roms.reduce((acc, rom) => {
         if (rom.selected) acc++;

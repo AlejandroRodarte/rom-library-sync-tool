@@ -1,63 +1,79 @@
 import type { Rom } from "./types.js";
 
+interface RomIndexAndVersion {
+  index: number;
+  version: string;
+}
+
 const selectByVersion = (
   roms: Rom[],
   versionFormat: RegExp,
   compare: (label1: string, label2: string) => number,
+  countryLabel: string,
   shortCircuit = false,
 ): boolean => {
   if (shortCircuit) return shortCircuit;
 
-  let groupHasVersionFormat = false;
-  let [highestVersionIndex, highestVersion]: [number, string] = [-1, ""];
+  const countryVersionedRoms: RomIndexAndVersion[] = [];
+  roms.forEach((rom, index) => {
+    const hasCountryLabel = rom.labels.some((label) =>
+      label.includes(countryLabel),
+    );
+    const versionLabelIndex = rom.labels.findIndex((label) =>
+      label.match(versionFormat),
+    );
 
-  for (const [index, rom] of roms.entries()) {
-    let versionLabelFound = false;
-    let firstVersion = true;
+    if (hasCountryLabel && versionLabelIndex !== -1) {
+      const version = rom.labels[versionLabelIndex];
+      if (version) countryVersionedRoms.push({ index, version });
+    }
+  });
 
-    for (const label of rom.labels) {
-      if (versionLabelFound) break;
+  const nonCountryVersionedRoms = roms.filter((rom) => {
+    const lacksCountryLabel = !rom.labels.some((label) =>
+      label.includes(countryLabel),
+    );
+    const hasVersionLabel = rom.labels.some((label) =>
+      label.match(versionFormat),
+    );
+    return lacksCountryLabel && hasVersionLabel;
+  });
 
-      if (label.match(versionFormat)) {
-        if (!groupHasVersionFormat) groupHasVersionFormat = true;
-        versionLabelFound = true;
+  const highestVersionedRom: RomIndexAndVersion = {
+    index: -1,
+    version: "",
+  };
 
-        if (firstVersion) {
-          highestVersion = label;
-          highestVersionIndex = index;
-          firstVersion = false;
-          break;
-        }
+  let firstVersion = true;
+  for (const rom of countryVersionedRoms) {
+    if (firstVersion) {
+      highestVersionedRom.index = rom.index;
+      highestVersionedRom.version = rom.version;
+      firstVersion = false;
+      continue;
+    }
 
-        const result = compare(label, highestVersion);
-        const newHighestVersionFound = result === 1;
+    const result = compare(rom.version, highestVersionedRom.version);
+    const newHighestVersionFound = result === 1;
 
-        if (newHighestVersionFound) {
-          highestVersion = label;
-          highestVersionIndex = index;
-        }
-      }
+    if (newHighestVersionFound) {
+      highestVersionedRom.index = rom.index;
+      highestVersionedRom.version = rom.version;
     }
   }
 
-  if (groupHasVersionFormat && highestVersionIndex !== -1) {
-    const highestVersionRom = roms[highestVersionIndex];
-    if (highestVersionRom) highestVersionRom.selected = true;
+  const romToSelect = roms[highestVersionedRom.index];
+  if (romToSelect) romToSelect.selected = true;
 
-    for (const [index, rom] of roms.entries()) {
-      let romHasVersionLabel = false;
-      for (const label of rom.labels) {
-        if (label.match(versionFormat)) {
-          romHasVersionLabel = true;
-          break;
-        }
-      }
-      if (romHasVersionLabel && index !== highestVersionIndex)
-        rom.selected = false;
+  countryVersionedRoms.forEach((rom, index) => {
+    if (rom.index !== highestVersionedRom.index) {
+      const romToDeselect = roms[rom.index];
+      if (romToDeselect) romToDeselect.selected = false;
     }
-  }
+  });
+  nonCountryVersionedRoms.forEach((rom) => (rom.selected = false));
 
-  return groupHasVersionFormat;
+  return countryVersionedRoms.length > 0;
 };
 
 export default selectByVersion;

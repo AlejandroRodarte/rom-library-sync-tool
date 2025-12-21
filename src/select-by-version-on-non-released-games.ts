@@ -4,6 +4,7 @@ import type { Rom } from "./types.js";
 const selectByVersionOnNonReleasedGames = (
   roms: Rom[],
   labels: string[],
+  countryLabel: string,
 ): void => {
   let romsProcessed = false;
 
@@ -29,6 +30,7 @@ const selectByVersionOnNonReleasedGames = (
           else if (num1 < num2) return -1;
           else return 0;
         },
+        countryLabel,
       );
 
       romsProcessed = true;
