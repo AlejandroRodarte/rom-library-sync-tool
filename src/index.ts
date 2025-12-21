@@ -85,12 +85,21 @@ const main = async () => {
 
       // unselect ROMs with undesired labels
       unselectByUnwanted(roms, [
+        "Arcade",
         "Beta",
+        "Capcom Town",
+        "Castlevania Advance Collection",
+        "Castlevania Anniversary Collection",
         "Demo",
+        "Keihin Ban",
+        "Limited Run Games",
         "Muted",
         "Proto",
         "Sample",
         "Source Code",
+        "Strictly Limited Games",
+        "Switch Online",
+        "The Cowabunga Collection",
         "Two Player",
         "Virtual Console",
       ]);
