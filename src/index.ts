@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, Consoles } from "./types.js";
+import type { Groups, Consoles, DuplicatesData } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
@@ -514,6 +514,31 @@ const main = async () => {
   console.log(`ROMs with 0 selections: ${totalNoneSelected}`);
   // console.log(`ROMs with 1 selection: ${totalOneSelected}`);
   console.log(`ROMs with >1 selections: ${totalMultipleSelected}`);
+
+  console.log(`===== Duplicates Report =====`);
+  const duplicatesData: DuplicatesData = {};
+  for (const [name, konsole] of Object.entries(consoles)) {
+    for (const [title, roms] of Object.entries(
+      konsole.roms.selected.multiple,
+    )) {
+      const amount = roms.reduce((acc, rom) => {
+        if (rom.selected) acc++;
+        return acc;
+      }, 0);
+      if (!duplicatesData[amount]) {
+        duplicatesData[amount] = {};
+        duplicatesData[amount][title] = roms;
+      } else {
+        duplicatesData[amount][title] = roms;
+      }
+    }
+  }
+
+  for (const [amount, groups] of Object.entries(duplicatesData)) {
+    console.log(
+      `ROMs with ${amount} duplicates: ${Object.keys(groups).length}`,
+    );
+  }
 };
 
 main();

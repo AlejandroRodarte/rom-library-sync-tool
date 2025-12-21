@@ -21,3 +21,7 @@ export interface Console {
 export interface Consoles {
   [name: string]: Console;
 }
+
+export type DuplicatesData = {
+  [amount: number]: Groups;
+};
