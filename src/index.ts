@@ -234,13 +234,61 @@ const main = async () => {
         countryLabel,
         versionLabelFound,
       );
-
-      selectByVersionOnNonReleasedGames(
+      versionLabelFound = selectByVersion(
         roms,
-        ["Proto", "Demo", "Beta"],
+        /^Rev [A-Z]$/,
+        (label1, label2) => {
+          const num1 = label1.replace(/Rev /, "").charCodeAt(0);
+          const num2 = label2.replace(/Rev /, "").charCodeAt(0);
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
         countryLabel,
+        versionLabelFound,
       );
 
+      if (allRomsAreUnreleased) {
+        versionLabelFound = selectByVersion(
+          roms,
+          /^Beta( [0-9]+)?$/,
+          (label1, label2) => {
+            const num1 = label1.replace(/Beta/, "").trim() || 0;
+            const num2 = label2.replace(/Beta/, "").trim() || 0;
+            if (num1 > num2) return 1;
+            else if (num1 < num2) return -1;
+            else return 0;
+          },
+          countryLabel,
+          versionLabelFound,
+        );
+        versionLabelFound = selectByVersion(
+          roms,
+          /^Proto( [0-9]+)?$/,
+          (label1, label2) => {
+            const num1 = label1.replace(/Proto/, "").trim() || 0;
+            const num2 = label2.replace(/Proto/, "").trim() || 0;
+            if (num1 > num2) return 1;
+            else if (num1 < num2) return -1;
+            else return 0;
+          },
+          countryLabel,
+          versionLabelFound,
+        );
+        versionLabelFound = selectByVersion(
+          roms,
+          /^Demo( [0-9]+)?$/,
+          (label1, label2) => {
+            const num1 = label1.replace(/Demo/, "").trim() || 0;
+            const num2 = label2.replace(/Demo/, "").trim() || 0;
+            if (num1 > num2) return 1;
+            else if (num1 < num2) return -1;
+            else return 0;
+          },
+          countryLabel,
+          versionLabelFound,
+        );
+      }
       const romsSelected = roms.reduce((acc, rom) => {
         if (rom.selected) acc++;
         return acc;
