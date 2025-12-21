@@ -22,11 +22,8 @@ const selectByVersion = (
     const versionLabelIndex = rom.labels.findIndex((label) =>
       label.match(versionFormat),
     );
-    const lacksUnwantedLabel = !rom.labels.some((label) =>
-      label.includes("Beta"),
-    );
 
-    if (hasCountryLabel && versionLabelIndex !== -1 && lacksUnwantedLabel) {
+    if (hasCountryLabel && versionLabelIndex !== -1) {
       const version = rom.labels[versionLabelIndex];
       if (version) countryVersionedRoms.push({ index, version });
     }
