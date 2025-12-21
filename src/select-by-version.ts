@@ -32,16 +32,6 @@ const selectByVersion = (
     }
   });
 
-  const nonCountryVersionedRoms = roms.filter((rom) => {
-    const lacksCountryLabel = !rom.labels.some((label) =>
-      label.includes(countryLabel),
-    );
-    const hasVersionLabel = rom.labels.some((label) =>
-      label.match(versionFormat),
-    );
-    return lacksCountryLabel && hasVersionLabel;
-  });
-
   const highestVersionedRom: RomIndexAndVersion = {
     index: -1,
     version: "",
@@ -68,13 +58,12 @@ const selectByVersion = (
   const romToSelect = roms[highestVersionedRom.index];
   if (romToSelect) romToSelect.selected = true;
 
-  countryVersionedRoms.forEach((rom, index) => {
+  countryVersionedRoms.forEach((rom) => {
     if (rom.index !== highestVersionedRom.index) {
       const romToDeselect = roms[rom.index];
       if (romToDeselect) romToDeselect.selected = false;
     }
   });
-  nonCountryVersionedRoms.forEach((rom) => (rom.selected = false));
 
   if (countryVersionedRoms.length > 0) {
     const countryNonVersionedRoms = roms.filter((rom) => {
