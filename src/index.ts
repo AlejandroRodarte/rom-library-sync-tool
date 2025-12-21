@@ -124,6 +124,12 @@ const main = async () => {
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
+          "Korea",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
           "Asia",
           allRomsAreUnreleased,
         );
