@@ -112,6 +112,12 @@ const main = async () => {
         [countryLabelFound, countryLabel] = unselectByCountry(roms, "Europe");
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(roms, "Japan");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Asia");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Taiwan");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "China");
 
       unselectPAL(roms);
 
