@@ -97,9 +97,12 @@ const main = async () => {
 
       // country priorities: USA, World, Europe, Japan
       let [countryLabelFound, countryLabel] = unselectByCountry(roms, "USA");
-      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "World");
-      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "Europe");
-      if (!countryLabelFound) [countryLabelFound, countryLabel] = unselectByCountry(roms, "Japan");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "World");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Europe");
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Japan");
 
       unselectPAL(roms);
 
