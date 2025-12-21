@@ -83,27 +83,6 @@ const main = async () => {
         continue;
       }
 
-      // unselect ROMs with undesired labels
-      unselectByUnwanted(roms, [
-        "Arcade",
-        "Beta",
-        "Capcom Town",
-        "Castlevania Advance Collection",
-        "Castlevania Anniversary Collection",
-        "Demo",
-        "Keihin Ban",
-        "Limited Run Games",
-        "Muted",
-        "Proto",
-        "Sample",
-        "Source Code",
-        "Strictly Limited Games",
-        "Switch Online",
-        "The Cowabunga Collection",
-        "Two Player",
-        "Virtual Console",
-      ]);
-
       // country priorities: USA, World, Europe, Japan
       let [countryLabelFound, countryLabel] = unselectByCountry(roms, "USA");
       if (!countryLabelFound)
@@ -118,6 +97,21 @@ const main = async () => {
         [countryLabelFound, countryLabel] = unselectByCountry(roms, "Taiwan");
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(roms, "China");
+      // unselect ROMs with undesired labels
+      unselectByUnwanted(
+        roms,
+        [
+          "Beta",
+          "Demo",
+          "Muted",
+          "Proto",
+          "Sample",
+          "Source Code",
+          "Two Player",
+          "Virtual Console",
+        ],
+        countryLabel,
+      );
 
       unselectPAL(roms);
 
