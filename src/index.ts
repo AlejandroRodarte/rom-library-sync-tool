@@ -1,29 +1,17 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, Consoles, DuplicatesData } from "./types.js";
+import type { Groups, DuplicatesData } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
-import CONSOLE_NAMES from "./constants/console-names.constant.js";
-
-const consoles: Consoles = {};
-
-for (const name of CONSOLE_NAMES) {
-  consoles[name] = {
-    roms: {
-      selected: {
-        none: {},
-        one: {},
-        multiple: {},
-      },
-    },
-  };
-}
+import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 
 const dirBasePath = "/home/alejandro/Downloads/myrient";
 
 const main = async () => {
+  const consoles = buildEmptyConsolesObject();
+
   for (const [name, konsole] of Object.entries(consoles)) {
     const dirPath = path.join(dirBasePath, name);
 
