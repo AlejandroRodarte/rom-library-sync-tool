@@ -83,35 +83,83 @@ const main = async () => {
         continue;
       }
 
-      // country priorities: USA, World, Europe, Japan
-      let [countryLabelFound, countryLabel] = unselectByCountry(roms, "USA");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "World");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Europe");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Japan");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Asia");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "Taiwan");
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(roms, "China");
-      // unselect ROMs with undesired labels
-      unselectByUnwanted(
-        roms,
-        [
-          "Beta",
-          "Demo",
-          "Muted",
-          "Proto",
-          "Sample",
-          "Source Code",
-          "Two Player",
-          "Virtual Console",
-        ],
-        countryLabel,
+      const allRomsAreUnreleased = roms.every((rom) =>
+        rom.labels.some(
+          (label) =>
+            label.includes("Beta") ||
+            label.includes("Proto") ||
+            label.includes("Demo"),
+        ),
       );
+
+      // country priorities: USA, World, Europe, Japan
+      let [countryLabelFound, countryLabel] = unselectByCountry(
+        roms,
+        "USA",
+        allRomsAreUnreleased,
+      );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "World",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Europe",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Australia",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Japan",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Asia",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Taiwan",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "China",
+          allRomsAreUnreleased,
+        );
+      if (!countryLabelFound)
+        [countryLabelFound, countryLabel] = unselectByCountry(
+          roms,
+          "Unknown",
+          allRomsAreUnreleased,
+        );
+
+      const unwantedLabels = [
+        "Muted",
+        "Sample",
+        "Source Code",
+        "Two Player",
+        "Virtual Console",
+      ];
+
+      if (!allRomsAreUnreleased)
+        unwantedLabels.push(...["Beta", "Demo", "Proto"]);
+
+      // unselect ROMs with undesired labels
+      unselectByUnwanted(roms, unwantedLabels, countryLabel);
 
       unselectPAL(roms);
 
@@ -228,6 +276,10 @@ const main = async () => {
   console.log(`ROMs with 0 selections: ${totalNoneSelected}`);
   console.log(`ROMs with 1 selection: ${totalOneSelected}`);
   console.log(`ROMs with >1 selections: ${totalMultipleSelected}`);
+
+  for (const [name, konsole] of Object.entries(consoles)) {
+    console.log(konsole.roms.selected.none);
+  }
 };
 
 main();
