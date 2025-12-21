@@ -6,7 +6,6 @@ import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import unselectPAL from "./unselect-pal.js";
-import selectByVersionOnNonReleasedGames from "./select-by-version-on-non-released-games.js";
 
 const CONSOLE_NAMES = [
   "atari2600",
@@ -148,9 +147,24 @@ const main = async () => {
         );
 
       const unwantedLabels = [
+        "Activision Anthology - Remix Edition",
+        "Aleste Collection",
+        "Alt",
+        "Atari Anthology",
+        "Animal Crossing",
+        "Arcade",
+        "Capcom Town",
+        "e-Reader",
+        "GameCube Edition",
+        "HOT B",
+        "Keihin Ban",
+        "Limited Run Games",
         "Muted",
         "Sample",
+        "Switch Online",
         "Source Code",
+        "Strictly Limited Games",
+        "The Cowabunga Collection",
         "Two Player",
         "Virtual Console",
       ];
@@ -304,6 +318,11 @@ const main = async () => {
   let totalOneSelected = 0;
   let totalMultipleSelected = 0;
 
+  console.log(consoles["gamegear"]!.roms.selected.multiple);
+  // for (const [name, konsole] of Object.entries(consoles)) {
+  //   console.log(konsole.roms.selected.multiple);
+  // }
+
   for (const [name, konsole] of Object.entries(consoles)) {
     console.log(`===== Report for console ${name} =====`);
 
@@ -312,7 +331,7 @@ const main = async () => {
     const multipleSelected = Object.keys(konsole.roms.selected.multiple).length;
 
     console.log(`ROMs with 0 selections: ${noneSelected}`);
-    console.log(`ROMs with 1 selection: ${oneSelected}`);
+    // console.log(`ROMs with 1 selection: ${oneSelected}`);
     console.log(`ROMs with >1 selections: ${multipleSelected}`);
 
     totalNoneSelected += noneSelected;
@@ -322,12 +341,8 @@ const main = async () => {
 
   console.log(`===== Global Report =====`);
   console.log(`ROMs with 0 selections: ${totalNoneSelected}`);
-  console.log(`ROMs with 1 selection: ${totalOneSelected}`);
+  // console.log(`ROMs with 1 selection: ${totalOneSelected}`);
   console.log(`ROMs with >1 selections: ${totalMultipleSelected}`);
-
-  for (const [name, konsole] of Object.entries(consoles)) {
-    console.log(konsole.roms.selected.none);
-  }
 };
 
 main();
