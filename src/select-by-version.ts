@@ -76,6 +76,20 @@ const selectByVersion = (
   });
   nonCountryVersionedRoms.forEach((rom) => (rom.selected = false));
 
+  if (countryVersionedRoms.length > 0) {
+    const countryNonVersionedRoms = roms.filter((rom) => {
+      const hasCountryLabel = rom.labels.some((label) =>
+        label.includes(countryLabel),
+      );
+      const lacksVersionLabel = !rom.labels.some((label) =>
+        label.match(versionFormat),
+      );
+      return hasCountryLabel && lacksVersionLabel;
+    });
+
+    countryNonVersionedRoms.forEach((rom) => (rom.selected = false));
+  }
+
   return countryVersionedRoms.length > 0;
 };
 
