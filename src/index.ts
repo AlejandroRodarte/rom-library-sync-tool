@@ -7,6 +7,7 @@ import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
+import extractLabelsFromFilename from "./helpers/extract-labels-from-filename.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -31,13 +32,7 @@ const main = async () => {
         continue;
       }
 
-      const labels: string[] = [];
-      const labelsRegexp = /\((.*?)\)/g;
-      const matches = filename.matchAll(labelsRegexp);
-      for (const match of matches) {
-        const [, label] = match;
-        if (label) labels.push(label);
-      }
+      const labels = extractLabelsFromFilename(filename);
 
       // group ROMs by title
       if (title === previousTitle) {
