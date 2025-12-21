@@ -6,14 +6,13 @@ import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
-
-const dirBasePath = "/home/alejandro/Downloads/myrient";
+import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
 
   for (const [name, konsole] of Object.entries(consoles)) {
-    const dirPath = path.join(dirBasePath, name);
+    const dirPath = path.join(DIR_BASE_PATH, name);
 
     // NOTE: output already sorts filenames in ascending order
     const filenames = await readdir(dirPath);
