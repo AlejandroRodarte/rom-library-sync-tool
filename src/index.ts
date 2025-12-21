@@ -190,7 +190,7 @@ const main = async () => {
 
       let versionLabelFound = selectByVersion(
         roms,
-        /^v([0-9]+\.*)+$/,
+        /^[vV]([0-9]+\.*)+$/,
         (label1, label2) => {
           const nums1 = label1
             .substring(1)
@@ -265,6 +265,136 @@ const main = async () => {
         (label1, label2) => {
           const num1 = label1.replace(/Rev /, "").charCodeAt(0);
           const num2 = label2.replace(/Rev /, "").charCodeAt(0);
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^[A-Z]$/,
+        (label1, label2) => {
+          const num1 = label1.replace(/[A-Z] /, "").charCodeAt(0);
+          const num2 = label2.replace(/[A-Z] /, "").charCodeAt(0);
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^[0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1;
+          const num2 = +label2;
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^4B-[0-9]+(, [\w-]*)$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/4B-/, "");
+          const num2 = +label2.split(",")[0]!.replace(/4B-/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^KG-[0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/KG-/, "");
+          const num2 = +label2.split(",")[0]!.replace(/KG-/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^HH-[0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/HH-/, "");
+          const num2 = +label2.split(",")[0]!.replace(/HH-/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^FS[0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/FS/, "");
+          const num2 = +label2.split(",")[0]!.replace(/FS/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^[0-9]+ Fighters$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/ Fighters/, "");
+          const num2 = +label2.split(",")[0]!.replace(/ Fighters/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^[0-9]+ People$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/ People/, "");
+          const num2 = +label2.split(",")[0]!.replace(/ People/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^DS-H[0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/DS-H/, "");
+          const num2 = +label2.split(",")[0]!.replace(/DS-H/, "");
+          if (num1 > num2) return 1;
+          else if (num1 < num2) return -1;
+          else return 0;
+        },
+        countryLabel,
+        versionLabelFound,
+      );
+      versionLabelFound = selectByVersion(
+        roms,
+        /^NROM [0-9]+$/,
+        (label1, label2) => {
+          const num1 = +label1.split(",")[0]!.replace(/NROM /, "");
+          const num2 = +label2.split(",")[0]!.replace(/NROM /, "");
           if (num1 > num2) return 1;
           else if (num1 < num2) return -1;
           else return 0;
