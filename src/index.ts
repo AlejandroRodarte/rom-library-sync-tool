@@ -5,19 +5,7 @@ import type { Groups, Consoles, DuplicatesData } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
-import unselectPAL from "./unselect-pal.js";
-
-const CONSOLE_NAMES = [
-  "atari2600",
-  "atari7800",
-  "gamegear",
-  "gb",
-  "gba",
-  "gbc",
-  "mastersystem",
-  "nes",
-  "snes",
-];
+import CONSOLE_NAMES from "./constants/console-names.constant.js";
 
 const consoles: Consoles = {};
 
@@ -487,10 +475,9 @@ const main = async () => {
   let totalOneSelected = 0;
   let totalMultipleSelected = 0;
 
-  console.log(consoles["gamegear"]!.roms.selected.multiple);
-  // for (const [name, konsole] of Object.entries(consoles)) {
-  //   console.log(konsole.roms.selected.multiple);
-  // }
+  for (const [name, konsole] of Object.entries(consoles)) {
+    console.log(konsole.roms.selected.none);
+  }
 
   for (const [name, konsole] of Object.entries(consoles)) {
     console.log(`===== Report for console ${name} =====`);
