@@ -90,6 +90,9 @@ const main = async () => {
             label.includes("Demo"),
         ),
       );
+      const allRomsAreVirtualConsole = roms.every((rom) =>
+        rom.labels.some((label) => label.includes("Virtual Console")),
+      );
 
       // country priorities: USA, World, Europe, Japan
       let [countryLabelFound, countryLabel] = unselectByCountry(
@@ -177,11 +180,11 @@ const main = async () => {
         "Source Code",
         "The Cowabunga Collection",
         "Two Player",
-        "Virtual Console",
       ];
 
       if (!allRomsAreUnreleased)
         unwantedLabels.push(...["Beta", "Demo", "Proto"]);
+      if (!allRomsAreVirtualConsole) unwantedLabels.push("Virtual Console");
 
       // unselect ROMs with undesired labels
       unselectByUnwanted(roms, unwantedLabels, countryLabel);
