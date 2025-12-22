@@ -13,6 +13,7 @@ import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-v
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
+import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -56,16 +57,7 @@ const main = async () => {
       }
 
       pickRomWithLeastAmountOfLabels(roms, countryLabel);
-
-      const romsSelected = roms.reduce((acc, rom) => {
-        if (rom.selected) acc++;
-        return acc;
-      }, 0);
-
-      if (romsSelected === 0) konsole.roms.selected.none.set(title, roms);
-      else if (romsSelected > 1)
-        konsole.roms.selected.multiple.set(title, roms);
-      else konsole.roms.selected.one.set(title, roms);
+      addRomsToConsole(roms, konsole, title);
     }
   }
 
