@@ -8,6 +8,7 @@ import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import extractLabelsFromFilename from "./helpers/extract-labels-from-filename.helper.js";
+import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -17,27 +18,7 @@ const main = async () => {
 
     // NOTE: output already sorts filenames in ascending order
     const filenames = await readdir(dirPath);
-
-    const groups: Groups = new Map<string, Rom[]>();
-
-    for (const filename of filenames) {
-      // EXAMPLE
-      // rom: Super Space Invaders (USA, Europe).zip
-      // title: Super Space Invaders
-      const [title] = filename.split("(");
-
-      if (!title) {
-        console.error(`No title found for ROM ${filename}`);
-        continue;
-      }
-
-      const labels = extractLabelsFromFilename(filename);
-      const group = groups.get(title);
-      const newRom: Rom = { filename, labels, selected: true };
-
-      if (group) group.push(newRom);
-      else groups.set(title, [newRom]);
-    }
+    const groups = buildGroupsFromFilenames(filenames);
 
     for (const [title, roms] of groups) {
       // if there is only one entry in the ROM group, skip
