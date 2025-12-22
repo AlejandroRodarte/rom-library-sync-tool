@@ -2,7 +2,6 @@ import { readdir } from "node:fs/promises";
 import path from "path";
 
 import type { Groups, DuplicatesData, Rom } from "./types.js";
-import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
@@ -10,9 +9,7 @@ import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.help
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
-import UNWANTED_LABELS_BASE_LIST from "./constants/unwanted-labels-base-list.constant.js";
-import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
-import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
+import discardRomsBasedOnUnwantedLabelList from "./helpers/discard-roms-based-on-unwanted-label-list.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -39,14 +36,7 @@ const main = async () => {
         specialFlags.allRomsAreUnreleased,
       );
 
-      const unwantedLabels: string[] = [...UNWANTED_LABELS_BASE_LIST];
-      if (!specialFlags.allRomsAreUnreleased)
-        unwantedLabels.push(...UNRELEASED_LABELS);
-      if (!specialFlags.allRomsAreForVirtualConsole)
-        unwantedLabels.push(VIRTUAL_CONSOLE_LABEL);
-
-      // unselect ROMs with undesired labels
-      unselectByUnwanted(roms, unwantedLabels, countryLabel);
+      discardRomsBasedOnUnwantedLabelList(roms, countryLabel, specialFlags);
 
       let versionLabelFound = selectByVersion(
         roms,
