@@ -2,7 +2,6 @@ import { readdir } from "node:fs/promises";
 import path from "path";
 
 import type { Groups, DuplicatesData, Rom } from "./types.js";
-import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
@@ -10,6 +9,26 @@ import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import discardRomsBasedOnUnwantedLabelList from "./helpers/discard-roms-based-on-unwanted-label-list.helper.js";
+import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-versioning.systems.helper.js";
+import vVersioning from "./objects/version-systems/v-versioning.object.js";
+import revNumberVersioning from "./objects/version-systems/rev-number-versioning.object.js";
+import rNumberVersioning from "./objects/version-systems/r-number-versioning.object.js";
+import dateVersioning from "./objects/version-systems/date-versioning.object.js";
+import revLetterVersioning from "./objects/version-systems/rev-letter-versioning.object.js";
+import revUppercasedLetterVersioning from "./objects/version-systems/rev-uppercased-letter-versioning.object.js";
+import letterVersioning from "./objects/version-systems/letter-versioning.object.js";
+import numberVersioning from "./objects/version-systems/number-versioning.object.js";
+import fourBVersioning from "./objects/version-systems/4b-versioning.object.js";
+import kgVersioning from "./objects/version-systems/kg-versioning.object.js";
+import hhVersioning from "./objects/version-systems/hh-versioning.object.js";
+import fsVersioning from "./objects/version-systems/fs-versioning.object.js";
+import fightersVersioning from "./objects/version-systems/fighters-versioning.object.js";
+import peopleVersioning from "./objects/version-systems/people-versioning.object.js";
+import dshVersioning from "./objects/version-systems/ds-h-versioning.object.js";
+import nromVersioning from "./objects/version-systems/nrom-versioning.object.js";
+import betaVersioning from "./objects/version-systems/beta-versioning.object.js";
+import protoVersioning from "./objects/version-systems/proto-versioning.object.js";
+import demoVersioning from "./objects/version-systems/demo-versioning-object.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -38,260 +57,34 @@ const main = async () => {
 
       discardRomsBasedOnUnwantedLabelList(roms, countryLabel, specialFlags);
 
-      let versionLabelFound = selectByVersion(
+      selectRomsBasedOnVersioningSystems(
         roms,
-        /^[vV]([0-9]+\.*)+$/,
-        (label1, label2) => {
-          const nums1 = label1
-            .substring(1)
-            .split(".")
-            .map((n) => +n);
-          const nums2 = label2
-            .substring(1)
-            .split(".")
-            .map((n) => +n);
-
-          const shortestNumsList = nums1.length < nums2.length ? nums1 : nums2;
-          const lengthDiff = Math.abs(nums1.length - nums2.length);
-          [...Array(lengthDiff)]
-            .fill(undefined)
-            .forEach((_) => shortestNumsList.push(0));
-
-          for (const [index, num1] of nums1.entries()) {
-            const num2 = nums2[index] || -1;
-            if (num1 > num2) return 1;
-            else if (num1 < num2) return -1;
-          }
-          return 0;
-        },
+        [
+          vVersioning,
+          revNumberVersioning,
+          rNumberVersioning,
+          dateVersioning,
+          revUppercasedLetterVersioning,
+          revLetterVersioning,
+          letterVersioning,
+          numberVersioning,
+          fourBVersioning,
+          kgVersioning,
+          hhVersioning,
+          fsVersioning,
+          fightersVersioning,
+          peopleVersioning,
+          dshVersioning,
+          nromVersioning,
+        ],
         countryLabel,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /(Rev [0-9]+)|(R[0-9]+)/,
-        (label1, label2) => {
-          const num1 = +label1.replace(/Rev /, "").replace(/R/, "");
-          const num2 = +label2.replace(/Rev /, "").replace(/R/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,
-        (label1, label2) => {
-          const nums1 = label1.split("-");
-          const nums2 = label2.split("-");
-
-          for (const [index, num1] of nums1.entries()) {
-            const num2 = nums2[index] || -1;
-            if (num1 > num2) return 1;
-            else if (num1 < num2) return -1;
-          }
-          return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^REV-[A-Z]$/,
-        (label1, label2) => {
-          const num1 = label1.replace(/REV-/, "").charCodeAt(0);
-          const num2 = label2.replace(/REV-/, "").charCodeAt(0);
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^Rev [A-Z]$/,
-        (label1, label2) => {
-          const num1 = label1.replace(/Rev /, "").charCodeAt(0);
-          const num2 = label2.replace(/Rev /, "").charCodeAt(0);
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^[A-Z]$/,
-        (label1, label2) => {
-          const num1 = label1.replace(/[A-Z] /, "").charCodeAt(0);
-          const num2 = label2.replace(/[A-Z] /, "").charCodeAt(0);
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^[0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1;
-          const num2 = +label2;
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^4B-[0-9]+(, [\w-]*)$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/4B-/, "");
-          const num2 = +label2.split(",")[0]!.replace(/4B-/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^KG-[0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/KG-/, "");
-          const num2 = +label2.split(",")[0]!.replace(/KG-/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^HH-[0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/HH-/, "");
-          const num2 = +label2.split(",")[0]!.replace(/HH-/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^FS[0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/FS/, "");
-          const num2 = +label2.split(",")[0]!.replace(/FS/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^[0-9]+ Fighters$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/ Fighters/, "");
-          const num2 = +label2.split(",")[0]!.replace(/ Fighters/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^[0-9]+ People$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/ People/, "");
-          const num2 = +label2.split(",")[0]!.replace(/ People/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^DS-H[0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/DS-H/, "");
-          const num2 = +label2.split(",")[0]!.replace(/DS-H/, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
-      );
-      versionLabelFound = selectByVersion(
-        roms,
-        /^NROM [0-9]+$/,
-        (label1, label2) => {
-          const num1 = +label1.split(",")[0]!.replace(/NROM /, "");
-          const num2 = +label2.split(",")[0]!.replace(/NROM /, "");
-          if (num1 > num2) return 1;
-          else if (num1 < num2) return -1;
-          else return 0;
-        },
-        countryLabel,
-        versionLabelFound,
       );
 
       if (specialFlags.allRomsAreUnreleased) {
-        versionLabelFound = selectByVersion(
+        selectRomsBasedOnVersioningSystems(
           roms,
-          /^Beta( [0-9]+)?$/,
-          (label1, label2) => {
-            const num1 = label1.replace(/Beta/, "").trim() || 0;
-            const num2 = label2.replace(/Beta/, "").trim() || 0;
-            if (num1 > num2) return 1;
-            else if (num1 < num2) return -1;
-            else return 0;
-          },
+          [betaVersioning, protoVersioning, demoVersioning],
           countryLabel,
-          versionLabelFound,
-        );
-        versionLabelFound = selectByVersion(
-          roms,
-          /^Proto( [0-9]+)?$/,
-          (label1, label2) => {
-            const num1 = label1.replace(/Proto/, "").trim() || 0;
-            const num2 = label2.replace(/Proto/, "").trim() || 0;
-            if (num1 > num2) return 1;
-            else if (num1 < num2) return -1;
-            else return 0;
-          },
-          countryLabel,
-          versionLabelFound,
-        );
-        versionLabelFound = selectByVersion(
-          roms,
-          /^Demo( [0-9]+)?$/,
-          (label1, label2) => {
-            const num1 = label1.replace(/Demo/, "").trim() || 0;
-            const num2 = label2.replace(/Demo/, "").trim() || 0;
-            if (num1 > num2) return 1;
-            else if (num1 < num2) return -1;
-            else return 0;
-          },
-          countryLabel,
-          versionLabelFound,
         );
       }
 
