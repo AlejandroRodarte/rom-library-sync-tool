@@ -4,9 +4,7 @@ export interface Rom {
   selected: boolean;
 }
 
-export type Groups = {
-  [title: string]: Rom[];
-};
+export type Groups = Map<string, Rom[]>;
 
 export interface Console {
   roms: {
@@ -18,10 +16,5 @@ export interface Console {
   };
 }
 
-export interface Consoles {
-  [name: string]: Console;
-}
-
-export type DuplicatesData = {
-  [amount: number]: Groups;
-};
+export type Consoles = Map<string, Console>;
+export type DuplicatesData = Map<number, Groups>;

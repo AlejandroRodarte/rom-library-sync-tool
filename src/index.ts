@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, DuplicatesData } from "./types.js";
+import type { Groups, DuplicatesData, Rom } from "./types.js";
 import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
@@ -12,14 +12,13 @@ import extractLabelsFromFilename from "./helpers/extract-labels-from-filename.he
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
 
-  for (const [name, konsole] of Object.entries(consoles)) {
+  for (const [name, konsole] of consoles) {
     const dirPath = path.join(DIR_BASE_PATH, name);
 
     // NOTE: output already sorts filenames in ascending order
     const filenames = await readdir(dirPath);
 
-    const groups: Groups = {};
-    let previousTitle = "";
+    const groups: Groups = new Map<string, Rom[]>();
 
     for (const filename of filenames) {
       // EXAMPLE
@@ -33,22 +32,17 @@ const main = async () => {
       }
 
       const labels = extractLabelsFromFilename(filename);
+      const group = groups.get(title);
+      const newRom: Rom = { filename, labels, selected: true };
 
-      // group ROMs by title
-      if (title === previousTitle) {
-        const group = groups[title];
-        if (group) group.push({ filename, labels, selected: true });
-      } else {
-        groups[title] = [{ filename, labels, selected: true }];
-      }
-
-      previousTitle = title;
+      if (group) group.push(newRom);
+      else groups.set(title, [newRom]);
     }
 
-    for (const [title, roms] of Object.entries(groups)) {
+    for (const [title, roms] of groups) {
       // if there is only one entry in the ROM group, skip
       if (roms.length === 1) {
-        konsole.roms.selected.one[title] = roms;
+        konsole.roms.selected.one.set(title, roms);
         continue;
       }
 
@@ -447,9 +441,10 @@ const main = async () => {
         return acc;
       }, 0);
 
-      if (romsSelected === 0) konsole.roms.selected.none[title] = roms;
-      else if (romsSelected > 1) konsole.roms.selected.multiple[title] = roms;
-      else konsole.roms.selected.one[title] = roms;
+      if (romsSelected === 0) konsole.roms.selected.none.set(title, roms);
+      else if (romsSelected > 1)
+        konsole.roms.selected.multiple.set(title, roms);
+      else konsole.roms.selected.one.set(title, roms);
     }
   }
 
@@ -457,19 +452,19 @@ const main = async () => {
   let totalOneSelected = 0;
   let totalMultipleSelected = 0;
 
-  for (const [name, konsole] of Object.entries(consoles)) {
+  for (const [_, konsole] of consoles) {
     console.log(konsole.roms.selected.none);
   }
 
-  for (const [name, konsole] of Object.entries(consoles)) {
+  for (const [name, konsole] of consoles) {
     console.log(`===== Report for console ${name} =====`);
 
-    const noneSelected = Object.keys(konsole.roms.selected.none).length;
-    const oneSelected = Object.keys(konsole.roms.selected.one).length;
-    const multipleSelected = Object.keys(konsole.roms.selected.multiple).length;
+    const noneSelected = konsole.roms.selected.none.size;
+    const oneSelected = konsole.roms.selected.one.size;
+    const multipleSelected = konsole.roms.selected.multiple.size;
 
     console.log(`ROMs with 0 selections: ${noneSelected}`);
-    // console.log(`ROMs with 1 selection: ${oneSelected}`);
+    console.log(`ROMs with 1 selection: ${oneSelected}`);
     console.log(`ROMs with >1 selections: ${multipleSelected}`);
 
     totalNoneSelected += noneSelected;
@@ -479,32 +474,25 @@ const main = async () => {
 
   console.log(`===== Global Report =====`);
   console.log(`ROMs with 0 selections: ${totalNoneSelected}`);
-  // console.log(`ROMs with 1 selection: ${totalOneSelected}`);
+  console.log(`ROMs with 1 selection: ${totalOneSelected}`);
   console.log(`ROMs with >1 selections: ${totalMultipleSelected}`);
 
   console.log(`===== Duplicates Report =====`);
-  const duplicatesData: DuplicatesData = {};
-  for (const [name, konsole] of Object.entries(consoles)) {
-    for (const [title, roms] of Object.entries(
-      konsole.roms.selected.multiple,
-    )) {
+  const duplicatesData: DuplicatesData = new Map<number, Groups>();
+  for (const [_, konsole] of consoles) {
+    for (const [title, roms] of konsole.roms.selected.multiple) {
       const amount = roms.reduce((acc, rom) => {
         if (rom.selected) acc++;
         return acc;
       }, 0);
-      if (!duplicatesData[amount]) {
-        duplicatesData[amount] = {};
-        duplicatesData[amount][title] = roms;
-      } else {
-        duplicatesData[amount][title] = roms;
-      }
+      const amountData = duplicatesData.get(amount);
+      if (amountData) amountData.set(title, roms);
+      else duplicatesData.set(amount, new Map<string, Rom[]>([[title, roms]]));
     }
   }
 
-  for (const [amount, groups] of Object.entries(duplicatesData)) {
-    console.log(
-      `ROMs with ${amount} duplicates: ${Object.keys(groups).length}`,
-    );
+  for (const [amount, groups] of duplicatesData) {
+    console.log(`ROMs with ${amount} duplicates: ${groups.size}`);
   }
 };
 
