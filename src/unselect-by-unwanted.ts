@@ -7,15 +7,24 @@ const unselectByUnwanted = (
 ): void => {
   if (unwantedLabels.length === 0) return;
 
-  const countryRoms = roms.filter((rom) =>
-    rom.labels.some((label) => label.includes(countryLabel)),
-  );
-
-  for (const unwantedLabel of unwantedLabels) {
-    const unwantedRoms = countryRoms.filter((rom) =>
-      rom.labels.some((label) => label.includes(unwantedLabel)),
+  const selectedCountryRoms = roms.filter((rom) => {
+    const isSelected = rom.selected;
+    const hasCountryLabel = rom.labels.some((label) =>
+      label.includes(countryLabel),
     );
-    unwantedRoms.forEach((rom) => (rom.selected = false));
+    return isSelected && hasCountryLabel;
+  });
+
+  for (const rom of selectedCountryRoms) {
+    for (const unwantedLabel of unwantedLabels) {
+      const romHasUnwantedLabel = rom.labels.some((label) =>
+        label.includes(unwantedLabel),
+      );
+      if (romHasUnwantedLabel) {
+        rom.selected = false;
+        break;
+      }
+    }
   }
 };
 
