@@ -1,4 +1,5 @@
 import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
+import VIRTUAL_CONSOLE_LABEL from "../constants/virtual-console-label.constant.js";
 import type { Rom } from "../types.js";
 
 const pickRomsBasedOnCountryList = (
@@ -16,16 +17,19 @@ const pickRomsBasedOnCountryList = (
     countryFound = country;
 
     if (!allRomsAreUnreleased) {
-      const allCountryRomsAreUnreleased = countryRoms.every((rom) =>
+      const allCountryRomsHaveUnwantedLabels = countryRoms.every((rom) =>
         rom.labels.some((label) => {
-          for (const unwantedLabel of UNRELEASED_LABELS) {
+          for (const unwantedLabel of [
+            ...UNRELEASED_LABELS,
+            VIRTUAL_CONSOLE_LABEL,
+          ]) {
             if (label.includes(unwantedLabel)) return true;
           }
           return false;
         }),
       );
 
-      if (allCountryRomsAreUnreleased) continue;
+      if (allCountryRomsHaveUnwantedLabels) continue;
     }
 
     const nonCountryRoms = roms.filter(
