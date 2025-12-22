@@ -1,0 +1,42 @@
+import type { VersionSystem } from "../../types.js";
+
+const vVersioning: VersionSystem = {
+  pattern: /^[vV]([0-9]+\.*)+[a-zA-Z]*$/,
+  compareFn: (label1, label2) => {
+    const nums1 = label1
+      .substring(1)
+      .split(".")
+      .map((s) => {
+        const n = +s;
+        if (!isNaN(n)) return n;
+        const [finalNum, letter] = s.split("");
+        if (finalNum && letter) return +finalNum + letter.charCodeAt(0);
+        return 0;
+      });
+    const nums2 = label2
+      .substring(1)
+      .split(".")
+      .map((s) => {
+        const n = +s;
+        if (!isNaN(n)) return n;
+        const [finalNum, letter] = s.split("");
+        if (finalNum && letter) return +finalNum + letter.charCodeAt(0);
+        return 0;
+      });
+
+    const shortestNumsList = nums1.length < nums2.length ? nums1 : nums2;
+    const lengthDiff = Math.abs(nums1.length - nums2.length);
+    [...Array(lengthDiff)]
+      .fill(undefined)
+      .forEach((_) => shortestNumsList.push(0));
+
+    for (const [index, num1] of nums1.entries()) {
+      const num2 = nums2[index] || -1;
+      if (num1 > num2) return 1;
+      else if (num1 < num2) return -1;
+    }
+    return 0;
+  },
+};
+
+export default vVersioning;
