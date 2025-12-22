@@ -12,6 +12,7 @@ import discardRomsBasedOnUnwantedLabelList from "./helpers/discard-roms-based-on
 import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-versioning.systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
+import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -54,31 +55,7 @@ const main = async () => {
         );
       }
 
-      const countryRomsSelected = roms.filter((rom) => {
-        const hasCountryLabel = rom.labels.some((label) =>
-          label.includes(countryLabel),
-        );
-        const isSelected = rom.selected;
-        return hasCountryLabel && isSelected;
-      });
-
-      if (countryRomsSelected.length > 1) {
-        let minLabelAmount = -1;
-        const firstRom = countryRomsSelected[0];
-        if (firstRom) minLabelAmount = firstRom.labels.length;
-
-        for (let index = 1; index < countryRomsSelected.length; index++) {
-          const rom = countryRomsSelected[index];
-          if (rom) {
-            const labelAmount = rom.labels.length;
-            if (labelAmount < minLabelAmount) minLabelAmount = labelAmount;
-          }
-        }
-
-        countryRomsSelected.forEach((rom) => {
-          if (rom.labels.length > minLabelAmount) rom.selected = false;
-        });
-      }
+      pickRomWithLeastAmountOfLabels(roms, countryLabel);
 
       const romsSelected = roms.reduce((acc, rom) => {
         if (rom.selected) acc++;
