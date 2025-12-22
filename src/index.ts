@@ -9,6 +9,7 @@ import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.js";
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
+import COUNTRY_LIST from "./constants/country-list.constant.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -31,27 +32,7 @@ const main = async () => {
 
       const countryLabel = pickRomsBasedOnCountryList(
         roms,
-        [
-          "USA",
-          "World",
-          "Europe",
-          "Australia",
-          "Spain",
-          "Brazil",
-          "France",
-          "Italy",
-          "Germany",
-          "Netherlands",
-          "Denmark",
-          "Japan",
-          "Korea",
-          "Asia",
-          "Russia",
-          "Taiwan",
-          "China",
-          "Hong Kong",
-          "Unknown",
-        ],
+        COUNTRY_LIST,
         specialFlags.allRomsAreUnreleased,
       );
 
