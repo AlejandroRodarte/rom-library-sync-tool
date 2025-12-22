@@ -9,6 +9,7 @@ import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.help
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import extractLabelsFromFilename from "./helpers/extract-labels-from-filename.helper.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
+import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -27,77 +28,67 @@ const main = async () => {
         continue;
       }
 
-      const allRomsAreUnreleased = roms.every((rom) =>
-        rom.labels.some(
-          (label) =>
-            label.includes("Beta") ||
-            label.includes("Proto") ||
-            label.includes("Demo"),
-        ),
-      );
-      const allRomsAreVirtualConsole = roms.every((rom) =>
-        rom.labels.some((label) => label.includes("Virtual Console")),
-      );
+      const specialFlags = getSpecialFlagsFromRomSet(roms);
 
       // country priorities: USA, World, Europe, Japan
       let [countryLabelFound, countryLabel] = unselectByCountry(
         roms,
         "USA",
-        allRomsAreUnreleased,
+        specialFlags.allRomsAreUnreleased,
       );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "World",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Europe",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Australia",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Japan",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Korea",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Asia",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Taiwan",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "China",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
       if (!countryLabelFound)
         [countryLabelFound, countryLabel] = unselectByCountry(
           roms,
           "Unknown",
-          allRomsAreUnreleased,
+          specialFlags.allRomsAreUnreleased,
         );
 
       const unwantedLabels = [
@@ -127,9 +118,10 @@ const main = async () => {
         "Two Player",
       ];
 
-      if (!allRomsAreUnreleased)
+      if (!specialFlags.allRomsAreUnreleased)
         unwantedLabels.push(...["Beta", "Demo", "Proto"]);
-      if (!allRomsAreVirtualConsole) unwantedLabels.push("Virtual Console");
+      if (!specialFlags.allRomsAreForVirtualConsole)
+        unwantedLabels.push("Virtual Console");
 
       // unselect ROMs with undesired labels
       unselectByUnwanted(roms, unwantedLabels, countryLabel);
@@ -349,7 +341,7 @@ const main = async () => {
         versionLabelFound,
       );
 
-      if (allRomsAreUnreleased) {
+      if (specialFlags.allRomsAreUnreleased) {
         versionLabelFound = selectByVersion(
           roms,
           /^Beta( [0-9]+)?$/,
