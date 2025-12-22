@@ -1,7 +1,7 @@
 import type { VersionSystem } from "../../types.js";
 
 const revUppercasedLetterVersioning: VersionSystem = {
-  pattern: /^REV-[A-Z]$/,
+  pattern: /^REV-[a-zA-Z]$/,
   compareFn: (label1, label2) => {
     const num1 = label1.replace(/REV-/, "").charCodeAt(0);
     const num2 = label2.replace(/REV-/, "").charCodeAt(0);

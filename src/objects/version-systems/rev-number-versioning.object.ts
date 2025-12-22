@@ -1,13 +1,29 @@
 import type { VersionSystem } from "../../types.js";
 
 const revNumberVersioning: VersionSystem = {
-  pattern: /^Rev [0-9]+$/,
+  pattern: /^Rev [0-9]+(\.[0-9]+)*$/,
   compareFn: (label1, label2) => {
-    const num1 = +label1.replace(/Rev /, "");
-    const num2 = +label2.replace(/Rev /, "");
-    if (num1 > num2) return 1;
-    else if (num1 < num2) return -1;
-    else return 0;
+    const nums1 = label1
+      .replace(/Rev /, "")
+      .split(".")
+      .map((s) => +s);
+    const nums2 = label2
+      .replace(/Rev /, "")
+      .split(".")
+      .map((s) => +s);
+
+    const shortestNumsList = nums1.length < nums2.length ? nums1 : nums2;
+    const lengthDiff = Math.abs(nums1.length - nums2.length);
+    [...Array(lengthDiff)]
+      .fill(undefined)
+      .forEach((_) => shortestNumsList.push(0));
+
+    for (const [index, num1] of nums1.entries()) {
+      const num2 = nums2[index] || -1;
+      if (num1 > num2) return 1;
+      else if (num1 < num2) return -1;
+    }
+    return 0;
   },
 };
 
