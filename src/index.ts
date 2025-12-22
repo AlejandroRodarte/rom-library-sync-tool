@@ -2,14 +2,13 @@ import { readdir } from "node:fs/promises";
 import path from "path";
 
 import type { Groups, DuplicatesData, Rom } from "./types.js";
-import unselectByCountry from "./unselect-by-country.js";
 import unselectByUnwanted from "./unselect-by-unwanted.js";
 import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
-import extractLabelsFromFilename from "./helpers/extract-labels-from-filename.helper.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.js";
+import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -30,66 +29,31 @@ const main = async () => {
 
       const specialFlags = getSpecialFlagsFromRomSet(roms);
 
-      // country priorities: USA, World, Europe, Japan
-      let [countryLabelFound, countryLabel] = unselectByCountry(
+      const countryLabel = pickRomsBasedOnCountryList(
         roms,
-        "USA",
+        [
+          "USA",
+          "World",
+          "Europe",
+          "Australia",
+          "Spain",
+          "Brazil",
+          "France",
+          "Italy",
+          "Germany",
+          "Netherlands",
+          "Denmark",
+          "Japan",
+          "Korea",
+          "Asia",
+          "Russia",
+          "Taiwan",
+          "China",
+          "Hong Kong",
+          "Unknown",
+        ],
         specialFlags.allRomsAreUnreleased,
       );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "World",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Europe",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Australia",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Japan",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Korea",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Asia",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Taiwan",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "China",
-          specialFlags.allRomsAreUnreleased,
-        );
-      if (!countryLabelFound)
-        [countryLabelFound, countryLabel] = unselectByCountry(
-          roms,
-          "Unknown",
-          specialFlags.allRomsAreUnreleased,
-        );
 
       const unwantedLabels = [
         "Activision Anthology - Remix Edition",
@@ -426,7 +390,7 @@ const main = async () => {
   let totalMultipleSelected = 0;
 
   for (const [_, konsole] of consoles) {
-    console.log(konsole.roms.selected.none);
+    console.log(konsole.roms.selected.multiple);
   }
 
   for (const [name, konsole] of consoles) {
