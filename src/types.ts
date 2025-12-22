@@ -18,3 +18,8 @@ export interface Console {
 
 export type Consoles = Map<string, Console>;
 export type DuplicatesData = Map<number, Groups>;
+
+export interface SpecialFlags {
+  allRomsAreUnreleased: boolean;
+  allRomsAreForVirtualConsole: boolean;
+}

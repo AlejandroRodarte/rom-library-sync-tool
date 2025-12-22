@@ -1,10 +1,5 @@
 import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
-import type { Rom } from "../types.js";
-
-interface SpecialFlags {
-  allRomsAreUnreleased: boolean;
-  allRomsAreForVirtualConsole: boolean;
-}
+import type { Rom, SpecialFlags } from "../types.js";
 
 const getSpecialFlagsFromRomSet = (roms: Rom[]): SpecialFlags => {
   const allRomsAreUnreleased = roms.every((rom) =>

@@ -7,7 +7,7 @@ import selectByVersion from "./select-by-version.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
-import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.js";
+import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import UNWANTED_LABELS_BASE_LIST from "./constants/unwanted-labels-base-list.constant.js";
