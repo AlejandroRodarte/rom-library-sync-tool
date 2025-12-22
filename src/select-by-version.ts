@@ -1,9 +1,4 @@
-import type { Rom } from "./types.js";
-
-interface RomIndexAndVersion {
-  index: number;
-  version: string;
-}
+import type { Rom, RomIndexAndVersion } from "./types.js";
 
 const selectByVersion = (
   roms: Rom[],
