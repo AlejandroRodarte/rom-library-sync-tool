@@ -1,0 +1,28 @@
+const UNWANTED_LABELS_BASE_LIST = [
+  "Activision Anthology - Remix Edition",
+  "Aleste Collection",
+  "Alt",
+  "Animal Crossing",
+  "Arcade",
+  "Batteryless",
+  "Capcom Classics Mini Mix",
+  "Cowabunga Collection, The",
+  "Debug",
+  "Easy Version",
+  "GameCube",
+  "HOT B",
+  "Keihin Ban",
+  "Muted",
+  "No SRAM",
+  "Other Control",
+  "QUByte Classics",
+  "Retro-Bit Generations",
+  "Sample",
+  "Sega 3D Classics",
+  "Seiken Densetsu Collection",
+  "Source Code",
+  "The Cowabunga Collection",
+  "Two Player",
+];
+
+export default UNWANTED_LABELS_BASE_LIST;

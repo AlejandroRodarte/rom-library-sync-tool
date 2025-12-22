@@ -10,6 +10,9 @@ import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.help
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.js";
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
+import UNWANTED_LABELS_BASE_LIST from "./constants/unwanted-labels-base-list.constant.js";
+import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
+import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -36,37 +39,11 @@ const main = async () => {
         specialFlags.allRomsAreUnreleased,
       );
 
-      const unwantedLabels = [
-        "Activision Anthology - Remix Edition",
-        "Aleste Collection",
-        "Alt",
-        "Animal Crossing",
-        "Arcade",
-        "Batteryless",
-        "Capcom Classics Mini Mix",
-        "Cowabunga Collection, The",
-        "Debug",
-        "Easy Version",
-        "GameCube",
-        "HOT B",
-        "Keihin Ban",
-        "Muted",
-        "No SRAM",
-        "Other Control",
-        "QUByte Classics",
-        "Retro-Bit Generations",
-        "Sample",
-        "Sega 3D Classics",
-        "Seiken Densetsu Collection",
-        "Source Code",
-        "The Cowabunga Collection",
-        "Two Player",
-      ];
-
+      const unwantedLabels: string[] = [...UNWANTED_LABELS_BASE_LIST];
       if (!specialFlags.allRomsAreUnreleased)
-        unwantedLabels.push(...["Beta", "Demo", "Proto"]);
+        unwantedLabels.push(...UNRELEASED_LABELS);
       if (!specialFlags.allRomsAreForVirtualConsole)
-        unwantedLabels.push("Virtual Console");
+        unwantedLabels.push(VIRTUAL_CONSOLE_LABEL);
 
       // unselect ROMs with undesired labels
       unselectByUnwanted(roms, unwantedLabels, countryLabel);

@@ -1,3 +1,4 @@
+import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
 import type { Rom } from "../types.js";
 
 const pickRomsBasedOnCountryList = (
@@ -15,18 +16,16 @@ const pickRomsBasedOnCountryList = (
     countryFound = country;
 
     if (!allRomsAreUnreleased) {
-      const unwantedLabels = ["Beta", "Demo", "Proto"];
-
-      const allCountryRomsHaveUnwantedLabels = countryRoms.every((rom) =>
+      const allCountryRomsAreUnreleased = countryRoms.every((rom) =>
         rom.labels.some((label) => {
-          for (const unwantedLabel of unwantedLabels) {
+          for (const unwantedLabel of UNRELEASED_LABELS) {
             if (label.includes(unwantedLabel)) return true;
           }
           return false;
         }),
       );
 
-      if (allCountryRomsHaveUnwantedLabels) continue;
+      if (allCountryRomsAreUnreleased) continue;
     }
 
     const nonCountryRoms = roms.filter(
