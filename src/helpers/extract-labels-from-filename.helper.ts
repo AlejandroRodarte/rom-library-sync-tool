@@ -5,10 +5,13 @@ const extractLabelsFromFilename = (filename: string): string[] => {
   const matches = filename.matchAll(labelsRegexp);
 
   for (const match of matches) {
-    const [, parenthesesContent] = match;
-    if (parenthesesContent) {
-      const parenthesesLabels = parenthesesContent.split(",");
-      parenthesesLabels.forEach((label) => labels.push(label.trim()));
+    const [, parenthesesText] = match;
+    if (parenthesesText) {
+      const parenthesesItems = parenthesesText.split(",");
+      for (const parenthesesItem of parenthesesItems) {
+        const parenthesesLabels = parenthesesItem.split("+");
+        parenthesesLabels.forEach((label) => labels.push(label.trim()));
+      }
     }
   }
 
