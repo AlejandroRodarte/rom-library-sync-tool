@@ -1,8 +1,8 @@
 const COUNTRY_LIST = [
   "USA",
-  "Canada",
-  "World",
   "Europe",
+  "World",
+  "Canada",
   "United Kingdom",
   "Australia",
   "Spain",

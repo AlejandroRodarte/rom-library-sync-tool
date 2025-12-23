@@ -14,6 +14,8 @@ import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-li
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
+import pickRomsBasedOnLanguageList from "./helpers/pick-roms-based-on-language-list.helper.js";
+import LANGUAGE_LIST from "./constants/language-list.constant.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -45,6 +47,11 @@ const main = async () => {
       );
 
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
+
+      const countryRomsWithLanguages = countryRoms.filter(
+        (rom) => rom.languages.length > 0,
+      );
+      pickRomsBasedOnLanguageList(countryRomsWithLanguages, LANGUAGE_LIST);
 
       discardRomsBasedOnUnwantedLabels(
         roms,
