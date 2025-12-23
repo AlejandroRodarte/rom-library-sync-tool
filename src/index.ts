@@ -51,11 +51,12 @@ const main = async () => {
       );
       discardRomsBasedOnLanguageList(selectedRomsWithLanguages, LANGUAGE_LIST);
       selectedRoms = roms.filter((rom) => rom.selected);
+      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       discardRomsBasedOnUnwantedLabels(
         selectedRoms,
         countryLabel,
-        countryRomSetSpecialFlags,
+        specialFlags,
       );
 
       selectRomsBasedOnVersioningSystems(
