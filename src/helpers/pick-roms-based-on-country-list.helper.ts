@@ -11,7 +11,7 @@ const pickRomsBasedOnCountryList = (
 
   for (const country of countryList) {
     const countryRoms = roms.filter((rom) =>
-      rom.labels.some((label) => label.includes(country)),
+      rom.labels.some((label) => label === country),
     );
     if (countryRoms.length === 0) continue;
     countryFound = country;
@@ -41,7 +41,7 @@ const pickRomsBasedOnCountryList = (
     }
 
     const nonCountryRoms = roms.filter(
-      (rom) => !rom.labels.some((label) => label.includes(country)),
+      (rom) => !rom.labels.some((label) => label === country),
     );
     nonCountryRoms.forEach((rom) => (rom.selected = false));
 

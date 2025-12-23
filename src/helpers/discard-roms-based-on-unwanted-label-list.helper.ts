@@ -16,9 +16,7 @@ const discardRomsBasedOnUnwantedLabelList = (
 
   const selectedCountryRoms = roms.filter((rom) => {
     const isSelected = rom.selected;
-    const hasCountryLabel = rom.labels.some((label) =>
-      label.includes(countryLabel),
-    );
+    const hasCountryLabel = rom.labels.some((label) => label === countryLabel);
     return isSelected && hasCountryLabel;
   });
 

@@ -41,7 +41,7 @@ const main = async () => {
       );
 
       const countryRoms = roms.filter((rom) =>
-        rom.labels.some((label) => label.includes(countryLabel)),
+        rom.labels.some((label) => label === countryLabel),
       );
 
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
