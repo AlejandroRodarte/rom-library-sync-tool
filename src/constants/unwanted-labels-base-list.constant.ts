@@ -6,7 +6,7 @@ const UNWANTED_LABELS_BASE_LIST = [
   "Arcade",
   "Batteryless",
   "Capcom Classics Mini Mix",
-  "Cowabunga Collection, The",
+  "Cowabunga Collection",
   "Debug",
   "Easy Version",
   "GameCube",
