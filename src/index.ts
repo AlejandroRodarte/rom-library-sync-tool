@@ -42,21 +42,18 @@ const main = async () => {
         COUNTRY_LIST,
         specialFlags,
       );
-
-      const countryRoms = roms.filter((rom) =>
-        rom.labels.includes(countryLabel),
-      );
-      const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
-
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(roms);
+      const countryRomSetSpecialFlags = specialFlags;
+
       const selectedRomsWithLanguages = selectedRoms.filter(
         (rom) => rom.languages.length > 0,
       );
       discardRomsBasedOnLanguageList(selectedRomsWithLanguages, LANGUAGE_LIST);
+      selectedRoms = roms.filter((rom) => rom.selected);
 
       discardRomsBasedOnUnwantedLabels(
-        roms,
+        selectedRoms,
         countryLabel,
         countryRomSetSpecialFlags,
       );
