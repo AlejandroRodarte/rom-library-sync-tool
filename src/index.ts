@@ -8,7 +8,7 @@ import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.help
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
 import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
-import discardRomsBasedOnUnwantedLabelList from "./helpers/discard-roms-based-on-unwanted-label-list.helper.js";
+import discardRomsBasedOnUnwantedLabels from "./helpers/discard-roms-based-on-unwanted-labels.helper.js";
 import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-versioning.systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
@@ -46,7 +46,7 @@ const main = async () => {
 
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
 
-      discardRomsBasedOnUnwantedLabelList(
+      discardRomsBasedOnUnwantedLabels(
         roms,
         countryLabel,
         countryRomSetSpecialFlags,

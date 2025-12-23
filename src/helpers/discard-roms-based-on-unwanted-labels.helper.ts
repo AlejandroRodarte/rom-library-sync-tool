@@ -8,7 +8,7 @@ interface UnwantedLabels {
   includes: string[];
 }
 
-const discardRomsBasedOnUnwantedLabelList = (
+const discardRomsBasedOnUnwantedLabels = (
   roms: Rom[],
   countryLabel: string,
   specialFlags: SpecialFlags,
@@ -53,4 +53,4 @@ const discardRomsBasedOnUnwantedLabelList = (
   }
 };
 
-export default discardRomsBasedOnUnwantedLabelList;
+export default discardRomsBasedOnUnwantedLabels;
