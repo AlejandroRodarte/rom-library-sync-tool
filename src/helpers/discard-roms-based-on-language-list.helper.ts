@@ -1,6 +1,6 @@
 import type { Rom } from "../types.js";
 
-const pickRomsBasedOnLanguageList = (
+const discardRomsBasedOnLanguageList = (
   roms: Rom[],
   languageList: string[],
 ): string => {
@@ -21,4 +21,4 @@ const pickRomsBasedOnLanguageList = (
   return languageFound;
 };
 
-export default pickRomsBasedOnLanguageList;
+export default discardRomsBasedOnLanguageList;
