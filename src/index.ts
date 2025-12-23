@@ -43,7 +43,7 @@ const main = async () => {
         specialFlags,
       );
       selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(roms);
+      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
       const countryRomSetSpecialFlags = specialFlags;
 
       const selectedRomsWithLanguages = selectedRoms.filter(
