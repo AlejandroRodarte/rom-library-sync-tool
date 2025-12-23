@@ -36,15 +36,8 @@ const main = async () => {
 
       const fullRomSetSpecialFlags = getSpecialFlagsFromRomSet(roms);
 
-      const countryLabel = pickRomsBasedOnCountryList(
-        roms,
-        COUNTRY_LIST,
-        fullRomSetSpecialFlags,
-      );
-
-      const countryRoms = roms.filter((rom) =>
-        rom.labels.includes(countryLabel),
-      );
+      const { country: countryLabel, roms: countryRoms } =
+        pickRomsBasedOnCountryList(roms, COUNTRY_LIST, fullRomSetSpecialFlags);
 
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
 

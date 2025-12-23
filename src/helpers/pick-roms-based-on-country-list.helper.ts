@@ -2,11 +2,16 @@ import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
 import VIRTUAL_CONSOLE_LABEL from "../constants/virtual-console-label.constant.js";
 import type { Rom, SpecialFlags } from "../types.js";
 
+interface CountryAndRoms {
+  country: string;
+  roms: Rom[];
+}
+
 const pickRomsBasedOnCountryList = (
   roms: Rom[],
   countryList: string[],
   specialFlags: SpecialFlags,
-): string => {
+): CountryAndRoms => {
   let countryFound = "";
 
   for (const country of countryList) {
@@ -41,10 +46,10 @@ const pickRomsBasedOnCountryList = (
     const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
     nonCountryRoms.forEach((rom) => (rom.selected = false));
 
-    if (countryFound) break;
+    if (countryFound) return { country: countryFound, roms: countryRoms };
   }
 
-  return countryFound;
+  return { country: "", roms: [] };
 };
 
 export default pickRomsBasedOnCountryList;
