@@ -9,9 +9,7 @@ const selectRomsBasedOnVersioningSystems = (
     const countryVersionedRoms: RomIndexAndVersion[] = [];
 
     roms.forEach((rom, index) => {
-      const hasCountryLabel = rom.labels.some(
-        (label) => label === countryLabel,
-      );
+      const hasCountryLabel = rom.labels.includes(countryLabel);
       const versionLabelIndex = rom.labels.findIndex((label) =>
         label.match(versionSystem.pattern),
       );
@@ -62,9 +60,7 @@ const selectRomsBasedOnVersioningSystems = (
 
     if (countryVersionedRomsWereFound) {
       const countryNonVersionedRoms = roms.filter((rom) => {
-        const hasCountryLabel = rom.labels.some(
-          (label) => label === countryLabel,
-        );
+        const hasCountryLabel = rom.labels.includes(countryLabel);
         const lacksVersionLabel = !rom.labels.some((label) =>
           label.match(versionSystem.pattern),
         );

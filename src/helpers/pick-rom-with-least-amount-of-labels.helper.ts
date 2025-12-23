@@ -5,7 +5,7 @@ const pickRomWithLeastAmountOfLabels = (
   countryLabel: string,
 ): void => {
   const countryRomsSelected = roms.filter((rom) => {
-    const hasCountryLabel = rom.labels.some((label) => label === countryLabel);
+    const hasCountryLabel = rom.labels.includes(countryLabel);
     const isSelected = rom.selected;
     return hasCountryLabel && isSelected;
   });

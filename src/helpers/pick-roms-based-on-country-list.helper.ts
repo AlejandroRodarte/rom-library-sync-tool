@@ -10,9 +10,7 @@ const pickRomsBasedOnCountryList = (
   let countryFound = "";
 
   for (const country of countryList) {
-    const countryRoms = roms.filter((rom) =>
-      rom.labels.some((label) => label === country),
-    );
+    const countryRoms = roms.filter((rom) => rom.labels.includes(country));
     if (countryRoms.length === 0) continue;
     countryFound = country;
 
@@ -40,9 +38,7 @@ const pickRomsBasedOnCountryList = (
       if (allReleasedCountryRomsAreForVirtualConsole) continue;
     }
 
-    const nonCountryRoms = roms.filter(
-      (rom) => !rom.labels.some((label) => label === country),
-    );
+    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
     nonCountryRoms.forEach((rom) => (rom.selected = false));
 
     if (countryFound) break;
