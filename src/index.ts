@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, DuplicatesData, Rom } from "./types.js";
+import type { Groups, DuplicatesData, Rom, SpecialFlags } from "./types.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
@@ -34,15 +34,18 @@ const main = async () => {
         continue;
       }
 
-      const fullRomSetSpecialFlags = getSpecialFlagsFromRomSet(roms);
+      let selectedRoms: Rom[] = roms;
+      let specialFlags: SpecialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      const { country: countryLabel, roms: countryRoms } =
-        discardRomsBasedOnCountryList(
-          roms,
-          COUNTRY_LIST,
-          fullRomSetSpecialFlags,
-        );
+      const countryLabel = discardRomsBasedOnCountryList(
+        selectedRoms,
+        COUNTRY_LIST,
+        specialFlags,
+      );
 
+      const countryRoms = roms.filter((rom) =>
+        rom.labels.includes(countryLabel),
+      );
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
 
       const countryRomsWithLanguages = countryRoms.filter(
