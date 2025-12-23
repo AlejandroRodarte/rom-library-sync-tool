@@ -6,7 +6,7 @@ import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.help
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
-import pickRomsBasedOnCountryList from "./helpers/pick-roms-based-on-country-list.helper.js";
+import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import discardRomsBasedOnUnwantedLabels from "./helpers/discard-roms-based-on-unwanted-labels.helper.js";
 import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-versioning.systems.helper.js";
@@ -14,7 +14,7 @@ import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-li
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
-import pickRomsBasedOnLanguageList from "./helpers/pick-roms-based-on-language-list.helper.js";
+import discardRomsBasedOnLanguageList from "./helpers/discard-roms-based-on-language-list.helper.js";
 import LANGUAGE_LIST from "./constants/language-list.constant.js";
 
 const main = async () => {
@@ -37,14 +37,18 @@ const main = async () => {
       const fullRomSetSpecialFlags = getSpecialFlagsFromRomSet(roms);
 
       const { country: countryLabel, roms: countryRoms } =
-        pickRomsBasedOnCountryList(roms, COUNTRY_LIST, fullRomSetSpecialFlags);
+        discardRomsBasedOnCountryList(
+          roms,
+          COUNTRY_LIST,
+          fullRomSetSpecialFlags,
+        );
 
       const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
 
       const countryRomsWithLanguages = countryRoms.filter(
         (rom) => rom.languages.length > 0,
       );
-      pickRomsBasedOnLanguageList(countryRomsWithLanguages, LANGUAGE_LIST);
+      discardRomsBasedOnLanguageList(countryRomsWithLanguages, LANGUAGE_LIST);
 
       discardRomsBasedOnUnwantedLabels(
         roms,
