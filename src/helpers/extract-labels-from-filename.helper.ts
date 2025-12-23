@@ -8,7 +8,7 @@ const extractLabelsFromFilename = (filename: string): string[] => {
     const [, parenthesesContent] = match;
     if (parenthesesContent) {
       const parenthesesLabels = parenthesesContent.split(",");
-      parenthesesLabels.forEach((label) => labels.push(label));
+      parenthesesLabels.forEach((label) => labels.push(label.trim()));
     }
   }
 
