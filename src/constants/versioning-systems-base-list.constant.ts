@@ -1,4 +1,5 @@
 import fourBVersioning from "../objects/version-systems/4b-versioning.object.js";
+import a8fVersioning from "../objects/version-systems/a8f-versioning.object.js";
 import dateVersioning from "../objects/version-systems/date-versioning.object.js";
 import dshVersioning from "../objects/version-systems/ds-h-versioning.object.js";
 import fightersVersioning from "../objects/version-systems/fighters-versioning.object.js";
@@ -13,6 +14,7 @@ import rNumberVersioning from "../objects/version-systems/r-number-versioning.ob
 import revLetterVersioning from "../objects/version-systems/rev-letter-versioning.object.js";
 import revNumberVersioning from "../objects/version-systems/rev-number-versioning.object.js";
 import revUppercasedLetterVersioning from "../objects/version-systems/rev-uppercased-letter-versioning.object.js";
+import tjVersioning from "../objects/version-systems/tj-versioning.object.js";
 import vVersioning from "../objects/version-systems/v-versioning.object.js";
 import type { VersionSystem } from "../types.js";
 
@@ -33,6 +35,8 @@ const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   peopleVersioning,
   dshVersioning,
   nromVersioning,
+  tjVersioning,
+  a8fVersioning,
 ];
 
 export default VERSIONING_SYSTEMS_BASE_LIST;
