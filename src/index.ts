@@ -32,15 +32,25 @@ const main = async () => {
         continue;
       }
 
-      const specialFlags = getSpecialFlagsFromRomSet(roms);
+      const fullRomSetSpecialFlags = getSpecialFlagsFromRomSet(roms);
 
       const countryLabel = pickRomsBasedOnCountryList(
         roms,
         COUNTRY_LIST,
-        specialFlags.allRomsAreUnreleased,
+        fullRomSetSpecialFlags,
       );
 
-      discardRomsBasedOnUnwantedLabelList(roms, countryLabel, specialFlags);
+      const countryRoms = roms.filter((rom) =>
+        rom.labels.some((label) => label.includes(countryLabel)),
+      );
+
+      const countryRomSetSpecialFlags = getSpecialFlagsFromRomSet(countryRoms);
+
+      discardRomsBasedOnUnwantedLabelList(
+        roms,
+        countryLabel,
+        countryRomSetSpecialFlags,
+      );
 
       selectRomsBasedOnVersioningSystems(
         roms,
@@ -48,7 +58,7 @@ const main = async () => {
         countryLabel,
       );
 
-      if (specialFlags.allRomsAreUnreleased) {
+      if (countryRomSetSpecialFlags.allRomsAreUnreleased) {
         selectRomsBasedOnVersioningSystems(
           roms,
           VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS,
