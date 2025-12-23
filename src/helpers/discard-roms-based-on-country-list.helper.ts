@@ -7,7 +7,7 @@ interface CountryAndRoms {
   roms: Rom[];
 }
 
-const pickRomsBasedOnCountryList = (
+const discardRomsBasedOnCountryList = (
   roms: Rom[],
   countryList: string[],
   specialFlags: SpecialFlags,
@@ -52,4 +52,4 @@ const pickRomsBasedOnCountryList = (
   return { country: "", roms: [] };
 };
 
-export default pickRomsBasedOnCountryList;
+export default discardRomsBasedOnCountryList;
