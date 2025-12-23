@@ -10,7 +10,6 @@ interface UnwantedLabels {
 
 const discardRomsBasedOnUnwantedLabels = (
   roms: Rom[],
-  countryLabel: string,
   specialFlags: SpecialFlags,
 ): void => {
   const unwantedLabels: UnwantedLabels = {
@@ -23,13 +22,7 @@ const discardRomsBasedOnUnwantedLabels = (
   if (!specialFlags.allRomsAreForVirtualConsole)
     unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
 
-  const selectedCountryRoms = roms.filter((rom) => {
-    const isSelected = rom.selected;
-    const hasCountryLabel = rom.labels.includes(countryLabel);
-    return isSelected && hasCountryLabel;
-  });
-
-  for (const rom of selectedCountryRoms) {
+  for (const rom of roms) {
     let romHasUnwantedLabel = false;
 
     for (const unwantedIncludesLabel of unwantedLabels.includes) {

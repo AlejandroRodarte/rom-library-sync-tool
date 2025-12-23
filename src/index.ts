@@ -53,11 +53,7 @@ const main = async () => {
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      discardRomsBasedOnUnwantedLabels(
-        selectedRoms,
-        countryLabel,
-        specialFlags,
-      );
+      discardRomsBasedOnUnwantedLabels(selectedRoms, specialFlags);
 
       selectRomsBasedOnVersioningSystems(
         roms,
