@@ -17,19 +17,24 @@ const pickRomsBasedOnCountryList = (
     countryFound = country;
 
     if (!allRomsAreUnreleased) {
-      const allCountryRomsHaveUnwantedLabels = countryRoms.every((rom) =>
-        rom.labels.some((label) => {
-          for (const unwantedLabel of [
-            ...UNRELEASED_LABELS,
-            VIRTUAL_CONSOLE_LABEL,
-          ]) {
-            if (label.includes(unwantedLabel)) return true;
-          }
-          return false;
-        }),
+      const releasedCountryRoms = countryRoms.filter(
+        (rom) =>
+          !rom.labels.some((label) => {
+            for (const unwantedLabel of UNRELEASED_LABELS) {
+              if (label.includes(unwantedLabel)) return true;
+            }
+            return false;
+          }),
       );
 
-      if (allCountryRomsHaveUnwantedLabels) continue;
+      const allCountryRomsAreUnreleased = releasedCountryRoms.length === 0;
+      if (allCountryRomsAreUnreleased) continue;
+
+      const allReleasedCountryRomsAreForVirtualConsole =
+        releasedCountryRoms.every((rom) =>
+          rom.labels.some((label) => label.includes(VIRTUAL_CONSOLE_LABEL)),
+        );
+      if (allReleasedCountryRomsAreForVirtualConsole) continue;
     }
 
     const nonCountryRoms = roms.filter(
