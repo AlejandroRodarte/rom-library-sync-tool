@@ -1,4 +1,4 @@
-const UNWANTED_LABELS_BASE_LIST = [
+const UNWANTED_EXACT_LABELS_BASE_LIST = [
   "Activision Anthology - Remix Edition",
   "Aleste Collection",
   "Alt",
@@ -25,4 +25,4 @@ const UNWANTED_LABELS_BASE_LIST = [
   "Two Player",
 ];
 
-export default UNWANTED_LABELS_BASE_LIST;
+export default UNWANTED_EXACT_LABELS_BASE_LIST;
