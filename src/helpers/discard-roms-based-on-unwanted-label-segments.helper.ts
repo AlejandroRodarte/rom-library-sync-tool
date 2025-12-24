@@ -7,21 +7,15 @@ const discardRomsBasedOnUnwantedLabelSegments = (
   let romAmount = roms.length;
   if (romAmount === 1) return;
 
-  for (const rom of roms) {
-    if (romAmount === 1) break;
+  for (const unwantedLabelSegment of unwantedLabelSegments) {
+    const romsWithUnwantedLabelSegment = roms.filter((rom) =>
+      rom.labels.some((label) => label.includes(unwantedLabelSegment)),
+    );
 
-    let romHasUnwantedLabelSegment = false;
-
-    for (const unwantedLabelSegment of unwantedLabelSegments) {
-      romHasUnwantedLabelSegment = rom.labels.some((label) =>
-        label.includes(unwantedLabelSegment),
-      );
-      if (romHasUnwantedLabelSegment) break;
-    }
-
-    if (romHasUnwantedLabelSegment) {
-      rom.selected = false;
+    for (const romToDeselect of romsWithUnwantedLabelSegment) {
+      romToDeselect.selected = false;
       romAmount--;
+      if (romAmount === 1) return;
     }
   }
 };
