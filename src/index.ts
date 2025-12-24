@@ -15,7 +15,7 @@ import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.
 import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import discardRomsBasedOnUnwantedLabels from "./helpers/discard-roms-based-on-unwanted-labels.helper.js";
-import selectRomsBasedOnVersioningSystems from "./helpers/select-roms-based-on-versioning.systems.helper.js";
+import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning.systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
@@ -67,7 +67,7 @@ const main = async () => {
         versionSystems.push(...VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS);
       versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
 
-      selectRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
+      discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
 
       pickRomWithLeastAmountOfLabels(roms, countryLabel);
       addRomsToConsole(roms, konsole, title);

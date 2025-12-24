@@ -1,6 +1,6 @@
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
 
-const selectRomsBasedOnVersioningSystems = (
+const discardRomsBasedOnVersioningSystems = (
   roms: Rom[],
   versionSystems: VersionSystem[],
 ): void => {
@@ -69,4 +69,4 @@ const selectRomsBasedOnVersioningSystems = (
   }
 };
 
-export default selectRomsBasedOnVersioningSystems;
+export default discardRomsBasedOnVersioningSystems;
