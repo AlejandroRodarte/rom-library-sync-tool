@@ -21,34 +21,32 @@ const discardRomsBasedOnVersioningSystems = (
     const versionedRomsFound = versionedRoms.length > 0;
     if (!versionedRomsFound) continue;
 
-    const highestVersionedRom: RomIndexAndVersion = {
-      index: -1,
-      version: "",
-    };
+    const highestVersionRomIndexes: number[] = [];
+    let highestVersion: string = "";
 
     let firstVersion = true;
     for (const rom of versionedRoms) {
       if (firstVersion) {
-        highestVersionedRom.index = rom.index;
-        highestVersionedRom.version = rom.version;
+        highestVersionRomIndexes.push(rom.index);
+        highestVersion = rom.version;
         firstVersion = false;
         continue;
       }
 
-      const result = versionSystem.compareFn(
-        rom.version,
-        highestVersionedRom.version,
-      );
+      const result = versionSystem.compareFn(rom.version, highestVersion);
+      const sameVersionFound = result === 0;
       const newHighestVersionFound = result === 1;
 
-      if (newHighestVersionFound) {
-        highestVersionedRom.index = rom.index;
-        highestVersionedRom.version = rom.version;
+      if (sameVersionFound) highestVersionRomIndexes.push(rom.index);
+      else if (newHighestVersionFound) {
+        highestVersionRomIndexes.length = 0;
+        highestVersionRomIndexes.push(rom.index);
+        highestVersion = rom.version;
       }
     }
 
     versionedRoms.forEach((rom) => {
-      if (rom.index !== highestVersionedRom.index) {
+      if (!highestVersionRomIndexes.includes(rom.index)) {
         const romToDeselect = roms[rom.index];
         if (romToDeselect) romToDeselect.selected = false;
       }
