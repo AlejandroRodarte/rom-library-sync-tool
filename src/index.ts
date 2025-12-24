@@ -25,6 +25,7 @@ import LANGUAGE_LIST from "./constants/language-list.constant.js";
 import UNWANTED_EXACT_LABELS_BASE_LIST from "./constants/unwanted-exact-labels-base-list.constant.js";
 import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
 import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
+import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -81,6 +82,9 @@ const main = async () => {
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
       unwantedLabels.exact.length = 0;
+      selectedRoms = roms.filter((rom) => rom.selected);
+
+      discardRomsWithPALLabelIfRomsetHasNTSCRoms(selectedRoms);
       selectedRoms = roms.filter((rom) => rom.selected);
 
       // discardRomsBasedOnLabelAmount(selectedRoms);
