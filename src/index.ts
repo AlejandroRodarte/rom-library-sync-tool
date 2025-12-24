@@ -1,7 +1,13 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type { Groups, DuplicatesData, Rom, SpecialFlags } from "./types.js";
+import type {
+  Groups,
+  DuplicatesData,
+  Rom,
+  SpecialFlags,
+  VersionSystem,
+} from "./types.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
@@ -44,7 +50,6 @@ const main = async () => {
       );
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
-      const countryRomSetSpecialFlags = specialFlags;
 
       const selectedRomsWithLanguages = selectedRoms.filter(
         (rom) => rom.languages.length > 0,
@@ -54,20 +59,15 @@ const main = async () => {
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, specialFlags);
+      selectedRoms = roms.filter((rom) => rom.selected);
+      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      selectRomsBasedOnVersioningSystems(
-        roms,
-        VERSIONING_SYSTEMS_BASE_LIST,
-        countryLabel,
-      );
+      const versionSystems: VersionSystem[] = [];
+      if (specialFlags.allRomsAreUnreleased)
+        versionSystems.push(...VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS);
+      versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
 
-      if (countryRomSetSpecialFlags.allRomsAreUnreleased) {
-        selectRomsBasedOnVersioningSystems(
-          roms,
-          VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS,
-          countryLabel,
-        );
-      }
+      selectRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
 
       pickRomWithLeastAmountOfLabels(roms, countryLabel);
       addRomsToConsole(roms, konsole, title);

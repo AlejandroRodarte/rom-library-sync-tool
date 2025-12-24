@@ -3,24 +3,23 @@ import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
 const selectRomsBasedOnVersioningSystems = (
   roms: Rom[],
   versionSystems: VersionSystem[],
-  countryLabel: string,
 ): void => {
   for (const versionSystem of versionSystems) {
-    const countryVersionedRoms: RomIndexAndVersion[] = [];
+    const versionedRoms: RomIndexAndVersion[] = [];
 
     roms.forEach((rom, index) => {
-      const hasCountryLabel = rom.labels.includes(countryLabel);
       const versionLabelIndex = rom.labels.findIndex((label) =>
         label.match(versionSystem.pattern),
       );
 
-      if (hasCountryLabel && versionLabelIndex !== -1) {
+      if (versionLabelIndex !== -1) {
         const version = rom.labels[versionLabelIndex];
-        if (version) countryVersionedRoms.push({ index, version });
+        if (version) versionedRoms.push({ index, version });
       }
     });
 
-    const countryVersionedRomsWereFound = countryVersionedRoms.length > 0;
+    const versionedRomsFound = versionedRoms.length > 0;
+    if (!versionedRomsFound) continue;
 
     const highestVersionedRom: RomIndexAndVersion = {
       index: -1,
@@ -28,7 +27,7 @@ const selectRomsBasedOnVersioningSystems = (
     };
 
     let firstVersion = true;
-    for (const rom of countryVersionedRoms) {
+    for (const rom of versionedRoms) {
       if (firstVersion) {
         highestVersionedRom.index = rom.index;
         highestVersionedRom.version = rom.version;
@@ -48,29 +47,25 @@ const selectRomsBasedOnVersioningSystems = (
       }
     }
 
-    const romToSelect = roms[highestVersionedRom.index];
-    if (romToSelect) romToSelect.selected = true;
-
-    countryVersionedRoms.forEach((rom) => {
+    versionedRoms.forEach((rom) => {
       if (rom.index !== highestVersionedRom.index) {
         const romToDeselect = roms[rom.index];
         if (romToDeselect) romToDeselect.selected = false;
       }
     });
 
-    if (countryVersionedRomsWereFound) {
-      const countryNonVersionedRoms = roms.filter((rom) => {
-        const hasCountryLabel = rom.labels.includes(countryLabel);
+    if (versionedRomsFound) {
+      const nonVersionedRoms = roms.filter((rom) => {
         const lacksVersionLabel = !rom.labels.some((label) =>
           label.match(versionSystem.pattern),
         );
-        return hasCountryLabel && lacksVersionLabel;
+        return lacksVersionLabel;
       });
 
-      countryNonVersionedRoms.forEach((rom) => (rom.selected = false));
+      nonVersionedRoms.forEach((rom) => (rom.selected = false));
     }
 
-    if (countryVersionedRomsWereFound) break;
+    if (versionedRomsFound) break;
   }
 };
 
