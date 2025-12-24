@@ -26,6 +26,7 @@ import UNWANTED_EXACT_LABELS_BASE_LIST from "./constants/unwanted-exact-labels-b
 import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
 import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
 import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
+import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -56,17 +57,16 @@ const main = async () => {
       selectedRoms = roms.filter((rom) => rom.selected);
       let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      const unwantedLabels: UnwantedLabels = {
-        exact: [],
-        includes: [],
-      };
+      const unwantedLabelSegments: string[] = [];
       if (!specialFlags.allRomsAreUnreleased)
-        unwantedLabels.includes.push(...UNRELEASED_LABELS);
+        unwantedLabelSegments.push(...UNRELEASED_LABELS);
       if (!specialFlags.allRomsAreForVirtualConsole)
-        unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
+        unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL);
 
-      discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
-      unwantedLabels.includes.length = 0;
+      discardRomsBasedOnUnwantedLabelSegments(
+        selectedRoms,
+        unwantedLabelSegments,
+      );
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
@@ -81,6 +81,7 @@ const main = async () => {
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(selectedRoms);
       selectedRoms = roms.filter((rom) => rom.selected);
 
+      const unwantedLabels: UnwantedLabels = { includes: [], exact: [] };
       unwantedLabels.exact = [...UNWANTED_EXACT_LABELS_BASE_LIST];
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
