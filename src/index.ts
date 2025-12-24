@@ -76,14 +76,12 @@ const main = async () => {
 
       discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
       selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       unwantedLabels.exact = [...UNWANTED_EXACT_LABELS_BASE_LIST];
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
       unwantedLabels.exact.length = 0;
       selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       // discardRomsBasedOnLabelAmount(selectedRoms);
       // selectedRoms = roms.filter((rom) => rom.selected);
