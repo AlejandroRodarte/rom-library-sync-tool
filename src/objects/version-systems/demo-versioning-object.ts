@@ -1,10 +1,10 @@
 import type { VersionSystem } from "../../types.js";
 
 const demoVersioning: VersionSystem = {
-  pattern: /^Demo( [0-9]+)?[a-zA-Z]?$/,
+  pattern: /^Demo [0-9]+[a-zA-Z]?$/,
   compareFn: (label1, label2) => {
     const nums1 = label1
-      .replace(/Demo/, "")
+      .replace(/Demo /, "")
       .trim()
       .split("")
       .map((s) => {
@@ -13,7 +13,7 @@ const demoVersioning: VersionSystem = {
         else return +s;
       });
     const nums2 = label2
-      .replace(/Demo/, "")
+      .replace(/Demo /, "")
       .trim()
       .split("")
       .map((s) => {
