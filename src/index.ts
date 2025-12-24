@@ -19,7 +19,7 @@ import discardRomsBasedOnUnwantedLabels from "./helpers/discard-roms-based-on-un
 import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning.systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
-import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount-of-labels.helper.js";
+import discardRomsBasedOnLabelAmount from "./helpers/discard-roms-based-on-label-amount.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import discardRomsBasedOnLanguageList from "./helpers/discard-roms-based-on-language-list.helper.js";
 import LANGUAGE_LIST from "./constants/language-list.constant.js";
@@ -78,7 +78,7 @@ const main = async () => {
       discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
       selectedRoms = roms.filter((rom) => rom.selected);
 
-      pickRomWithLeastAmountOfLabels(selectedRoms);
+      discardRomsBasedOnLabelAmount(selectedRoms);
       addRomsToConsole(roms, konsole, title);
     }
   }

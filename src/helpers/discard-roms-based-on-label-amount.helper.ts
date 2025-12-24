@@ -1,6 +1,6 @@
 import type { Rom } from "../types.js";
 
-const pickRomWithLeastAmountOfLabels = (roms: Rom[]): void => {
+const discardRomsBasedOnLabelAmount = (roms: Rom[]): void => {
   if (roms.length > 1) {
     let minLabelAmount = -1;
     const firstRom = roms[0];
@@ -20,4 +20,4 @@ const pickRomWithLeastAmountOfLabels = (roms: Rom[]): void => {
   }
 };
 
-export default pickRomWithLeastAmountOfLabels;
+export default discardRomsBasedOnLabelAmount;
