@@ -23,8 +23,8 @@ import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import discardRomsBasedOnLanguageList from "./helpers/discard-roms-based-on-language-list.helper.js";
 import LANGUAGE_LIST from "./constants/language-list.constant.js";
 import UNWANTED_EXACT_LABELS_BASE_LIST from "./constants/unwanted-exact-labels-base-list.constant.js";
-import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
-import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
+import UNRELEASED_LABEL_SEGMENT_LIST from "./constants/unreleased-label-segment-list.constant.js";
+import VIRTUAL_CONSOLE_LABEL_SEGMENT from "./constants/virtual-console-label-segment.constant.js";
 import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
 
@@ -59,9 +59,9 @@ const main = async () => {
 
       const unwantedLabelSegments: string[] = [];
       if (!specialFlags.allRomsAreUnreleased)
-        unwantedLabelSegments.push(...UNRELEASED_LABELS);
+        unwantedLabelSegments.push(...UNRELEASED_LABEL_SEGMENT_LIST);
       if (!specialFlags.allRomsAreForVirtualConsole)
-        unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL);
+        unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL_SEGMENT);
 
       discardRomsBasedOnUnwantedLabelSegments(
         selectedRoms,
