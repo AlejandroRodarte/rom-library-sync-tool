@@ -43,13 +43,8 @@ const main = async () => {
       let selectedRoms: Rom[] = roms;
       let specialFlags: SpecialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      const countryLabel = discardRomsBasedOnCountryList(
-        selectedRoms,
-        COUNTRY_LIST,
-        specialFlags,
-      );
+      discardRomsBasedOnCountryList(selectedRoms, COUNTRY_LIST, specialFlags);
       selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       const selectedRomsWithLanguages = selectedRoms.filter(
         (rom) => rom.languages.length > 0,
@@ -68,8 +63,9 @@ const main = async () => {
       versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
 
       discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
+      selectedRoms = roms.filter((rom) => rom.selected);
 
-      pickRomWithLeastAmountOfLabels(roms, countryLabel);
+      pickRomWithLeastAmountOfLabels(selectedRoms);
       addRomsToConsole(roms, konsole, title);
     }
   }

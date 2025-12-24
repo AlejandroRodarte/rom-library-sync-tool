@@ -1,29 +1,20 @@
 import type { Rom } from "../types.js";
 
-const pickRomWithLeastAmountOfLabels = (
-  roms: Rom[],
-  countryLabel: string,
-): void => {
-  const countryRomsSelected = roms.filter((rom) => {
-    const hasCountryLabel = rom.labels.includes(countryLabel);
-    const isSelected = rom.selected;
-    return hasCountryLabel && isSelected;
-  });
-
-  if (countryRomsSelected.length > 1) {
+const pickRomWithLeastAmountOfLabels = (roms: Rom[]): void => {
+  if (roms.length > 1) {
     let minLabelAmount = -1;
-    const firstRom = countryRomsSelected[0];
+    const firstRom = roms[0];
     if (firstRom) minLabelAmount = firstRom.labels.length;
 
-    for (let index = 1; index < countryRomsSelected.length; index++) {
-      const rom = countryRomsSelected[index];
+    for (let index = 1; index < roms.length; index++) {
+      const rom = roms[index];
       if (rom) {
         const labelAmount = rom.labels.length;
         if (labelAmount < minLabelAmount) minLabelAmount = labelAmount;
       }
     }
 
-    countryRomsSelected.forEach((rom) => {
+    roms.forEach((rom) => {
       if (rom.labels.length > minLabelAmount) rom.selected = false;
     });
   }
