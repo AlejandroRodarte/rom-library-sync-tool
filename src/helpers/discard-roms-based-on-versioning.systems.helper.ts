@@ -55,13 +55,10 @@ const discardRomsBasedOnVersioningSystems = (
     });
 
     if (versionedRomsFound) {
-      const nonVersionedRoms = roms.filter((rom) => {
-        const lacksVersionLabel = !rom.labels.some((label) =>
-          label.match(versionSystem.pattern),
-        );
-        return lacksVersionLabel;
-      });
-
+      const nonVersionedRoms = roms.filter(
+        (rom) =>
+          !rom.labels.some((label) => label.match(versionSystem.pattern)),
+      );
       nonVersionedRoms.forEach((rom) => (rom.selected = false));
     }
 
