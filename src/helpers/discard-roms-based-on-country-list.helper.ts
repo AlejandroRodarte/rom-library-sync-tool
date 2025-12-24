@@ -1,50 +1,56 @@
 import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
 import VIRTUAL_CONSOLE_LABEL from "../constants/virtual-console-label.constant.js";
-import type { Rom, SpecialFlags } from "../types.js";
+import type { Rom } from "../types.js";
+import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
 const discardRomsBasedOnCountryList = (
   roms: Rom[],
   countryList: string[],
-  specialFlags: SpecialFlags,
 ): string => {
-  let countryFound = "";
+  const unselectNonCountryRoms = (country: string) => {
+    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
+    nonCountryRoms.forEach((rom) => (rom.selected = false));
+  };
+
+  const specialFlags = getSpecialFlagsFromRomSet(roms);
 
   for (const country of countryList) {
     const countryRoms = roms.filter((rom) => rom.labels.includes(country));
-    if (countryRoms.length === 0) continue;
-    countryFound = country;
+    const countryRomsFound = countryRoms.length > 0;
+    if (!countryRomsFound) continue;
 
     if (
-      !specialFlags.allRomsAreUnreleased &&
-      !specialFlags.allRomsAreForVirtualConsole
+      specialFlags.allRomsAreUnreleased ||
+      specialFlags.allRomsAreForVirtualConsole
     ) {
-      const releasedCountryRoms = countryRoms.filter(
-        (rom) =>
-          !rom.labels.some((label) => {
-            for (const unwantedLabel of UNRELEASED_LABELS) {
-              if (label.includes(unwantedLabel)) return true;
-            }
-            return false;
-          }),
-      );
-
-      const allCountryRomsAreUnreleased = releasedCountryRoms.length === 0;
-      if (allCountryRomsAreUnreleased) continue;
-
-      const allReleasedCountryRomsAreForVirtualConsole =
-        releasedCountryRoms.every((rom) =>
-          rom.labels.some((label) => label.includes(VIRTUAL_CONSOLE_LABEL)),
-        );
-      if (allReleasedCountryRomsAreForVirtualConsole) continue;
+      unselectNonCountryRoms(country);
+      return country;
     }
 
-    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
-    nonCountryRoms.forEach((rom) => (rom.selected = false));
+    const releasedCountryRoms = countryRoms.filter(
+      (rom) =>
+        !rom.labels.some((label) => {
+          for (const unwantedLabel of UNRELEASED_LABELS) {
+            if (label.includes(unwantedLabel)) return true;
+          }
+          return false;
+        }),
+    );
 
-    if (countryFound) return countryFound;
+    const allCountryRomsAreUnreleased = releasedCountryRoms.length === 0;
+    if (allCountryRomsAreUnreleased) continue;
+
+    const allReleasedCountryRomsAreForVirtualConsole =
+      releasedCountryRoms.every((rom) =>
+        rom.labels.some((label) => label.includes(VIRTUAL_CONSOLE_LABEL)),
+      );
+    if (allReleasedCountryRomsAreForVirtualConsole) continue;
+
+    unselectNonCountryRoms(country);
+    return country;
   }
 
-  return countryFound;
+  return "";
 };
 
 export default discardRomsBasedOnCountryList;

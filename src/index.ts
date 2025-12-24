@@ -5,7 +5,6 @@ import type {
   Groups,
   DuplicatesData,
   Rom,
-  SpecialFlags,
   VersionSystem,
   UnwantedLabels,
 } from "./types.js";
@@ -45,9 +44,8 @@ const main = async () => {
       }
 
       let selectedRoms: Rom[] = roms;
-      let specialFlags: SpecialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      discardRomsBasedOnCountryList(selectedRoms, COUNTRY_LIST, specialFlags);
+      discardRomsBasedOnCountryList(selectedRoms, COUNTRY_LIST);
       selectedRoms = roms.filter((rom) => rom.selected);
 
       const selectedRomsWithLanguages = selectedRoms.filter(
@@ -55,7 +53,7 @@ const main = async () => {
       );
       discardRomsBasedOnLanguageList(selectedRomsWithLanguages, LANGUAGE_LIST);
       selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
+      let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       const unwantedLabels: UnwantedLabels = {
         exact: UNWANTED_EXACT_LABELS_BASE_LIST,
