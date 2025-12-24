@@ -1,27 +1,9 @@
-import UNRELEASED_LABELS from "../constants/unreleased-labels.constant.js";
-import UNWANTED_EXACT_LABELS_BASE_LIST from "../constants/unwanted-exact-labels-base-list.constant.js";
-import VIRTUAL_CONSOLE_LABEL from "../constants/virtual-console-label.constant.js";
-import type { Rom, SpecialFlags } from "../types.js";
-
-interface UnwantedLabels {
-  exact: string[];
-  includes: string[];
-}
+import type { Rom, UnwantedLabels } from "../types.js";
 
 const discardRomsBasedOnUnwantedLabels = (
   roms: Rom[],
-  specialFlags: SpecialFlags,
+  unwantedLabels: UnwantedLabels,
 ): void => {
-  const unwantedLabels: UnwantedLabels = {
-    exact: UNWANTED_EXACT_LABELS_BASE_LIST,
-    includes: [],
-  };
-
-  if (!specialFlags.allRomsAreUnreleased)
-    unwantedLabels.includes.push(...UNRELEASED_LABELS);
-  if (!specialFlags.allRomsAreForVirtualConsole)
-    unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
-
   for (const rom of roms) {
     let romHasUnwantedLabel = false;
 

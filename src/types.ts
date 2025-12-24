@@ -34,3 +34,8 @@ export interface RomIndexAndVersion {
   index: number;
   version: string;
 }
+
+export interface UnwantedLabels {
+  exact: string[];
+  includes: string[];
+}

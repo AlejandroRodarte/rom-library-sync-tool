@@ -7,6 +7,7 @@ import type {
   Rom,
   SpecialFlags,
   VersionSystem,
+  UnwantedLabels,
 } from "./types.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
@@ -22,6 +23,9 @@ import pickRomWithLeastAmountOfLabels from "./helpers/pick-rom-with-least-amount
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import discardRomsBasedOnLanguageList from "./helpers/discard-roms-based-on-language-list.helper.js";
 import LANGUAGE_LIST from "./constants/language-list.constant.js";
+import UNWANTED_EXACT_LABELS_BASE_LIST from "./constants/unwanted-exact-labels-base-list.constant.js";
+import UNRELEASED_LABELS from "./constants/unreleased-labels.constant.js";
+import VIRTUAL_CONSOLE_LABEL from "./constants/virtual-console-label.constant.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -53,7 +57,16 @@ const main = async () => {
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      discardRomsBasedOnUnwantedLabels(selectedRoms, specialFlags);
+      const unwantedLabels: UnwantedLabels = {
+        exact: UNWANTED_EXACT_LABELS_BASE_LIST,
+        includes: [],
+      };
+      if (!specialFlags.allRomsAreUnreleased)
+        unwantedLabels.includes.push(...UNRELEASED_LABELS);
+      if (!specialFlags.allRomsAreForVirtualConsole)
+        unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
+
+      discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
