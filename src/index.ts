@@ -65,7 +65,7 @@ const main = async () => {
         unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
-      unwantedLabels.includes = [];
+      unwantedLabels.includes.length = 0;
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
@@ -81,7 +81,7 @@ const main = async () => {
       unwantedLabels.exact = [...UNWANTED_EXACT_LABELS_BASE_LIST];
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
-      unwantedLabels.exact = [];
+      unwantedLabels.exact.length = 0;
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
