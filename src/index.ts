@@ -1,20 +1,13 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
 
-import type {
-  Groups,
-  DuplicatesData,
-  Rom,
-  VersionSystem,
-  UnwantedLabels,
-} from "./types.js";
+import type { Groups, DuplicatesData, Rom, VersionSystem } from "./types.js";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
 import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
-import discardRomsBasedOnUnwantedLabels from "./helpers/discard-roms-based-on-unwanted-labels.helper.js";
 import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning.systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
@@ -27,6 +20,7 @@ import UNRELEASED_LABEL_SEGMENT_LIST from "./constants/unreleased-label-segment-
 import VIRTUAL_CONSOLE_LABEL_SEGMENT from "./constants/virtual-console-label-segment.constant.js";
 import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
+import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -81,11 +75,11 @@ const main = async () => {
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(selectedRoms);
       selectedRoms = roms.filter((rom) => rom.selected);
 
-      const unwantedLabels: UnwantedLabels = { includes: [], exact: [] };
-      unwantedLabels.exact = [...UNWANTED_EXACT_LABELS_BASE_LIST];
+      const unwantedExactLabels: string[] = [
+        ...UNWANTED_EXACT_LABELS_BASE_LIST,
+      ];
 
-      discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
-      unwantedLabels.exact.length = 0;
+      discardRomsBasedOnUnwantedExactLabels(selectedRoms, unwantedExactLabels);
       selectedRoms = roms.filter((rom) => rom.selected);
 
       // discardRomsBasedOnLabelAmount(selectedRoms);
