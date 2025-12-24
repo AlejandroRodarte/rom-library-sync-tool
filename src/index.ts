@@ -56,7 +56,7 @@ const main = async () => {
       let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       const unwantedLabels: UnwantedLabels = {
-        exact: UNWANTED_EXACT_LABELS_BASE_LIST,
+        exact: [],
         includes: [],
       };
       if (!specialFlags.allRomsAreUnreleased)
@@ -65,6 +65,7 @@ const main = async () => {
         unwantedLabels.includes.push(VIRTUAL_CONSOLE_LABEL);
 
       discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
+      unwantedLabels.includes = [];
       selectedRoms = roms.filter((rom) => rom.selected);
       specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
@@ -75,8 +76,18 @@ const main = async () => {
 
       discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
       selectedRoms = roms.filter((rom) => rom.selected);
+      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
-      discardRomsBasedOnLabelAmount(selectedRoms);
+      unwantedLabels.exact = [...UNWANTED_EXACT_LABELS_BASE_LIST];
+
+      discardRomsBasedOnUnwantedLabels(selectedRoms, unwantedLabels);
+      unwantedLabels.exact = [];
+      selectedRoms = roms.filter((rom) => rom.selected);
+      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
+
+      // discardRomsBasedOnLabelAmount(selectedRoms);
+      // selectedRoms = roms.filter((rom) => rom.selected);
+
       addRomsToConsole(roms, konsole, title);
     }
   }
