@@ -43,11 +43,8 @@ const main = async () => {
       discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
       discardRomsBasedOnUnwantedLabelSegments(roms);
       discardRomsBasedOnVersioningSystems(roms);
-
+      discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
       let selectedRoms = roms.filter((rom) => rom.selected);
-
-      discardRomsWithPALLabelIfRomsetHasNTSCRoms(selectedRoms);
-      selectedRoms = roms.filter((rom) => rom.selected);
 
       const unwantedExactLabels: string[] = [
         ...UNWANTED_EXACT_LABELS_BASE_LIST,
