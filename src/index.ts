@@ -15,6 +15,7 @@ import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-w
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
 import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
+import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-language-amount.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -35,6 +36,7 @@ const main = async () => {
 
       discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
       discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
+      discardRomsBasedOnLanguageAmount(roms);
       discardRomsBasedOnUnwantedLabelSegments(roms);
       discardRomsBasedOnVersioningSystems(roms);
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
