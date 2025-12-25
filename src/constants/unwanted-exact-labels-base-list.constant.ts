@@ -1,6 +1,5 @@
 const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Digital" /* 139 results */,
-  "Alt" /* 138 results NOTE: consider removing - I may want the alternate ROMs, even if they are duplicates. */,
   "Evercade" /* 111 results */,
   "Kiosk" /* 39 results */,
   "Switch Online" /* 38 results */,
@@ -38,6 +37,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Debug Version" /* 2 results */,
   "Easy Version" /* 2 results */,
   "GameCube Edition" /* 2 results */,
+  "Multicart Rip" /* 2 results */,
   "No Music" /* 1 result */,
   "Anniversary Edition" /* 1 result */,
   "Source Code" /* 1 result */,
