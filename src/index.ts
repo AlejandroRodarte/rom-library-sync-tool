@@ -14,6 +14,7 @@ import LANGUAGE_LIST from "./constants/language-list.constant.js";
 import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
 import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
+import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -38,6 +39,7 @@ const main = async () => {
       discardRomsBasedOnVersioningSystems(roms);
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
       discardRomsBasedOnUnwantedExactLabels(roms);
+      discardRomsBasedOnWantedExactLabels(roms);
 
 
       addRomsToConsole(roms, konsole, title);
