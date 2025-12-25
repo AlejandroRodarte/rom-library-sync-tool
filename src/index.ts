@@ -41,22 +41,10 @@ const main = async () => {
 
       discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
       discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
+      discardRomsBasedOnUnwantedLabelSegments(roms);
 
       let selectedRoms = roms.filter((rom) => rom.selected);
       let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
-
-      const unwantedLabelSegments: string[] = [];
-      if (!specialFlags.allRomsAreUnreleased)
-        unwantedLabelSegments.push(...UNRELEASED_LABEL_SEGMENT_LIST);
-      if (!specialFlags.allRomsAreForVirtualConsole)
-        unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL_SEGMENT);
-
-      discardRomsBasedOnUnwantedLabelSegments(
-        selectedRoms,
-        unwantedLabelSegments,
-      );
-      selectedRoms = roms.filter((rom) => rom.selected);
-      specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       const versionSystems: VersionSystem[] = [];
       if (specialFlags.allRomsAreUnreleased)
