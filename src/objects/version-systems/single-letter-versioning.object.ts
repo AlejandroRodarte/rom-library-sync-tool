@@ -1,6 +1,6 @@
 import type { VersionSystem } from "../../types.js";
 
-const letterVersioning: VersionSystem = {
+const singleLetterVersioning: VersionSystem = {
   pattern: /^[a-zA-Z]$/,
   compareFn: (label1, label2) => {
     const num1 = label1.charCodeAt(0);
@@ -11,4 +11,4 @@ const letterVersioning: VersionSystem = {
   },
 };
 
-export default letterVersioning;
+export default singleLetterVersioning;

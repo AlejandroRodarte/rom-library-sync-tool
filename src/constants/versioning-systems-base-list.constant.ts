@@ -6,9 +6,9 @@ import fightersVersioning from "../objects/version-systems/fighters-versioning.o
 import fsVersioning from "../objects/version-systems/fs-versioning.object.js";
 import hhVersioning from "../objects/version-systems/hh-versioning.object.js";
 import kgVersioning from "../objects/version-systems/kg-versioning.object.js";
-import letterVersioning from "../objects/version-systems/letter-versioning.object.js";
+import singleLetterVersioning from "../objects/version-systems/single-letter-versioning.object.js";
 import nromVersioning from "../objects/version-systems/nrom-versioning.object.js";
-import numberVersioning from "../objects/version-systems/number-versioning.object.js";
+import numbersVersioning from "../objects/version-systems/numbers-versioning.object.js";
 import peopleVersioning from "../objects/version-systems/people-versioning.object.js";
 import rNumberVersioning from "../objects/version-systems/r-number-versioning.object.js";
 import revLetterVersioning from "../objects/version-systems/rev-letter-versioning.object.js";
@@ -35,8 +35,8 @@ const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   nromVersioning,
   tjVersioning,
   a8fVersioning,
-  numberVersioning,
-  letterVersioning,
+  singleLetterVersioning,
+  numbersVersioning,
 ];
 
 export default VERSIONING_SYSTEMS_BASE_LIST;

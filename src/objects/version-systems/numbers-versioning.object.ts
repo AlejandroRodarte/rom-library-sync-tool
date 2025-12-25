@@ -1,6 +1,6 @@
 import type { VersionSystem } from "../../types.js";
 
-const numberVersioning: VersionSystem = {
+const numbersVersioning: VersionSystem = {
   pattern: /^[0-9]+$/,
   compareFn: (label1, label2) => {
     const num1 = +label1;
@@ -11,4 +11,4 @@ const numberVersioning: VersionSystem = {
   },
 };
 
-export default numberVersioning;
+export default numbersVersioning;
