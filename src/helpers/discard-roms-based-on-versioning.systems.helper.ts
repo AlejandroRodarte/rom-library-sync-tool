@@ -1,13 +1,24 @@
+import VERSIONING_SYSTEMS_BASE_LIST from "../constants/versioning-systems-base-list.constant.js";
+import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "../constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
+import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
-const discardRomsBasedOnVersioningSystems = (
-  roms: Rom[],
-  versionSystems: VersionSystem[],
-): void => {
+const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
+  const selectedRoms = roms.filter((rom) => rom.selected);
+
+  let romAmount = selectedRoms.length;
+  if (romAmount === 1) return;
+
+  const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
+  const versionSystems: VersionSystem[] = [];
+  if (specialFlags.allRomsAreUnreleased)
+    versionSystems.push(...VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS);
+  versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
+
   for (const versionSystem of versionSystems) {
     const versionedRoms: RomIndexAndVersion[] = [];
 
-    roms.forEach((rom, index) => {
+    selectedRoms.forEach((rom, index) => {
       const versionLabelIndex = rom.labels.findIndex((label) =>
         label.match(versionSystem.pattern),
       );
@@ -45,19 +56,30 @@ const discardRomsBasedOnVersioningSystems = (
       }
     }
 
-    versionedRoms.forEach((rom) => {
-      if (!highestVersionRomIndexes.includes(rom.index)) {
-        const romToDeselect = roms[rom.index];
-        if (romToDeselect) romToDeselect.selected = false;
+    for (const versionedRom of versionedRoms) {
+      const romIsOfLowerVersion = !highestVersionRomIndexes.includes(
+        versionedRom.index,
+      );
+      if (romIsOfLowerVersion) {
+        const romToUnselect = selectedRoms[versionedRom.index];
+        if (romToUnselect) {
+          romToUnselect.selected = false;
+          romAmount--;
+          if (romAmount === 1) return;
+        }
       }
-    });
+    }
 
     if (versionedRomsFound) {
-      const nonVersionedRoms = roms.filter(
+      const nonVersionedRoms = selectedRoms.filter(
         (rom) =>
           !rom.labels.some((label) => label.match(versionSystem.pattern)),
       );
-      nonVersionedRoms.forEach((rom) => (rom.selected = false));
+      for (const romToUnselect of nonVersionedRoms) {
+        romToUnselect.selected = false;
+        romAmount--;
+        if (romAmount === 1) return;
+      }
     }
 
     if (versionedRomsFound) break;

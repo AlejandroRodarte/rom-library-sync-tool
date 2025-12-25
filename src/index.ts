@@ -42,17 +42,9 @@ const main = async () => {
       discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
       discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
       discardRomsBasedOnUnwantedLabelSegments(roms);
+      discardRomsBasedOnVersioningSystems(roms);
 
       let selectedRoms = roms.filter((rom) => rom.selected);
-      let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
-
-      const versionSystems: VersionSystem[] = [];
-      if (specialFlags.allRomsAreUnreleased)
-        versionSystems.push(...VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS);
-      versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
-
-      discardRomsBasedOnVersioningSystems(selectedRoms, versionSystems);
-      selectedRoms = roms.filter((rom) => rom.selected);
 
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(selectedRoms);
       selectedRoms = roms.filter((rom) => rom.selected);
