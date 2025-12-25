@@ -40,13 +40,9 @@ const main = async () => {
       }
 
       discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
-      let selectedRoms = roms.filter((rom) => rom.selected);
+      discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
 
-      const selectedRomsWithLanguages = selectedRoms.filter(
-        (rom) => rom.languages.length > 0,
-      );
-      discardRomsBasedOnLanguageList(selectedRomsWithLanguages, LANGUAGE_LIST);
-      selectedRoms = roms.filter((rom) => rom.selected);
+      let selectedRoms = roms.filter((rom) => rom.selected);
       let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
       const unwantedLabelSegments: string[] = [];

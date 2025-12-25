@@ -4,21 +4,28 @@ const discardRomsBasedOnLanguageList = (
   roms: Rom[],
   languageList: string[],
 ): string => {
-  let languageFound = "";
+  const romsWithLanguages = roms.filter((rom) => rom.languages.length > 0);
+
   for (const language of languageList) {
-    const romSetHasLanguageLabel = roms.some((rom) =>
-      rom.languages.includes(language),
+    const selectedRoms = romsWithLanguages.filter((rom) => rom.selected);
+    let romAmount = selectedRoms.length;
+    if (romAmount === 1) return language;
+
+    const romsWithoutLanguage = selectedRoms.filter(
+      (rom) => !rom.languages.includes(language),
     );
-    if (romSetHasLanguageLabel) {
-      languageFound = language;
-      const unwantedRoms = roms.filter(
-        (rom) => !rom.languages.includes(language),
-      );
-      unwantedRoms.forEach((rom) => (rom.selected = false));
+
+    const romSetLacksLanguage =
+      romsWithoutLanguage.length === selectedRoms.length;
+    if (romSetLacksLanguage) continue;
+
+    for (const romToUnselect of romsWithoutLanguage) {
+      romToUnselect.selected = false;
+      romAmount--;
+      if (romAmount === 1) return language;
     }
-    if (languageFound) break;
   }
-  return languageFound;
+  return "";
 };
 
 export default discardRomsBasedOnLanguageList;
