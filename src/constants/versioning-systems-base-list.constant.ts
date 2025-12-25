@@ -18,6 +18,7 @@ import tjVersioning from "../objects/version-systems/tj-versioning.object.js";
 import vVersioning from "../objects/version-systems/v-versioning.object.js";
 import type { VersionSystem } from "../types.js";
 import fjVersioning from "../objects/version-systems/fj-versioning.object.js";
+import mbcVersioning from "../objects/version-systems/mbc-versioning.object.js";
 
 const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   vVersioning,
@@ -37,6 +38,7 @@ const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   tjVersioning,
   a8fVersioning,
   fjVersioning,
+  mbcVersioning,
   singleLetterVersioning,
   numbersVersioning,
 ];
