@@ -8,7 +8,7 @@ import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.help
 import getSpecialFlagsFromRomSet from "./helpers/get-special-flags-from-rom-set.helper.js";
 import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
-import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning.systems.helper.js";
+import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning-systems.helper.js";
 import VERSIONING_SYSTEMS_BASE_LIST from "./constants/versioning-systems-base-list.constant.js";
 import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "./constants/versioning-systems-list-for-unreleased-roms.constant.js";
 import discardRomsBasedOnLabelAmount from "./helpers/discard-roms-based-on-label-amount.helper.js";
