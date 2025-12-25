@@ -39,10 +39,8 @@ const main = async () => {
         continue;
       }
 
-      let selectedRoms: Rom[] = roms;
-
-      discardRomsBasedOnCountryList(selectedRoms, COUNTRY_LIST);
-      selectedRoms = roms.filter((rom) => rom.selected);
+      discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
+      let selectedRoms = roms.filter((rom) => rom.selected);
 
       const selectedRomsWithLanguages = selectedRoms.filter(
         (rom) => rom.languages.length > 0,

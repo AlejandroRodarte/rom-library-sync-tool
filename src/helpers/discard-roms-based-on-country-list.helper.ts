@@ -7,15 +7,26 @@ const discardRomsBasedOnCountryList = (
   roms: Rom[],
   countryList: string[],
 ): string => {
-  const unselectNonCountryRoms = (country: string) => {
-    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
-    nonCountryRoms.forEach((rom) => (rom.selected = false));
-  };
+  const selectedRoms = roms.filter((rom) => rom.selected);
+
+  let romAmount = selectedRoms.length;
+  if (romAmount === 1) return "";
 
   const specialFlags = getSpecialFlagsFromRomSet(roms);
 
+  const unselectNonCountryRoms = (country: string): void => {
+    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
+    for (const romToUnselect of nonCountryRoms) {
+      romToUnselect.selected = false;
+      romAmount--;
+      if (romAmount === 1) return;
+    }
+  };
+
   for (const country of countryList) {
-    const countryRoms = roms.filter((rom) => rom.labels.includes(country));
+    const countryRoms = selectedRoms.filter((rom) =>
+      rom.labels.includes(country),
+    );
     const countryRomsFound = countryRoms.length > 0;
     if (!countryRomsFound) continue;
 
