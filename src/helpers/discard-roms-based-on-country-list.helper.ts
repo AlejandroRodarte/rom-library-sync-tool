@@ -12,10 +12,12 @@ const discardRomsBasedOnCountryList = (
   let romAmount = selectedRoms.length;
   if (romAmount === 1) return "";
 
-  const specialFlags = getSpecialFlagsFromRomSet(roms);
+  const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
   const unselectNonCountryRoms = (country: string): void => {
-    const nonCountryRoms = roms.filter((rom) => !rom.labels.includes(country));
+    const nonCountryRoms = selectedRoms.filter(
+      (rom) => !rom.labels.includes(country),
+    );
     for (const romToUnselect of nonCountryRoms) {
       romToUnselect.selected = false;
       romAmount--;
