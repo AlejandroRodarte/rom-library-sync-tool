@@ -6,10 +6,15 @@ const dateVersioning: VersionSystem = {
     const nums1 = label1.split("-");
     const nums2 = label2.split("-");
 
-    for (const [index, num1] of nums1.entries()) {
-      const num2 = nums2[index] || -1;
-      if (num1 > num2) return 1;
-      else if (num1 < num2) return -1;
+    for (let i = 0; i < nums1.length; i++) {
+      const s1 = nums1[i];
+      const s2 = nums2[i];
+      if (typeof s1 !== "undefined" && typeof s2 !== "undefined") {
+        const n1 = +s1;
+        const n2 = +s2;
+        if (n1 > n2) return 1;
+        else if (n1 < n2) return -1;
+      }
     }
     return 0;
   },

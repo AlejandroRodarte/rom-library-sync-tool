@@ -21,22 +21,22 @@ import type { VersionSystem } from "../types.js";
 const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   vVersioning,
   revNumberVersioning,
-  rNumberVersioning,
-  dateVersioning,
   revUppercasedLetterVersioning,
   revLetterVersioning,
-  letterVersioning,
-  numberVersioning,
+  rNumberVersioning,
+  fightersVersioning,
+  peopleVersioning,
+  dateVersioning,
   fourBVersioning,
   kgVersioning,
   hhVersioning,
   fsVersioning,
-  fightersVersioning,
-  peopleVersioning,
   dshVersioning,
   nromVersioning,
   tjVersioning,
   a8fVersioning,
+  numberVersioning,
+  letterVersioning,
 ];
 
 export default VERSIONING_SYSTEMS_BASE_LIST;

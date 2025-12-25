@@ -18,10 +18,13 @@ const revNumberVersioning: VersionSystem = {
       .fill(undefined)
       .forEach((_) => shortestNumsList.push(0));
 
-    for (const [index, num1] of nums1.entries()) {
-      const num2 = nums2[index] || -1;
-      if (num1 > num2) return 1;
-      else if (num1 < num2) return -1;
+    for (let i = 0; i < nums1.length; i++) {
+      const num1 = nums1[i];
+      const num2 = nums2[i];
+      if (typeof num1 !== "undefined" && typeof num2 !== "undefined") {
+        if (num1 > num2) return 1;
+        else if (num1 < num2) return -1;
+      }
     }
     return 0;
   },
