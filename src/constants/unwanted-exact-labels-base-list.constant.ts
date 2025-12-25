@@ -1,6 +1,7 @@
 const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Digital" /* 139 results */,
   "Evercade" /* 111 results */,
+  "Switch" /* 39 results */,
   "Kiosk" /* 39 results */,
   "Switch Online" /* 38 results */,
   "Limited Run Games" /* 29 results */,
@@ -12,6 +13,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "e-Reader" /* 13 results */,
   "Retro-Bit" /* 13 results */,
   "Castlevania Anniversary Collection" /* 13 results */,
+  "Steam" /* 12 results */,
   "Castlevania Advance Collection" /* 12 results */,
   "Batteryless" /* 12 results */,
   "Earlier" /* 11 results */,
