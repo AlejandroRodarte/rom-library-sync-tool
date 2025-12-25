@@ -17,6 +17,7 @@ import revUppercasedLetterVersioning from "../objects/version-systems/rev-upperc
 import tjVersioning from "../objects/version-systems/tj-versioning.object.js";
 import vVersioning from "../objects/version-systems/v-versioning.object.js";
 import type { VersionSystem } from "../types.js";
+import fjVersioning from "../objects/version-systems/fj-versioning.object.js";
 
 const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   vVersioning,
@@ -35,6 +36,7 @@ const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   nromVersioning,
   tjVersioning,
   a8fVersioning,
+  fjVersioning,
   singleLetterVersioning,
   numbersVersioning,
 ];
