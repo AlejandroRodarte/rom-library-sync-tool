@@ -6,6 +6,7 @@ const WANTED_EXACT_LABELS_BASE_LIST = [
   "Color Blind",
   "Remastered",
   "Final Version",
+  "Emulator Optimized",
 ];
 
 export default WANTED_EXACT_LABELS_BASE_LIST;

@@ -10,6 +10,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Kiosk" /* 39 results */,
   "Switch Online" /* 38 results */,
   "GBA Jam 2024" /* 37 results */,
+  "Extract" /* 30 results */,
   "Limited Run Games" /* 29 results */,
   "Namcot Collection" /* 21 results */,
   "NESDev 2016" /* 16 results */,
@@ -23,6 +24,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "e-Reader" /* 13 results */,
   "Retro-Bit" /* 13 results */,
   "Castlevania Anniversary Collection" /* 13 results */,
+  "Piko Interactive" /* 13 results */,
   "NESDev 2014" /* 12 results */,
   "Steam" /* 12 results */,
   "Castlevania Advance Collection" /* 12 results */,
@@ -33,6 +35,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Namco Museum Archives Vol 1" /* 11 results */,
   "Namco Museum Archives Vol 2" /* 11 results */,
   "FamicomBox" /* 11 results */,
+  "No flash saving" /* 10 results */,
   "IE Institute" /* 10 results */,
   "Arcade" /* 10 results */,
   "Capcom Town" /* 10 results */,
@@ -69,6 +72,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "RetroZone" /* 2 results */,
   "Aladdin Compact Cartridge" /* 2 results */,
   "Intellivision" /* 2 results */,
+  "Jeffrey Wittenhagen's" /* 2 results */,
   "No Music" /* 1 result */,
   "Anniversary Edition" /* 1 result */,
   "Source Code" /* 1 result */,
@@ -95,6 +99,8 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Game Boy Advance" /* 1 result */,
   "NES Mini Version" /* 1 result */,
   "Robert Bryant" /* 1 result */,
+  "Super 808 Extract" /* 1 result */,
+  "SPC009 Extract" /* 1 result */,
 ];
 
 export default UNWANTED_EXACT_LABELS_BASE_LIST;
