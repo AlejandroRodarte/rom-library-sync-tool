@@ -49,9 +49,6 @@ const main = async () => {
   let totalOneSelected = 0;
   let totalMultipleSelected = 0;
 
-  for (const [_, konsole] of consoles) {
-  }
-
   for (const [name, konsole] of consoles) {
     console.log(`===== Report for console ${name} =====`);
 
