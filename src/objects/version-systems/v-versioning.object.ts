@@ -1,7 +1,7 @@
 import type { VersionSystem } from "../../types.js";
 
 const vVersioning: VersionSystem = {
-  pattern: /^[vV]([0-9]+\.*)+[a-zA-Z]*$/,
+  pattern: /^[vV][0-9]+(\.[a-zA-Z0-9]+)*$/,
   compareFn: (label1, label2) => {
     const nums1: number[] = [];
 
