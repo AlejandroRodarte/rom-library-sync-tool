@@ -16,16 +16,18 @@ import fjVersioning from "../objects/version-systems/fj-versioning.object.js";
 import mbcVersioning from "../objects/version-systems/mbc-versioning.object.js";
 import ninaVersioning from "../objects/version-systems/nina-versioning.object.js";
 import rDotCDotVersioning from "../objects/version-systems/r-dot-c-dot-versioning.object.js";
+import vDotVersioning from "../objects/version-systems/v-dot-versioning.object.js";
 
 const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   vVersioning,
+  vDotVersioning,
   revNumberVersioning,
   revUppercasedLetterVersioning,
   revLetterVersioning,
   rNumberVersioning,
+  dateVersioning,
   fightersVersioning,
   peopleVersioning,
-  dateVersioning,
   fsVersioning,
   dshVersioning,
   tjVersioning,
