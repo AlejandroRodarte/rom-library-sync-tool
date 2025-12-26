@@ -1,6 +1,7 @@
 import {
   BETA_LABEL_SEGMENT,
   DEMO_LABEL_SEGMENT,
+  DISK_LABEL_SEGMENT,
   PROTO_LABEL_SEGMENT,
   SAMPLE_LABEL_SEGMENT,
   VIRTUAL_CONSOLE_LABEL_SEGMENT,
@@ -27,6 +28,8 @@ const discardRomsBasedOnUnwantedLabelSegments = (roms: Rom[]): void => {
     unwantedLabelSegments.push(BETA_LABEL_SEGMENT);
   if (!specialFlags.allRomsAreForVirtualConsole)
     unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL_SEGMENT);
+
+  unwantedLabelSegments.push(DISK_LABEL_SEGMENT);
 
   for (const unwantedLabelSegment of unwantedLabelSegments) {
     const romsWithUnwantedLabelSegment = selectedRoms.filter((rom) =>
