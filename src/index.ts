@@ -19,7 +19,6 @@ import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-la
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
-
   for (const [name, konsole] of consoles) {
     const dirPath = path.join(DIR_BASE_PATH, name);
 
@@ -42,8 +41,6 @@ const main = async () => {
       discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
       discardRomsBasedOnUnwantedExactLabels(roms);
       discardRomsBasedOnWantedExactLabels(roms);
-
-
       addRomsToConsole(roms, konsole, title);
     }
   }
@@ -53,7 +50,6 @@ const main = async () => {
   let totalMultipleSelected = 0;
 
   for (const [_, konsole] of consoles) {
-    console.log(konsole.roms.selected.multiple);
   }
 
   for (const [name, konsole] of consoles) {
