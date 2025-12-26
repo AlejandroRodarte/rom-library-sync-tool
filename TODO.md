@@ -1,5 +1,1 @@
-- [ ] Deal with weird date versioning format (e.g. 2024-08-14-1 and 2024-08-14-2). Found on ROM title "Witches and Butchers".
-- [ ] Deal with weird v-versioning formats.
-- [ ] Deal with other weird versioning formats.
-- [ ] Trigger subsequent versioning comparisons if the first one yielded more than 1 selected ROM.
-- [ ] Try to avoid to compute selected ROMs on each language iteration (on function discardRomsBasedOnLanguageList). 
+- [ ] Omit files that begin with [BIOS] on them.
