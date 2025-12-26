@@ -1,4 +1,5 @@
 const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
+  "Pirate" /* 1154 results */,
   "GB Compatible" /* 904 results */,
   "Digital" /* 139 results */,
   "Evercade" /* 111 results */,
@@ -36,6 +37,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Arcade" /* 10 results */,
   "Capcom Town" /* 10 results */,
   "Atari Anthology" /* 10 results */,
+  "Robert L Bryant" /* 10 results */,
   "NintendoAge" /* 9 results */,
   "Retro-Bit Generations" /* 9 results */,
   "NESDev 2011" /* 8 results */,
@@ -92,6 +94,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "RetroGameCon 5 Edition" /* 1 result */,
   "Game Boy Advance" /* 1 result */,
   "NES Mini Version" /* 1 result */,
+  "Robert Bryant" /* 1 result */,
 ];
 
 export default UNWANTED_EXACT_LABELS_BASE_LIST;
