@@ -1,4 +1,5 @@
 const WANTED_EXACT_LABELS_BASE_LIST = [
+  "GB Compatible",
   "Limited Run Games",
   "Strictly Limited Games",
   "Limited Edition",

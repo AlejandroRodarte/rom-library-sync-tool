@@ -1,6 +1,5 @@
 const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Pirate" /* 1154 results */,
-  "GB Compatible" /* 904 results */,
   "Digital" /* 139 results */,
   "Evercade" /* 111 results */,
   "NP" /* 84 items */,
