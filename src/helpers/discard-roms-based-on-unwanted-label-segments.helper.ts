@@ -1,5 +1,10 @@
-import UNRELEASED_LABEL_SEGMENT_LIST from "../constants/unreleased-label-segment-list.constant.js";
-import VIRTUAL_CONSOLE_LABEL_SEGMENT from "../constants/virtual-console-label-segment.constant.js";
+import {
+  BETA_LABEL_SEGMENT,
+  DEMO_LABEL_SEGMENT,
+  PROTO_LABEL_SEGMENT,
+  SAMPLE_LABEL_SEGMENT,
+  VIRTUAL_CONSOLE_LABEL_SEGMENT,
+} from "../constants/label-segments.constants.js";
 import type { Rom } from "../types.js";
 import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
@@ -11,8 +16,15 @@ const discardRomsBasedOnUnwantedLabelSegments = (roms: Rom[]): void => {
 
   let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
   const unwantedLabelSegments: string[] = [];
-  if (!specialFlags.allRomsAreUnreleased)
-    unwantedLabelSegments.push(...UNRELEASED_LABEL_SEGMENT_LIST);
+
+  if (!specialFlags.allRomsAreSample)
+    unwantedLabelSegments.push(SAMPLE_LABEL_SEGMENT);
+  if (!specialFlags.allRomsAreDemo)
+    unwantedLabelSegments.push(DEMO_LABEL_SEGMENT);
+  if (!specialFlags.allRomsAreProto)
+    unwantedLabelSegments.push(PROTO_LABEL_SEGMENT);
+  if (!specialFlags.allRomsAreBeta)
+    unwantedLabelSegments.push(BETA_LABEL_SEGMENT);
   if (!specialFlags.allRomsAreForVirtualConsole)
     unwantedLabelSegments.push(VIRTUAL_CONSOLE_LABEL_SEGMENT);
 

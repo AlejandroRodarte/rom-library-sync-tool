@@ -1,3 +1,0 @@
-const VIRTUAL_CONSOLE_LABEL_SEGMENT = "Virtual Console";
-
-export default VIRTUAL_CONSOLE_LABEL_SEGMENT;

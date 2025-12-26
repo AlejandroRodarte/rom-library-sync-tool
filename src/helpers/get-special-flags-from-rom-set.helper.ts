@@ -1,6 +1,18 @@
-import UNRELEASED_LABEL_SEGMENT_LIST from "../constants/unreleased-label-segment-list.constant.js";
-import VIRTUAL_CONSOLE_LABEL_SEGMENT from "../constants/virtual-console-label-segment.constant.js";
+import {
+  BETA_LABEL_SEGMENT,
+  DEMO_LABEL_SEGMENT,
+  PROTO_LABEL_SEGMENT,
+  SAMPLE_LABEL_SEGMENT,
+  VIRTUAL_CONSOLE_LABEL_SEGMENT,
+} from "../constants/label-segments.constants.js";
 import type { Rom, SpecialFlags } from "../types.js";
+
+const UNRELEASED_LABEL_SEGMENT_LIST = [
+  BETA_LABEL_SEGMENT,
+  PROTO_LABEL_SEGMENT,
+  DEMO_LABEL_SEGMENT,
+  SAMPLE_LABEL_SEGMENT,
+];
 
 const getSpecialFlagsFromRomSet = (roms: Rom[]): SpecialFlags => {
   const allRomsAreUnreleased = roms.every((rom) =>
@@ -12,11 +24,30 @@ const getSpecialFlagsFromRomSet = (roms: Rom[]): SpecialFlags => {
     }),
   );
 
+  const allRomsAreBeta = roms.every((rom) =>
+    rom.labels.some((label) => label.includes(BETA_LABEL_SEGMENT)),
+  );
+  const allRomsAreProto = roms.every((rom) =>
+    rom.labels.some((label) => label.includes(PROTO_LABEL_SEGMENT)),
+  );
+  const allRomsAreDemo = roms.every((rom) =>
+    rom.labels.some((label) => label.includes(DEMO_LABEL_SEGMENT)),
+  );
+  const allRomsAreSample = roms.every((rom) =>
+    rom.labels.some((label) => label.includes(SAMPLE_LABEL_SEGMENT)),
+  );
   const allRomsAreForVirtualConsole = roms.every((rom) =>
     rom.labels.some((label) => label.includes(VIRTUAL_CONSOLE_LABEL_SEGMENT)),
   );
 
-  return { allRomsAreUnreleased, allRomsAreForVirtualConsole };
+  return {
+    allRomsAreUnreleased,
+    allRomsAreBeta,
+    allRomsAreProto,
+    allRomsAreDemo,
+    allRomsAreSample,
+    allRomsAreForVirtualConsole,
+  };
 };
 
 export default getSpecialFlagsFromRomSet;
