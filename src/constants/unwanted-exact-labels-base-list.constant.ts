@@ -86,7 +86,7 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "Samsung" /* 1 result */,
   "Renkaban" /* 1 result */,
   "JR Nishi-Nihon Presents" /* 1 result */,
-  "PDRoms Competition 4.01" /* 1 result */,
+  "PDroms Competition 4.01" /* 1 result */,
   "Battery Save Version" /* 1 result */,
   "No Logo Version" /* 1 result */,
   "RetroGameCon 5 Edition" /* 1 result */,
