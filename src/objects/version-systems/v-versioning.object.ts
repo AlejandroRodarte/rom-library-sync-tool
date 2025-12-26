@@ -1,13 +1,13 @@
 import type { VersionSystem } from "../../types.js";
 
 const vVersioning: VersionSystem = {
-  pattern: /^[vV][0-9]+(\.[a-zA-Z0-9]+)*$/,
+  pattern: /^[vV]\.?[0-9]+(?:\.[a-zA-Z0-9]+)*$/,
   compareFn: (label1, label2) => {
     const nums1: number[] = [];
 
     // "v1.01" -> ["1", "01"]
     // "v1.00AI" -> ["1", "00AI"]
-    const setA1 = label1.substring(1).split(".");
+    const setA1 = label1.substring(1).split(".").filter(Boolean);
     for (const setA1Item of setA1) {
       // ["1", "01"] -> ["1", "0", "1"]
       // ["1", "00AI"] -> ["1", "0", "0", "A", "I"]
@@ -23,7 +23,7 @@ const vVersioning: VersionSystem = {
 
     // "v1.01" -> ["1", "01"]
     // "v1.00AI" -> ["1", "00AI"]
-    const setA2 = label2.substring(1).split(".");
+    const setA2 = label2.substring(1).split(".").filter(Boolean);
     for (const setA2Item of setA2) {
       // ["1", "01"] -> ["1", "0", "1"]
       // ["1", "00AI"] -> ["1", "0", "0", "A", "I"]
