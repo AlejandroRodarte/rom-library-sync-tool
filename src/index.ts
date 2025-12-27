@@ -29,6 +29,8 @@ const main = async () => {
     const groups = buildGroupsFromFilenames(filenames);
 
     for (const [title, roms] of groups) {
+      if (title === "metadata.txt" || title === "systeminfo.txt") continue;
+
       // if there is only one entry in the ROM group, skip
       if (roms.length === 1) {
         konsole.roms.selected.one.set(title, roms);
