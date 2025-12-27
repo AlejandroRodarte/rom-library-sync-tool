@@ -7,6 +7,7 @@ const WANTED_EXACT_LABELS_BASE_LIST = [
   "Rumble Version",
   "Final Version",
   "Emulator Optimized",
+  "Fixed",
   "Remastered",
   "Color Blind",
   "Multiple Endings",
