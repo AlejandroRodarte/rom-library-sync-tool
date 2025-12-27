@@ -1,10 +1,11 @@
 import type { VersionSystem } from "../../types.js";
 
 const revLetterVersioning: VersionSystem = {
-  pattern: /^Rev [a-zA-Z](\.[0-9]+)*$/,
+  pattern: /^Rev +[a-zA-Z](\.[0-9]+)*$/,
   compareFn: (label1, label2) => {
     const nums1 = label1
-      .replace(/Rev /, "")
+      .replace(/Rev/, "")
+      .trim()
       .split(".")
       .map((s) => {
         const isCharLetter = /^[a-zA-Z]$/.test(s);
@@ -12,7 +13,8 @@ const revLetterVersioning: VersionSystem = {
         else return +s;
       });
     const nums2 = label2
-      .replace(/Rev /, "")
+      .replace(/Rev/, "")
+      .trim()
       .split(".")
       .map((s) => {
         const isCharLetter = /^[a-zA-Z]$/.test(s);

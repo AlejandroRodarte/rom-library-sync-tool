@@ -1,14 +1,16 @@
 import type { VersionSystem } from "../../types.js";
 
 const revNumberVersioning: VersionSystem = {
-  pattern: /^Rev [0-9]+(\.[0-9]+)*$/,
+  pattern: /^Rev +[0-9]+(\.[0-9]+)*$/,
   compareFn: (label1, label2) => {
     const nums1 = label1
-      .replace(/Rev /, "")
+      .replace(/Rev/, "")
+      .trim()
       .split(".")
       .map((s) => +s);
     const nums2 = label2
-      .replace(/Rev /, "")
+      .replace(/Rev/, "")
+      .trim()
       .split(".")
       .map((s) => +s);
 
