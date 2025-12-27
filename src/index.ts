@@ -16,6 +16,7 @@ import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-base
 import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
 import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-language-amount.helper.js";
+import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -33,14 +34,21 @@ const main = async () => {
         continue;
       }
 
-      discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
-      discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
-      discardRomsBasedOnLanguageAmount(roms);
+      const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
+
+      if (!titleIsBios) {
+        discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
+        discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
+        discardRomsBasedOnLanguageAmount(roms);
+      }
       discardRomsBasedOnUnwantedLabelSegments(roms);
       discardRomsBasedOnVersioningSystems(roms);
-      discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
-      discardRomsBasedOnUnwantedExactLabels(roms);
-      discardRomsBasedOnWantedExactLabels(roms);
+      if (!titleIsBios) {
+        discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
+        discardRomsBasedOnUnwantedExactLabels(roms);
+        discardRomsBasedOnWantedExactLabels(roms);
+      }
+
       addRomsToConsole(roms, konsole, title);
     }
   }
