@@ -8,13 +8,14 @@ const buildGroupsFromFilenames = (filenames: string[]): Groups => {
     // EXAMPLE
     // rom: Super Space Invaders (USA, Europe).zip
     // title: Super Space Invaders
-    const [title] = filename.split("(");
+    const [rawTitle] = filename.split("(");
 
-    if (!title) {
+    if (!rawTitle) {
       console.error(`No title found for ROM ${filename}`);
       continue;
     }
 
+    const title = rawTitle.trim();
     const { labels, languages } =
       extractLabelsAndLanguagesFromFilename(filename);
     const group = groups.get(title);
