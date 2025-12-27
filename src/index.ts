@@ -17,6 +17,7 @@ import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
 import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-language-amount.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
+import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -51,6 +52,10 @@ const main = async () => {
 
       addRomsToConsole(roms, konsole, title);
     }
+  }
+
+  for (const [_, konsole] of consoles) {
+    printConsoleDuplicates(konsole);
   }
 
   let totalNoneSelected = 0;
