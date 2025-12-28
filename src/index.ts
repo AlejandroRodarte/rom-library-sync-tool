@@ -1,5 +1,6 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
+import os from "node:os";
 
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
@@ -18,6 +19,15 @@ import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-la
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
+import {
+  closeSync,
+  existsSync,
+  openSync,
+  readFileSync,
+  truncateSync,
+  unlinkSync,
+  writeSync,
+} from "node:fs";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -60,6 +70,96 @@ const main = async () => {
     printConsoleDuplicates(konsole);
   }
   printFinalConsolesReport(consoles);
+
+  const appDir = process.env.PWD;
+  if (!appDir) return;
+
+  const dataDir = path.resolve(appDir, "data");
+
+  for (const [name, konsole] of consoles) {
+    const newConsoleFilenames: string[] = [];
+
+    for (const [_, groups] of Object.entries(konsole.roms.selected)) {
+      for (const [_, roms] of groups) {
+        const selectedRoms = roms.filter((rom) => rom.selected);
+        for (const rom of selectedRoms) newConsoleFilenames.push(rom.filename);
+      }
+    }
+
+    const consoleFilePath = path.resolve(dataDir, `${name}.txt`);
+    const diffConsoleFilePath = path.resolve(dataDir, `${name}.diff.txt`);
+
+    const consoleFileExists = existsSync(consoleFilePath);
+    const diffConsoleFileExists = existsSync(diffConsoleFilePath);
+
+    if (diffConsoleFileExists) {
+      unlinkSync(diffConsoleFilePath);
+    }
+
+    if (!consoleFileExists) {
+      const consoleFileDescriptor = openSync(consoleFilePath, "w");
+
+      let content = "";
+      for (const [index, filename] of newConsoleFilenames.entries()) {
+        const lastItem = index === newConsoleFilenames.length - 1;
+        if (!lastItem) content += `${filename}\n`;
+        else content += filename;
+      }
+
+      writeSync(consoleFileDescriptor, content, null, "utf8");
+      closeSync(consoleFileDescriptor);
+      continue;
+    }
+
+    const currentConsoleFilenames = readFileSync(consoleFilePath)
+      .toString()
+      .split(os.EOL);
+    truncateSync(consoleFilePath);
+
+    const consoleFileDescriptor = openSync(consoleFilePath, "w");
+
+    let content = "";
+    for (const [index, filename] of newConsoleFilenames.entries()) {
+      const lastItem = index === newConsoleFilenames.length - 1;
+      if (!lastItem) content += `${filename}\n`;
+      else content += filename;
+    }
+
+    writeSync(consoleFileDescriptor, content, null, "utf8");
+    closeSync(consoleFileDescriptor);
+
+    const diffConsoleFileDescriptor = openSync(diffConsoleFilePath, "w");
+
+    for (const newConsoleFilename of newConsoleFilenames) {
+      const indexWhereNewFilenameIsOnCurrentList =
+        currentConsoleFilenames.findIndex((f) => f === newConsoleFilename);
+      const newFilenameIsOnCurrentList =
+        indexWhereNewFilenameIsOnCurrentList !== -1;
+
+      if (newFilenameIsOnCurrentList) {
+        currentConsoleFilenames.splice(indexWhereNewFilenameIsOnCurrentList, 1);
+        continue;
+      }
+
+      writeSync(
+        diffConsoleFileDescriptor,
+        `add-file "${DIR_BASE_PATH}/${newConsoleFilename}"\n`,
+        null,
+        "utf8",
+      );
+    }
+
+    for (const currentConsoleFilename of currentConsoleFilenames) {
+      writeSync(
+        diffConsoleFileDescriptor,
+        `remove-file "${DIR_BASE_PATH}/${currentConsoleFilename}"\n`,
+        null,
+        "utf8",
+      );
+    }
+
+    closeSync(diffConsoleFileDescriptor);
+  }
 };
 
 main();
