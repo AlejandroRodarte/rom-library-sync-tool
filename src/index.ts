@@ -31,6 +31,7 @@ import {
 import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filenames-from-console.helper.js";
 import writeRomFilenamesToConsoleFile from "./helpers/write-rom-filenames-to-console-file.helper.js";
 import writeConsoleDiffFile from "./helpers/write-console-diff-file.helper.js";
+import writeConsoleFiles from "./helpers/write-console-files.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -69,39 +70,10 @@ const main = async () => {
     }
   }
 
-  for (const [_, konsole] of consoles) {
-    printConsoleDuplicates(konsole);
-  }
+  for (const [_, konsole] of consoles) printConsoleDuplicates(konsole);
   printFinalConsolesReport(consoles);
 
-  for (const [name, konsole] of consoles) {
-    const newConsoleFilenames = getSelectedRomFilenamesFromConsole(konsole);
-
-    const consoleFilePath = path.resolve(DATA_DIR_PATH, `${name}.txt`);
-    const diffConsoleFilePath = path.resolve(DATA_DIR_PATH, `${name}.diff.txt`);
-
-    const consoleFileExists = existsSync(consoleFilePath);
-    const diffConsoleFileExists = existsSync(diffConsoleFilePath);
-
-    if (diffConsoleFileExists) unlinkSync(diffConsoleFilePath);
-
-    if (!consoleFileExists) {
-      writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
-      continue;
-    }
-
-    const currentConsoleFilenames = readFileSync(consoleFilePath)
-      .toString()
-      .split(os.EOL);
-    truncateSync(consoleFilePath);
-
-    writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
-    writeConsoleDiffFile(
-      diffConsoleFilePath,
-      currentConsoleFilenames,
-      newConsoleFilenames,
-    );
-  }
+  for (const [name, konsole] of consoles) writeConsoleFiles(name, konsole);
 };
 
 main();
