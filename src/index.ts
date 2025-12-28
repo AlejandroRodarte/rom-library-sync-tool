@@ -39,7 +39,10 @@ const main = async () => {
     const dirPath = path.join(ROMS_DIR_PATH, name);
 
     // NOTE: output already sorts filenames in ascending order
-    const filenames = await readdir(dirPath);
+    const entries = await readdir(dirPath, { withFileTypes: true });
+    const filenames = entries
+      .filter((entry) => entry.isFile())
+      .map((e) => e.name);
     const groups = buildGroupsFromFilenames(filenames);
 
     for (const [title, roms] of groups) {
