@@ -1,9 +1,8 @@
 import { readdir } from "node:fs/promises";
 import path from "path";
-import os from "node:os";
 
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
-import { DATA_DIR_PATH, ROMS_DIR_PATH } from "./constants/paths.constants.js";
+import { ROMS_DIR_PATH } from "./constants/paths.constants.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
@@ -19,18 +18,6 @@ import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-la
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
-import {
-  closeSync,
-  existsSync,
-  openSync,
-  readFileSync,
-  truncateSync,
-  unlinkSync,
-  writeSync,
-} from "node:fs";
-import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filenames-from-console.helper.js";
-import writeRomFilenamesToConsoleFile from "./helpers/write-rom-filenames-to-console-file.helper.js";
-import writeConsoleDiffFile from "./helpers/write-console-diff-file.helper.js";
 import writeConsoleFiles from "./helpers/write-console-files.helper.js";
 
 const main = async () => {
