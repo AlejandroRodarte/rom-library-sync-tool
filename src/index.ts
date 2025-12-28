@@ -3,7 +3,7 @@ import path from "path";
 import os from "node:os";
 
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
-import DIR_BASE_PATH from "./constants/dir-base-path.constant.js";
+import { DATA_DIR_PATH, ROMS_DIR_PATH } from "./constants/paths.constants.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
@@ -33,7 +33,7 @@ import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filen
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
   for (const [name, konsole] of consoles) {
-    const dirPath = path.join(DIR_BASE_PATH, name);
+    const dirPath = path.join(ROMS_DIR_PATH, name);
 
     // NOTE: output already sorts filenames in ascending order
     const filenames = await readdir(dirPath);
@@ -72,16 +72,11 @@ const main = async () => {
   }
   printFinalConsolesReport(consoles);
 
-  const appDir = process.env.PWD;
-  if (!appDir) return;
-
-  const dataDir = path.resolve(appDir, "data");
-
   for (const [name, konsole] of consoles) {
     const newConsoleFilenames = getSelectedRomFilenamesFromConsole(konsole);
 
-    const consoleFilePath = path.resolve(dataDir, `${name}.txt`);
-    const diffConsoleFilePath = path.resolve(dataDir, `${name}.diff.txt`);
+    const consoleFilePath = path.resolve(DATA_DIR_PATH, `${name}.txt`);
+    const diffConsoleFilePath = path.resolve(DATA_DIR_PATH, `${name}.diff.txt`);
 
     const consoleFileExists = existsSync(consoleFilePath);
     const diffConsoleFileExists = existsSync(diffConsoleFilePath);
@@ -137,7 +132,7 @@ const main = async () => {
 
       writeSync(
         diffConsoleFileDescriptor,
-        `add-file "${DIR_BASE_PATH}/${newConsoleFilename}"\n`,
+        `add-file "${ROMS_DIR_PATH}/${newConsoleFilename}"\n`,
         null,
         "utf8",
       );
@@ -146,7 +141,7 @@ const main = async () => {
     for (const currentConsoleFilename of currentConsoleFilenames) {
       writeSync(
         diffConsoleFileDescriptor,
-        `remove-file "${DIR_BASE_PATH}/${currentConsoleFilename}"\n`,
+        `remove-file "${ROMS_DIR_PATH}/${currentConsoleFilename}"\n`,
         null,
         "utf8",
       );
