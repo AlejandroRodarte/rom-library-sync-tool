@@ -29,6 +29,7 @@ import {
   writeSync,
 } from "node:fs";
 import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filenames-from-console.helper.js";
+import writeRomFilenamesToConsoleFile from "./helpers/write-rom-filenames-to-console-file.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -81,22 +82,10 @@ const main = async () => {
     const consoleFileExists = existsSync(consoleFilePath);
     const diffConsoleFileExists = existsSync(diffConsoleFilePath);
 
-    if (diffConsoleFileExists) {
-      unlinkSync(diffConsoleFilePath);
-    }
+    if (diffConsoleFileExists) unlinkSync(diffConsoleFilePath);
 
     if (!consoleFileExists) {
-      const consoleFileDescriptor = openSync(consoleFilePath, "w");
-
-      let content = "";
-      for (const [index, filename] of newConsoleFilenames.entries()) {
-        const lastItem = index === newConsoleFilenames.length - 1;
-        if (!lastItem) content += `${filename}\n`;
-        else content += filename;
-      }
-
-      writeSync(consoleFileDescriptor, content, null, "utf8");
-      closeSync(consoleFileDescriptor);
+      writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
       continue;
     }
 
@@ -104,18 +93,7 @@ const main = async () => {
       .toString()
       .split(os.EOL);
     truncateSync(consoleFilePath);
-
-    const consoleFileDescriptor = openSync(consoleFilePath, "w");
-
-    let content = "";
-    for (const [index, filename] of newConsoleFilenames.entries()) {
-      const lastItem = index === newConsoleFilenames.length - 1;
-      if (!lastItem) content += `${filename}\n`;
-      else content += filename;
-    }
-
-    writeSync(consoleFileDescriptor, content, null, "utf8");
-    closeSync(consoleFileDescriptor);
+    writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
 
     const diffConsoleFileDescriptor = openSync(diffConsoleFilePath, "w");
 
