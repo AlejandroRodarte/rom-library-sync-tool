@@ -21,6 +21,7 @@ const writeConsoleFiles = (name: string, konsole: Console): void => {
 
   if (!consoleFileExists) {
     writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
+    writeConsoleDiffFile(diffConsoleFilePath, [], newConsoleFilenames);
     return;
   }
 
