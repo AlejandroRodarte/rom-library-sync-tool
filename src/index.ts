@@ -28,6 +28,7 @@ import {
   unlinkSync,
   writeSync,
 } from "node:fs";
+import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filenames-from-console.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -77,14 +78,7 @@ const main = async () => {
   const dataDir = path.resolve(appDir, "data");
 
   for (const [name, konsole] of consoles) {
-    const newConsoleFilenames: string[] = [];
-
-    for (const [_, groups] of Object.entries(konsole.roms.selected)) {
-      for (const [_, roms] of groups) {
-        const selectedRoms = roms.filter((rom) => rom.selected);
-        for (const rom of selectedRoms) newConsoleFilenames.push(rom.filename);
-      }
-    }
+    const newConsoleFilenames = getSelectedRomFilenamesFromConsole(konsole);
 
     const consoleFilePath = path.resolve(dataDir, `${name}.txt`);
     const diffConsoleFilePath = path.resolve(dataDir, `${name}.diff.txt`);
