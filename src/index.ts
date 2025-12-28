@@ -23,10 +23,10 @@ import writeConsoleFiles from "./helpers/write-console-files.helper.js";
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
   for (const [name, konsole] of consoles) {
-    const dirPath = path.join(ROMS_DIR_PATH, name);
+    const consoleRomsDirPath = path.resolve(ROMS_DIR_PATH, name);
 
     // NOTE: output already sorts filenames in ascending order
-    const entries = await readdir(dirPath, { withFileTypes: true });
+    const entries = await readdir(consoleRomsDirPath, { withFileTypes: true });
     const filenames = entries
       .filter((entry) => entry.isFile())
       .map((e) => e.name);
