@@ -63,7 +63,9 @@ const main = async () => {
   for (const [_, konsole] of consoles) printConsoleDuplicates(konsole);
   printFinalConsolesReport(consoles);
 
-  for (const [name, konsole] of consoles) writeConsoleFiles(name, konsole);
+  const generateFiles = false;
+  if (generateFiles)
+    for (const [name, konsole] of consoles) writeConsoleFiles(name, konsole);
 };
 
 main();
