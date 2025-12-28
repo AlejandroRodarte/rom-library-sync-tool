@@ -31,7 +31,7 @@ const writeConsoleDiffFile = (
   for (const currentConsoleFilename of currentFilenames) {
     writeSync(
       diffConsoleFileDescriptor,
-      `remove-file|"${ROMS_DIR_PATH}/${currentConsoleFilename}"\n`,
+      `remove-file|"${currentConsoleFilename}"\n`,
       null,
       "utf8",
     );
