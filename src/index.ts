@@ -30,6 +30,7 @@ import {
 } from "node:fs";
 import getSelectedRomFilenamesFromConsole from "./helpers/get-selected-rom-filenames-from-console.helper.js";
 import writeRomFilenamesToConsoleFile from "./helpers/write-rom-filenames-to-console-file.helper.js";
+import writeConsoleDiffFile from "./helpers/write-console-diff-file.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -93,39 +94,13 @@ const main = async () => {
       .toString()
       .split(os.EOL);
     truncateSync(consoleFilePath);
+
     writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
-
-    const diffConsoleFileDescriptor = openSync(diffConsoleFilePath, "w");
-
-    for (const newConsoleFilename of newConsoleFilenames) {
-      const indexWhereNewFilenameIsOnCurrentList =
-        currentConsoleFilenames.findIndex((f) => f === newConsoleFilename);
-      const newFilenameIsOnCurrentList =
-        indexWhereNewFilenameIsOnCurrentList !== -1;
-
-      if (newFilenameIsOnCurrentList) {
-        currentConsoleFilenames.splice(indexWhereNewFilenameIsOnCurrentList, 1);
-        continue;
-      }
-
-      writeSync(
-        diffConsoleFileDescriptor,
-        `add-file "${ROMS_DIR_PATH}/${newConsoleFilename}"\n`,
-        null,
-        "utf8",
-      );
-    }
-
-    for (const currentConsoleFilename of currentConsoleFilenames) {
-      writeSync(
-        diffConsoleFileDescriptor,
-        `remove-file "${ROMS_DIR_PATH}/${currentConsoleFilename}"\n`,
-        null,
-        "utf8",
-      );
-    }
-
-    closeSync(diffConsoleFileDescriptor);
+    writeConsoleDiffFile(
+      diffConsoleFilePath,
+      currentConsoleFilenames,
+      newConsoleFilenames,
+    );
   }
 };
 
