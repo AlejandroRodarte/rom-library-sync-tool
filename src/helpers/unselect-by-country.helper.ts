@@ -3,9 +3,9 @@ import UNRELEASED_LABEL_SEGMENT_LIST from "../constants/unreleased-label-segment
 import type { Rom } from "../types.js";
 import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
-const discardRomsBasedOnCountryList = (
+const unselectByCountry = (
   roms: Rom[],
-  countryList: string[],
+  countryPriorityList: string[],
   keepSelected: number = 1,
 ): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
@@ -31,7 +31,7 @@ const discardRomsBasedOnCountryList = (
     }
   };
 
-  for (const country of countryList) {
+  for (const country of countryPriorityList) {
     const countryRoms = selectedRoms.filter((rom) =>
       rom.labels.includes(country),
     );
@@ -72,4 +72,4 @@ const discardRomsBasedOnCountryList = (
   }
 };
 
-export default discardRomsBasedOnCountryList;
+export default unselectByCountry;

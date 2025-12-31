@@ -4,7 +4,7 @@ import path from "path";
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import { ROMS_DIR_PATH } from "./constants/paths.constants.js";
 import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
-import discardRomsBasedOnCountryList from "./helpers/discard-roms-based-on-country-list.helper.js";
+import unselectByCountry from "./helpers/unselect-by-country.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning-systems.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
@@ -44,7 +44,7 @@ const main = async () => {
       const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
 
       if (!titleIsBios) {
-        discardRomsBasedOnCountryList(roms, COUNTRY_LIST);
+        unselectByCountry(roms, COUNTRY_LIST);
         discardRomsBasedOnLanguageList(roms, LANGUAGE_LIST);
         discardRomsBasedOnLanguageAmount(roms);
       }
