@@ -6,11 +6,17 @@ import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.j
 const discardRomsBasedOnCountryList = (
   roms: Rom[],
   countryList: string[],
-): string => {
+  keepSelected: number = 1,
+): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
+  let selectedRomAmount = selectedRoms.length;
 
-  let romAmount = selectedRoms.length;
-  if (romAmount === 1) return "";
+  if (keepSelected > selectedRomAmount) {
+    console.log(`You want to keep selected ${keepSelected} ROMs out of the ${selectedRomAmount} selected ROMs available.`);
+    return;
+  }
+
+  if (selectedRomAmount === keepSelected) return;
 
   const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
 
@@ -20,8 +26,8 @@ const discardRomsBasedOnCountryList = (
     );
     for (const romToUnselect of nonCountryRoms) {
       romToUnselect.selected = false;
-      romAmount--;
-      if (romAmount === 1) return;
+      selectedRomAmount--;
+      if (selectedRomAmount === keepSelected) return;
     }
   };
 
@@ -37,7 +43,7 @@ const discardRomsBasedOnCountryList = (
       specialFlags.allRomsAreForVirtualConsole
     ) {
       unselectNonCountryRoms(country);
-      return country;
+      return;
     }
 
     const releasedCountryRoms = countryRoms.filter(
@@ -62,10 +68,8 @@ const discardRomsBasedOnCountryList = (
     if (allReleasedCountryRomsAreForVirtualConsole) continue;
 
     unselectNonCountryRoms(country);
-    return country;
+    return;
   }
-
-  return "";
 };
 
 export default discardRomsBasedOnCountryList;
