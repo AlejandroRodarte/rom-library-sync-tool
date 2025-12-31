@@ -4,11 +4,11 @@ import protoVersioning from "../objects/version-systems/proto-versioning.object.
 import sampleVersioning from "../objects/version-systems/sample-versioning.object.js";
 import type { VersionSystem } from "../types.js";
 
-const VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS: VersionSystem[] = [
+const VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS: VersionSystem[] = [
   betaVersioning,
   protoVersioning,
   demoVersioning,
   sampleVersioning,
 ];
 
-export default VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS;
+export default VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS;

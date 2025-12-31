@@ -1,5 +1,5 @@
-import VERSIONING_SYSTEMS_BASE_LIST from "../constants/versioning-systems-base-list.constant.js";
-import VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS from "../constants/versioning-systems-list-for-unreleased-roms.constant.js";
+import VERSIONING_SYSTEMS_PRIORITY_LIST from "../constants/versioning-systems-priority-list.constant.js";
+import VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS from "../constants/versioning-systems-priority-list-for-unreleased-roms.constant.js";
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
 import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
@@ -12,8 +12,10 @@ const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
   const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
   const versionSystems: VersionSystem[] = [];
   if (specialFlags.allRomsAreUnreleased)
-    versionSystems.push(...VERSIONING_SYSTEMS_LIST_FOR_UNRELEASED_ROMS);
-  versionSystems.push(...VERSIONING_SYSTEMS_BASE_LIST);
+    versionSystems.push(
+      ...VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS,
+    );
+  versionSystems.push(...VERSIONING_SYSTEMS_PRIORITY_LIST);
 
   for (const versionSystem of versionSystems) {
     const versionedRoms: RomIndexAndVersion[] = [];

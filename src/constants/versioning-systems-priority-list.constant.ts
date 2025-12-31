@@ -17,7 +17,7 @@ import mbcVersioning from "../objects/version-systems/mbc-versioning.object.js";
 import ninaVersioning from "../objects/version-systems/nina-versioning.object.js";
 import rDotCDotVersioning from "../objects/version-systems/r-dot-c-dot-versioning.object.js";
 
-const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
+const VERSIONING_SYSTEMS_PRIORITY_LIST: VersionSystem[] = [
   vVersioning,
   revNumberVersioning,
   revUppercasedLetterVersioning,
@@ -37,4 +37,4 @@ const VERSIONING_SYSTEMS_BASE_LIST: VersionSystem[] = [
   numbersVersioning,
 ];
 
-export default VERSIONING_SYSTEMS_BASE_LIST;
+export default VERSIONING_SYSTEMS_PRIORITY_LIST;
