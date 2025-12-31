@@ -19,17 +19,13 @@ import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
 import writeConsoleFiles from "./helpers/write-console-files.helper.js";
+import getGroupsFromConsoleRomsDir from "./helpers/get-groups-from-console-roms-dir.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
 
   for (const [name, konsole] of consoles) {
-    const consoleRomsDirPath = path.resolve(ROMS_DIR_PATH, name);
-    const entries = await readdir(consoleRomsDirPath, { withFileTypes: true });
-    const filenames = entries
-      .filter((entry) => entry.isFile())
-      .map((e) => e.name);
-    const groups = buildGroupsFromFilenames(filenames);
+    const groups = await getGroupsFromConsoleRomsDir(name);
 
     for (const [title, roms] of groups) {
       if (title === "metadata.txt" || title === "systeminfo.txt") continue;
