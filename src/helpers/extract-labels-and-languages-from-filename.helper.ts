@@ -1,4 +1,4 @@
-import LANGUAGE_LIST from "../constants/language-list.constant.js";
+import LANGUAGE_PRIORITY_LIST from "../constants/language-priority-list.constant.js";
 
 interface LabelsAndLanguages {
   labels: string[];
@@ -22,7 +22,7 @@ const extractLabelsAndLanguagesFromFilename = (
         const parenthesesItems = parenthesesGroup.split("+");
         parenthesesItems.forEach((item) => {
           const trimmedItem = item.trim();
-          const itemIsALanguage = LANGUAGE_LIST.includes(trimmedItem);
+          const itemIsALanguage = LANGUAGE_PRIORITY_LIST.includes(trimmedItem);
           if (itemIsALanguage) languages.push(trimmedItem);
           else labels.push(trimmedItem);
         });

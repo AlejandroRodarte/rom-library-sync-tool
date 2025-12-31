@@ -1,4 +1,4 @@
-const LANGUAGE_LIST = [
+const LANGUAGE_PRIORITY_LIST = [
   "En",
   "En-US",
   "En-GB",
@@ -35,4 +35,4 @@ const LANGUAGE_LIST = [
   "Kw",
 ];
 
-export default LANGUAGE_LIST;
+export default LANGUAGE_PRIORITY_LIST;

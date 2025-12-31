@@ -1,4 +1,4 @@
-const COUNTRY_LIST = [
+const COUNTRY_PRIORITY_LIST = [
   "USA",
   "Europe",
   "World",
@@ -25,4 +25,4 @@ const COUNTRY_LIST = [
   "Unknown",
 ];
 
-export default COUNTRY_LIST;
+export default COUNTRY_PRIORITY_LIST;
