@@ -23,7 +23,6 @@ const main = async () => {
     const groups = await getGroupsFromConsoleRomsDir(name);
 
     for (const [title, roms] of groups) {
-      if (title === "metadata.txt" || title === "systeminfo.txt") continue;
       const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
       const keepSelected = 1;
 
