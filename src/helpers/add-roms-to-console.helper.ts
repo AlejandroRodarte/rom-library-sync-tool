@@ -10,9 +10,9 @@ const addRomsToConsole = (
     return acc;
   }, 0);
 
-  if (romsSelected === 0) konsole.roms.selected.none.set(title, roms);
-  else if (romsSelected > 1) konsole.roms.selected.multiple.set(title, roms);
-  else konsole.roms.selected.one.set(title, roms);
+  const consoleEntry = konsole.get(romsSelected);
+  if (consoleEntry) consoleEntry.set(title, roms);
+  else konsole.set(romsSelected, new Map<string, Rom[]>([[title, roms]]));
 };
 
 export default addRomsToConsole;

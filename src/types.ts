@@ -6,16 +6,7 @@ export interface Rom {
 }
 
 export type Groups = Map<string, Rom[]>;
-
-export interface Console {
-  roms: {
-    selected: {
-      none: Groups;
-      one: Groups;
-      multiple: Groups;
-    };
-  };
-}
+export type Console = Map<number, Groups>;
 
 export type Consoles = Map<string, Console>;
 export type DuplicatesData = Map<number, Groups>;
