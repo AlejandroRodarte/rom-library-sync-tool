@@ -12,7 +12,9 @@ const unselectByCountry = (
   let selectedRomAmount = selectedRoms.length;
 
   if (keepSelected > selectedRomAmount) {
-    console.log(`You want to keep selected ${keepSelected} ROMs out of the ${selectedRomAmount} selected ROMs available.`);
+    console.log(
+      `You want to keep selected ${keepSelected} ROMs out of the ${selectedRomAmount} selected ROMs available.`,
+    );
     return;
   }
 
