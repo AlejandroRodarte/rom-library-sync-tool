@@ -1,9 +1,4 @@
-import { readdir } from "node:fs/promises";
-import path from "path";
-
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
-import { ROMS_DIR_PATH } from "./constants/paths.constants.js";
-import buildGroupsFromFilenames from "./helpers/build-groups-from-filenames.helper.js";
 import unselectByCountry from "./helpers/unselect-by-country.helper.js";
 import COUNTRY_LIST from "./constants/country-list.constant.js";
 import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning-systems.helper.js";
