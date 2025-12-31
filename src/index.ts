@@ -29,14 +29,13 @@ const main = async () => {
 
     for (const [title, roms] of groups) {
       if (title === "metadata.txt" || title === "systeminfo.txt") continue;
+      const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
 
       // if there is only one entry in the ROM group, skip
       if (roms.length === 1) {
         konsole.roms.selected.one.set(title, roms);
         continue;
       }
-
-      const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
 
       if (!titleIsBios) {
         unselectByCountry(roms, COUNTRY_LIST);
