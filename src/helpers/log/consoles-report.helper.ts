@@ -1,6 +1,6 @@
 import type { Consoles } from "../../types.js";
 
-const printFinalConsolesReport = (consoles: Consoles): void => {
+const consolesReport = (consoles: Consoles): void => {
   const romsSelectedTotals = new Map<number, number>();
 
   for (const [name, konsole] of consoles) {
@@ -19,4 +19,4 @@ const printFinalConsolesReport = (consoles: Consoles): void => {
     console.log(`ROMs with ${romsSelected} selections: ${total}`);
 };
 
-export default printFinalConsolesReport;
+export default consolesReport;

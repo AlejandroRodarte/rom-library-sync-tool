@@ -1,6 +1,6 @@
 import type { Console } from "../../types.js";
 
-const printConsoleDuplicates = (konsole: Console): void => {
+const consoleDuplicates = (konsole: Console): void => {
   for (const [romsSelected, groups] of konsole) {
     if (romsSelected <= 1) continue;
     console.log(`\n===== ${romsSelected} duplicates ======`);
@@ -12,4 +12,4 @@ const printConsoleDuplicates = (konsole: Console): void => {
   }
 };
 
-export default printConsoleDuplicates;
+export default consoleDuplicates;
