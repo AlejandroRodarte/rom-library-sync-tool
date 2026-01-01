@@ -13,7 +13,7 @@ const unselectBySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
   let selectedRoms = roms.filter((rom) => rom.selected);
 
   let romAmount = selectedRoms.length;
-  if (romAmount === 1) return;
+  if (romAmount === keepSelected) return;
 
   let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
   const bannedLabelSegments: string[] = [];
