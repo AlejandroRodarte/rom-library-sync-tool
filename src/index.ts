@@ -12,7 +12,10 @@ const main = async () => {
     const groups = await build.groupsFromConsoleName(name);
 
     for (const [title, roms] of groups) {
+      let type: "normal" | "bios" = "normal";
       const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
+      if (titleIsBios) type = "bios";
+
       const keepSelected = 1;
 
       if (!titleIsBios) {
