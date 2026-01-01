@@ -1,13 +1,13 @@
-import WANTED_EXACT_LABELS_BASE_LIST from "../constants/wanted-exact-labels-base-list.constant.js";
+import WHITELISTED_LABELS_BASE_PRIORITY_LIST from "../constants/whitelisted-labels-base-priority-list.constant.js";
 import type { Rom } from "../types.js";
 
-const discardRomsBasedOnWantedExactLabels = (roms: Rom[]): void => {
+const unselectByWhitelistedLabelsBasePriorityList = (roms: Rom[]): void => {
   let selectedRoms = roms.filter((rom) => rom.selected);
 
   let romAmount = selectedRoms.length;
   if (romAmount === 1) return;
 
-  for (const wantedExactLabel of WANTED_EXACT_LABELS_BASE_LIST) {
+  for (const wantedExactLabel of WHITELISTED_LABELS_BASE_PRIORITY_LIST) {
     const romsWithoutWantedLabel = selectedRoms.filter(
       (rom) => !rom.labels.includes(wantedExactLabel),
     );
@@ -25,4 +25,4 @@ const discardRomsBasedOnWantedExactLabels = (roms: Rom[]): void => {
   }
 };
 
-export default discardRomsBasedOnWantedExactLabels;
+export default unselectByWhitelistedLabelsBasePriorityList;

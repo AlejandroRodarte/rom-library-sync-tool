@@ -8,7 +8,6 @@ import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.
 import unselectByPALAndNTSCLabels from "./helpers/unselect-by-pal-and-ntsc-labels.helper.js";
 import unselectBySpecialFlags from "./helpers/unselect-by-special-flags.helper.js";
 import unselectByBannedLabelsBasePriorityList from "./helpers/unselect-by-banned-labels-base-priority-list.helper.js";
-import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
 import unselectByLanguageAmount from "./helpers/unselect-by-language-amount.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
@@ -16,6 +15,7 @@ import printFinalConsolesReport from "./helpers/print-final-consoles-report.help
 import writeConsoleFiles from "./helpers/write-console-files.helper.js";
 import getGroupsFromConsoleRomsDir from "./helpers/get-groups-from-console-roms-dir.helper.js";
 import unselectByBannedLabelSegments from "./helpers/unselect-by-banned-label-segments.helper.js";
+import unselectByWhitelistedLabelsBasePriorityList from "./helpers/unselect-by-whitelisted-labels-base-priority-list.helper.js";
 
 const main = async () => {
   const consoles = buildEmptyConsolesObject();
@@ -38,7 +38,7 @@ const main = async () => {
       if (!titleIsBios) {
         unselectByPALAndNTSCLabels(roms);
         unselectByBannedLabelsBasePriorityList(roms);
-        discardRomsBasedOnWantedExactLabels(roms);
+        unselectByWhitelistedLabelsBasePriorityList(roms);
       }
 
       addRomsToConsole(roms, konsole, title);

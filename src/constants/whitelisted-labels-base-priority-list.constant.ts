@@ -1,4 +1,4 @@
-const WANTED_EXACT_LABELS_BASE_LIST = [
+const WHITELISTED_LABELS_BASE_PRIORITY_LIST = [
   "GB Compatible",
   "Limited Run Games",
   "Strictly Limited Games",
@@ -15,4 +15,4 @@ const WANTED_EXACT_LABELS_BASE_LIST = [
   "Bugfix",
 ];
 
-export default WANTED_EXACT_LABELS_BASE_LIST;
+export default WHITELISTED_LABELS_BASE_PRIORITY_LIST;
