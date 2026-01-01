@@ -1,4 +1,4 @@
-import type { Console, Rom } from "../types.js";
+import type { Console, Rom } from "../../types.js";
 
 const addRomsToConsole = (
   roms: Rom[],

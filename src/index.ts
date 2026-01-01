@@ -1,4 +1,4 @@
-import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
+import addRomsToConsole from "./helpers/add/add-roms-to-console.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
