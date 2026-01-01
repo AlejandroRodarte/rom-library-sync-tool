@@ -1,4 +1,4 @@
-import type { Consoles } from "../types.js";
+import type { Consoles } from "../../types.js";
 
 const printFinalConsolesReport = (consoles: Consoles): void => {
   const romsSelectedTotals = new Map<number, number>();

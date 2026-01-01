@@ -1,7 +1,7 @@
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
-import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
-import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
+import printConsoleDuplicates from "./helpers/log/print-console-duplicates.helper.js";
+import printFinalConsolesReport from "./helpers/log/print-final-consoles-report.helper.js";
 import writeConsoleFiles from "./helpers/write-console-files.helper.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";

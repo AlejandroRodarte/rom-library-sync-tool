@@ -1,4 +1,4 @@
-import type { Console } from "../types.js";
+import type { Console } from "../../types.js";
 
 const printConsoleDuplicates = (konsole: Console): void => {
   for (const [romsSelected, groups] of konsole) {
