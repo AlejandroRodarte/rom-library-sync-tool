@@ -1,6 +1,6 @@
 import type { Rom } from "../../types.js";
 
-const unselectByLanguages = (
+const byLanguages = (
   roms: Rom[],
   languagePriorityList: string[],
   keepSelected = 1,
@@ -28,4 +28,4 @@ const unselectByLanguages = (
   }
 };
 
-export default unselectByLanguages;
+export default byLanguages;

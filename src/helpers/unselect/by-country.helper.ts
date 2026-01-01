@@ -3,7 +3,7 @@ import UNRELEASED_LABEL_SEGMENT_LIST from "../../constants/unreleased-label-segm
 import type { Rom } from "../../types.js";
 import getSpecialFlagsFromRomSet from "../get-special-flags-from-rom-set.helper.js";
 
-const unselectByCountry = (
+const byCountry = (
   roms: Rom[],
   countryPriorityList: string[],
   keepSelected: number = 1,
@@ -74,4 +74,4 @@ const unselectByCountry = (
   }
 };
 
-export default unselectByCountry;
+export default byCountry;

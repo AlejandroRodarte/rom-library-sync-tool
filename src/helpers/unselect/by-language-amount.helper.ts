@@ -5,7 +5,7 @@ interface RomIndexAndLanguageAmount {
   languageAmount: number;
 }
 
-const unselectByLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
+const byLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
   let selectedRomAmount = selectedRoms.length;
@@ -63,4 +63,4 @@ const unselectByLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
   }
 };
 
-export default unselectByLanguageAmount;
+export default byLanguageAmount;

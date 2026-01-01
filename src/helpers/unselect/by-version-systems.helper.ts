@@ -1,6 +1,6 @@
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../../types.js";
 
-const unselectByVersionSystem = (
+const byVersionSystem = (
   roms: Rom[],
   versioningSystemsPriorityList: VersionSystem[],
   keepSelected = 1,
@@ -81,4 +81,4 @@ const unselectByVersionSystem = (
   }
 };
 
-export default unselectByVersionSystem;
+export default byVersionSystem;

@@ -1,6 +1,6 @@
 import type { Rom } from "../../types.js";
 
-const unselectByWhitelistedLabels = (
+const byWhitelistedLabels = (
   roms: Rom[],
   labelPriorityList: string[],
   keepSelected = 1,
@@ -28,4 +28,4 @@ const unselectByWhitelistedLabels = (
   }
 };
 
-export default unselectByWhitelistedLabels;
+export default byWhitelistedLabels;

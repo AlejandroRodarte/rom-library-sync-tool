@@ -1,6 +1,6 @@
 import type { Rom } from "../../types.js";
 
-const unselectByPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
+const byPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
   let selectedRomAmount = selectedRoms.length;
@@ -22,4 +22,4 @@ const unselectByPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
   }
 };
 
-export default unselectByPALAndNTSCLabels;
+export default byPALAndNTSCLabels;

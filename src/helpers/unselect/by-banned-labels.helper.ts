@@ -1,6 +1,6 @@
 import type { Rom } from "../../types.js";
 
-const unselectByBannedLabels = (
+const byBannedLabels = (
   roms: Rom[],
   labelPriorityList: string[],
   keepSelected = 1,
@@ -28,4 +28,4 @@ const unselectByBannedLabels = (
   }
 };
 
-export default unselectByBannedLabels;
+export default byBannedLabels;

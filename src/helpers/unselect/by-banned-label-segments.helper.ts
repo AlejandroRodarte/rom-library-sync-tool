@@ -1,6 +1,6 @@
 import type { Rom } from "../../types.js";
 
-const unselectByBannedLabelSegments = (
+const byBannedLabelSegments = (
   roms: Rom[],
   labelSegments: string[],
   keepSelected = 1,
@@ -24,4 +24,4 @@ const unselectByBannedLabelSegments = (
   }
 };
 
-export default unselectByBannedLabelSegments;
+export default byBannedLabelSegments;
