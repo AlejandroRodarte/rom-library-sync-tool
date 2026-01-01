@@ -11,7 +11,7 @@ const byBannedLabelsBasePriorityList = (
   let selectedRomAmount = selectedRoms.length;
   if (selectedRomAmount === keepSelected) return;
 
-  byBannedLabels(selectedRoms, BANNED_LABELS_BASE_PRIORITY_LIST);
+  byBannedLabels(selectedRoms, BANNED_LABELS_BASE_PRIORITY_LIST, keepSelected);
 };
 
 export default byBannedLabelsBasePriorityList;

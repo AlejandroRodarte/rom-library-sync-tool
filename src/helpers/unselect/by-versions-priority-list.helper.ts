@@ -18,7 +18,7 @@ const byVersionsPriorityList = (roms: Rom[], keepSelected = 1): void => {
     );
   versionSystemsPriorityList.push(...VERSIONING_SYSTEMS_BASE_PRIORITY_LIST);
 
-  byVersionSystem(selectedRoms, versionSystemsPriorityList);
+  byVersionSystem(selectedRoms, versionSystemsPriorityList, keepSelected);
 };
 
 export default byVersionsPriorityList;

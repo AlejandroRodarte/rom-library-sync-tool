@@ -2,7 +2,14 @@ import WHITELISTED_LABELS_BASE_PRIORITY_LIST from "../../constants/whitelisted-l
 import type { Rom } from "../../types.js";
 import byWhitelistedLabels from "./by-whitelisted-labels.helper.js";
 
-const byWhitelistedLabelsBasePriorityList = (roms: Rom[]): void =>
-  byWhitelistedLabels(roms, WHITELISTED_LABELS_BASE_PRIORITY_LIST);
+const byWhitelistedLabelsBasePriorityList = (
+  roms: Rom[],
+  keepSelected = 1,
+): void =>
+  byWhitelistedLabels(
+    roms,
+    WHITELISTED_LABELS_BASE_PRIORITY_LIST,
+    keepSelected,
+  );
 
 export default byWhitelistedLabelsBasePriorityList;
