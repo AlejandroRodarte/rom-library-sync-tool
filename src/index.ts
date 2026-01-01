@@ -5,7 +5,7 @@ import unselectByVersion from "./helpers/unselect-by-version.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import unselectByLanguages from "./helpers/unselect-by-languages.helper.js";
 import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.js";
-import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
+import unselectByPALAndNTSCLabels from "./helpers/unselect-by-pal-and-ntsc-labels.helper.js";
 import unselectBySpecialFlags from "./helpers/unselect-by-special-flags.helper.js";
 import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
@@ -36,7 +36,7 @@ const main = async () => {
       unselectByBannedLabelSegments(roms, ["Disk"]);
       unselectByVersion(roms);
       if (!titleIsBios) {
-        discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
+        unselectByPALAndNTSCLabels(roms);
         discardRomsBasedOnUnwantedExactLabels(roms);
         discardRomsBasedOnWantedExactLabels(roms);
       }

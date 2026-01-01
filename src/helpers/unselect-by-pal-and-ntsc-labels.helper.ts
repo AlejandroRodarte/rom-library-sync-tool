@@ -1,10 +1,10 @@
 import type { Rom } from "../types.js";
 
-const discardRomsWithPALLabelIfRomsetHasNTSCRoms = (roms: Rom[]): void => {
+const unselectByPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
-  let romAmount = selectedRoms.length;
-  if (romAmount === 1) return;
+  let selectedRomAmount = selectedRoms.length;
+  if (selectedRomAmount === keepSelected) return;
 
   const romSetHasNTSCLabel = selectedRoms.some((rom) =>
     rom.labels.some((label) => label.includes("NTSC")),
@@ -17,9 +17,9 @@ const discardRomsWithPALLabelIfRomsetHasNTSCRoms = (roms: Rom[]): void => {
 
   for (const romToUnselect of palRoms) {
     romToUnselect.selected = false;
-    romAmount--;
-    if (romAmount === 1) return;
+    selectedRomAmount--;
+    if (selectedRomAmount === keepSelected) return;
   }
 };
 
-export default discardRomsWithPALLabelIfRomsetHasNTSCRoms;
+export default unselectByPALAndNTSCLabels;
