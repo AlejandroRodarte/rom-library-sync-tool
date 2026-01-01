@@ -1,4 +1,4 @@
-import LANGUAGE_PRIORITY_LIST from "../../constants/language-priority-list.constant.js";
+import LANGUAGE_BASE_PRIORITY_LIST from "../../constants/language-base-priority-list.constant.js";
 import type { LabelsAndLanguages } from "../../types.js";
 
 const labelsAndLanguagesFromFilename = (
@@ -18,7 +18,8 @@ const labelsAndLanguagesFromFilename = (
         const parenthesesItems = parenthesesGroup.split("+");
         parenthesesItems.forEach((item) => {
           const trimmedItem = item.trim();
-          const itemIsALanguage = LANGUAGE_PRIORITY_LIST.includes(trimmedItem);
+          const itemIsALanguage =
+            LANGUAGE_BASE_PRIORITY_LIST.includes(trimmedItem);
           if (itemIsALanguage) languages.push(trimmedItem);
           else labels.push(trimmedItem);
         });

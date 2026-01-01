@@ -1,6 +1,6 @@
-import COUNTRY_PRIORITY_LIST from "./constants/country-priority-list.constant.js";
+import COUNTRY_BASE_PRIORITY_LIST from "./constants/country-base-priority-list.constant.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
-import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.js";
+import LANGUAGE_BASE_PRIORITY_LIST from "./constants/language-base-priority-list.constant.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
@@ -19,8 +19,8 @@ const main = async () => {
       const keepSelected = 1;
 
       if (!titleIsBios) {
-        unselect.byCountry(roms, COUNTRY_PRIORITY_LIST);
-        unselect.byLanguages(roms, LANGUAGE_PRIORITY_LIST);
+        unselect.byCountry(roms, COUNTRY_BASE_PRIORITY_LIST);
+        unselect.byLanguages(roms, LANGUAGE_BASE_PRIORITY_LIST);
         unselect.byLanguageAmount(roms);
       }
       unselect.bySpecialFlags(roms);
