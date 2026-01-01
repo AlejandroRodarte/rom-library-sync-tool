@@ -1,8 +1,7 @@
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
-import consoleDuplicates from "./helpers/log/console-duplicates.helper.js";
-import consolesReport from "./helpers/log/consoles-report.helper.js";
 import writeConsoleFiles from "./helpers/write-console-files.helper.js";
+import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";
 
@@ -34,8 +33,8 @@ const main = async () => {
     }
   }
 
-  for (const [_, konsole] of consoles) consoleDuplicates(konsole);
-  consolesReport(consoles);
+  for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
+  log.consolesReport(consoles);
 
   const generateFiles = false;
   if (generateFiles)
