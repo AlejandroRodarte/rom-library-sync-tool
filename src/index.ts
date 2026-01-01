@@ -3,7 +3,7 @@ import unselectByCountry from "./helpers/unselect-by-country.helper.js";
 import COUNTRY_PRIORITY_LIST from "./constants/country-priority-list.constant.js";
 import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning-systems.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
-import discardRomsBasedOnLanguageList from "./helpers/discard-roms-based-on-language-list.helper.js";
+import unselectByLanguages from "./helpers/unselect-by-languages.helper.js";
 import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.js";
 import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-with-pal-label-if-romset-has-ntsc-roms.helper.js";
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
@@ -28,7 +28,7 @@ const main = async () => {
 
       if (!titleIsBios) {
         unselectByCountry(roms, COUNTRY_PRIORITY_LIST);
-        discardRomsBasedOnLanguageList(roms, LANGUAGE_PRIORITY_LIST);
+        unselectByLanguages(roms, LANGUAGE_PRIORITY_LIST);
         discardRomsBasedOnLanguageAmount(roms);
       }
       discardRomsBasedOnUnwantedLabelSegments(roms);

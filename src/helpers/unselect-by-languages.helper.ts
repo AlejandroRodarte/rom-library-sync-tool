@@ -1,15 +1,16 @@
 import type { Rom } from "../types.js";
 
-const discardRomsBasedOnLanguageList = (
+const unselectByLanguages = (
   roms: Rom[],
   languageList: string[],
-): string => {
+  keepSelected = 1,
+): void => {
   const romsWithLanguages = roms.filter((rom) => rom.languages.length > 0);
 
   for (const language of languageList) {
     const selectedRoms = romsWithLanguages.filter((rom) => rom.selected);
     let romAmount = selectedRoms.length;
-    if (romAmount === 1) return language;
+    if (romAmount === keepSelected) return;
 
     const romsWithoutLanguage = selectedRoms.filter(
       (rom) => !rom.languages.includes(language),
@@ -22,10 +23,9 @@ const discardRomsBasedOnLanguageList = (
     for (const romToUnselect of romsWithoutLanguage) {
       romToUnselect.selected = false;
       romAmount--;
-      if (romAmount === 1) return language;
+      if (romAmount === keepSelected) return;
     }
   }
-  return "";
 };
 
-export default discardRomsBasedOnLanguageList;
+export default unselectByLanguages;
