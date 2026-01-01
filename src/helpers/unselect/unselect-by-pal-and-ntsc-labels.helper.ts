@@ -1,4 +1,4 @@
-import type { Rom } from "../types.js";
+import type { Rom } from "../../types.js";
 
 const unselectByPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);

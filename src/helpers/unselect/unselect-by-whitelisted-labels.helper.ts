@@ -1,4 +1,4 @@
-import type { Rom } from "../types.js";
+import type { Rom } from "../../types.js";
 
 const unselectByWhitelistedLabels = (
   roms: Rom[],

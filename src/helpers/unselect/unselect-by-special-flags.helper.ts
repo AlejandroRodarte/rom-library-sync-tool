@@ -4,9 +4,9 @@ import {
   PROTO_LABEL_SEGMENT,
   SAMPLE_LABEL_SEGMENT,
   VIRTUAL_CONSOLE_LABEL_SEGMENT,
-} from "../constants/label-segments.constants.js";
-import type { Rom } from "../types.js";
-import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
+} from "../../constants/label-segments.constants.js";
+import type { Rom } from "../../types.js";
+import getSpecialFlagsFromRomSet from "../get-special-flags-from-rom-set.helper.js";
 import unselectByBannedLabelSegments from "./unselect-by-banned-label-segments.helper.js";
 
 const unselectBySpecialFlags = (roms: Rom[], keepSelected = 1): void => {

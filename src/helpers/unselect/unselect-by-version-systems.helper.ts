@@ -1,4 +1,4 @@
-import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
+import type { Rom, RomIndexAndVersion, VersionSystem } from "../../types.js";
 
 const unselectByVersionSystem = (
   roms: Rom[],
