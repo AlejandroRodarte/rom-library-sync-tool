@@ -3,11 +3,11 @@ import VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS from "../constants/v
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../types.js";
 import getSpecialFlagsFromRomSet from "./get-special-flags-from-rom-set.helper.js";
 
-const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
+const unselectByVersion = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
-  let romAmount = selectedRoms.length;
-  if (romAmount === 1) return;
+  let selectedRomAmount = selectedRoms.length;
+  if (selectedRomAmount === keepSelected) return;
 
   const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
   const versionSystems: VersionSystem[] = [];
@@ -66,8 +66,8 @@ const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
         const romToUnselect = selectedRoms[versionedRom.index];
         if (romToUnselect) {
           romToUnselect.selected = false;
-          romAmount--;
-          if (romAmount === 1) return;
+          selectedRomAmount--;
+          if (selectedRomAmount === keepSelected) return;
         }
       }
     }
@@ -79,8 +79,8 @@ const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
       );
       for (const romToUnselect of nonVersionedRoms) {
         romToUnselect.selected = false;
-        romAmount--;
-        if (romAmount === 1) return;
+        selectedRomAmount--;
+        if (selectedRomAmount === keepSelected) return;
       }
     }
 
@@ -88,4 +88,4 @@ const discardRomsBasedOnVersioningSystems = (roms: Rom[]): void => {
   }
 };
 
-export default discardRomsBasedOnVersioningSystems;
+export default unselectByVersion;

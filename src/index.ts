@@ -1,7 +1,7 @@
 import buildEmptyConsolesObject from "./helpers/build-empty-consoles-object.helper.js";
 import unselectByCountry from "./helpers/unselect-by-country.helper.js";
 import COUNTRY_PRIORITY_LIST from "./constants/country-priority-list.constant.js";
-import discardRomsBasedOnVersioningSystems from "./helpers/discard-roms-based-on-versioning-systems.helper.js";
+import unselectByVersion from "./helpers/unselect-by-version.helper.js";
 import addRomsToConsole from "./helpers/add-roms-to-console.helper.js";
 import unselectByLanguages from "./helpers/unselect-by-languages.helper.js";
 import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.js";
@@ -34,7 +34,7 @@ const main = async () => {
       }
       unselectBySpecialFlags(roms);
       unselectByBannedLabelSegments(roms, ["Disk"]);
-      discardRomsBasedOnVersioningSystems(roms);
+      unselectByVersion(roms);
       if (!titleIsBios) {
         discardRomsWithPALLabelIfRomsetHasNTSCRoms(roms);
         discardRomsBasedOnUnwantedExactLabels(roms);
