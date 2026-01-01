@@ -1,4 +1,4 @@
-const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
+const BANNED_LABELS_BASE_PRIORITY_LIST: string[] = [
   "Digital" /* 139 results */,
   "Evercade" /* 111 results */,
   "NP" /* 84 items */,
@@ -99,4 +99,4 @@ const UNWANTED_EXACT_LABELS_BASE_LIST: string[] = [
   "SPC009 Extract" /* 1 result */,
 ];
 
-export default UNWANTED_EXACT_LABELS_BASE_LIST;
+export default BANNED_LABELS_BASE_PRIORITY_LIST;

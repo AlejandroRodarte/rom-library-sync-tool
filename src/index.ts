@@ -7,7 +7,7 @@ import unselectByLanguages from "./helpers/unselect-by-languages.helper.js";
 import LANGUAGE_PRIORITY_LIST from "./constants/language-priority-list.constant.js";
 import unselectByPALAndNTSCLabels from "./helpers/unselect-by-pal-and-ntsc-labels.helper.js";
 import unselectBySpecialFlags from "./helpers/unselect-by-special-flags.helper.js";
-import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
+import unselectByBannedLabelsBasePriorityList from "./helpers/unselect-by-banned-labels-base-priority-list.helper.js";
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
 import unselectByLanguageAmount from "./helpers/unselect-by-language-amount.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
@@ -37,7 +37,7 @@ const main = async () => {
       unselectByVersion(roms);
       if (!titleIsBios) {
         unselectByPALAndNTSCLabels(roms);
-        discardRomsBasedOnUnwantedExactLabels(roms);
+        unselectByBannedLabelsBasePriorityList(roms);
         discardRomsBasedOnWantedExactLabels(roms);
       }
 
