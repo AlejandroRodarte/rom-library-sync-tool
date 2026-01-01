@@ -9,7 +9,7 @@ import discardRomsWithPALLabelIfRomsetHasNTSCRoms from "./helpers/discard-roms-w
 import discardRomsBasedOnUnwantedLabelSegments from "./helpers/discard-roms-based-on-unwanted-label-segments.helper.js";
 import discardRomsBasedOnUnwantedExactLabels from "./helpers/discard-roms-based-on-unwanted-exact-labels.helper.js";
 import discardRomsBasedOnWantedExactLabels from "./helpers/discard-roms-based-on-wanted-exact-labels.helper.js";
-import discardRomsBasedOnLanguageAmount from "./helpers/discard-roms-based-on-language-amount.helper.js";
+import unselectByLanguageAmount from "./helpers/unselect-by-language-amount.helper.js";
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import printConsoleDuplicates from "./helpers/print-console-duplicates.helper.js";
 import printFinalConsolesReport from "./helpers/print-final-consoles-report.helper.js";
@@ -29,7 +29,7 @@ const main = async () => {
       if (!titleIsBios) {
         unselectByCountry(roms, COUNTRY_PRIORITY_LIST);
         unselectByLanguages(roms, LANGUAGE_PRIORITY_LIST);
-        discardRomsBasedOnLanguageAmount(roms);
+        unselectByLanguageAmount(roms);
       }
       discardRomsBasedOnUnwantedLabelSegments(roms);
       discardRomsBasedOnVersioningSystems(roms);

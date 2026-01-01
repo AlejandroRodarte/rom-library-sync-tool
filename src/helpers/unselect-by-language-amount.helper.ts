@@ -5,11 +5,11 @@ interface RomIndexAndLanguageAmount {
   languageAmount: number;
 }
 
-const discardRomsBasedOnLanguageAmount = (roms: Rom[]): void => {
+const unselectByLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
   let romAmount = selectedRoms.length;
-  if (romAmount === 1) return;
+  if (romAmount === keepSelected) return;
 
   const selectedRomsWithLanguages = selectedRoms.filter(
     (rom) => rom.languages.length > 0,
@@ -57,10 +57,10 @@ const discardRomsBasedOnLanguageAmount = (roms: Rom[]): void => {
       if (romToUnselect) {
         romToUnselect.selected = false;
         romAmount--;
-        if (romAmount === 1) return;
+        if (romAmount === keepSelected) return;
       }
     }
   }
 };
 
-export default discardRomsBasedOnLanguageAmount;
+export default unselectByLanguageAmount;
