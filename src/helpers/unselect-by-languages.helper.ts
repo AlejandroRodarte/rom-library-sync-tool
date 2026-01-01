@@ -9,8 +9,8 @@ const unselectByLanguages = (
 
   for (const language of languageList) {
     const selectedRoms = romsWithLanguages.filter((rom) => rom.selected);
-    let romAmount = selectedRoms.length;
-    if (romAmount === keepSelected) return;
+    let selectedRomAmount = selectedRoms.length;
+    if (selectedRomAmount === keepSelected) return;
 
     const romsWithoutLanguage = selectedRoms.filter(
       (rom) => !rom.languages.includes(language),
@@ -22,8 +22,8 @@ const unselectByLanguages = (
 
     for (const romToUnselect of romsWithoutLanguage) {
       romToUnselect.selected = false;
-      romAmount--;
-      if (romAmount === keepSelected) return;
+      selectedRomAmount--;
+      if (selectedRomAmount === keepSelected) return;
     }
   }
 };

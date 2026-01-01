@@ -8,8 +8,8 @@ interface RomIndexAndLanguageAmount {
 const unselectByLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
   const selectedRoms = roms.filter((rom) => rom.selected);
 
-  let romAmount = selectedRoms.length;
-  if (romAmount === keepSelected) return;
+  let selectedRomAmount = selectedRoms.length;
+  if (selectedRomAmount === keepSelected) return;
 
   const selectedRomsWithLanguages = selectedRoms.filter(
     (rom) => rom.languages.length > 0,
@@ -56,8 +56,8 @@ const unselectByLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
       const romToUnselect = selectedRomsWithLanguages[rom.index];
       if (romToUnselect) {
         romToUnselect.selected = false;
-        romAmount--;
-        if (romAmount === keepSelected) return;
+        selectedRomAmount--;
+        if (selectedRomAmount === keepSelected) return;
       }
     }
   }
