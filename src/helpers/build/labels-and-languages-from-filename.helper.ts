@@ -1,9 +1,5 @@
 import LANGUAGE_PRIORITY_LIST from "../../constants/language-priority-list.constant.js";
-
-interface LabelsAndLanguages {
-  labels: string[];
-  languages: string[];
-}
+import type { LabelsAndLanguages } from "../../types.js";
 
 const labelsAndLanguagesFromFilename = (
   filename: string,

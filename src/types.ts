@@ -29,3 +29,8 @@ export interface RomIndexAndVersion {
   index: number;
   version: string;
 }
+
+export interface LabelsAndLanguages {
+  labels: string[];
+  languages: string[];
+}
