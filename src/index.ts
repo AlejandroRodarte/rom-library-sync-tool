@@ -16,17 +16,17 @@ const main = async () => {
       const keepSelected = 1;
 
       if (!titleIsBios) {
-        unselect.byCountryBasePriorityList(roms);
-        unselect.byLanguagesBasePriorityList(roms);
-        unselect.byLanguageAmount(roms);
+        unselect.byCountryBasePriorityList(roms, keepSelected);
+        unselect.byLanguagesBasePriorityList(roms, keepSelected);
+        unselect.byLanguageAmount(roms, keepSelected);
       }
-      unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms);
-      unselect.byBannedLabelSegments(roms, ["Disk"]);
-      unselect.byVersionsPriorityList(roms);
+      unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms, keepSelected);
+      unselect.byBannedLabelSegments(roms, ["Disk"], keepSelected);
+      unselect.byVersionsPriorityList(roms, keepSelected);
       if (!titleIsBios) {
-        unselect.byPALAndNTSCLabels(roms);
-        unselect.byBannedLabelsBasePriorityList(roms);
-        unselect.byWhitelistedLabelsBasePriorityList(roms);
+        unselect.byPALAndNTSCLabels(roms, keepSelected);
+        unselect.byBannedLabelsBasePriorityList(roms, keepSelected);
+        unselect.byWhitelistedLabelsBasePriorityList(roms, keepSelected);
       }
 
       add.romsToConsole(roms, konsole, title);
