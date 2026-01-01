@@ -1,10 +1,6 @@
 import type { Console, Rom } from "../../types.js";
 
-const addRomsToConsole = (
-  roms: Rom[],
-  konsole: Console,
-  title: string,
-): void => {
+const romsToConsole = (roms: Rom[], konsole: Console, title: string): void => {
   const romsSelected = roms.reduce((acc, rom) => {
     if (rom.selected) acc++;
     return acc;
@@ -15,4 +11,4 @@ const addRomsToConsole = (
   else konsole.set(romsSelected, new Map<string, Rom[]>([[title, roms]]));
 };
 
-export default addRomsToConsole;
+export default romsToConsole;
