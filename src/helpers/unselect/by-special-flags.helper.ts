@@ -7,7 +7,7 @@ import {
 } from "../../constants/label-segments.constants.js";
 import type { Rom } from "../../types.js";
 import getSpecialFlagsFromRomSet from "../get-special-flags-from-rom-set.helper.js";
-import unselectByBannedLabelSegments from "./unselect-by-banned-label-segments.helper.js";
+import unselectByBannedLabelSegments from "./by-banned-label-segments.helper.js";
 
 const unselectBySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
   let selectedRoms = roms.filter((rom) => rom.selected);

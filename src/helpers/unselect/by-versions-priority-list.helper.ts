@@ -2,7 +2,7 @@ import VERSIONING_SYSTEMS_PRIORITY_LIST from "../../constants/versioning-systems
 import VERSIONING_SYSTEMS_PRIORITY_LIST_FOR_UNRELEASED_ROMS from "../../constants/versioning-systems-priority-list-for-unreleased-roms.constant.js";
 import type { Rom, RomIndexAndVersion, VersionSystem } from "../../types.js";
 import getSpecialFlagsFromRomSet from "../get-special-flags-from-rom-set.helper.js";
-import unselectByVersionSystem from "./unselect-by-version-systems.helper.js";
+import unselectByVersionSystem from "./by-version-systems.helper.js";
 
 const unselectByVersionsPriorityList = (
   roms: Rom[],
