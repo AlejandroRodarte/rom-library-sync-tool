@@ -2,12 +2,12 @@ import type { Rom } from "../types.js";
 
 const unselectByLanguages = (
   roms: Rom[],
-  languageList: string[],
+  languagePriorityList: string[],
   keepSelected = 1,
 ): void => {
   const romsWithLanguages = roms.filter((rom) => rom.languages.length > 0);
 
-  for (const language of languageList) {
+  for (const language of languagePriorityList) {
     const selectedRoms = romsWithLanguages.filter((rom) => rom.selected);
     let selectedRomAmount = selectedRoms.length;
     if (selectedRomAmount === keepSelected) return;
