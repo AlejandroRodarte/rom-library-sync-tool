@@ -7,7 +7,7 @@ import byLanguageAmount from "./by-language-amount.helper.js";
 import byLanguagesBasePriorityList from "./by-languages-base-priority-list.helper.js";
 import byLanguages from "./by-languages.helper.js";
 import byPALAndNTSCLabels from "./by-pal-and-ntsc-labels.helper.js";
-import bySpecialFlags from "./by-special-flags.helper.js";
+import byBannedLabelSegmentsImposedBySpecialFlags from "./by-banned-label-segments-imposed-by-special-flags.helper.js";
 import byVersionSystem from "./by-version-systems.helper.js";
 import byVersionsPriorityList from "./by-versions-priority-list.helper.js";
 import byWhitelistedLabelsBasePriorityList from "./by-whitelisted-labels-base-priority-list.helper.js";
@@ -23,7 +23,7 @@ const unselect = {
   byBannedLabelSegments,
   byWhitelistedLabels,
   byVersionSystem,
-  bySpecialFlags,
+  byBannedLabelSegmentsImposedBySpecialFlags,
   byPALAndNTSCLabels,
   byVersionsPriorityList,
   byBannedLabelsBasePriorityList,

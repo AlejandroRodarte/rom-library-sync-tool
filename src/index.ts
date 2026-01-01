@@ -21,7 +21,7 @@ const main = async () => {
         unselect.byLanguagesBasePriorityList(roms);
         unselect.byLanguageAmount(roms);
       }
-      unselect.bySpecialFlags(roms);
+      unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms);
       unselect.byBannedLabelSegments(roms, ["Disk"]);
       unselect.byVersionsPriorityList(roms);
       if (!titleIsBios) {

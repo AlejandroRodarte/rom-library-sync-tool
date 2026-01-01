@@ -9,7 +9,10 @@ import type { Rom } from "../../types.js";
 import specialFlagsFromRoms from "../build/special-flags-from-roms.helper.js";
 import byBannedLabelSegments from "./by-banned-label-segments.helper.js";
 
-const bySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
+const byBannedLabelSegmentsImposedBySpecialFlags = (
+  roms: Rom[],
+  keepSelected = 1,
+): void => {
   let selectedRoms = roms.filter((rom) => rom.selected);
 
   let romAmount = selectedRoms.length;
@@ -32,4 +35,4 @@ const bySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
   byBannedLabelSegments(selectedRoms, bannedLabelSegments, keepSelected);
 };
 
-export default bySpecialFlags;
+export default byBannedLabelSegmentsImposedBySpecialFlags;
