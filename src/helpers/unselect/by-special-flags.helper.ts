@@ -6,7 +6,7 @@ import {
   VIRTUAL_CONSOLE_LABEL_SEGMENT,
 } from "../../constants/label-segments.constants.js";
 import type { Rom } from "../../types.js";
-import getSpecialFlagsFromRomSet from "../build/get-special-flags-from-rom-set.helper.js";
+import specialFlagsFromRoms from "../build/special-flags-from-roms.helper.js";
 import byBannedLabelSegments from "./by-banned-label-segments.helper.js";
 
 const bySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
@@ -15,7 +15,7 @@ const bySpecialFlags = (roms: Rom[], keepSelected = 1): void => {
   let romAmount = selectedRoms.length;
   if (romAmount === keepSelected) return;
 
-  let specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
+  let specialFlags = specialFlagsFromRoms(selectedRoms);
   const bannedLabelSegments: string[] = [];
 
   if (!specialFlags.allRomsAreSample)

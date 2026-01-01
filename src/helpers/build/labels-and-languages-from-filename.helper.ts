@@ -5,7 +5,7 @@ interface LabelsAndLanguages {
   languages: string[];
 }
 
-const extractLabelsAndLanguagesFromFilename = (
+const labelsAndLanguagesFromFilename = (
   filename: string,
 ): LabelsAndLanguages => {
   const labels: string[] = [];
@@ -33,4 +33,4 @@ const extractLabelsAndLanguagesFromFilename = (
   return { labels, languages };
 };
 
-export default extractLabelsAndLanguagesFromFilename;
+export default labelsAndLanguagesFromFilename;

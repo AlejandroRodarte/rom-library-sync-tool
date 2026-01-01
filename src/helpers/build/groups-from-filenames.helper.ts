@@ -1,7 +1,7 @@
 import type { Groups, Rom } from "../../types.js";
-import extractLabelsAndLanguagesFromFilename from "./extract-labels-and-languages-from-filename.helper.js";
+import labelsAndLanguagesFromFilename from "./labels-and-languages-from-filename.helper.js";
 
-const buildGroupsFromFilenames = (filenames: string[]): Groups => {
+const groupsFromFilenames = (filenames: string[]): Groups => {
   const groups: Groups = new Map<string, Rom[]>();
 
   for (const filename of filenames) {
@@ -16,8 +16,7 @@ const buildGroupsFromFilenames = (filenames: string[]): Groups => {
     }
 
     const title = rawTitle.trim();
-    const { labels, languages } =
-      extractLabelsAndLanguagesFromFilename(filename);
+    const { labels, languages } = labelsAndLanguagesFromFilename(filename);
     const group = groups.get(title);
     const newRom: Rom = { filename, labels, languages, selected: true };
 
@@ -28,4 +27,4 @@ const buildGroupsFromFilenames = (filenames: string[]): Groups => {
   return groups;
 };
 
-export default buildGroupsFromFilenames;
+export default groupsFromFilenames;

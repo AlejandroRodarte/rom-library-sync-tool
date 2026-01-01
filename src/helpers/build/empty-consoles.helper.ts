@@ -1,11 +1,11 @@
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import type { Consoles, Console, Groups } from "../../types.js";
 
-const buildEmptyConsolesObject = (): Consoles => {
+const emptyConsoles = (): Consoles => {
   const consoles: Consoles = new Map<string, Console>();
   for (const name of CONSOLE_NAMES)
     consoles.set(name, new Map<number, Groups>());
   return consoles;
 };
 
-export default buildEmptyConsolesObject;
+export default emptyConsoles;

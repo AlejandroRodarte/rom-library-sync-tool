@@ -1,6 +1,6 @@
 import type { Console } from "../../types.js";
 
-const getSelectedRomFilenamesFromConsole = (konsole: Console): string[] => {
+const selectedRomFilenamesFromConsole = (konsole: Console): string[] => {
   const filenames: string[] = [];
   for (const [_, groups] of konsole)
     for (const [_, roms] of groups) {
@@ -10,4 +10,4 @@ const getSelectedRomFilenamesFromConsole = (konsole: Console): string[] => {
   return filenames;
 };
 
-export default getSelectedRomFilenamesFromConsole;
+export default selectedRomFilenamesFromConsole;

@@ -1,7 +1,7 @@
 import { VIRTUAL_CONSOLE_LABEL_SEGMENT } from "../../constants/label-segments.constants.js";
 import UNRELEASED_LABEL_SEGMENT_LIST from "../../constants/unreleased-label-segment-list.constant.js";
 import type { Rom } from "../../types.js";
-import getSpecialFlagsFromRomSet from "../build/get-special-flags-from-rom-set.helper.js";
+import specialFlagsFromRoms from "../build/special-flags-from-roms.helper.js";
 
 const byCountry = (
   roms: Rom[],
@@ -20,7 +20,7 @@ const byCountry = (
 
   if (selectedRomAmount === keepSelected) return;
 
-  const specialFlags = getSpecialFlagsFromRomSet(selectedRoms);
+  const specialFlags = specialFlagsFromRoms(selectedRoms);
 
   const unselectNonCountryRoms = (country: string): void => {
     const nonCountryRoms = selectedRoms.filter(
