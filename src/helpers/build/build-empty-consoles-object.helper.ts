@@ -1,5 +1,5 @@
-import CONSOLE_NAMES from "../constants/console-names.constant.js";
-import type { Consoles, Console, Groups } from "../types.js";
+import CONSOLE_NAMES from "../../constants/console-names.constant.js";
+import type { Consoles, Console, Groups } from "../../types.js";
 
 const buildEmptyConsolesObject = (): Consoles => {
   const consoles: Consoles = new Map<string, Console>();

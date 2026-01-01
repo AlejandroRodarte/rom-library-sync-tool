@@ -1,6 +1,6 @@
 import path from "path";
 import os from "node:os";
-import getSelectedRomFilenamesFromConsole from "./get-selected-rom-filenames-from-console.helper.js";
+import getSelectedRomFilenamesFromConsole from "./build/get-selected-rom-filenames-from-console.helper.js";
 import { DATA_DIR_PATH } from "../constants/paths.constants.js";
 import { existsSync, readFileSync, unlinkSync } from "fs";
 import writeRomFilenamesToConsoleFile from "./write-rom-filenames-to-console-file.helper.js";

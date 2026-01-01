@@ -1,8 +1,8 @@
 import { readdir } from "node:fs/promises";
-import type { Groups } from "../types.js";
+import type { Groups } from "../../types.js";
 import buildGroupsFromFilenames from "./build-groups-from-filenames.helper.js";
 import path from "node:path";
-import { ROMS_DIR_PATH } from "../constants/paths.constants.js";
+import { ROMS_DIR_PATH } from "../../constants/paths.constants.js";
 
 const getGroupsFromConsoleRomsDir = async (
   consoleName: string,

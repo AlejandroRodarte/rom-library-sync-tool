@@ -1,4 +1,4 @@
-import type { Groups, Rom } from "../types.js";
+import type { Groups, Rom } from "../../types.js";
 import extractLabelsAndLanguagesFromFilename from "./extract-labels-and-languages-from-filename.helper.js";
 
 const buildGroupsFromFilenames = (filenames: string[]): Groups => {

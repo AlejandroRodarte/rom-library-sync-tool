@@ -1,7 +1,7 @@
 import { VIRTUAL_CONSOLE_LABEL_SEGMENT } from "../../constants/label-segments.constants.js";
 import UNRELEASED_LABEL_SEGMENT_LIST from "../../constants/unreleased-label-segment-list.constant.js";
 import type { Rom } from "../../types.js";
-import getSpecialFlagsFromRomSet from "../get-special-flags-from-rom-set.helper.js";
+import getSpecialFlagsFromRomSet from "../build/get-special-flags-from-rom-set.helper.js";
 
 const byCountry = (
   roms: Rom[],

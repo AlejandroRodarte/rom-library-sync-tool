@@ -1,4 +1,4 @@
-import LANGUAGE_PRIORITY_LIST from "../constants/language-priority-list.constant.js";
+import LANGUAGE_PRIORITY_LIST from "../../constants/language-priority-list.constant.js";
 
 interface LabelsAndLanguages {
   labels: string[];
