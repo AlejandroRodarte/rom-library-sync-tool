@@ -1,6 +1,6 @@
 import { closeSync, openSync, writeSync, type PathLike } from "node:fs";
 import path from "node:path";
-import { ROMS_DIR_PATH } from "../constants/paths.constants.js";
+import { ROMS_DIR_PATH } from "../../constants/paths.constants.js";
 
 const writeConsoleDiffFile = (
   name: string,
