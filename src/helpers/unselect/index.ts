@@ -12,6 +12,8 @@ import byVersionSystem from "./by-version-systems.helper.js";
 import byVersionsPriorityList from "./by-versions-priority-list.helper.js";
 import byWhitelistedLabelsBasePriorityList from "./by-whitelisted-labels-base-priority-list.helper.js";
 import byWhitelistedLabels from "./by-whitelisted-labels.helper.js";
+import byNormalTitle from "./by-normal-title.helper.js";
+import byBiosTitle from "./by-bios-title.helper.js";
 
 const unselect = {
   byCountry,
@@ -28,6 +30,8 @@ const unselect = {
   byVersionsPriorityList,
   byBannedLabelsBasePriorityList,
   byWhitelistedLabelsBasePriorityList,
+  byNormalTitle,
+  byBiosTitle,
 };
 
 export default unselect;
