@@ -17,19 +17,15 @@ const main = async () => {
       if (titleIsBios) type = "bios";
 
       const keepSelected = 1;
-
-      if (!titleIsBios) {
-        unselect.byCountryBasePriorityList(roms, keepSelected);
-        unselect.byLanguagesBasePriorityList(roms, keepSelected);
-        unselect.byLanguageAmount(roms, keepSelected);
-      }
-      unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms, keepSelected);
-      unselect.byBannedLabelSegments(roms, ["Disk"], keepSelected);
-      unselect.byVersionsPriorityList(roms, keepSelected);
-      if (!titleIsBios) {
-        unselect.byPALAndNTSCLabels(roms, keepSelected);
-        unselect.byBannedLabelsBasePriorityList(roms, keepSelected);
-        unselect.byWhitelistedLabelsBasePriorityList(roms, keepSelected);
+      switch (type) {
+        case "normal":
+          unselect.byNormalTitle(roms, keepSelected);
+          break;
+        case "bios":
+          unselect.byBiosTitle(roms, keepSelected);
+          break;
+        default:
+          break;
       }
 
       add.romsToConsole(roms, konsole, title);
