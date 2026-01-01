@@ -2,3 +2,4 @@
 - [ ] Functions that unselect ROMs should return the amount of ROMs that got unselected.
 - [ ] Build a class composed of both the ROM title and its ROM set with helper methods.
 - [ ] Move duplicate code in versioning systems to functions.
+- [ ] Add more `if (keepSelected > selectedRomAmount)` clauses where needed.
