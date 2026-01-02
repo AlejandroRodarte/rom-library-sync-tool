@@ -38,3 +38,20 @@ export interface LabelsAndLanguages {
   labels: string[];
   languages: string[];
 }
+
+export interface Environment {
+  files: {
+    replaceLists: boolean;
+  };
+  sftp: {
+    connectToSteamDeck: boolean;
+    credentials: {
+      steamDeck: {
+        host: string;
+        port: number;
+        username: string;
+        password: string;
+      };
+    };
+  };
+}
