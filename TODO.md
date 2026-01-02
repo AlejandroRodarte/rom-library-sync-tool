@@ -1,6 +1,5 @@
 - [x] Apply some filters to files that begin with [BIOS] on them.
-- [ ] Functions that unselect ROMs should return the amount of ROMs that got unselected.
-- [ ] Build a class composed of both the ROM title and its ROM set with helper methods.
+- [x] Build a class composed of both the ROM title and its ROM set with helper methods.
 - [ ] Move duplicate code in versioning systems to functions.
-- [ ] Add more `if (keepSelected > selectedRomAmount)` clauses where needed.
 - [ ] Migrate ROM labels and languages from arrays to sets.
+- [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
