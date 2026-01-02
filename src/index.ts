@@ -1,3 +1,5 @@
+import ENVIRONMENT from "./constants/environment.constant.js";
+
 import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import add from "./helpers/add/index.js";
 import fileIO from "./helpers/file-io/index.js";
