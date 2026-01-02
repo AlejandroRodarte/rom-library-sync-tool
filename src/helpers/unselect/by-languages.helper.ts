@@ -8,7 +8,7 @@ interface RomIdAndLanguages {
 const byLanguages = (title: Title, languagePriorityList: string[]): void => {
   if (!title.canUnselect()) return;
 
-  const romsWithLanguages: RomIdAndLanguages[] = title.selectedRomSet
+  let romsWithLanguages: RomIdAndLanguages[] = title.selectedRomSet
     .entries()
     .filter(([, rom]) => rom.languages.length > 0)
     .map(([id, rom]) => ({ id, languages: rom.languages }))
@@ -25,7 +25,12 @@ const byLanguages = (title: Title, languagePriorityList: string[]): void => {
       romsWithoutLanguage.length === romsWithLanguages.length;
     if (romSetLacksLanguage) continue;
 
-    title.unselectByIds(romsWithoutLanguage.map((rom) => rom.id));
+    const romIdsWithoutLanguage = romsWithoutLanguage.map((rom) => rom.id);
+
+    title.unselectByIds(romIdsWithoutLanguage);
+    romsWithLanguages = romsWithLanguages.filter(
+      (rom) => !romIdsWithoutLanguage.includes(rom.id),
+    );
   }
 };
 
