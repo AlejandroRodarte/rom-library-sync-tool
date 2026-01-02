@@ -5,12 +5,12 @@ const consolesReport = (consoles: Consoles): void => {
 
   for (const [name, konsole] of consoles) {
     console.log(`===== Report for console ${name} =====`);
-    for (const [romsSelected, groups] of konsole) {
-      console.log(`ROMs with ${romsSelected} selections: ${groups.size}`);
+    for (const [romsSelected, titles] of konsole) {
+      console.log(`ROMs with ${romsSelected} selections: ${titles.size}`);
       const total = romsSelectedTotals.get(romsSelected);
       if (typeof total !== "undefined")
-        romsSelectedTotals.set(romsSelected, total + groups.size);
-      else romsSelectedTotals.set(romsSelected, groups.size);
+        romsSelectedTotals.set(romsSelected, total + titles.size);
+      else romsSelectedTotals.set(romsSelected, titles.size);
     }
   }
 

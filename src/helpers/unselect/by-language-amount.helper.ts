@@ -1,33 +1,27 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 
-interface RomIndexAndLanguageAmount {
-  index: number;
+interface RomIdAndLanguageAmount {
+  id: string;
   languageAmount: number;
 }
 
-const byLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
-  const selectedRoms = roms.filter((rom) => rom.selected);
+const byLanguageAmount = (title: Title): void => {
+  if (!title.canUnselect()) return;
 
-  let selectedRomAmount = selectedRoms.length;
-  if (selectedRomAmount === keepSelected) return;
+  const selectedRomsWithLanguages: RomIdAndLanguageAmount[] =
+    title.selectedRomSet
+      .entries()
+      .filter(([, rom]) => rom.languages.length > 0)
+      .map(([id, rom]) => ({ id, languageAmount: rom.languages.length }))
+      .toArray();
 
-  const selectedRomsWithLanguages = selectedRoms.filter(
-    (rom) => rom.languages.length > 0,
-  );
-
-  const selectedRomIndexesWithLanguages: RomIndexAndLanguageAmount[] =
-    selectedRomsWithLanguages.map((r, i) => ({
-      index: i,
-      languageAmount: r.languages.length,
-    }));
-
-  const romIndexesWithHighestLanguageAmount: number[] = [];
+  const romIdsWithHighestLanguageAmount: string[] = [];
   let highestLanguageAmount = 0;
 
   let firstRom = true;
-  for (const rom of selectedRomIndexesWithLanguages) {
+  for (const rom of selectedRomsWithLanguages) {
     if (firstRom) {
-      romIndexesWithHighestLanguageAmount.push(rom.index);
+      romIdsWithHighestLanguageAmount.push(rom.id);
       highestLanguageAmount = rom.languageAmount;
       firstRom = false;
       continue;
@@ -40,26 +34,19 @@ const byLanguageAmount = (roms: Rom[], keepSelected = 1): void => {
     const sameLanguageAmountFound = comparisonResult === 0;
     const newHighestLanguageAmountFound = comparisonResult === 1;
 
-    if (sameLanguageAmountFound)
-      romIndexesWithHighestLanguageAmount.push(rom.index);
+    if (sameLanguageAmountFound) romIdsWithHighestLanguageAmount.push(rom.id);
     else if (newHighestLanguageAmountFound) {
-      romIndexesWithHighestLanguageAmount.length = 0;
-      romIndexesWithHighestLanguageAmount.push(rom.index);
+      romIdsWithHighestLanguageAmount.length = 0;
+      romIdsWithHighestLanguageAmount.push(rom.id);
       highestLanguageAmount = rom.languageAmount;
     }
   }
 
-  for (const rom of selectedRomIndexesWithLanguages) {
-    const romHasLowerLanguageAmount =
-      !romIndexesWithHighestLanguageAmount.includes(rom.index);
-    if (romHasLowerLanguageAmount) {
-      const romToUnselect = selectedRomsWithLanguages[rom.index];
-      if (romToUnselect) {
-        romToUnselect.selected = false;
-        selectedRomAmount--;
-        if (selectedRomAmount === keepSelected) return;
-      }
-    }
+  for (const rom of selectedRomsWithLanguages) {
+    const romHasLowerLanguageAmount = !romIdsWithHighestLanguageAmount.includes(
+      rom.id,
+    );
+    if (romHasLowerLanguageAmount) title.unselectById(rom.id);
   }
 };
 

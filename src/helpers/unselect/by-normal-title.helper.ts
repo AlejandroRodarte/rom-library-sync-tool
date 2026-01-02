@@ -1,16 +1,18 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 import unselect from "./index.js";
 
-const byNormalTitle = (roms: Rom[], keepSelected = 1): void => {
-  unselect.byCountryBasePriorityList(roms, keepSelected);
-  unselect.byLanguagesBasePriorityList(roms, keepSelected);
-  unselect.byLanguageAmount(roms, keepSelected);
-  unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms, keepSelected);
-  unselect.byBannedLabelSegments(roms, ["Disk"], keepSelected);
-  unselect.byVersionsPriorityList(roms, keepSelected);
-  unselect.byPALAndNTSCLabels(roms, keepSelected);
-  unselect.byBannedLabelsBasePriorityList(roms, keepSelected);
-  unselect.byWhitelistedLabelsBasePriorityList(roms, keepSelected);
+const byNormalTitle = (title: Title): void => {
+  if (!title.canUnselect()) return;
+
+  unselect.byCountryBasePriorityList(title);
+  unselect.byLanguagesBasePriorityList(title);
+  unselect.byLanguageAmount(title);
+  unselect.byBannedLabelSegmentsImposedBySpecialFlags(title);
+  unselect.byBannedLabelSegments(title, ["Disk"]);
+  unselect.byVersionsPriorityList(title);
+  unselect.byPALAndNTSCLabels(title);
+  unselect.byBannedLabelsBasePriorityList(title);
+  unselect.byWhitelistedLabelsBasePriorityList(title);
 };
 
 export default byNormalTitle;

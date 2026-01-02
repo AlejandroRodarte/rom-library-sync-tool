@@ -1,17 +1,10 @@
+import type Title from "../../classes/title.class.js";
 import BANNED_LABELS_BASE_PRIORITY_LIST from "../../constants/banned-labels-base-priority-list.constant.js";
-import type { Rom } from "../../types.js";
 import byBannedLabels from "./by-banned-labels.helper.js";
 
-const byBannedLabelsBasePriorityList = (
-  roms: Rom[],
-  keepSelected = 1,
-): void => {
-  let selectedRoms = roms.filter((rom) => rom.selected);
-
-  let selectedRomAmount = selectedRoms.length;
-  if (selectedRomAmount === keepSelected) return;
-
-  byBannedLabels(selectedRoms, BANNED_LABELS_BASE_PRIORITY_LIST, keepSelected);
+const byBannedLabelsBasePriorityList = (title: Title): void => {
+  if (!title.canUnselect()) return;
+  byBannedLabels(title, BANNED_LABELS_BASE_PRIORITY_LIST);
 };
 
 export default byBannedLabelsBasePriorityList;

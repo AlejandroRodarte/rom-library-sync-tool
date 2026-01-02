@@ -3,3 +3,4 @@
 - [ ] Build a class composed of both the ROM title and its ROM set with helper methods.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Add more `if (keepSelected > selectedRomAmount)` clauses where needed.
+- [ ] Migrate ROM labels and languages from arrays to sets.

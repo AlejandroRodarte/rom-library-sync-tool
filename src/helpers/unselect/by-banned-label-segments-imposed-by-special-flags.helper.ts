@@ -1,3 +1,4 @@
+import type Title from "../../classes/title.class.js";
 import {
   BETA_LABEL_SEGMENT,
   DEMO_LABEL_SEGMENT,
@@ -5,20 +6,12 @@ import {
   SAMPLE_LABEL_SEGMENT,
   VIRTUAL_CONSOLE_LABEL_SEGMENT,
 } from "../../constants/label-segments.constants.js";
-import type { Rom } from "../../types.js";
-import specialFlagsFromRoms from "../build/special-flags-from-roms.helper.js";
 import byBannedLabelSegments from "./by-banned-label-segments.helper.js";
 
-const byBannedLabelSegmentsImposedBySpecialFlags = (
-  roms: Rom[],
-  keepSelected = 1,
-): void => {
-  let selectedRoms = roms.filter((rom) => rom.selected);
+const byBannedLabelSegmentsImposedBySpecialFlags = (title: Title): void => {
+  if (!title.canUnselect()) return;
 
-  let romAmount = selectedRoms.length;
-  if (romAmount === keepSelected) return;
-
-  let specialFlags = specialFlagsFromRoms(selectedRoms);
+  const specialFlags = title.getSpecialFlags("selected-roms");
   const bannedLabelSegments: string[] = [];
 
   if (!specialFlags.allRomsAreSample)
@@ -32,7 +25,7 @@ const byBannedLabelSegmentsImposedBySpecialFlags = (
   if (!specialFlags.allRomsAreForVirtualConsole)
     bannedLabelSegments.push(VIRTUAL_CONSOLE_LABEL_SEGMENT);
 
-  byBannedLabelSegments(selectedRoms, bannedLabelSegments, keepSelected);
+  byBannedLabelSegments(title, bannedLabelSegments);
 };
 
 export default byBannedLabelSegmentsImposedBySpecialFlags;

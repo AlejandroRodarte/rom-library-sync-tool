@@ -1,7 +1,7 @@
-import romsToConsole from "./roms-to-console.helper.js";
+import titleToConsole from "./title-to-console.helper.js";
 
 const add = {
-  romsToConsole,
+  titleToConsole,
 };
 
 export default add;

@@ -1,30 +1,31 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 
-const byLanguages = (
-  roms: Rom[],
-  languagePriorityList: string[],
-  keepSelected = 1,
-): void => {
-  const romsWithLanguages = roms.filter((rom) => rom.languages.length > 0);
+interface RomIdAndLanguages {
+  id: string;
+  languages: string[];
+}
+
+const byLanguages = (title: Title, languagePriorityList: string[]): void => {
+  if (!title.canUnselect()) return;
+
+  const romsWithLanguages: RomIdAndLanguages[] = title.selectedRomSet
+    .entries()
+    .filter(([, rom]) => rom.languages.length > 0)
+    .map(([id, rom]) => ({ id, languages: rom.languages }))
+    .toArray();
 
   for (const language of languagePriorityList) {
-    const selectedRoms = romsWithLanguages.filter((rom) => rom.selected);
-    let selectedRomAmount = selectedRoms.length;
-    if (selectedRomAmount === keepSelected) return;
+    if (!title.canUnselect()) break;
 
-    const romsWithoutLanguage = selectedRoms.filter(
+    const romsWithoutLanguage = romsWithLanguages.filter(
       (rom) => !rom.languages.includes(language),
     );
 
     const romSetLacksLanguage =
-      romsWithoutLanguage.length === selectedRoms.length;
+      romsWithoutLanguage.length === romsWithLanguages.length;
     if (romSetLacksLanguage) continue;
 
-    for (const romToUnselect of romsWithoutLanguage) {
-      romToUnselect.selected = false;
-      selectedRomAmount--;
-      if (selectedRomAmount === keepSelected) return;
-    }
+    title.unselectByIds(romsWithoutLanguage.map((rom) => rom.id));
   }
 };
 

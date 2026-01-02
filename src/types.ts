@@ -1,3 +1,5 @@
+import type Title from "./classes/title.class.js";
+
 export interface Rom {
   filename: string;
   labels: string[];
@@ -5,11 +7,13 @@ export interface Rom {
   selected: boolean;
 }
 
-export type Groups = Map<string, Rom[]>;
-export type Console = Map<number, Groups>;
+export type RomSet = Map<string, Rom>;
+
+export type Titles = Map<string, Title>;
+export type Console = Map<number, Titles>;
 
 export type Consoles = Map<string, Console>;
-export type DuplicatesData = Map<number, Groups>;
+export type DuplicatesData = Map<number, Titles>;
 
 export interface SpecialFlags {
   allRomsAreUnreleased: boolean;
@@ -25,8 +29,8 @@ export interface VersionSystem {
   compareFn: (label1: string, label2: string) => -1 | 0 | 1;
 }
 
-export interface RomIndexAndVersion {
-  index: number;
+export interface RomIdAndVersion {
+  id: string;
   version: string;
 }
 

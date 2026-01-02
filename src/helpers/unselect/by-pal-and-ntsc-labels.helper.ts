@@ -1,25 +1,20 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 
-const byPALAndNTSCLabels = (roms: Rom[], keepSelected = 1): void => {
-  const selectedRoms = roms.filter((rom) => rom.selected);
+const byPALAndNTSCLabels = (title: Title): void => {
+  if (!title.canUnselect()) return;
 
-  let selectedRomAmount = selectedRoms.length;
-  if (selectedRomAmount === keepSelected) return;
-
-  const romSetHasNTSCLabel = selectedRoms.some((rom) =>
-    rom.labels.some((label) => label.includes("NTSC")),
-  );
+  const romSetHasNTSCLabel = title.selectedRomSet
+    .values()
+    .some((rom) => rom.labels.some((label) => label.includes("NTSC")));
   if (!romSetHasNTSCLabel) return;
 
-  const palRoms = selectedRoms.filter((rom) =>
-    rom.labels.some((label) => label.includes("PAL")),
-  );
+  const romIdsWithPALLabel = title.selectedRomSet
+    .entries()
+    .filter(([_, rom]) => rom.labels.some((label) => label.includes("PAL")))
+    .map(([id]) => id)
+    .toArray();
 
-  for (const romToUnselect of palRoms) {
-    romToUnselect.selected = false;
-    selectedRomAmount--;
-    if (selectedRomAmount === keepSelected) return;
-  }
+  title.unselectByIds(romIdsWithPALLabel);
 };
 
 export default byPALAndNTSCLabels;

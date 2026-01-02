@@ -1,42 +1,26 @@
+import type Title from "../../classes/title.class.js";
 import { VIRTUAL_CONSOLE_LABEL_SEGMENT } from "../../constants/label-segments.constants.js";
 import UNRELEASED_LABEL_SEGMENT_LIST from "../../constants/unreleased-label-segment-list.constant.js";
-import type { Rom } from "../../types.js";
-import specialFlagsFromRoms from "../build/special-flags-from-roms.helper.js";
 
-const byCountry = (
-  roms: Rom[],
-  countryPriorityList: string[],
-  keepSelected: number = 1,
-): void => {
-  const selectedRoms = roms.filter((rom) => rom.selected);
-  let selectedRomAmount = selectedRoms.length;
-
-  if (keepSelected > selectedRomAmount) {
-    console.log(
-      `You want to keep selected ${keepSelected} ROMs out of the ${selectedRomAmount} selected ROMs available.`,
-    );
-    return;
-  }
-
-  if (selectedRomAmount === keepSelected) return;
-
-  const specialFlags = specialFlagsFromRoms(selectedRoms);
+const byCountry = (title: Title, countryPriorityList: string[]): void => {
+  if (!title.canUnselect()) return;
+  const specialFlags = title.getSpecialFlags("selected-roms");
 
   const unselectNonCountryRoms = (country: string): void => {
-    const nonCountryRoms = selectedRoms.filter(
-      (rom) => !rom.labels.includes(country),
-    );
-    for (const romToUnselect of nonCountryRoms) {
-      romToUnselect.selected = false;
-      selectedRomAmount--;
-      if (selectedRomAmount === keepSelected) return;
-    }
+    const nonCountryRomIds = title.selectedRomSet
+      .entries()
+      .filter(([_, rom]) => !rom.labels.includes(country))
+      .map(([id]) => id)
+      .toArray();
+
+    title.unselectByIds(nonCountryRomIds);
   };
 
   for (const country of countryPriorityList) {
-    const countryRoms = selectedRoms.filter((rom) =>
-      rom.labels.includes(country),
-    );
+    const countryRoms = title.selectedRomSet
+      .values()
+      .filter((rom) => rom.labels.includes(country))
+      .toArray();
     const countryRomsFound = countryRoms.length > 0;
     if (!countryRomsFound) continue;
 

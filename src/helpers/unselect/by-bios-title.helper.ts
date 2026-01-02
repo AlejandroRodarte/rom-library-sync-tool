@@ -1,10 +1,11 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 import unselect from "./index.js";
 
-const byBiosTitle = (roms: Rom[], keepSelected = 1): void => {
-  unselect.byBannedLabelSegmentsImposedBySpecialFlags(roms, keepSelected);
-  unselect.byBannedLabelSegments(roms, ["Disk"], keepSelected);
-  unselect.byVersionsPriorityList(roms, keepSelected);
+const byBiosTitle = (title: Title): void => {
+  if (!title.canUnselect()) return;
+
+  unselect.byBannedLabelSegmentsImposedBySpecialFlags(title);
+  unselect.byVersionsPriorityList(title);
 };
 
 export default byBiosTitle;

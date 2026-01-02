@@ -9,26 +9,25 @@ const main = async () => {
   const consoles = build.emptyConsoles();
 
   for (const [name, konsole] of consoles) {
-    const groups = await build.groupsFromConsoleName(name);
+    const titles = await build.titlesFromConsoleName(name);
 
-    for (const [title, roms] of groups) {
+    for (const [name, title] of titles) {
       let type: "normal" | "bios" = "normal";
-      const titleIsBios = title.includes(BIOS_TITLE_SEGMENT);
+      const titleIsBios = name.includes(BIOS_TITLE_SEGMENT);
       if (titleIsBios) type = "bios";
 
-      const keepSelected = 1;
       switch (type) {
         case "normal":
-          unselect.byNormalTitle(roms, keepSelected);
+          unselect.byNormalTitle(title);
           break;
         case "bios":
-          unselect.byBiosTitle(roms, keepSelected);
+          unselect.byBiosTitle(title);
           break;
         default:
           break;
       }
 
-      add.romsToConsole(roms, konsole, title);
+      add.titleToConsole(title, konsole);
     }
   }
 

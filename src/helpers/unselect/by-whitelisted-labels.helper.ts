@@ -1,30 +1,23 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 
 const byWhitelistedLabels = (
-  roms: Rom[],
+  title: Title,
   labelPriorityList: string[],
-  keepSelected = 1,
 ): void => {
-  let selectedRoms = roms.filter((rom) => rom.selected);
-
-  let selectedRomAmount = selectedRoms.length;
-  if (selectedRomAmount === keepSelected) return;
+  if (!title.canUnselect()) return;
 
   for (const wantedExactLabel of labelPriorityList) {
-    const romsWithoutWantedLabel = selectedRoms.filter(
-      (rom) => !rom.labels.includes(wantedExactLabel),
-    );
+    const romIdsWithoutWhitelistedLabel = title.selectedRomSet
+      .entries()
+      .filter(([, rom]) => !rom.labels.includes(wantedExactLabel))
+      .map(([id]) => id)
+      .toArray();
 
-    const romSetLacksWantedLabel =
-      romsWithoutWantedLabel.length === selectedRoms.length;
-    if (romSetLacksWantedLabel) continue;
+    const romSetLacksWhitelistedLabel =
+      romIdsWithoutWhitelistedLabel.length === title.selectedRomAmount;
+    if (romSetLacksWhitelistedLabel) continue;
 
-    for (const romToUnselect of romsWithoutWantedLabel) {
-      romToUnselect.selected = false;
-      selectedRomAmount--;
-      if (selectedRomAmount === keepSelected) return;
-      selectedRoms = roms.filter((rom) => rom.selected);
-    }
+    title.unselectByIds(romIdsWithoutWhitelistedLabel);
   }
 };
 

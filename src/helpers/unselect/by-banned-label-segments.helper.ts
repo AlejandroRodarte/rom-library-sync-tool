@@ -1,26 +1,18 @@
-import type { Rom } from "../../types.js";
+import type Title from "../../classes/title.class.js";
 
-const byBannedLabelSegments = (
-  roms: Rom[],
-  labelSegments: string[],
-  keepSelected = 1,
-): void => {
-  let selectedRoms = roms.filter((rom) => rom.selected);
-
-  let selectedRomAmount = selectedRoms.length;
-  if (selectedRomAmount === keepSelected) return;
-
+const byBannedLabelSegments = (title: Title, labelSegments: string[]): void => {
   for (const bannedLabelSegment of labelSegments) {
-    const romsWithBannedLabelSegment = selectedRoms.filter((rom) =>
-      rom.labels.some((label) => label.includes(bannedLabelSegment)),
-    );
+    if (!title.canUnselect()) break;
 
-    for (const romToUnselect of romsWithBannedLabelSegment) {
-      romToUnselect.selected = false;
-      selectedRomAmount--;
-      if (selectedRomAmount === keepSelected) return;
-      selectedRoms = roms.filter((rom) => rom.selected);
-    }
+    const romIdsWithBannedLabelSegment = title.selectedRomSet
+      .entries()
+      .filter(([_, rom]) =>
+        rom.labels.some((label) => label.includes(bannedLabelSegment)),
+      )
+      .map(([id]) => id)
+      .toArray();
+
+    title.unselectByIds(romIdsWithBannedLabelSegment);
   }
 };
 
