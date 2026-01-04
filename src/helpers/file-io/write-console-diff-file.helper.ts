@@ -10,7 +10,7 @@ import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
 import build from "../build/index.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
-import writeToFile from "./write-to-file.helper.js";
+import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
 
 const writeConsoleDiffFile = async (
   name: string,
@@ -76,20 +76,16 @@ const writeConsoleDiffFile = async (
   for (const index of indexes.newFilenames.toAdd) {
     const newFilename = newFilenames[index];
     if (!newFilename) continue;
-    const writeError = await writeToFile(
+
+    const diffFileWriteError = await writeToFileOrDelete(
+      diffFilePath,
       diffFileHandle,
       `add-file|"${romsDirPath}/${newFilename}"\n`,
       "utf8",
     );
-    if (writeError) {
-      console.log(writeError.message);
-      console.log("Deleting diff file and skipping this console.");
-      await diffFileHandle.close();
-      const deleteError = await findAndDeleteFile(diffFilePath);
-      if (deleteError) {
-        console.log(deleteError.message);
-        console.log("Was not able to delete diff file.");
-      }
+    if (diffFileWriteError) {
+      console.log(diffFileWriteError.message);
+      console.log("Skipping this console.");
       return;
     }
   }
@@ -97,20 +93,16 @@ const writeConsoleDiffFile = async (
   for (const index of indexes.currentFilenames.toDelete) {
     const currentFilename = currentFilenames[index];
     if (!currentFilename) continue;
-    const writeError = await writeToFile(
+
+    const diffFileWriteError = await writeToFileOrDelete(
+      diffFilePath,
       diffFileHandle,
       `remove-file|"${currentFilename}"\n`,
       "utf8",
     );
-    if (writeError) {
-      console.log(writeError.message);
-      console.log("Deleting diff file and skipping this console.");
-      await diffFileHandle.close();
-      const deleteError = await findAndDeleteFile(diffFilePath);
-      if (deleteError) {
-        console.log(deleteError.message);
-        console.log("Was not able to delete diff file.");
-      }
+    if (diffFileWriteError) {
+      console.log(diffFileWriteError.message);
+      console.log("Skipping this console.");
       return;
     }
   }
