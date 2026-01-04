@@ -5,6 +5,7 @@ import labelsAndLanguagesFromFilename from "./labels-and-languages-from-filename
 import selectedRomFilenamesFromConsole from "./selected-rom-filenames-from-console.helper.js";
 import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
 import environmentFromProcessVariables from "./environment-from-process-variables.helper.js";
+import filenameIndexesToAddAndDelete from "./filename-indexes-to-add-and-delete.helper.js";
 
 const build = {
   emptyConsoles,
@@ -14,6 +15,7 @@ const build = {
   selectedRomFilenamesFromConsole,
   specialFlagsFromRoms,
   environmentFromProcessVariables,
+  filenameIndexesToAddAndDelete,
 };
 
 export default build;
