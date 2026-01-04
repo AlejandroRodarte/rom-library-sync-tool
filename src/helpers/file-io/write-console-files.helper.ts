@@ -5,14 +5,16 @@ import { LOCAL_ROM_LISTS_DIR_PATH } from "../../constants/paths.constants.js";
 import { existsSync, readFileSync, unlinkSync } from "fs";
 import writeRomFilenamesToConsoleFile from "./write-rom-filenames-to-console-file.helper.js";
 import { truncateSync } from "node:fs";
-import writeConsoleDiffFile from "./write-console-diff-file.helper.js";
 import type { Console } from "../../types.js";
 
 const writeConsoleFiles = (name: string, konsole: Console): void => {
   const newConsoleFilenames = selectedRomFilenamesFromConsole(konsole);
 
   const consoleFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
-  const diffConsoleFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.diff.txt`);
+  const diffConsoleFilePath = path.resolve(
+    LOCAL_ROM_LISTS_DIR_PATH,
+    `${name}.diff.txt`,
+  );
 
   const consoleFileExists = existsSync(consoleFilePath);
   const diffConsoleFileExists = existsSync(diffConsoleFilePath);
@@ -21,7 +23,6 @@ const writeConsoleFiles = (name: string, konsole: Console): void => {
 
   if (!consoleFileExists) {
     writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
-    writeConsoleDiffFile(name, diffConsoleFilePath, [], newConsoleFilenames);
     return;
   }
 
@@ -31,12 +32,6 @@ const writeConsoleFiles = (name: string, konsole: Console): void => {
   truncateSync(consoleFilePath);
 
   writeRomFilenamesToConsoleFile(consoleFilePath, newConsoleFilenames);
-  writeConsoleDiffFile(
-    name,
-    diffConsoleFilePath,
-    currentConsoleFilenames,
-    newConsoleFilenames,
-  );
 };
 
 export default writeConsoleFiles;
