@@ -13,6 +13,7 @@ import writeConsoleDiffFile from "./write-console-diff-file.helper.js";
 import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
 import writeAddFileLineToDiffFile from "./write-add-file-line-to-diff-file.helper.js";
 import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file.helper.js";
+import writeConsoleListFile from "./write-console-list-file.helper.js";
 
 const fileIO = {
   writeConsoleFiles,
@@ -30,6 +31,7 @@ const fileIO = {
   writeToFileOrDelete,
   writeAddFileLineToDiffFile,
   writeDeleteFileLineToDiffFile,
+  writeConsoleListFile,
 };
 
 export default fileIO;

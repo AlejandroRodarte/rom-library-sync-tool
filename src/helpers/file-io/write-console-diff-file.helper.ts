@@ -10,7 +10,8 @@ import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
 import build from "../build/index.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
-import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
+import writeAddFileLineToDiffFile from "./write-add-file-line-to-diff-file.helper.js";
+import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file.helper.js";
 
 const writeConsoleDiffFile = async (
   name: string,
@@ -74,15 +75,16 @@ const writeConsoleDiffFile = async (
   );
 
   for (const index of indexes.newFilenames.toAdd) {
-    const newFilename = newFilenames[index];
-    if (!newFilename) continue;
+    const filenameToAdd = newFilenames[index];
+    if (!filenameToAdd) continue;
 
-    const diffFileWriteError = await writeToFileOrDelete(
+    const diffFileWriteError = await writeAddFileLineToDiffFile(
+      filenameToAdd,
       diffFilePath,
       diffFileHandle,
-      `add-file|"${romsDirPath}/${newFilename}"\n`,
-      "utf8",
+      romsDirPath,
     );
+
     if (diffFileWriteError) {
       console.log(diffFileWriteError.message);
       console.log("Skipping this console.");
@@ -91,15 +93,15 @@ const writeConsoleDiffFile = async (
   }
 
   for (const index of indexes.currentFilenames.toDelete) {
-    const currentFilename = currentFilenames[index];
-    if (!currentFilename) continue;
+    const filenameToDelete = currentFilenames[index];
+    if (!filenameToDelete) continue;
 
-    const diffFileWriteError = await writeToFileOrDelete(
+    const diffFileWriteError = await writeDeleteFileLineToDiffFile(
+      filenameToDelete,
       diffFilePath,
       diffFileHandle,
-      `remove-file|"${currentFilename}"\n`,
-      "utf8",
     );
+
     if (diffFileWriteError) {
       console.log(diffFileWriteError.message);
       console.log("Skipping this console.");
