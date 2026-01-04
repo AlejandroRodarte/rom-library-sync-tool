@@ -68,18 +68,14 @@ const writeConsoleDiffFile = async (
     return;
   }
 
-  for (const newFilename of newFilenames) {
-    const indexWhereNewFilenameIsOnCurrentList = currentFilenames.findIndex(
-      (f) => f === newFilename,
-    );
-    const newFilenameIsOnCurrentList =
-      indexWhereNewFilenameIsOnCurrentList !== -1;
+  const indexes = build.filenameIndexesToAddAndDelete(
+    currentFilenames,
+    newFilenames,
+  );
 
-    if (newFilenameIsOnCurrentList) {
-      currentFilenames.splice(indexWhereNewFilenameIsOnCurrentList, 1);
-      continue;
-    }
-
+  for (const index of indexes.newFilenames.toAdd) {
+    const newFilename = newFilenames[index];
+    if (!newFilename) continue;
     const writeError = await writeToFile(
       diffFileHandle,
       `add-file|"${romsDirPath}/${newFilename}"\n`,
@@ -98,7 +94,9 @@ const writeConsoleDiffFile = async (
     }
   }
 
-  for (const currentFilename of currentFilenames) {
+  for (const index of indexes.currentFilenames.toDelete) {
+    const currentFilename = currentFilenames[index];
+    if (!currentFilename) continue;
     const writeError = await writeToFile(
       diffFileHandle,
       `remove-file|"${currentFilename}"\n`,
