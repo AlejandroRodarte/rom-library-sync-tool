@@ -18,6 +18,10 @@ const writeConsoleDiffFile = async (
 ): Promise<void> => {
   const romsDirPath = path.resolve(LOCAL_ROMS_DIR_PATH, name);
   const listFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
+  const diffFilePath = path.resolve(
+    LOCAL_ROM_DIFFS_DIR_PATH,
+    `${name}.diff.txt`,
+  );
 
   const listFileAccessError = await fileExistsAndIsReadable(listFilePath);
   if (listFileAccessError) {
@@ -25,11 +29,6 @@ const writeConsoleDiffFile = async (
     console.log("Skipping this console.");
     return;
   }
-
-  const diffFilePath = path.resolve(
-    LOCAL_ROM_DIFFS_DIR_PATH,
-    `${name}.diff.txt`,
-  );
 
   const diffFileDeleteError = await findAndDeleteFile(diffFilePath, false);
   if (diffFileDeleteError) {
