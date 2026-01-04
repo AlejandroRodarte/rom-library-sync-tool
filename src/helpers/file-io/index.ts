@@ -9,6 +9,7 @@ import readUtf8FileIntoString from "./read-utf8-file.helper.js";
 import writeConsoleFiles from "./write-console-files.helper.js";
 import writeRomFilenamesToConsoleFile from "./write-rom-filenames-to-console-file.helper.js";
 import writeToFile from "./write-to-file.helper.js";
+import writeConsoleDiffFile from "./write-console-diff-file.helper.js";
 
 const fileIO = {
   writeConsoleFiles,
@@ -22,6 +23,7 @@ const fileIO = {
   openFile,
   openNewWriteOnlyFile,
   writeToFile,
+  writeConsoleDiffFile,
 };
 
 export default fileIO;
