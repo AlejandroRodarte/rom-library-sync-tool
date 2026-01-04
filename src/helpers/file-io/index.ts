@@ -11,6 +11,8 @@ import writeRomFilenamesToConsoleFile from "./write-rom-filenames-to-console-fil
 import writeToFile from "./write-to-file.helper.js";
 import writeConsoleDiffFile from "./write-console-diff-file.helper.js";
 import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
+import writeAddFileLineToDiffFile from "./write-add-file-line-to-diff-file.helper.js";
+import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file.helper.js";
 
 const fileIO = {
   writeConsoleFiles,
@@ -26,6 +28,8 @@ const fileIO = {
   writeToFile,
   writeConsoleDiffFile,
   writeToFileOrDelete,
+  writeAddFileLineToDiffFile,
+  writeDeleteFileLineToDiffFile,
 };
 
 export default fileIO;
