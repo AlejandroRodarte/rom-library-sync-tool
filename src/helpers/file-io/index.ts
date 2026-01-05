@@ -6,7 +6,6 @@ import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
 import openFile from "./open-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
 import readUtf8FileIntoString from "./read-utf8-file.helper.js";
-import writeConsoleFiles from "./write-console-files.helper.js";
 import writeRomFilenamesToConsoleFile from "./write-rom-filenames-to-console-file.helper.js";
 import writeToFile from "./write-to-file.helper.js";
 import writeConsoleDiffFile from "./write-console-diff-file.helper.js";
@@ -16,7 +15,6 @@ import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file
 import writeConsoleListFile from "./write-console-list-file.helper.js";
 
 const fileIO = {
-  writeConsoleFiles,
   writeRomFilenamesToConsoleFile,
   accessPath,
   fileExistsAndIsReadable,
