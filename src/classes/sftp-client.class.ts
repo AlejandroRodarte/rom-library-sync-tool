@@ -10,41 +10,24 @@ class SftpClient {
     this._client = new Client(name);
   }
 
-  public async connect(credentials: SftpCredentials): Promise<void> {
-    if (this._connected) {
-      console.log(
-        "This client is already connected to a remote device. Build a new SftpClient object to connect to another device.",
-      );
-      return;
-    }
+  public async connect(
+    credentials: SftpCredentials,
+  ): Promise<Error | undefined> {
+    if (this._connected)
+      return new Error("This client is already connected to a remote device.");
 
     const connectionError = await sftp.connect(this._client, credentials);
-
-    if (connectionError) {
-      console.log(
-        "Failed to connect to remote device. This client remains uninitialized",
-      );
-      return;
-    }
+    if (connectionError) return connectionError;
 
     this._connected = true;
   }
 
-  public async disconnect(): Promise<void> {
-    if (!this._connected) {
-      console.log(
-        "This client is not connected to a remote device. Doing nothing.",
-      );
-      return;
-    }
+  public async disconnect(): Promise<Error | undefined> {
+    if (!this._connected)
+      return new Error("This client is not connected to a remote device.");
 
     const disconnectionError = await sftp.disconnect(this._client);
-
-    if (disconnectionError) {
-      console.log(
-        "Failed to disconnect from remote device. This client remains initialized.",
-      );
-    }
+    if (disconnectionError) return disconnectionError;
 
     this._connected = false;
   }
