@@ -1,6 +1,4 @@
 import ENVIRONMENT from "./constants/environment.constant.js";
-
-import { BIOS_TITLE_SEGMENT } from "./constants/title-segments.constnats.js";
 import add from "./helpers/add/index.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
@@ -9,51 +7,46 @@ import unselect from "./helpers/unselect/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
 
 const main = async () => {
-  const consoles = build.emptyConsoles();
+  for (const deviceName of DEVICE_NAMES) {
+    const deviceDirPaths = build.deviceDirPathsFromName(deviceName);
 
-  for (const [name, konsole] of consoles) {
-    const titles = await build.titlesFromConsoleName(name);
-
-    for (const [name, title] of titles) {
-      let type: "normal" | "bios" = "normal";
-      const titleIsBios = name.includes(BIOS_TITLE_SEGMENT);
-      if (titleIsBios) type = "bios";
-
-      switch (type) {
-        case "normal":
-          unselect.byNormalTitle(title);
-          break;
-        case "bios":
-          unselect.byBiosTitle(title);
-          break;
-        default:
-          break;
-      }
-
-      add.titleToConsole(title, konsole);
+    const deviceDirPathsError =
+      await fileIO.checkDeviceDirPaths(deviceDirPaths);
+    if (deviceDirPathsError) {
+      console.log(deviceDirPathsError.message);
+      console.log("Terminating program.");
+      return;
     }
-  }
 
-  for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
-  log.consolesReport(consoles);
+    const consoles = build.emptyConsoles();
 
-  for (const [name, konsole] of consoles) {
-    for (const device of DEVICE_NAMES) {
-      const deviceDirPaths = build.deviceDirPathsFromName(device);
+    for (const [name, konsole] of consoles) {
+      const titles = await build.titlesFromConsoleName(name);
 
-      const deviceDirPathsError =
-        await fileIO.checkDeviceDirPaths(deviceDirPaths);
-      if (deviceDirPathsError) {
-        console.log(deviceDirPathsError.message);
-        console.log("Terminating program.");
-        return;
+      for (const [name, title] of titles) {
+        switch (deviceName) {
+          case "local":
+            unselect.byLocalDevice(name, title);
+            break;
+          case "steam-deck":
+            unselect.bySteamDeckDevice(name, title);
+            break;
+          default:
+            throw new Error("Unrecognized device.");
+        }
+        add.titleToConsole(title, konsole);
       }
+    }
 
+    for (const [name, konsole] of consoles) {
       await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
 
       if (ENVIRONMENT.files.replaceLists)
         await fileIO.writeConsoleListFile(name, konsole, deviceDirPaths.lists);
     }
+
+    for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
+    log.consolesReport(consoles);
   }
 };
 
