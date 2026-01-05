@@ -36,12 +36,11 @@ const main = async () => {
   for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
   log.consolesReport(consoles);
 
-  for (const [name, konsole] of consoles)
+  for (const [name, konsole] of consoles) {
     await fileIO.writeConsoleDiffFile(name, konsole);
-
-  if (ENVIRONMENT.files.replaceLists)
-    for (const [name, konsole] of consoles)
+    if (ENVIRONMENT.files.replaceLists)
       await fileIO.writeConsoleListFile(name, konsole);
+  }
 };
 
 main();
