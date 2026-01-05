@@ -14,6 +14,8 @@ import byWhitelistedLabelsBasePriorityList from "./by-whitelisted-labels-base-pr
 import byWhitelistedLabels from "./by-whitelisted-labels.helper.js";
 import byNormalTitle from "./by-normal-title.helper.js";
 import byBiosTitle from "./by-bios-title.helper.js";
+import byLocalDevice from "./by-local-device.helper.js";
+import bySteamDeckDevice from "./by-steam-deck-device.helper.js";
 
 const unselect = {
   byCountry,
@@ -32,6 +34,8 @@ const unselect = {
   byWhitelistedLabelsBasePriorityList,
   byNormalTitle,
   byBiosTitle,
+  byLocalDevice,
+  bySteamDeckDevice,
 };
 
 export default unselect;
