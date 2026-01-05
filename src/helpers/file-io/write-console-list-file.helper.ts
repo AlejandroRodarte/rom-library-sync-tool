@@ -1,16 +1,15 @@
 import path from "node:path";
 import type { Console } from "../../types.js";
 import { LOCAL_ROM_LISTS_DIR_PATH } from "../../constants/paths.constants.js";
-import fileIO from "./index.js";
 import build from "../build/index.js";
+import findAndDeleteFile from "./find-and-delete-file.helper.js";
+import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
+import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
 
 const writeConsoleListFile = async (name: string, konsole: Console) => {
   const listFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
 
-  const listFileDeleteError = await fileIO.findAndDeleteFile(
-    listFilePath,
-    false,
-  );
+  const listFileDeleteError = await findAndDeleteFile(listFilePath, false);
   if (listFileDeleteError) {
     console.log(listFileDeleteError.message);
     console.log("Skipping this console.");
@@ -18,7 +17,7 @@ const writeConsoleListFile = async (name: string, konsole: Console) => {
   }
 
   const [listFileHandle, listFileOpenError] =
-    await fileIO.openNewWriteOnlyFile(listFilePath);
+    await openNewWriteOnlyFile(listFilePath);
   if (listFileOpenError) {
     console.log(listFileOpenError.message);
     console.log("Skipping this console.");
@@ -36,7 +35,7 @@ const writeConsoleListFile = async (name: string, konsole: Console) => {
     .selectedRomFilenamesFromConsole(konsole)
     .join("\n");
 
-  const listFileWriteOrDeleteError = await fileIO.writeToFileOrDelete(
+  const listFileWriteOrDeleteError = await writeToFileOrDelete(
     listFilePath,
     listFileHandle,
     newFilenames + "\n",
