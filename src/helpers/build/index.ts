@@ -6,6 +6,7 @@ import selectedRomFilenamesFromConsole from "./selected-rom-filenames-from-conso
 import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
 import environmentFromProcessVariables from "./environment-from-process-variables.helper.js";
 import filenameIndexesToAddAndDelete from "./filename-indexes-to-add-and-delete.helper.js";
+import deviceDirPathsFromName from "./device-dir-paths-from-name.helper.js";
 
 const build = {
   emptyConsoles,
@@ -16,6 +17,7 @@ const build = {
   specialFlagsFromRoms,
   environmentFromProcessVariables,
   filenameIndexesToAddAndDelete,
+  deviceDirPathsFromName,
 };
 
 export default build;
