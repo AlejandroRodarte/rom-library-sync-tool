@@ -48,39 +48,15 @@ const main = async () => {
 
   for (const [name, konsole] of consoles) {
     for (const device of DEVICE_NAMES) {
-      const deviceDirPath = path.join(DEVICES_DIR_PATH, device);
+      const deviceDirPaths = build.deviceDirPathsFromName(device);
 
-      const deviceDirPathExistsError = await dirExists(deviceDirPath);
-      if (deviceDirPathExistsError) {
-        console.log(deviceDirPathExistsError.message);
+      const deviceDirPathsError =
+        await fileIO.checkDeviceDirPaths(deviceDirPaths);
+      if (deviceDirPathsError) {
+        console.log(deviceDirPathsError.message);
         console.log("Terminating program.");
         return;
       }
-
-      const deviceDiffsDirPath = path.join(deviceDirPath, "diffs");
-
-      const deviceDiffsDirPathExistsError =
-        await dirExistsAndIsReadableAndWritable(deviceDiffsDirPath);
-      if (deviceDiffsDirPathExistsError) {
-        console.log(deviceDiffsDirPathExistsError.message);
-        console.log("Terminating program.");
-        return;
-      }
-
-      const deviceListsDirPath = path.join(deviceDirPath, "lists");
-
-      const deviceListsDirPathExistsError =
-        await dirExistsAndIsReadableAndWritable(deviceListsDirPath);
-      if (deviceListsDirPathExistsError) {
-        console.log(deviceListsDirPathExistsError.message);
-        console.log("Terminating program.");
-        return;
-      }
-
-      const deviceDirPaths: DeviceDirPaths = {
-        diffs: deviceDiffsDirPath,
-        lists: deviceListsDirPath,
-      };
 
       await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
 
