@@ -14,8 +14,8 @@ const main = async () => {
       await fileIO.checkDeviceDirPaths(deviceDirPaths);
     if (deviceDirPathsError) {
       console.log(deviceDirPathsError.message);
-      console.log("Terminating program.");
-      return;
+      console.log("Continuing with the next device.");
+      continue;
     }
 
     const consoles = build.emptyConsoles();
