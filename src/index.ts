@@ -38,12 +38,8 @@ const main = async () => {
       }
     }
 
-    for (const [name, konsole] of consoles) {
+    for (const [name, konsole] of consoles)
       await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
-
-      if (ENVIRONMENT.files.replaceLists)
-        await fileIO.writeConsoleListFile(name, konsole, deviceDirPaths.lists);
-    }
 
     for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
     log.consolesReport(consoles);
