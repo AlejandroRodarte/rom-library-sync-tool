@@ -58,6 +58,30 @@ class SftpClient {
     const existsError = await sftp.exists(this._client, dirPath, "dir");
     if (existsError) return existsError;
   }
+
+  public async addFile(
+    localFilePath: string,
+    remoteFilePath: string,
+  ): Promise<Error | undefined> {
+    const addError = await sftp.addFile(
+      this._client,
+      localFilePath,
+      remoteFilePath,
+    );
+    if (addError) return addError;
+  }
+
+  public async deleteFile(
+    remoteFilePath: string,
+    fileMustExist = false,
+  ): Promise<Error | undefined> {
+    const deleteError = await sftp.deleteFile(
+      this._client,
+      remoteFilePath,
+      fileMustExist,
+    );
+    if (deleteError) return deleteError;
+  }
 }
 
 export default SftpClient;
