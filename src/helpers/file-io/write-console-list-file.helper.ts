@@ -1,13 +1,16 @@
 import path from "node:path";
 import type { Console } from "../../types.js";
-import { LOCAL_ROM_LISTS_DIR_PATH } from "../../constants/paths.constants.js";
 import build from "../build/index.js";
 import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
 import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
 
-const writeConsoleListFile = async (name: string, konsole: Console) => {
-  const listFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
+const writeConsoleListFile = async (
+  name: string,
+  konsole: Console,
+  listsDirPath: string,
+) => {
+  const listFilePath = path.join(listsDirPath, `${name}.txt`);
 
   const listFileDeleteError = await findAndDeleteFile(listFilePath, false);
   if (listFileDeleteError) {

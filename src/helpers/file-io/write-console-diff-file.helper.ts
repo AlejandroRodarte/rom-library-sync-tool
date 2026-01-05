@@ -1,10 +1,6 @@
 import path from "path";
-import type { Console } from "../../types.js";
-import {
-  LOCAL_ROM_DIFFS_DIR_PATH,
-  LOCAL_ROM_LISTS_DIR_PATH,
-  LOCAL_ROMS_DIR_PATH,
-} from "../../constants/paths.constants.js";
+import type { Console, DeviceDirPaths } from "../../types.js";
+import { LOCAL_ROMS_DIR_PATH } from "../../constants/paths.constants.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
@@ -16,13 +12,12 @@ import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file
 const writeConsoleDiffFile = async (
   name: string,
   konsole: Console,
+  devicePaths: DeviceDirPaths,
 ): Promise<void> => {
-  const romsDirPath = path.resolve(LOCAL_ROMS_DIR_PATH, name);
-  const listFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
-  const diffFilePath = path.resolve(
-    LOCAL_ROM_DIFFS_DIR_PATH,
-    `${name}.diff.txt`,
-  );
+  const romsDirPath = path.join(LOCAL_ROMS_DIR_PATH, name);
+
+  const listFilePath = path.join(devicePaths.lists, `${name}.txt`);
+  const diffFilePath = path.join(devicePaths.diffs, `${name}.diff.txt`);
 
   let listFileExists = true;
   const listFileAccessError = await fileExistsAndIsReadable(listFilePath);

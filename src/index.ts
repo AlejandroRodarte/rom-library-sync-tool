@@ -7,10 +7,15 @@ import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";
 import {
+  DEVICES_DIR_PATH,
   LOCAL_ROM_DIFFS_DIR_PATH,
   LOCAL_ROM_LISTS_DIR_PATH,
 } from "./constants/paths.constants.js";
 import path from "node:path";
+import DEVICE_NAMES from "./constants/device-names.constant.js";
+import dirExists from "./helpers/file-io/dir-exists.helper.js";
+import dirExistsAndIsReadableAndWritable from "./helpers/file-io/dir-exists-and-is-readable-and-writable.helper.js";
+import type { DeviceDirPaths } from "./types.js";
 
 const main = async () => {
   const consoles = build.emptyConsoles();
@@ -42,29 +47,45 @@ const main = async () => {
   log.consolesReport(consoles);
 
   for (const [name, konsole] of consoles) {
-    const localDiffsDirExistsError =
-      await fileIO.dirExistsAndIsReadableAndWritable(LOCAL_ROM_DIFFS_DIR_PATH);
-    if (localDiffsDirExistsError) {
-      console.log(localDiffsDirExistsError.message);
-      console.log("Terminating program.");
-      return;
-    }
+    for (const device of DEVICE_NAMES) {
+      const deviceDirPath = path.join(DEVICES_DIR_PATH, device);
 
-    await fileIO.writeConsoleDiffFile(name, konsole);
-
-    if (ENVIRONMENT.files.replaceLists) {
-      const localListsDirExistsError =
-        await fileIO.dirExistsAndIsReadableAndWritable(
-          LOCAL_ROM_LISTS_DIR_PATH,
-        );
-      if (localListsDirExistsError) {
-        console.log(localListsDirExistsError.message);
-        console.log("Terminating program and rolling back.");
-        await fileIO.deleteAllConsoleDiffFiles(consoles.keys().toArray());
+      const deviceDirPathExistsError = await dirExists(deviceDirPath);
+      if (deviceDirPathExistsError) {
+        console.log(deviceDirPathExistsError.message);
+        console.log("Terminating program.");
         return;
       }
 
-      await fileIO.writeConsoleListFile(name, konsole);
+      const deviceDiffsDirPath = path.join(deviceDirPath, "diffs");
+
+      const deviceDiffsDirPathExistsError =
+        await dirExistsAndIsReadableAndWritable(deviceDiffsDirPath);
+      if (deviceDiffsDirPathExistsError) {
+        console.log(deviceDiffsDirPathExistsError.message);
+        console.log("Terminating program.");
+        return;
+      }
+
+      const deviceListsDirPath = path.join(deviceDirPath, "lists");
+
+      const deviceListsDirPathExistsError =
+        await dirExistsAndIsReadableAndWritable(deviceListsDirPath);
+      if (deviceListsDirPathExistsError) {
+        console.log(deviceListsDirPathExistsError.message);
+        console.log("Terminating program.");
+        return;
+      }
+
+      const deviceDirPaths: DeviceDirPaths = {
+        diffs: deviceDiffsDirPath,
+        lists: deviceListsDirPath,
+      };
+
+      await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
+
+      if (ENVIRONMENT.files.replaceLists)
+        await fileIO.writeConsoleListFile(name, konsole, deviceDirPaths.lists);
     }
   }
 };
