@@ -48,6 +48,16 @@ class SftpClient {
 
     this._connected = false;
   }
+
+  public async fileExists(filePath: string): Promise<Error | undefined> {
+    const existsError = await sftp.exists(this._client, filePath, "file");
+    if (existsError) return existsError;
+  }
+
+  public async dirExists(dirPath: string): Promise<Error | undefined> {
+    const existsError = await sftp.exists(this._client, dirPath, "dir");
+    if (existsError) return existsError;
+  }
 }
 
 export default SftpClient;
