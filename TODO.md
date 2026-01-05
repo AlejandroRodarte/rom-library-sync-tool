@@ -3,3 +3,4 @@
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
+- [ ] Check if Steam Deck has the last ROM from each diff file.
