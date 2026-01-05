@@ -13,6 +13,7 @@ import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
 import writeAddFileLineToDiffFile from "./write-add-file-line-to-diff-file.helper.js";
 import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file.helper.js";
 import writeConsoleListFile from "./write-console-list-file.helper.js";
+import dirExistsAndIsReadableAndWritable from "./dir-exists-and-is-readable-and-writable.helper.js";
 
 const fileIO = {
   writeRomFilenamesToConsoleFile,
@@ -30,6 +31,7 @@ const fileIO = {
   writeAddFileLineToDiffFile,
   writeDeleteFileLineToDiffFile,
   writeConsoleListFile,
+  dirExistsAndIsReadableAndWritable,
 };
 
 export default fileIO;
