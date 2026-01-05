@@ -6,6 +6,11 @@ import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";
+import {
+  LOCAL_ROM_DIFFS_DIR_PATH,
+  LOCAL_ROM_LISTS_DIR_PATH,
+} from "./constants/paths.constants.js";
+import path from "node:path";
 
 const main = async () => {
   const consoles = build.emptyConsoles();
@@ -37,9 +42,36 @@ const main = async () => {
   log.consolesReport(consoles);
 
   for (const [name, konsole] of consoles) {
+    const localDiffsDirExistsError =
+      await fileIO.dirExistsAndIsReadableAndWritable(LOCAL_ROM_DIFFS_DIR_PATH);
+    if (localDiffsDirExistsError) {
+      console.log(localDiffsDirExistsError.message);
+      console.log("Terminating program.");
+      return;
+    }
+
     await fileIO.writeConsoleDiffFile(name, konsole);
-    if (ENVIRONMENT.files.replaceLists)
+
+    if (ENVIRONMENT.files.replaceLists) {
+      const localListsDirExistsError =
+        await fileIO.dirExistsAndIsReadableAndWritable(
+          LOCAL_ROM_LISTS_DIR_PATH,
+        );
+      if (localListsDirExistsError) {
+        console.log(localListsDirExistsError.message);
+        console.log("Terminating program and rolling back.");
+        for (const [name] of consoles) {
+          const diffFilePath = path.resolve(
+            LOCAL_ROM_DIFFS_DIR_PATH,
+            `${name}.diff.txt`,
+          );
+          await fileIO.findAndDeleteFile(diffFilePath, false);
+        }
+        return;
+      }
+
       await fileIO.writeConsoleListFile(name, konsole);
+    }
   }
 };
 
