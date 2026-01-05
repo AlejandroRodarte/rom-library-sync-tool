@@ -70,3 +70,8 @@ export interface DeviceDirPaths {
   diffs: string;
   lists: string;
 }
+
+export interface Device {
+  name: string;
+  consoles: Consoles;
+}
