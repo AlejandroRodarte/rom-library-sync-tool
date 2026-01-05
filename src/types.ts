@@ -64,3 +64,8 @@ export interface IndexesToAddAndDelete {
     toDelete: number[];
   };
 }
+
+export interface DeviceDirPaths {
+  diffs: string;
+  lists: string;
+}
