@@ -38,6 +38,10 @@ const main = async () => {
 
   for (const [name, konsole] of consoles)
     await fileIO.writeConsoleDiffFile(name, konsole);
+
+  if (ENVIRONMENT.files.replaceLists)
+    for (const [name, konsole] of consoles)
+      await fileIO.writeConsoleListFile(name, konsole);
 };
 
 main();
