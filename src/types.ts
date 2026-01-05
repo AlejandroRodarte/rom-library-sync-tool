@@ -75,3 +75,10 @@ export interface Device {
   name: string;
   consoles: Consoles;
 }
+
+export interface SftpCredentials {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+}
