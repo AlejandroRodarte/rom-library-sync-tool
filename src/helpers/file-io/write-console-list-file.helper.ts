@@ -7,12 +7,12 @@ import build from "../build/index.js";
 const writeConsoleListFile = async (name: string, konsole: Console) => {
   const listFilePath = path.resolve(LOCAL_ROM_LISTS_DIR_PATH, `${name}.txt`);
 
-  const listFileFindAndDeleteError = await fileIO.findAndDeleteFile(
+  const listFileDeleteError = await fileIO.findAndDeleteFile(
     listFilePath,
-    true,
+    false,
   );
-  if (listFileFindAndDeleteError) {
-    console.log(listFileFindAndDeleteError.message);
+  if (listFileDeleteError) {
+    console.log(listFileDeleteError.message);
     console.log("Skipping this console.");
     return;
   }

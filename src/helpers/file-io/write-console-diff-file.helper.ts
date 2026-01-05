@@ -24,11 +24,14 @@ const writeConsoleDiffFile = async (
     `${name}.diff.txt`,
   );
 
+  let listFileExists = true;
   const listFileAccessError = await fileExistsAndIsReadable(listFilePath);
   if (listFileAccessError) {
     console.log(listFileAccessError.message);
-    console.log("Skipping this console.");
-    return;
+    console.log(
+      "No list file exists for this console. Will generate diff anyways.",
+    );
+    listFileExists = false;
   }
 
   const diffFileDeleteError = await findAndDeleteFile(diffFilePath, false);
@@ -38,8 +41,9 @@ const writeConsoleDiffFile = async (
     return;
   }
 
-  const [currentFilenames, listFileReadError] =
-    await readUtf8FileLines(listFilePath);
+  const [currentFilenames, listFileReadError] = listFileExists
+    ? await readUtf8FileLines(listFilePath)
+    : [[], undefined];
   if (listFileReadError) {
     console.log(listFileReadError.message);
     console.log("Skipping this console.");
