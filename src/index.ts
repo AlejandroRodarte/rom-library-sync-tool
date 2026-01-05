@@ -6,16 +6,7 @@ import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";
-import {
-  DEVICES_DIR_PATH,
-  LOCAL_ROM_DIFFS_DIR_PATH,
-  LOCAL_ROM_LISTS_DIR_PATH,
-} from "./constants/paths.constants.js";
-import path from "node:path";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
-import dirExists from "./helpers/file-io/dir-exists.helper.js";
-import dirExistsAndIsReadableAndWritable from "./helpers/file-io/dir-exists-and-is-readable-and-writable.helper.js";
-import type { DeviceDirPaths } from "./types.js";
 
 const main = async () => {
   const consoles = build.emptyConsoles();
