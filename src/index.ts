@@ -60,13 +60,7 @@ const main = async () => {
       if (localListsDirExistsError) {
         console.log(localListsDirExistsError.message);
         console.log("Terminating program and rolling back.");
-        for (const [name] of consoles) {
-          const diffFilePath = path.resolve(
-            LOCAL_ROM_DIFFS_DIR_PATH,
-            `${name}.diff.txt`,
-          );
-          await fileIO.findAndDeleteFile(diffFilePath, false);
-        }
+        await fileIO.deleteAllConsoleDiffFiles(consoles.keys().toArray());
         return;
       }
 
