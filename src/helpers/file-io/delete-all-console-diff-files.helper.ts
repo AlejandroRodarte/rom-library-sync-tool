@@ -6,7 +6,7 @@ const deleteAllConsoleDiffFiles = async (
   consoleNames: string[],
 ): Promise<void> => {
   for (const name of consoleNames) {
-    const diffFilePath = path.resolve(
+    const diffFilePath = path.join(
       LOCAL_ROM_DIFFS_DIR_PATH,
       `${name}.diff.txt`,
     );

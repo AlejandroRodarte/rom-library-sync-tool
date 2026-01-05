@@ -1,16 +1,16 @@
 import path from "node:path";
 
-const DATA_DIR_PATH = path.resolve(process.env.PWD || __dirname, "data");
-const DEVICES_DIR_PATH = path.resolve(DATA_DIR_PATH, "devices");
+const DATA_DIR_PATH = path.join(process.env.PWD || __dirname, "data");
+export const DEVICES_DIR_PATH = path.join(DATA_DIR_PATH, "devices");
 
 export const LOCAL_ROMS_DIR_PATH =
   "/media/alejandro/3tb-ssd/home/alejandro/games/roms";
 
-const LOCAL_DIR_PATH = path.resolve(DEVICES_DIR_PATH, "local");
+const LOCAL_DIR_PATH = path.join(DEVICES_DIR_PATH, "local");
 
-export const LOCAL_ROM_LISTS_DIR_PATH = path.resolve(LOCAL_DIR_PATH, "lists");
-export const LOCAL_ROM_DIFFS_DIR_PATH = path.resolve(LOCAL_DIR_PATH, "diffs");
-export const LOCAL_ROM_FAILED_DIR_PATH = path.resolve(LOCAL_DIR_PATH, "failed");
+export const LOCAL_ROM_LISTS_DIR_PATH = path.join(LOCAL_DIR_PATH, "lists");
+export const LOCAL_ROM_DIFFS_DIR_PATH = path.join(LOCAL_DIR_PATH, "diffs");
+export const LOCAL_ROM_FAILED_DIR_PATH = path.join(LOCAL_DIR_PATH, "failed");
 
 export const STEAM_DECK_REMOTE_ROMS_DIR_PATH = "/home/deck/Emulation/roms";
 
