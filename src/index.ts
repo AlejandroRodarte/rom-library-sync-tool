@@ -27,21 +27,24 @@ const main = async () => {
 
     const consoles = build.emptyConsoles();
 
-    for (const [name, konsole] of consoles) {
-      const titles = await build.titlesFromConsoleName(name);
+    for (const [consoleName, konsole] of consoles) {
+      const titles = await build.titlesFromConsoleName(consoleName);
 
-      for (const [name, title] of titles) {
-        switch (deviceName) {
-          case "local":
-            unselect.byLocalDevice(name, title);
-            break;
-          case "steam-deck":
-            unselect.bySteamDeckDevice(name, title);
-            break;
-          default:
-            throw new Error("Unrecognized device.");
-        }
-        add.titleToConsole(title, konsole);
+      switch (deviceName) {
+        case "local":
+          for (const [titleName, title] of titles) {
+            unselect.byLocalDevice(titleName, title);
+            add.titleToConsole(title, konsole);
+          }
+          break;
+        case "steam-deck":
+          for (const [titleName, title] of titles) {
+            unselect.bySteamDeckDevice(titleName, title);
+            add.titleToConsole(title, konsole);
+          }
+          break;
+        default:
+          break;
       }
     }
 
