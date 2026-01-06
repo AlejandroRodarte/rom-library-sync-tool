@@ -17,6 +17,10 @@ const checkDeviceDirPaths = async (
     deviceDirPaths.lists,
   );
   if (deviceListsDirPathExistsError) return deviceListsDirPathExistsError;
+
+  const deviceFailedDirPathExistsError =
+    await dirExistsAndIsReadableAndWritable(deviceDirPaths.failed);
+  if (deviceFailedDirPathExistsError) return deviceFailedDirPathExistsError;
 };
 
 export default checkDeviceDirPaths;
