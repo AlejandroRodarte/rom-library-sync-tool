@@ -6,12 +6,11 @@ const writeAddFileLineToDiffFile = async (
   filename: string,
   diffFilePath: PathLike,
   diffFileHandle: FileHandle,
-  romsDirPath: PathLike,
 ): Promise<Error | undefined> => {
   const diffFileWriteError = await writeToFileOrDelete(
     diffFilePath,
     diffFileHandle,
-    `add-file|${romsDirPath}/${filename}\n`,
+    `add-file|${filename}\n`,
     "utf8",
   );
   if (diffFileWriteError) return diffFileWriteError;

@@ -81,7 +81,6 @@ const writeConsoleDiffFile = async (
       filenameToAdd,
       diffFilePath,
       diffFileHandle,
-      romsDirPath,
     );
 
     if (diffFileWriteError) {
