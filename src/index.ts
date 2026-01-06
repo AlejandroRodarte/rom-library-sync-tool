@@ -7,8 +7,7 @@ import unselect from "./helpers/unselect/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
 
 const main = async () => {
-  const romsDirPathExistsError =
-    await fileIO.dirExistsAndIsReadable(LOCAL_ROMS_DIR_PATH);
+  const romsDirPathExistsError = await fileIO.dirExists(LOCAL_ROMS_DIR_PATH);
   if (romsDirPathExistsError) {
     console.log(romsDirPathExistsError.message);
     console.log("No ROMs directory exists. Terminating.");
