@@ -17,6 +17,7 @@ import dirExistsAndIsReadableAndWritable from "./dir-exists-and-is-readable-and-
 import deleteAllConsoleDiffFiles from "./delete-all-console-diff-files.helper.js";
 import dirExists from "./dir-exists.helper.js";
 import checkDeviceDirPaths from "./check-device-dir-paths.helper.js";
+import dirExistsAndIsReadable from "./dir-exists-and-is-readable.helper.js";
 
 const fileIO = {
   writeRomFilenamesToConsoleFile,
@@ -38,6 +39,7 @@ const fileIO = {
   deleteAllConsoleDiffFiles,
   dirExists,
   checkDeviceDirPaths,
+  dirExistsAndIsReadable,
 };
 
 export default fileIO;
