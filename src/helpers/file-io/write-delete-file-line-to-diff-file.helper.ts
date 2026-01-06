@@ -10,7 +10,7 @@ const writeDeleteFileLineToDiffFile = async (
   const diffFileWriteError = await writeToFileOrDelete(
     diffFilePath,
     diffFileHandle,
-    `remove-file|"${filename}"\n`,
+    `remove-file|${filename}\n`,
     "utf8",
   );
   if (diffFileWriteError) return diffFileWriteError;

@@ -11,7 +11,7 @@ const writeAddFileLineToDiffFile = async (
   const diffFileWriteError = await writeToFileOrDelete(
     diffFilePath,
     diffFileHandle,
-    `add-file|"${romsDirPath}/${filename}"\n`,
+    `add-file|${romsDirPath}/${filename}\n`,
     "utf8",
   );
   if (diffFileWriteError) return diffFileWriteError;
