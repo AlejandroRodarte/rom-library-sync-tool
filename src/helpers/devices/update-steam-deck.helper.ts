@@ -197,7 +197,17 @@ const updateSteamDeck = async (consoles: Consoles) => {
 
     for (const diffAction of failedDiffActions) {
       const diffLine = build.diffLineFromDiffAction(diffAction);
-      // TODO: add diff line to failed file
+
+      const writeError = await fileIO.writeToFile(
+        failedFileHandle,
+        `${diffLine}\n`,
+        "utf8",
+      );
+
+      if (writeError) {
+        console.log(writeError.message);
+        continue;
+      }
     }
 
     await failedFileHandle.close();
