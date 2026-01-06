@@ -10,7 +10,7 @@ import build from "../build/index.js";
 const updateSteamDeck = async (consoles: Consoles) => {
   const deviceDirPaths = build.deviceDirPathsFromName("steam-deck");
 
-  let dontConnectToSteamDeck = false;
+  let failedFileFound = false;
 
   for (const [name, _] of consoles) {
     const failedFilePath = path.join(
@@ -21,12 +21,12 @@ const updateSteamDeck = async (consoles: Consoles) => {
 
     if (!failedFileExistsError) {
       console.log("Failed file found. Will NOT connect to Steam Deck.");
-      dontConnectToSteamDeck = true;
+      failedFileFound = true;
       break;
     }
   }
 
-  if (dontConnectToSteamDeck) return;
+  if (failedFileFound) return;
 
   const [steamDeck, sftpClientError] = await build.steamDeckSftpClient();
 
