@@ -3,9 +3,10 @@ import add from "./helpers/add/index.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
-import unselect from "./helpers/unselect/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
 import { LOCAL_ROMS_DIR_PATH } from "./constants/paths.constants.js";
+import devices from "./helpers/devices/index.js";
+import unselect from "./helpers/unselect/index.js";
 
 const main = async () => {
   const romsDirPathExistsError = await fileIO.dirExists(LOCAL_ROMS_DIR_PATH);
@@ -51,6 +52,18 @@ const main = async () => {
 
     for (const [name, konsole] of consoles)
       await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
+
+    switch (deviceName) {
+      case "local":
+        if (!ENVIRONMENT.devices.local.update) break;
+        await devices.updateLocal(consoles);
+      case "steam-deck":
+        if (!ENVIRONMENT.devices.steamDeck.update) break;
+        await devices.updateSteamDeck(consoles);
+        break;
+      default:
+        break;
+    }
 
     for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
     log.consolesReport(consoles);
