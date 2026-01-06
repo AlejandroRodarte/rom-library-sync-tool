@@ -4,3 +4,7 @@
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
 - [ ] Check if Steam Deck has the last ROM from each diff file.
+- [ ] Don't connect to Steam Deck if there are ANY .failed.txt files pending to be processed.
+- [ ] Let failed/ directory have two subdirectories: failed/diffs, and failed/images.
+    - Failed diff files will represent all add-file/remove-file operations that failed.
+    - Failed image files will represent two scenarios: when we added a file, but did not found its image, and when we deleted a file, but was not able to actually delete it.
