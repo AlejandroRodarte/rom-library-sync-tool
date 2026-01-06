@@ -1,6 +1,5 @@
 import path from "path";
 import type { Console, DeviceDirPaths } from "../../types.js";
-import { LOCAL_ROMS_DIR_PATH } from "../../constants/paths.constants.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
@@ -14,8 +13,6 @@ const writeConsoleDiffFile = async (
   konsole: Console,
   devicePaths: DeviceDirPaths,
 ): Promise<void> => {
-  const romsDirPath = path.join(LOCAL_ROMS_DIR_PATH, name);
-
   const listFilePath = path.join(devicePaths.lists, `${name}.txt`);
   const diffFilePath = path.join(devicePaths.diffs, `${name}.diff.txt`);
 

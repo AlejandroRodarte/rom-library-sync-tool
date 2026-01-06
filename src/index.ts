@@ -4,14 +4,16 @@ import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
-import { LOCAL_ROMS_DIR_PATH } from "./constants/paths.constants.js";
+import { ROMS_DATABASE_DIR_PATH } from "./constants/paths.constants.js";
 import devices from "./helpers/devices/index.js";
 import unselect from "./helpers/unselect/index.js";
 
 const main = async () => {
-  const romsDirPathExistsError = await fileIO.dirExists(LOCAL_ROMS_DIR_PATH);
-  if (romsDirPathExistsError) {
-    console.log(romsDirPathExistsError.message);
+  const dbRomsDirPathExistsError = await fileIO.dirExists(
+    ROMS_DATABASE_DIR_PATH,
+  );
+  if (dbRomsDirPathExistsError) {
+    console.log(dbRomsDirPathExistsError.message);
     console.log("No ROMs directory exists. Terminating.");
     return;
   }

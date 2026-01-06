@@ -2,7 +2,7 @@ import path from "path";
 import type { Consoles, DiffAction } from "../../types.js";
 import fileIO from "../file-io/index.js";
 import {
-  LOCAL_ROMS_DIR_PATH,
+  ROMS_DATABASE_DIR_PATH,
   STEAM_DECK_REMOTE_ROMS_DIR_PATH,
 } from "../../constants/paths.constants.js";
 import build from "../build/index.js";
@@ -51,12 +51,12 @@ const updateSteamDeck = async (consoles: Consoles) => {
   }
 
   for (const [name, _] of consoles) {
-    const localRomsDirPath = path.join(LOCAL_ROMS_DIR_PATH, name);
+    const dbRomsDirPath = path.join(ROMS_DATABASE_DIR_PATH, name);
 
-    const localRomsDirPathExistsError =
-      await fileIO.dirExistsAndIsReadable(localRomsDirPath);
-    if (localRomsDirPathExistsError) {
-      console.log(localRomsDirPathExistsError.message);
+    const dbRomsDirPathExistsError =
+      await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
+    if (dbRomsDirPathExistsError) {
+      console.log(dbRomsDirPathExistsError.message);
       console.log("Skipping this console.");
       continue;
     }
@@ -131,15 +131,14 @@ const updateSteamDeck = async (consoles: Consoles) => {
     for (const diffAction of diffActions) {
       switch (diffAction.type) {
         case "add-file": {
-          const localRomFilePath = path.join(
-            localRomsDirPath,
+          const dbRomFilePath = path.join(
+            dbRomsDirPath,
             diffAction.data.filename,
           );
 
-          const localRomFileExistsError =
-            await fileIO.fileExists(localRomFilePath);
-          if (localRomFileExistsError) {
-            console.log(localRomFileExistsError.message);
+          const dbRomFileExistsError = await fileIO.fileExists(dbRomFilePath);
+          if (dbRomFileExistsError) {
+            console.log(dbRomFileExistsError.message);
             console.log("Adding to failed list.");
             failedDiffActions.push(diffAction);
             break;
@@ -159,7 +158,7 @@ const updateSteamDeck = async (consoles: Consoles) => {
           }
 
           const steamDeckAddFileError = await steamDeck.addFile(
-            localRomFilePath,
+            dbRomFilePath,
             remoteRomFilePath,
           );
           if (steamDeckAddFileError) {
