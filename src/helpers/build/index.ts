@@ -7,6 +7,9 @@ import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
 import environmentFromProcessVariables from "./environment-from-process-variables.helper.js";
 import filenameIndexesToAddAndDelete from "./filename-indexes-to-add-and-delete.helper.js";
 import deviceDirPathsFromName from "./device-dir-paths-from-name.helper.js";
+import diffActionFromDiffLine from "./diff-action-from-diff-line.helper.js";
+import diffLineFromDiffAction from "./diff-line-from-diff-action.helper.js";
+import steamDeckSftpClient from "./steam-deck-sftp-client.helper.js";
 
 const build = {
   emptyConsoles,
@@ -18,6 +21,9 @@ const build = {
   environmentFromProcessVariables,
   filenameIndexesToAddAndDelete,
   deviceDirPathsFromName,
+  diffActionFromDiffLine,
+  diffLineFromDiffAction,
+  steamDeckSftpClient,
 };
 
 export default build;
