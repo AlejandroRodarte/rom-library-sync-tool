@@ -40,17 +40,19 @@ export interface LabelsAndLanguages {
 }
 
 export interface Environment {
-  files: {
-    replaceLists: boolean;
-  };
-  sftp: {
-    connectToSteamDeck: boolean;
-    credentials: {
-      steamDeck: {
-        host: string;
-        port: number;
-        username: string;
-        password: string;
+  devices: {
+    local: {
+      update: boolean;
+    };
+    steamDeck: {
+      update: boolean;
+      sftp: {
+        credentials: {
+          host: string;
+          port: number;
+          username: string;
+          password: string;
+        };
       };
     };
   };
