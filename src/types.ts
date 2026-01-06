@@ -83,3 +83,19 @@ export interface SftpCredentials {
   username: string;
   password: string;
 }
+
+export interface AddFileDiffAction {
+  type: "add-file";
+  data: {
+    filename: string;
+  };
+}
+
+export interface RemoveFileDiffAction {
+  type: "remove-file";
+  data: {
+    filename: string;
+  };
+}
+
+export type DiffAction = AddFileDiffAction | RemoveFileDiffAction;
