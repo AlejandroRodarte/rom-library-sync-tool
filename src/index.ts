@@ -5,6 +5,7 @@ import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
 import unselect from "./helpers/unselect/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
+import { LOCAL_ROMS_DIR_PATH } from "./constants/paths.constants.js";
 
 const main = async () => {
   const romsDirPathExistsError = await fileIO.dirExists(LOCAL_ROMS_DIR_PATH);
