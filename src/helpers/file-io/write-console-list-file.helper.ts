@@ -1,55 +1,46 @@
 import path from "node:path";
 import type { Console } from "../../types.js";
 import build from "../build/index.js";
-import findAndDeleteFile from "./find-and-delete-file.helper.js";
-import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
-import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
+import findAndDeleteFile, {
+  type FindAndDeleteFileError,
+} from "./find-and-delete-file.helper.js";
+import openNewWriteOnlyFile, {
+  type OpenNewWriteOnlyFileError,
+} from "./open-new-write-only-file.helper.js";
+import writeToFileOrDelete, {
+  type WriteToFileOrDeleteError,
+} from "./write-to-file-or-delete.helper.js";
+
+export type WriteConsoleListFileError =
+  | FindAndDeleteFileError
+  | OpenNewWriteOnlyFileError
+  | WriteToFileOrDeleteError;
 
 const writeConsoleListFile = async (
   name: string,
   konsole: Console,
   listsDirPath: string,
-) => {
+): Promise<WriteConsoleListFileError | undefined> => {
   const listFilePath = path.join(listsDirPath, `${name}.txt`);
 
   const listFileDeleteError = await findAndDeleteFile(listFilePath, false);
-  if (listFileDeleteError) {
-    console.log(listFileDeleteError.message);
-    console.log("Skipping this console.");
-    return;
-  }
+  if (listFileDeleteError) return listFileDeleteError;
 
   const [listFileHandle, listFileOpenError] =
     await openNewWriteOnlyFile(listFilePath);
-  if (listFileOpenError) {
-    console.log(listFileOpenError.message);
-    console.log("Skipping this console.");
-    return;
-  }
-  if (!listFileHandle) {
-    console.log(
-      "writeConsoleListFile(): FileHandle was not provided by openNewWriteOnlyFile().",
-    );
-    console.log("Skipping this console.");
-    return;
-  }
+  if (listFileOpenError) return listFileOpenError;
 
   const newFilenames = build
     .selectedRomFilenamesFromConsole(konsole)
     .join("\n");
 
-  const listFileWriteOrDeleteError = await writeToFileOrDelete(
+  const listFileWriteError = await writeToFileOrDelete(
     listFilePath,
     listFileHandle,
     newFilenames + "\n",
     "utf8",
   );
-
-  if (listFileWriteOrDeleteError) {
-    console.log(listFileWriteOrDeleteError.message);
-    console.log("Skipping this console.");
-    return;
-  }
+  if (listFileWriteError) return listFileWriteError;
 
   await listFileHandle.close();
 };

@@ -1,8 +1,12 @@
 import fs from "node:fs/promises";
 import type { PathLike } from "node:fs";
-import accessPath from "./access-path.helper.js";
+import accessPath, { type AccessPathError } from "./access-path.helper.js";
 
-const fileExists = async (filePath: PathLike): Promise<Error | undefined> => {
+export type FileExistsError = AccessPathError;
+
+const fileExists = async (
+  filePath: PathLike,
+): Promise<FileExistsError | undefined> => {
   const fileAccessError = await accessPath("file", filePath, fs.constants.F_OK);
   if (fileAccessError) return fileAccessError;
 };

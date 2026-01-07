@@ -1,11 +1,16 @@
 import os from "os";
 import type { PathLike } from "node:fs";
-import readUtf8FileIntoString from "./read-utf8-file.helper.js";
+import readUtf8FileIntoString, {
+  type ReadUtf8FileIntoStringError,
+} from "./read-utf8-file-into-string.helper.js";
 
-const readUtf8FileLines = async (filePath: PathLike): Promise<[string[], undefined] | [undefined, Error]> => {
+export type ReadUtf8FileLinesError = ReadUtf8FileIntoStringError;
+
+const readUtf8FileLines = async (
+  filePath: PathLike,
+): Promise<[string[], undefined] | [undefined, ReadUtf8FileLinesError]> => {
   const [buffer, readError] = await readUtf8FileIntoString(filePath);
   if (readError) return [undefined, readError];
-  if (!buffer) return [undefined, new Error("readUtf8FileLines(): did not get a buffer back from readUtf8FileIntoString().")];
   return [buffer.split(os.EOL), undefined];
 };
 

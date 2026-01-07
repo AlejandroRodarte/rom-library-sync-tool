@@ -1,10 +1,16 @@
 import type { DeviceDirPaths } from "../../types.js";
-import dirExistsAndIsReadableAndWritable from "./dir-exists-and-is-readable-and-writable.helper.js";
-import dirExists from "./dir-exists.helper.js";
+import dirExistsAndIsReadableAndWritable, {
+  type DirExistsAndIsReadableAndWritableError,
+} from "./dir-exists-and-is-readable-and-writable.helper.js";
+import dirExists, { type DirExistsError } from "./dir-exists.helper.js";
+
+export type CheckDeviceDirPathsError =
+  | DirExistsError
+  | DirExistsAndIsReadableAndWritableError;
 
 const checkDeviceDirPaths = async (
   deviceDirPaths: DeviceDirPaths,
-): Promise<Error | undefined> => {
+): Promise<CheckDeviceDirPathsError | undefined> => {
   const deviceDirPathExistsError = await dirExists(deviceDirPaths.base);
   if (deviceDirPathExistsError) return deviceDirPathExistsError;
 

@@ -1,12 +1,16 @@
 import type { PathLike } from "node:fs";
-import writeToFileOrDelete from "./write-to-file-or-delete.helper.js";
+import writeToFileOrDelete, {
+  type WriteToFileOrDeleteError,
+} from "./write-to-file-or-delete.helper.js";
 import type { FileHandle } from "node:fs/promises";
+
+export type WriteAddFileLineToDiffFileError = WriteToFileOrDeleteError;
 
 const writeAddFileLineToDiffFile = async (
   filename: string,
   diffFilePath: PathLike,
   diffFileHandle: FileHandle,
-): Promise<Error | undefined> => {
+): Promise<WriteAddFileLineToDiffFileError | undefined> => {
   const diffFileWriteError = await writeToFileOrDelete(
     diffFilePath,
     diffFileHandle,

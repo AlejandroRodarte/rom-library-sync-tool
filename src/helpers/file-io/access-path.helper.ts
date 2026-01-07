@@ -1,31 +1,35 @@
-import fs from "node:fs/promises";
 import type { PathLike } from "node:fs";
+import access, { type AccessError } from "./access.helper.js";
+import stats, { type StatsError } from "./stats.helper.js";
+import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
+import UnknownError from "../../classes/errors/unknown-error.class.js";
+
+export type AccessPathError = AccessError | StatsError | FsWrongTypeError;
 
 const accessPath = async (
   type: "file" | "dir",
   path: PathLike,
   mode?: number,
-): Promise<undefined | Error> => {
-  try {
-    await fs.access(path, mode);
-    const stats = await fs.stat(path);
-    switch (type) {
-      case "file":
-        if (!stats.isFile())
-          return new Error("Path is visible, but is not a file.");
-        return undefined;
-      case "dir":
-        if (!stats.isDirectory())
-          return new Error("Path is visible, but is not a directory.");
-        return undefined;
-      default:
-        return new Error(
-          "accessPath() only supports checking for files and directories.",
+): Promise<undefined | AccessPathError> => {
+  const accessError = await access(path, mode);
+  if (accessError) return accessError;
+
+  const [pathStats, statsError] = await stats(path);
+  if (statsError) return statsError;
+
+  switch (type) {
+    case "file":
+      if (!pathStats.isFile())
+        return new FsWrongTypeError(`Path ${path} exists, but is NOT a file.`);
+    case "dir":
+      if (!pathStats.isDirectory())
+        return new FsWrongTypeError(
+          `Path ${path} exists, but is NOT a directory.`,
         );
-    }
-  } catch (e: unknown) {
-    if (e instanceof Error) return e;
-    else return new Error("accessPath(): an unkwown error has happened.");
+    default:
+      return new UnknownError(
+        `Path ${path} exists, but is neither a file or a directory.`,
+      );
   }
 };
 

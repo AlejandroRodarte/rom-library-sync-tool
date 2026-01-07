@@ -1,10 +1,12 @@
 import fs from "node:fs/promises";
 import type { PathLike } from "node:fs";
-import accessPath from "./access-path.helper.js";
+import accessPath, { type AccessPathError } from "./access-path.helper.js";
+
+export type DirExistsAndIsReadableError = AccessPathError;
 
 const dirExistsAndIsReadable = async (
   dirPath: PathLike,
-): Promise<Error | undefined> => {
+): Promise<DirExistsAndIsReadableError | undefined> => {
   const dirAccessError = await accessPath(
     "dir",
     dirPath,

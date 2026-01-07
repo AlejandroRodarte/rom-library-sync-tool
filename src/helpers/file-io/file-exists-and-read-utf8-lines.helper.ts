@@ -1,10 +1,18 @@
 import type { PathLike } from "node:fs";
-import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
-import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
+import fileExistsAndIsReadable, {
+  type FileExistsAndIsReadableError,
+} from "./file-exists-and-is-readable.helper.js";
+import readUtf8FileLines, {
+  type ReadUtf8FileLinesError,
+} from "./read-utf8-file-lines.helper.js";
+
+export type FileExistsAndReadUtf8Lines =
+  | FileExistsAndIsReadableError
+  | ReadUtf8FileLinesError;
 
 const fileExistsAndReadUtf8Lines = async (
   filePath: PathLike,
-): Promise<[string[], undefined] | [undefined, Error]> => {
+): Promise<[string[], undefined] | [undefined, FileExistsAndReadUtf8Lines]> => {
   const existsError = await fileExistsAndIsReadable(filePath);
   if (existsError) return [undefined, existsError];
 
