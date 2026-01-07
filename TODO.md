@@ -8,3 +8,6 @@
 - [ ] Let failed/ directory have two subdirectories: failed/diffs, and failed/images.
     - Failed diff files will represent all add-file/remove-file operations that failed.
     - Failed image files will represent two scenarios: when we added a file, but did not found its image, and when we deleted a file, but was not able to actually delete it.
+- [ ] Improve error-handling with custom error classes.
+    - 3xx codes will be sftp-related errors.
+    - 2xx codes will be file-related errors.
