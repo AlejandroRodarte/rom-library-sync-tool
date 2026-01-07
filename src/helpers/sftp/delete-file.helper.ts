@@ -1,16 +1,26 @@
 import Client from "ssh2-sftp-client";
+import exists, { type ExistsError } from "./exists.helper.js";
+import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import sftpDelete, { type DeleteError } from "./delete.helper.js";
+
+export type DeleteFileError = ExistsError | DeleteError;
 
 const deleteFile = async (
   client: Client,
   remoteFilePath: string,
-  fileMustExist = false,
-): Promise<Error | undefined> => {
-  try {
-    await client.delete(remoteFilePath, fileMustExist);
-  } catch (e: unknown) {
-    if (e instanceof Error) return e;
-    else return new Error("deleteFile(): an unknown error has happened.");
+  fileMustExist: boolean,
+) => {
+  const remoteFileExistsError = await exists(client, remoteFilePath, "file");
+
+  if (!fileMustExist) {
+    if (remoteFileExistsError) {
+      if (remoteFileExistsError instanceof SftpNotFoundError) return undefined;
+      return remoteFileExistsError;
+    }
   }
+
+  const deleteError = await sftpDelete(client, remoteFilePath);
+  if (deleteError) return deleteError;
 };
 
 export default deleteFile;

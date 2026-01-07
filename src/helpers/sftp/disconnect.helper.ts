@@ -1,11 +1,35 @@
 import Client from "ssh2-sftp-client";
+import SftpDisconnectionError from "../../classes/errors/sftp-disconnection-error.class.js";
+import UnknownError from "../../classes/errors/unknown-error.class.js";
+import typeGuards from "../typescript/guards/index.js";
+import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
 
-const disconnect = async (client: Client): Promise<Error | undefined> => {
+export type DisconnectError =
+  | SftpDisconnectionError
+  | SftpConnectionError
+  | UnknownError;
+
+const disconnect = async (
+  client: Client,
+): Promise<DisconnectError | undefined> => {
   try {
     await client.end();
   } catch (e: unknown) {
-    if (e instanceof Error) return e;
-    else return new Error("disconnect(): an unknown error has occurred.");
+    if (!typeGuards.isSftpError(e))
+      return new SftpDisconnectionError(
+        `An unknown error happened while disconnecting from the SFTP client.`,
+      );
+
+    switch (e.code) {
+      case "ERR_NOT_CONNECTED":
+        return new SftpConnectionError(
+          "This client is not even connected. Idiot.",
+        );
+      default:
+        return new UnknownError(
+          `Something bad happened while trying to disconnect. Error code: ${e.code}. Original error message: ${e.message}.`,
+        );
+    }
   }
 };
 

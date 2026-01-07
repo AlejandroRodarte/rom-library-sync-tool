@@ -12,6 +12,8 @@ const sftp = {
   exists,
   put,
   delete: sftpDelete,
+  addFile,
+  deleteFile,
 };
 
 export default sftp;

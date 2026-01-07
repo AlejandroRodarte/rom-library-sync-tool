@@ -1,27 +1,80 @@
 import Client from "ssh2-sftp-client";
+import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
+import UnknownError from "../../classes/errors/unknown-error.class.js";
+import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import SftpWrongTypeError from "../../classes/errors/sftp-wrong-type-error.class.js";
+import typeGuards from "../typescript/guards/index.js";
+import SftpBadPathError from "../../classes/errors/sftp-bad-path.class.js";
+import SftpUnauthorizedError from "../../classes/errors/sftp-unauthorized-error.class.js";
+import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
+
+export type ExistsError =
+  | UnknownError
+  | SftpNotFoundError
+  | SftpWrongTypeError
+  | SftpConnectionError
+  | SftpBadCredentialsError
+  | SftpBadPathError
+  | SftpUnauthorizedError;
 
 const exists = async (
   client: Client,
-  path: string,
+  remotePath: string,
   type: "file" | "dir" | "link",
-): Promise<Error | undefined> => {
+): Promise<ExistsError | undefined> => {
   try {
-    const result = await client.exists(path);
-    if (result === false) return new Error("Content does not exist.");
+    const result = await client.exists(remotePath);
+    if (result === false)
+      return new SftpNotFoundError(`Remote path ${remotePath} does not exist.`);
 
     switch (type) {
       case "file":
-        if (result !== "-") return new Error("Content exists, but is NOT a file.");
+        if (result !== "-")
+          return new SftpWrongTypeError(
+            `Object exists in remote path ${remotePath}, but it is NOT a file.`,
+          );
       case "dir":
-        if (result !== "d") return new Error("Content exists, but is NOT a directory.");
-      case "link";
-        if (result !== "l") return new Error("Content exists, but is NOT a link.");
+        if (result !== "d")
+          return new SftpWrongTypeError(
+            `Object exists in remote path ${remotePath}, but it is NOT a directory.`,
+          );
+      case "link":
+        if (result !== "l")
+          return new SftpWrongTypeError(
+            `Object exists in remote path ${remotePath}, but it is NOT a link.`,
+          );
       default:
-        throw new Error("Unsupported file type.");
+        return new SftpWrongTypeError("Unsupported file type.");
     }
-  } catch (e) {
-    if (e instanceof Error) return e;
-    else return new Error("fileExists(): an unknown error has happened.");
+  } catch (e: unknown) {
+    if (!typeGuards.isSftpError(e))
+      return new UnknownError(
+        `An unknown error happened while accessing remote path ${remotePath}. File type to check: ${type}.`,
+      );
+
+    switch (e.code) {
+      case "ERR_NOT_CONNECTED":
+        return new SftpConnectionError(
+          `Client is not connected. Unable to reach remote path ${remotePath}. Original error message: ${e.message}.`,
+        );
+      case "ERR_BAD_AUTH":
+        return new SftpBadCredentialsError(
+          `Client suffers from bad/faulty authentication and credentials. Original error message: ${e.message}.`,
+        );
+      case "ERR_BAD_PATH":
+        return new SftpBadPathError(
+          `Remote path ${remotePath} is faulty. Original error message: ${e.message}.`,
+        );
+      case "EACCES":
+      case "EPERM":
+        return new SftpUnauthorizedError(
+          `Remote path ${remotePath} exists, but this process lacks the privileges to access it. Original error message: ${e.message}.`,
+        );
+      default:
+        return new UnknownError(
+          `Something wrong happened while accessing remote path ${remotePath}. Error code: ${e.code}. Original error message: ${e.message}.`,
+        );
+    }
   }
 };
 

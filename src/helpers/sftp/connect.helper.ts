@@ -1,16 +1,42 @@
 import Client from "ssh2-sftp-client";
 
 import type { SftpCredentials } from "../../types.js";
+import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
+import UnknownError from "../../classes/errors/unknown-error.class.js";
+import typeGuards from "../typescript/guards/index.js";
+import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
+
+export type ConnectError =
+  | SftpConnectionError
+  | SftpBadCredentialsError
+  | UnknownError;
 
 const connect = async (
   client: Client,
   credentials: SftpCredentials,
-): Promise<Error | undefined> => {
+): Promise<ConnectError | undefined> => {
   try {
     await client.connect(credentials);
   } catch (e: unknown) {
-    if (e instanceof Error) return e;
-    else return new Error("connect(): an unknown error has occured.");
+    if (!typeGuards.isSftpError(e))
+      return new SftpConnectionError(
+        `An unknown error happened while connecting via SFTP. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
+      );
+
+    switch (e.code) {
+      case "ERR_NOT_CONNECTED":
+        return new SftpConnectionError(
+          `Client is not connected. Original error message: ${e.message}.`,
+        );
+      case "ERR_BAD_AUTH":
+        return new SftpBadCredentialsError(
+          `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}. Original error message: ${e.message}.`,
+        );
+      default:
+        return new UnknownError(
+          `Something went wrong while connecting via SFTP. Error code: ${e.code}. Original error message: ${e.message}.`,
+        );
+    }
   }
 };
 
