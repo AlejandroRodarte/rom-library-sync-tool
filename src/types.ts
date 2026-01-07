@@ -101,3 +101,7 @@ export interface RemoveFileDiffAction {
 }
 
 export type DiffAction = AddFileDiffAction | RemoveFileDiffAction;
+
+export interface SftpError extends Error {
+  code: string;
+}
