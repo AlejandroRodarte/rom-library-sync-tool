@@ -21,11 +21,13 @@ const accessPath = async (
     case "file":
       if (!pathStats.isFile())
         return new FsWrongTypeError(`Path ${path} exists, but is NOT a file.`);
+      break;
     case "dir":
       if (!pathStats.isDirectory())
         return new FsWrongTypeError(
           `Path ${path} exists, but is NOT a directory.`,
         );
+      break;
     default:
       return new UnknownError(
         `Path ${path} exists, but is neither a file or a directory.`,

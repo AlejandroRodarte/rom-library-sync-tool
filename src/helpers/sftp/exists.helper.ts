@@ -33,16 +33,19 @@ const exists = async (
           return new SftpWrongTypeError(
             `Object exists in remote path ${remotePath}, but it is NOT a file.`,
           );
+        break;
       case "dir":
         if (result !== "d")
           return new SftpWrongTypeError(
             `Object exists in remote path ${remotePath}, but it is NOT a directory.`,
           );
+        break;
       case "link":
         if (result !== "l")
           return new SftpWrongTypeError(
             `Object exists in remote path ${remotePath}, but it is NOT a link.`,
           );
+        break;
       default:
         return new SftpWrongTypeError("Unsupported file type.");
     }

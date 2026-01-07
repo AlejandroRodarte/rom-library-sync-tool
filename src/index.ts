@@ -59,6 +59,7 @@ const main = async () => {
       case "local":
         if (!ENVIRONMENT.devices.local.update) break;
         await devices.updateLocal(consoles);
+        break;
       case "steam-deck":
         if (!ENVIRONMENT.devices.steamDeck.update) break;
         await devices.updateSteamDeck(consoles);
