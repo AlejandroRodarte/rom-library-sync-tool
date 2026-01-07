@@ -22,6 +22,8 @@ import fileExists from "./file-exists.helper.js";
 import fileIsEmpty from "./file-is-empty.helper.js";
 import findDeleteAndOpenWriteOnlyFile from "./find-delete-and-open-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "./file-exists-and-read-utf8-lines.helper.js";
+import stats from "./stats.helper.js";
+import access from "./access.helper.js";
 
 const fileIO = {
   writeRomFilenamesToConsoleFile,
@@ -48,6 +50,8 @@ const fileIO = {
   fileIsEmpty,
   findDeleteAndOpenWriteOnlyFile,
   fileExistsAndReadUtf8Lines,
+  stats,
+  access,
 };
 
 export default fileIO;
