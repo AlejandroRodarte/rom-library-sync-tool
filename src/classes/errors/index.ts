@@ -10,8 +10,10 @@ import SftpBadPathError from "./sftp-bad-path.class.js";
 import SftpUnauthorizedError from "./sftp-unauthorized-error.class.js";
 import SftpBadCredentialsError from "./sftp-bad-credentials.class.js";
 import FsFileExistsError from "./fs-file-exists-error.class.js";
+import AppNotFoundError from "./app-not-found-error.class.js";
 
 const errorClasses = {
+  AppNotFoundError,
   SftpConnectionError,
   SftpDisconnectionError,
   UnknownError,
