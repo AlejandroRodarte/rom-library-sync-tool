@@ -48,6 +48,7 @@ const writeDuplicateRomsFile = async (
   );
 
   if (writeOrDeleteError) return writeOrDeleteError;
+  else duplicatesFileHandle.close();
 };
 
 export default writeDuplicateRomsFile;

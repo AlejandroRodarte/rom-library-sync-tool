@@ -46,6 +46,7 @@ const writeScrappedRomsFile = async (
   );
 
   if (writeOrDeleteError) return writeOrDeleteError;
+  else scrappedFileHandle.close();
 };
 
 export default writeScrappedRomsFile;
