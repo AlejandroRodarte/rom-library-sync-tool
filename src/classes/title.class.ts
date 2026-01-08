@@ -75,14 +75,14 @@ class Title {
     return romExisted ? "rom-existed" : "rom-did-not-exist";
   }
 
-  public getSpecialFlags(from: "roms" | "selected-roms"): SpecialFlags {
+  public getSpecialFlags(
+    from: "roms" | "selected-roms" = "selected-roms",
+  ): SpecialFlags {
     switch (from) {
       case "roms":
         return this.computeSpecialFlags(this._romSet);
       case "selected-roms":
         return this.computeSpecialFlags(this.selectedRomSet);
-      default:
-        throw new Error("Need a ROM set");
     }
   }
 
