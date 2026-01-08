@@ -1,6 +1,7 @@
 import { v7 } from "uuid";
 import type { Rom, RomSet, SpecialFlags } from "../types.js";
 import build from "../helpers/build/index.js";
+import AppNotFoundError from "./errors/app-not-found-error.class.js";
 
 class Title {
   private _name: string;
@@ -26,7 +27,10 @@ class Title {
   }
 
   get selectedRomSet(): RomSet {
-    if (!this._selectedRomSet) throw new Error("No selected ROM set");
+    if (!this._selectedRomSet)
+      throw new AppNotFoundError(
+        "The set for selected ROMs has not been initialized. Make sure to call setSelectedRomSet() after you are done adding all of the ROMs for a given title.",
+      );
     return this._selectedRomSet;
   }
 
