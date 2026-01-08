@@ -10,12 +10,9 @@ export interface Rom {
 }
 
 export type RomSet = Map<string, Rom>;
-
 export type Titles = Map<string, Title>;
 export type Console = Map<number, Titles>;
-
 export type Consoles = Map<string, Console>;
-export type DuplicatesData = Map<number, Titles>;
 
 export interface SpecialFlags {
   allRomsAreUnreleased: boolean;
