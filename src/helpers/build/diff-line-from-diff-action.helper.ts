@@ -6,7 +6,6 @@ const diffLineFromDiffAction = (diffAction: DiffAction): string => {
       return `add-file|${diffAction.data.filename}`;
     case "remove-file":
       return `remove-file|${diffAction.data.filename}`;
-
     default:
       throw new Error("Unrecognized diff action. This should be unreachable.");
   }
