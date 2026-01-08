@@ -5,7 +5,7 @@
     - 2xx codes will be file-related errors.
     - 1xx codes will be app-related errors.
 - [x] Don't connect to Steam Deck if there are ANY .failed.txt files pending to be processed.
-- [ ] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
+- [x] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
 - [ ] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
