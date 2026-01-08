@@ -7,13 +7,21 @@
 - [x] Don't connect to Steam Deck if there are ANY .failed.txt files pending to be processed.
 - [x] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
 - [ ] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
+- [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
 - [ ] Improve logging in the overall codebase.
 - [ ] Move some of the path constants to environment variables.
+- [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
+- [ ] After adding/removing files to/from Steam Deck, updates all console `gameslist.xml` to update ES-DE's metadata.
+- [ ] Some games have different titles, but actually refer to the same game.
+    - Example: For the Atari 2600, files `Action Man - Action Force (Europe).a26` and `G.I. Joe - Cobra Strike (USA).a26` refer to the same game, named `Action Force` in ES-DE.
+    - The `Action Force` title name is actually found in the `atari2600/gameslist.xml` file.
+    - We should add some logic to bundle up these ROMs by their ES-DE title instead of their filename title.
+    - A quick idea would be to map the `gamelists.xml` file into a JSON object we can use to search for the filename.
+    - If an ES-DE title name exists for the filename, use that title when building our `Titles` entry.
+    - If not, then use the filename title as we currently do.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
-- [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
 - [ ] Check if Steam Deck has the last ROM from each diff file.
 - [ ] Let failed/ directory have two subdirectories: failed/diffs, and failed/images.
     - Failed diff files will represent all add-file/remove-file operations that failed.
     - Failed image files will represent two scenarios: when we added a file, but did not found its image, and when we deleted a file, but was not able to actually delete it.
-- [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
