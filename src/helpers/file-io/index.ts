@@ -22,6 +22,7 @@ import findDeleteAndOpenWriteOnlyFile from "./find-delete-and-open-write-only-fi
 import fileExistsAndReadUtf8Lines from "./file-exists-and-read-utf8-lines.helper.js";
 import stats from "./stats.helper.js";
 import access from "./access.helper.js";
+import anyFileExists from "./any-file-exists.helper.js";
 
 const fileIO = {
   accessPath,
@@ -48,6 +49,7 @@ const fileIO = {
   fileExistsAndReadUtf8Lines,
   stats,
   access,
+  anyFileExists,
 };
 
 export default fileIO;
