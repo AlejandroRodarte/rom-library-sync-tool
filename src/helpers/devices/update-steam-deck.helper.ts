@@ -186,11 +186,6 @@ const updateSteamDeck = async (consoles: Consoles) => {
 
           break;
         }
-        default: {
-          throw new Error(
-            "Unrecognized diff action. This should be unreachable.",
-          );
-        }
       }
     }
 
