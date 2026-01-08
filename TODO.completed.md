@@ -1,0 +1,8 @@
+- [x] Apply some filters to files that begin with [BIOS] on them.
+- [x] Build a class composed of both the ROM title and its ROM set with helper methods.
+- [x] Improve error-handling with custom error classes.
+    - 3xx codes will be sftp-related errors.
+    - 2xx codes will be file-related errors.
+    - 1xx codes will be app-related errors.
+- [x] Don't connect to Steam Deck if there are ANY .failed.txt files pending to be processed.
+- [x] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
