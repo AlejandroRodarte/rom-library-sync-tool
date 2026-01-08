@@ -1,10 +1,9 @@
-- [ ] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
-- [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
 - [ ] Environment variable that holds all devices to process
 - [ ] Improve logging in the overall codebase.
 - [ ] Move some of the path constants to environment variables.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
 - [ ] After adding/removing files to/from Steam Deck, updates all console `gameslist.xml` to update ES-DE's metadata.
+- [ ] Write helper for `fs.readdir`.
 - [ ] Some games have different titles, but actually refer to the same game.
     - Example: For the Atari 2600, files `Action Man - Action Force (Europe).a26` and `G.I. Joe - Cobra Strike (USA).a26` refer to the same game, named `Action Force` in ES-DE.
     - The `Action Force` title name is actually found in the `atari2600/gameslist.xml` file.
