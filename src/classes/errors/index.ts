@@ -12,10 +12,12 @@ import SftpBadCredentialsError from "./sftp-bad-credentials.class.js";
 import FsFileExistsError from "./fs-file-exists-error.class.js";
 import AppNotFoundError from "./app-not-found-error.class.js";
 import AppValidationError from "./app-validation-error.class.js";
+import AppWrongTypeError from "./app-wrong-type-error.class.js";
 
 const errorClasses = {
   AppNotFoundError,
   AppValidationError,
+  AppWrongTypeError,
   SftpConnectionError,
   SftpDisconnectionError,
   UnknownError,
