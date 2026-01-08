@@ -10,8 +10,8 @@ const titlesFromConsoleName = async (consoleName: string): Promise<Titles> => {
   const filenames = entries
     .filter((entry) => entry.isFile())
     .map((e) => e.name);
-  const groups = titlesFromFilenames(filenames);
-  return groups;
+  const titles = titlesFromFilenames(filenames);
+  return titles;
 };
 
 export default titlesFromConsoleName;
