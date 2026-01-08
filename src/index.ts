@@ -90,7 +90,6 @@ const main = async () => {
         break;
     }
 
-    for (const [_, konsole] of consoles) log.consoleDuplicates(konsole);
     log.consolesReport(consoles);
   }
 };
