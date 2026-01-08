@@ -23,6 +23,7 @@ import fileExistsAndReadUtf8Lines from "./file-exists-and-read-utf8-lines.helper
 import stats from "./stats.helper.js";
 import access from "./access.helper.js";
 import anyFileExists from "./any-file-exists.helper.js";
+import allDirsExistAndAreReadableAndWritable from "./all-dirs-exist-and-are-readable-and-writable.helper.js";
 
 const fileIO = {
   accessPath,
@@ -50,6 +51,7 @@ const fileIO = {
   stats,
   access,
   anyFileExists,
+  allDirsExistAndAreReadableAndWritable,
 };
 
 export default fileIO;
