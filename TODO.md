@@ -1,5 +1,6 @@
 - [ ] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
 - [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
+- [ ] Environment variable that holds all devices to process
 - [ ] Improve logging in the overall codebase.
 - [ ] Move some of the path constants to environment variables.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
