@@ -1,4 +1,6 @@
 import type Title from "./classes/title.class.js";
+import type CONSOLE_NAMES from "./constants/console-names.constant.js";
+import type DEVICE_NAMES from "./constants/device-names.constant.js";
 
 export interface Rom {
   filename: string;
@@ -105,3 +107,7 @@ export type DiffAction = AddFileDiffAction | RemoveFileDiffAction;
 export interface SftpError extends Error {
   code: string;
 }
+
+export type ConsoleName = (typeof CONSOLE_NAMES)[number];
+
+export type DeviceName = (typeof DEVICE_NAMES)[number];
