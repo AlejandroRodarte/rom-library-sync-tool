@@ -21,11 +21,22 @@ const main = async () => {
   for (const deviceName of DEVICE_NAMES) {
     const deviceDirPaths = build.deviceDirPathsFromName(deviceName);
 
-    const deviceDirPathsError =
-      await fileIO.checkDeviceDirPaths(deviceDirPaths);
-    if (deviceDirPathsError) {
-      console.log(deviceDirPathsError.message);
+    const [allDeviceDirsAreReady, deviceDirsExistError] =
+      await fileIO.allDirsExistAndAreReadableAndWritable([
+        deviceDirPaths.base,
+        deviceDirPaths.diffs,
+        deviceDirPaths.lists,
+        deviceDirPaths.failed,
+      ]);
+    if (deviceDirsExistError) {
+      console.log(deviceDirsExistError.message);
       console.log("Continuing with the next device.");
+      continue;
+    }
+    if (!allDeviceDirsAreReady) {
+      console.log(
+        "Not all device directories are read/write. Continuing with the next device.",
+      );
       continue;
     }
 
