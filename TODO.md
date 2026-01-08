@@ -11,3 +11,5 @@
 - [ ] Improve error-handling with custom error classes.
     - 3xx codes will be sftp-related errors.
     - 2xx codes will be file-related errors.
+    - 1xx codes will be app-related errors.
+- [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
