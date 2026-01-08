@@ -8,6 +8,7 @@
 - [x] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
 - [ ] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
 - [ ] Improve logging in the overall codebase.
+- [ ] Move some of the path constants to environment variables.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
