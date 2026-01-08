@@ -5,6 +5,7 @@
     - 2xx codes will be file-related errors.
     - 1xx codes will be app-related errors.
 - [x] Don't connect to Steam Deck if there are ANY .failed.txt files pending to be processed.
+- [ ] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
