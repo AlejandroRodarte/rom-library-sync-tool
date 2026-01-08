@@ -8,6 +8,6 @@ const CONSOLE_NAMES = [
   "mastersystem",
   "nes",
   "snes",
-];
+] as const;
 
 export default CONSOLE_NAMES;
