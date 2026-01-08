@@ -63,6 +63,17 @@ const main = async () => {
       }
     }
 
+    const duplicatesFileError = await fileIO.writeDuplicateRomsFile(
+      deviceName,
+      consoles,
+    );
+    if (duplicatesFileError) console.log(duplicatesFileError.message);
+    const scrappedFileError = await fileIO.writeScrappedRomsFile(
+      deviceName,
+      consoles,
+    );
+    if (scrappedFileError) console.log(scrappedFileError.message);
+
     for (const [name, konsole] of consoles)
       await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
 
