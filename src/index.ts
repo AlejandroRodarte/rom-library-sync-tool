@@ -1,10 +1,9 @@
 import ENVIRONMENT from "./constants/environment.constant.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
-import build from "./helpers/build/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
 import { ROMS_DATABASE_DIR_PATH } from "./constants/paths.constants.js";
-import devices from "./helpers/devices/index.js";
+import Device from "./classes/device.class.js";
 import unselect from "./helpers/unselect/index.js";
 
 const main = async () => {
@@ -18,14 +17,24 @@ const main = async () => {
   }
 
   for (const deviceName of DEVICE_NAMES) {
-    const deviceDirPaths = build.deviceDirPathsFromName(deviceName);
+    const device = new Device(deviceName, [
+      "atari2600",
+      "atari7800",
+      "gamegear",
+      "gb",
+      "gba",
+      "gbc",
+      "mastersystem",
+      "nes",
+      "snes",
+    ]);
 
     const [allDeviceDirsAreReady, deviceDirsExistError] =
       await fileIO.allDirsExistAndAreReadableAndWritable([
-        deviceDirPaths.base,
-        deviceDirPaths.diffs,
-        deviceDirPaths.lists,
-        deviceDirPaths.failed,
+        device.paths.base,
+        device.paths.diffs,
+        device.paths.lists,
+        device.paths.failed,
       ]);
     if (deviceDirsExistError) {
       console.log(deviceDirsExistError.message);
@@ -39,56 +48,31 @@ const main = async () => {
       continue;
     }
 
-    const consoles = build.emptyConsoles();
+    await device.populateConsoles();
 
-    for (const [consoleName, konsole] of consoles) {
-      const titles = await build.titlesFromConsoleName(consoleName);
-
-      for (const [titleName, title] of titles) {
-        switch (deviceName) {
-          case "local":
-            unselect.byLocalDevice(titleName, title);
-            break;
-          case "steam-deck":
-            unselect.bySteamDeckDevice(titleName, title);
-            break;
-        }
-        konsole.addTitle(titleName, title);
+    for (const [_, konsole] of device.consoles) {
+      switch (device.name) {
+        case "local":
+          konsole.unselectTitles(unselect.byLocalDevice);
+          break;
+        case "steam-deck":
+          konsole.unselectTitles(unselect.bySteamDeckDevice);
+          break;
       }
-
-      konsole.updateSelectedTitles();
-      konsole.updateScrappedTitles();
-      konsole.updateSelectedRoms();
     }
 
-    const duplicatesFileError = await fileIO.writeDuplicateRomsFile(
-      deviceName,
-      consoles,
-    );
+    device.updateConsolesMetadata();
+
+    const duplicatesFileError = await fileIO.writeDuplicateRomsFile(device);
     if (duplicatesFileError) console.log(duplicatesFileError.message);
-    const scrappedFileError = await fileIO.writeScrappedRomsFile(
-      deviceName,
-      consoles,
-    );
+    const scrappedFileError = await fileIO.writeScrappedRomsFile(device);
     if (scrappedFileError) console.log(scrappedFileError.message);
 
-    for (const [name, konsole] of consoles)
-      await fileIO.writeConsoleDiffFile(name, konsole, deviceDirPaths);
+    for (const [_, konsole] of device.consoles)
+      await fileIO.writeConsoleDiffFile(konsole, device.paths);
 
-    switch (deviceName) {
-      case "local":
-        if (!ENVIRONMENT.devices.local.update) break;
-        await devices.updateLocal(consoles);
-        break;
-      case "steam-deck":
-        if (!ENVIRONMENT.devices.steamDeck.update) break;
-        await devices.updateSteamDeck(consoles);
-        break;
-      default:
-        break;
-    }
-
-    log.consolesReport(consoles);
+    await device.sync();
+    log.consolesReport(device.consoles);
   }
 };
 

@@ -19,6 +19,10 @@ class Console {
     this._selectedRoms = new Map<string, Rom>();
   }
 
+  get name() {
+    return this._name;
+  }
+
   get selectedTitles() {
     return this._selectedTitles;
   }
@@ -59,6 +63,10 @@ class Console {
       );
 
     this._titles.set(titleName, title);
+  }
+
+  public unselectTitles(criteria: (title: Title) => void) {
+    for (const [_, title] of this._titles) criteria(title);
   }
 
   public updateSelectedTitles(): void {

@@ -1,24 +1,20 @@
 import path from "node:path";
-import type { Consoles } from "../../types.js";
-import build from "../build/index.js";
 import findDeleteAndOpenWriteOnlyFile, {
   type FindDeleteAndOpenWriteOnlyFileError,
 } from "./find-delete-and-open-write-only-file.helper.js";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
+import type Device from "../../classes/device.class.js";
 
 export type WriteDuplicateRomsFileError =
   | FindDeleteAndOpenWriteOnlyFileError
   | WriteToFileOrDeleteError;
 
 const writeDuplicateRomsFile = async (
-  deviceName: string,
-  consoles: Consoles,
+  device: Device,
 ): Promise<WriteDuplicateRomsFileError | undefined> => {
-  const devicePaths = build.deviceDirPathsFromName(deviceName);
-
-  const duplicatesFilePath = path.join(devicePaths.base, "duplicates.txt");
+  const duplicatesFilePath = path.join(device.paths.base, "duplicates.txt");
 
   const [duplicatesFileHandle, duplicatesFileError] =
     await findDeleteAndOpenWriteOnlyFile(duplicatesFilePath);
@@ -26,7 +22,7 @@ const writeDuplicateRomsFile = async (
 
   let content = "";
 
-  for (const [consoleName, konsole] of consoles) {
+  for (const [consoleName, konsole] of device.consoles) {
     content += `%%%%% Duplicates found on console ${consoleName} %%%%%\n`;
     for (const [romsSelected, titles] of konsole.duplicateTitles) {
       content += `***** Titles with ${romsSelected} duplicates *****\n`;

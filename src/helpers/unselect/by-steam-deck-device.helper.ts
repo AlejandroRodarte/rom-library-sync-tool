@@ -3,9 +3,9 @@ import { BIOS_TITLE_SEGMENT } from "../../constants/title-segments.constnats.js"
 import byBiosTitle from "./by-bios-title.helper.js";
 import byNormalTitle from "./by-normal-title.helper.js";
 
-const bySteamDeckDevice = (name: string, title: Title): void => {
+const bySteamDeckDevice = (title: Title): void => {
   let type: "normal" | "bios" = "normal";
-  const titleIsBios = name.includes(BIOS_TITLE_SEGMENT);
+  const titleIsBios = title.name.includes(BIOS_TITLE_SEGMENT);
   if (titleIsBios) type = "bios";
 
   switch (type) {

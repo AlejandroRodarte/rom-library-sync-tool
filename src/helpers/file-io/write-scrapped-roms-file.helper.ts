@@ -1,24 +1,20 @@
 import path from "node:path";
-import type { Consoles } from "../../types.js";
-import build from "../build/index.js";
 import findDeleteAndOpenWriteOnlyFile, {
   type FindDeleteAndOpenWriteOnlyFileError,
 } from "./find-delete-and-open-write-only-file.helper.js";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
+import type Device from "../../classes/device.class.js";
 
 export type WriteScrappedRomsFileError =
   | FindDeleteAndOpenWriteOnlyFileError
   | WriteToFileOrDeleteError;
 
 const writeScrappedRomsFile = async (
-  deviceName: string,
-  consoles: Consoles,
+  device: Device,
 ): Promise<WriteScrappedRomsFileError | undefined> => {
-  const devicePaths = build.deviceDirPathsFromName(deviceName);
-
-  const scrappedFilePath = path.join(devicePaths.base, "scrapped.txt");
+  const scrappedFilePath = path.join(device.paths.base, "scrapped.txt");
 
   const [scrappedFileHandle, scrappedFileError] =
     await findDeleteAndOpenWriteOnlyFile(scrappedFilePath);
@@ -26,7 +22,7 @@ const writeScrappedRomsFile = async (
 
   let content = "";
 
-  for (const [consoleName, konsole] of consoles) {
+  for (const [consoleName, konsole] of device.consoles) {
     content += `%%%%% Scrapped titles found from console ${consoleName} %%%%%\n`;
 
     for (const [titleName, title] of konsole.scrappedTitles) {

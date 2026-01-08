@@ -27,12 +27,11 @@ export type WriteConsoleDiffFileError =
   | WriteDeleteFileLineToDiffFileError;
 
 const writeConsoleDiffFile = async (
-  name: string,
   konsole: Console,
   devicePaths: DeviceDirPaths,
 ): Promise<WriteConsoleDiffFileError | undefined> => {
-  const listFilePath = path.join(devicePaths.lists, `${name}.txt`);
-  const diffFilePath = path.join(devicePaths.diffs, `${name}.diff.txt`);
+  const listFilePath = path.join(devicePaths.lists, `${konsole.name}.txt`);
+  const diffFilePath = path.join(devicePaths.diffs, `${konsole.name}.diff.txt`);
 
   let listFileExists = true;
   const listFileAccessError = await fileExistsAndIsReadable(listFilePath);
