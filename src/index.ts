@@ -1,5 +1,4 @@
 import ENVIRONMENT from "./constants/environment.constant.js";
-import add from "./helpers/add/index.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import build from "./helpers/build/index.js";
@@ -45,22 +44,21 @@ const main = async () => {
     for (const [consoleName, konsole] of consoles) {
       const titles = await build.titlesFromConsoleName(consoleName);
 
-      switch (deviceName) {
-        case "local":
-          for (const [titleName, title] of titles) {
+      for (const [titleName, title] of titles) {
+        switch (deviceName) {
+          case "local":
             unselect.byLocalDevice(titleName, title);
-            add.titleToConsole(title, konsole);
-          }
-          break;
-        case "steam-deck":
-          for (const [titleName, title] of titles) {
+            break;
+          case "steam-deck":
             unselect.bySteamDeckDevice(titleName, title);
-            add.titleToConsole(title, konsole);
-          }
-          break;
-        default:
-          break;
+            break;
+        }
+        konsole.addTitle(titleName, title);
       }
+
+      konsole.updateSelectedTitles();
+      konsole.updateScrappedTitles();
+      konsole.updateSelectedRoms();
     }
 
     const duplicatesFileError = await fileIO.writeDuplicateRomsFile(

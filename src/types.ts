@@ -1,3 +1,4 @@
+import type Console from "./classes/console.class.js";
 import type Title from "./classes/title.class.js";
 import type CONSOLE_NAMES from "./constants/console-names.constant.js";
 import type DEVICE_NAMES from "./constants/device-names.constant.js";
@@ -11,7 +12,6 @@ export interface Rom {
 
 export type RomSet = Map<string, Rom>;
 export type Titles = Map<string, Title>;
-export type Console = Map<number, Titles>;
 export type Consoles = Map<string, Console>;
 
 export interface SpecialFlags {

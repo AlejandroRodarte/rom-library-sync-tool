@@ -1,5 +1,5 @@
 import path from "path";
-import type { Console, DeviceDirPaths } from "../../types.js";
+import type { DeviceDirPaths } from "../../types.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import findAndDeleteFile, {
   type FindAndDeleteFileError,
@@ -17,6 +17,7 @@ import writeAddFileLineToDiffFile, {
 import writeDeleteFileLineToDiffFile, {
   type WriteDeleteFileLineToDiffFileError,
 } from "./write-delete-file-line-to-diff-file.helper.js";
+import type Console from "../../classes/console.class.js";
 
 export type WriteConsoleDiffFileError =
   | FindAndDeleteFileError
@@ -45,7 +46,10 @@ const writeConsoleDiffFile = async (
     : [[], undefined];
   if (listFileReadError) return listFileReadError;
 
-  const newFilenames = build.selectedRomFilenamesFromConsole(konsole);
+  const newFilenames = konsole.selectedRoms
+    .values()
+    .map((rom) => rom.filename)
+    .toArray();
 
   const [diffFileHandle, diffFileOpenError] =
     await openNewWriteOnlyFile(diffFilePath);

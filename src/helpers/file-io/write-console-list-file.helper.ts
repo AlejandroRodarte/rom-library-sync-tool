@@ -1,6 +1,4 @@
 import path from "node:path";
-import type { Console } from "../../types.js";
-import build from "../build/index.js";
 import findAndDeleteFile, {
   type FindAndDeleteFileError,
 } from "./find-and-delete-file.helper.js";
@@ -10,6 +8,7 @@ import openNewWriteOnlyFile, {
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
+import type Console from "../../classes/console.class.js";
 
 export type WriteConsoleListFileError =
   | FindAndDeleteFileError
@@ -30,8 +29,10 @@ const writeConsoleListFile = async (
     await openNewWriteOnlyFile(listFilePath);
   if (listFileOpenError) return listFileOpenError;
 
-  const newFilenames = build
-    .selectedRomFilenamesFromConsole(konsole)
+  const newFilenames = konsole.selectedRoms
+    .values()
+    .map((rom) => rom.filename)
+    .toArray()
     .join("\n");
 
   const listFileWriteError = await writeToFileOrDelete(
