@@ -1,5 +1,9 @@
 - [x] Apply some filters to files that begin with [BIOS] on them.
 - [x] Build a class composed of both the ROM title and its ROM set with helper methods.
+- [x] Improve error-handling with custom error classes.
+    - 3xx codes will be sftp-related errors.
+    - 2xx codes will be file-related errors.
+    - 1xx codes will be app-related errors.
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
@@ -8,8 +12,4 @@
 - [ ] Let failed/ directory have two subdirectories: failed/diffs, and failed/images.
     - Failed diff files will represent all add-file/remove-file operations that failed.
     - Failed image files will represent two scenarios: when we added a file, but did not found its image, and when we deleted a file, but was not able to actually delete it.
-- [ ] Improve error-handling with custom error classes.
-    - 3xx codes will be sftp-related errors.
-    - 2xx codes will be file-related errors.
-    - 1xx codes will be app-related errors.
 - [ ] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
