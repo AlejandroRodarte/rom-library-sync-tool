@@ -23,6 +23,7 @@ import stats from "./stats.helper.js";
 import access from "./access.helper.js";
 import anyFileExists from "./any-file-exists.helper.js";
 import allDirsExistAndAreReadableAndWritable from "./all-dirs-exist-and-are-readable-and-writable.helper.js";
+import writeDuplicateRomsFile from "./write-duplicate-roms-file.helper.js";
 
 const fileIO = {
   accessPath,
@@ -50,6 +51,7 @@ const fileIO = {
   access,
   anyFileExists,
   allDirsExistAndAreReadableAndWritable,
+  writeDuplicateRomsFile,
 };
 
 export default fileIO;
