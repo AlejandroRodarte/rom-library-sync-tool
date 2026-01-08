@@ -14,7 +14,6 @@ import writeDeleteFileLineToDiffFile from "./write-delete-file-line-to-diff-file
 import writeConsoleListFile from "./write-console-list-file.helper.js";
 import dirExistsAndIsReadableAndWritable from "./dir-exists-and-is-readable-and-writable.helper.js";
 import dirExists from "./dir-exists.helper.js";
-import checkDeviceDirPaths from "./check-device-dir-paths.helper.js";
 import dirExistsAndIsReadable from "./dir-exists-and-is-readable.helper.js";
 import fileExists from "./file-exists.helper.js";
 import fileIsEmpty from "./file-is-empty.helper.js";
@@ -42,7 +41,6 @@ const fileIO = {
   writeConsoleListFile,
   dirExistsAndIsReadableAndWritable,
   dirExists,
-  checkDeviceDirPaths,
   dirExistsAndIsReadable,
   fileExists,
   fileIsEmpty,
