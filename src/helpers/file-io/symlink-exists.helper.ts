@@ -1,7 +1,11 @@
 import type { PathLike } from "node:fs";
-import accessPath from "./access-path.helper.js";
+import accessPath, { type AccessPathError } from "./access-path.helper.js";
 
-const symlinkExists = async (linkPath: PathLike) => {
+export type SymlinkExistsError = AccessPathError;
+
+const symlinkExists = async (
+  linkPath: PathLike,
+): Promise<SymlinkExistsError | undefined> => {
   const accessError = await accessPath("link", linkPath);
   return accessError;
 };
