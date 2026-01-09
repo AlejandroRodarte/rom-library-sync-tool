@@ -1,29 +1,90 @@
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
+import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
+import CONSOLE_NAMES from "../../constants/console-names.constant.js";
+import DEVICE_NAMES from "../../constants/device-names.constant.js";
 import type { Environment } from "../../types.js";
+import typeGuards from "../typescript/guards/index.js";
 
 const environmentFromProcessVariables = (): Environment => {
-  const rawUpdateLocal = process.env.UPDATE_LOCAL;
-  if (!rawUpdateLocal)
+  const rawSyncDevicesList = process.env.SYNC_DEVICES_LIST;
+  if (!rawSyncDevicesList)
     throw new AppNotFoundError(
-      "Please assign a value to UPDATE_LOCAL environment variable.",
+      "Please assign a value to the SYNC_DEVICES_LIST environment variable.",
     );
-  const isRawUpdateLocalValid = /^[0-1]{1}$/.test(rawUpdateLocal);
-  if (!isRawUpdateLocalValid)
-    throw new AppValidationError("UPDATE_LOCAL must be either a 0 or a 1.");
-  const updateLocal = +rawUpdateLocal === 1 ? true : false;
 
-  const rawUpdateSteamDeck = process.env.UPDATE_STEAM_DECK;
-  if (!rawUpdateSteamDeck)
+  const devicesList = [...new Set(rawSyncDevicesList.split(","))];
+
+  let syncLocal = false;
+  let syncSteamDeck = false;
+
+  for (const device of devicesList) {
+    if (device === "none") {
+      syncLocal = false;
+      syncSteamDeck = false;
+      break;
+    } else if (typeGuards.isDeviceName(device)) {
+      switch (device) {
+        case "local":
+          syncLocal = true;
+          break;
+        case "steam-deck":
+          syncSteamDeck = true;
+          break;
+      }
+    } else
+      throw new AppWrongTypeError(
+        `Device ${device} is unrecognized. Please feed SYNC_DEVICES_LIST a comma-separated list of valid devices. Valid devices are: ${DEVICE_NAMES.join(", ")}.`,
+      );
+  }
+
+  const romsDatabaseDirPath = process.env.ROMS_DATABASE_DIR_PATH;
+  if (!romsDatabaseDirPath)
     throw new AppNotFoundError(
-      "Please assign a value to UPDATE_STEAM_DECK environment variable.",
+      "Please provide a valid path to the ROMS_DATABASE_DIR_PATH environment variable.",
     );
-  const isRawUpdateSteamDeckValid = /^[0-1]{1}$/.test(rawUpdateSteamDeck);
-  if (!isRawUpdateSteamDeckValid)
+
+  const isRomsDatabaseDirPathValid = /^[^\0]+$/.test(romsDatabaseDirPath);
+  if (!isRomsDatabaseDirPathValid)
     throw new AppValidationError(
-      "UPDATE_STEAM_DECK must be either a 0 or a 1.",
+      "ROMS_DATABASE_DIR_PATH must be a valid Unix path.",
     );
-  const updateSteamDeck = +rawUpdateSteamDeck === 1 ? true : false;
+
+  const mediaDatabaseDirPath = process.env.MEDIA_DATABASE_DIR_PATH;
+  if (!mediaDatabaseDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the MEDIA_DATABASE_DIR_PATH environment variable.",
+    );
+
+  const isMediaDatabaseDirPathValid = /^[^\0]+$/.test(mediaDatabaseDirPath);
+  if (!isMediaDatabaseDirPathValid)
+    throw new AppValidationError(
+      "MEDIA_DATABASE_DIR_PATH must be a valid Unix path.",
+    );
+
+  const rawLocalConsolesList = process.env.LOCAL_CONSOLES_LIST;
+  if (!rawLocalConsolesList)
+    throw new AppNotFoundError(
+      "Please assign a value to the LOCAL_CONSOLES_LIST environment variable.",
+    );
+
+  const localConsolesList = rawLocalConsolesList.split(",");
+  if (!typeGuards.isConsoleList(localConsolesList))
+    throw new AppWrongTypeError(
+      `Please feed LOCAL_CONSOLES_LIST a comma-separated list of valid console entries. Valid consoles: ${CONSOLE_NAMES.join(", ")}.`,
+    );
+
+  const rawSteamDeckConsolesList = process.env.STEAM_DECK_CONSOLES_LIST;
+  if (!rawSteamDeckConsolesList)
+    throw new AppNotFoundError(
+      "Please assign a value to the STEAM_DECK_CONSOLES_LIST environment variable.",
+    );
+
+  const steamDeckConsolesList = rawSteamDeckConsolesList.split(",");
+  if (!typeGuards.isConsoleList(steamDeckConsolesList))
+    throw new AppWrongTypeError(
+      `Please feed STEAM_DECK_CONSOLES_LIST a comma-separated list of valid console entries. Valid consoles: ${CONSOLE_NAMES.join(", ")}.`,
+    );
 
   const steamDeckHost = process.env.STEAM_DECK_HOST;
   if (!steamDeckHost)
@@ -66,13 +127,68 @@ const environmentFromProcessVariables = (): Environment => {
       "Please assign a value to STEAM_DECK_PASSWORD environment variable.",
     );
 
+  const localRomsDirPath = process.env.LOCAL_ROMS_DIR_PATH;
+  if (!localRomsDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the LOCAL_ROMS_DIR_PATH environment variable.",
+    );
+
+  const isLocalRomsDirPathValid = /^[^\0]+$/.test(localRomsDirPath);
+  if (!isLocalRomsDirPathValid)
+    throw new AppValidationError(
+      "LOCAL_ROMS_DIR_PATH must be a valid Unix path.",
+    );
+
+  const steamDeckRemoteRomsDirPath =
+    process.env.STEAM_DECK_REMOTE_ROMS_DIR_PATH;
+  if (!steamDeckRemoteRomsDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the STEAM_DECK_REMOTE_ROMS_DIR_PATH environment variable.",
+    );
+
+  const isSteamDeckRemoteRomsDirPathValid = /^[^\0]+$/.test(
+    steamDeckRemoteRomsDirPath,
+  );
+  if (!isSteamDeckRemoteRomsDirPathValid)
+    throw new AppValidationError(
+      "STEAM_DECK_REMOTE_ROMS_DIR_PATH must be a valid Unix path.",
+    );
+
+  const steamDeckRemoteMediaDirPath =
+    process.env.STEAM_DECK_REMOTE_MEDIA_DIR_PATH;
+  if (!steamDeckRemoteMediaDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the STEAM_DECK_REMOTE_MEDIA_DIR_PATH environment variable.",
+    );
+
+  const isSteamDeckRemoteMediaDirPathValid = /^[^\0]+$/.test(
+    steamDeckRemoteMediaDirPath,
+  );
+  if (!isSteamDeckRemoteMediaDirPathValid)
+    throw new AppValidationError(
+      "STEAM_DECK_REMOTE_MEDIA_DIR_PATH must be a valid Unix path.",
+    );
   return {
+    paths: {
+      dbs: {
+        roms: romsDatabaseDirPath,
+        media: mediaDatabaseDirPath,
+      },
+    },
     devices: {
       local: {
-        update: updateLocal,
+        sync: syncLocal,
+        paths: {
+          roms: localRomsDirPath,
+        },
+        consoles: localConsolesList,
       },
       steamDeck: {
-        update: updateSteamDeck,
+        sync: syncSteamDeck,
+        paths: {
+          roms: steamDeckRemoteRomsDirPath,
+          media: steamDeckRemoteMediaDirPath,
+        },
         sftp: {
           credentials: {
             host: steamDeckHost,
@@ -81,6 +197,7 @@ const environmentFromProcessVariables = (): Environment => {
             password: steamDeckPassword,
           },
         },
+        consoles: steamDeckConsolesList,
       },
     },
   };

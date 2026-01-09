@@ -92,11 +92,11 @@ class Device {
   public async sync() {
     switch (this._name) {
       case "local":
-        if (!ENVIRONMENT.devices.local.update) break;
+        if (!ENVIRONMENT.devices.local.sync) break;
         await devices.updateLocal(this._consoles);
         break;
       case "steam-deck":
-        if (!ENVIRONMENT.devices.steamDeck.update) break;
+        if (!ENVIRONMENT.devices.steamDeck.sync) break;
         await devices.updateSteamDeck(this._consoles);
         break;
     }

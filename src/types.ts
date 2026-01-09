@@ -39,12 +39,26 @@ export interface LabelsAndLanguages {
 }
 
 export interface Environment {
+  paths: {
+    dbs: {
+      roms: string;
+      media: string;
+    };
+  };
   devices: {
     local: {
-      update: boolean;
+      sync: boolean;
+      paths: {
+        roms: string;
+      };
+      consoles: ConsoleName[];
     };
     steamDeck: {
-      update: boolean;
+      sync: boolean;
+      paths: {
+        roms: string;
+        media: string;
+      };
       sftp: {
         credentials: {
           host: string;
@@ -53,6 +67,7 @@ export interface Environment {
           password: string;
         };
       };
+      consoles: ConsoleName[];
     };
   };
 }
