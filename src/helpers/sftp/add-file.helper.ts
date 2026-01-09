@@ -27,6 +27,7 @@ const addFile = async (
     if (remoteFileExistsError instanceof SftpNotFoundError) {
       const putError = await put(client, localFilePath, remoteFilePath);
       if (putError) return putError;
+      else return undefined;
     } else return remoteFileExistsError;
   }
 
