@@ -9,15 +9,17 @@ const deleteFile = async (
   client: Client,
   remoteFilePath: string,
   fileMustExist: boolean,
-) => {
+): Promise<DeleteFileError | undefined> => {
   const remoteFileExistsError = await exists(client, remoteFilePath, "file");
 
-  if (!fileMustExist) {
-    if (remoteFileExistsError) {
-      if (remoteFileExistsError instanceof SftpNotFoundError) return undefined;
-      return remoteFileExistsError;
-    }
-  }
+  if (
+    !fileMustExist &&
+    remoteFileExistsError &&
+    remoteFileExistsError instanceof SftpNotFoundError
+  )
+    return undefined;
+
+  if (remoteFileExistsError) return remoteFileExistsError;
 
   const deleteError = await sftpDelete(client, remoteFilePath);
   if (deleteError) return deleteError;
