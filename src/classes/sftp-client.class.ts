@@ -38,7 +38,7 @@ class SftpClient {
     this._connected = true;
   }
 
-  public async disconnect(): Promise<Error | undefined> {
+  public async disconnect(): Promise<DisconnectMethodError | undefined> {
     if (!this._connected)
       return new SftpDisconnectionError(
         "This client is not connected to a remote device.",
