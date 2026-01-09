@@ -7,7 +7,7 @@ import UnknownError from "../../classes/errors/unknown-error.class.js";
 export type AccessPathError = AccessError | StatsError | FsWrongTypeError;
 
 const accessPath = async (
-  type: "file" | "dir",
+  type: "file" | "dir" | "link",
   path: PathLike,
   mode?: number,
 ): Promise<undefined | AccessPathError> => {
@@ -28,6 +28,11 @@ const accessPath = async (
           `Path ${path} exists, but is NOT a directory.`,
         );
       break;
+    case "link":
+      if (!pathStats.isSymbolicLink())
+        return new FsWrongTypeError(
+          `Path ${path} exists, but is NOT a symbolic link.`,
+        );
     default:
       return new UnknownError(
         `Path ${path} exists, but is neither a file or a directory.`,
