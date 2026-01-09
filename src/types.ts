@@ -39,6 +39,11 @@ export interface LabelsAndLanguages {
 }
 
 export interface Environment {
+  options: {
+    sync: {
+      simulate: boolean;
+    };
+  };
   paths: {
     dbs: {
       roms: string;

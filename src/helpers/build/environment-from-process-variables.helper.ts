@@ -7,6 +7,18 @@ import type { Environment } from "../../types.js";
 import typeGuards from "../typescript/guards/index.js";
 
 const environmentFromProcessVariables = (): Environment => {
+  const rawSimulateSync = process.env.SIMULATE_SYNC;
+  if (!rawSimulateSync)
+    throw new AppNotFoundError(
+      "Please assign a value to the SIMULATE_SYNC environment variable.",
+    );
+
+  const isRawSimulateSyncValid = /^[0-1]{1}$/.test(rawSimulateSync);
+  if (!isRawSimulateSyncValid)
+    throw new AppValidationError(`SIMULATE_SYNC must be either a 0 or a 1.`);
+
+  const simulateSync = +rawSimulateSync === 1 ? true : false;
+
   const rawSyncDevicesList = process.env.SYNC_DEVICES_LIST;
   if (!rawSyncDevicesList)
     throw new AppNotFoundError(
@@ -199,6 +211,11 @@ const environmentFromProcessVariables = (): Environment => {
     );
 
   return {
+    options: {
+      sync: {
+        simulate: simulateSync,
+      },
+    },
     paths: {
       dbs: {
         roms: romsDatabaseDirPath,
