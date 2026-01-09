@@ -52,7 +52,9 @@ class Device {
   }
 
   get consoles() {
-    return this._consoles;
+    return new Map(
+      [...this._consoles.entries()].filter(([_, konsole]) => !konsole.skipped),
+    );
   }
 
   public addConsole(
