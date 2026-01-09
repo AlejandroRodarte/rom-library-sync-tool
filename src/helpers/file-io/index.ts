@@ -26,6 +26,7 @@ import allDirsExistAndAreReadableAndWritable from "./all-dirs-exist-and-are-read
 import writeDuplicateRomsFile from "./write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "./write-scrapped-roms-file.helper.js";
 import readdir from "./readdir.helper.js";
+import symlinkExists from "./symlink-exists.helper.js";
 
 const fileIO = {
   accessPath,
@@ -56,6 +57,7 @@ const fileIO = {
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
   readdir,
+  symlinkExists,
 };
 
 export default fileIO;
