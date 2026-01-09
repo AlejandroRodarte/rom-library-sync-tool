@@ -90,11 +90,6 @@ export interface DeviceDirPaths {
   failed: string;
 }
 
-export interface Device {
-  name: string;
-  consoles: Consoles;
-}
-
 export interface SftpCredentials {
   host: string;
   port: number;
