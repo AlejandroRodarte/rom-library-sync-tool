@@ -125,3 +125,9 @@ export interface SftpError extends Error {
 export type ConsoleName = (typeof CONSOLE_NAMES)[number];
 
 export type DeviceName = (typeof DEVICE_NAMES)[number];
+
+export type SyncFlags = {
+  [K in DeviceName]: boolean;
+};
+
+export type SyncDevicesItem = DeviceName | "none";
