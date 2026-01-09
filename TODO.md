@@ -1,6 +1,4 @@
-- [ ] Environment variable that holds all devices to process
 - [ ] Improve logging in the overall codebase.
-- [ ] Move some of the path constants to environment variables.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
 - [ ] After adding/removing files to/from Steam Deck, updates all console `gameslist.xml` to update ES-DE's metadata.
 - [ ] Write helper for `fs.readdir`.

@@ -8,3 +8,5 @@
 - [x] Log duplicates and scrapped ROMs into their own files duplicates.txt and scrapped.txt.
 - [x] Work with a more formal `Device` class. It should hold the device name, directory paths, list of console names (to process and filter), and `Consoles` object.
 - [x] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
+- [x] Move some of the path constants to environment variables.
+- [x] Environment variable that holds all devices to process.
