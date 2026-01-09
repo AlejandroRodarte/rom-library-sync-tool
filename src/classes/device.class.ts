@@ -77,7 +77,17 @@ class Device {
 
   public async populateConsoles() {
     for (const [consoleName, konsole] of this._consoles) {
-      const titles = await build.titlesFromConsoleName(consoleName);
+      const [titles, buildTitlesError] =
+        await build.titlesFromConsoleName(consoleName);
+
+      if (buildTitlesError) {
+        console.log(
+          `Error while reading database ROM directory for console ${consoleName}. Original error message: ${buildTitlesError.message}. Will skip this console. This means that NOTHING after this step will get processed.`,
+        );
+        konsole.skipped = true;
+        continue;
+      }
+
       for (const [titleName, title] of titles)
         konsole.addTitle(titleName, title);
     }
