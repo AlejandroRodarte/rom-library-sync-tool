@@ -1,3 +1,6 @@
+- [ ] Add a `SIMULATE_SYNC` environment variable to simulate additions/deletions.
+    - For the local device, we would simulate the creation and deletion of symlinks by just logging what would happen.
+    - For the steam-deck device, we would simulate the transfer of new files and remote deletion by just logging what would happen. For this to work, we would still need the steam deck to be connected.
 - [ ] Improve logging in the overall codebase.
 - [ ] Add SFTP code to connect to the Steam Deck. Credentials should be stored in a git-ignored .env file.
 - [ ] After adding/removing files to/from Steam Deck, updates all console `gameslist.xml` to update ES-DE's metadata.
