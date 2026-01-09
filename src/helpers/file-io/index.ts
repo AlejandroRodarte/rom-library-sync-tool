@@ -28,6 +28,7 @@ import writeScrappedRomsFile from "./write-scrapped-roms-file.helper.js";
 import readdir from "./readdir.helper.js";
 import symlinkExists from "./symlink-exists.helper.js";
 import unlink from "./unlink.helper.js";
+import symlink from "./symlink.helper.js";
 
 const fileIO = {
   accessPath,
@@ -60,6 +61,7 @@ const fileIO = {
   readdir,
   symlinkExists,
   unlink,
+  symlink,
 };
 
 export default fileIO;
