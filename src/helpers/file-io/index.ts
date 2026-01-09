@@ -25,6 +25,7 @@ import anyFileExists from "./any-file-exists.helper.js";
 import allDirsExistAndAreReadableAndWritable from "./all-dirs-exist-and-are-readable-and-writable.helper.js";
 import writeDuplicateRomsFile from "./write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "./write-scrapped-roms-file.helper.js";
+import readdir from "./readdir.helper.js";
 
 const fileIO = {
   accessPath,
@@ -54,6 +55,7 @@ const fileIO = {
   allDirsExistAndAreReadableAndWritable,
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
+  readdir,
 };
 
 export default fileIO;
