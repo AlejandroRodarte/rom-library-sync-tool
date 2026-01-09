@@ -1,7 +1,6 @@
 ## Priority
 
 - [ ] Finish implementation of `devices.syncLocal()`.
-- [ ] Write helper for `fs.readdir`.
 - [ ] Copy over the `Logger` object I built for better logging support.
 - [ ] Add a new `LOG_LEVEL` environment variable to control log levels.
 - [ ] Integrate `SIMULATE_SYNC` environment variable into `devices.syncLocal()` and `devices.syncSteamDeck()`. They should log instead of actually adding/removing content.

@@ -13,3 +13,4 @@
 - [x] Add a `SIMULATE_SYNC` environment variable to simulate additions/deletions.
     - For the local device, we would simulate the creation and deletion of symlinks by just logging what would happen.
     - For the steam-deck device, we would simulate the transfer of new files and remote deletion by just logging what would happen. For this to work, we would still need the steam deck to be connected.
+- [x] Write helper for `fs.readdir`.
