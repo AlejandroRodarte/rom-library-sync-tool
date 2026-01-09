@@ -10,3 +10,6 @@
 - [x] Relate each device to a unique set of consoles to filter and update. Not all devices would want to filter and update all consoles.
 - [x] Move some of the path constants to environment variables.
 - [x] Environment variable that holds all devices to process.
+- [x] Add a `SIMULATE_SYNC` environment variable to simulate additions/deletions.
+    - For the local device, we would simulate the creation and deletion of symlinks by just logging what would happen.
+    - For the steam-deck device, we would simulate the transfer of new files and remote deletion by just logging what would happen. For this to work, we would still need the steam deck to be connected.
