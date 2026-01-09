@@ -67,11 +67,13 @@ class SftpClient {
   public async addFile(
     localFilePath: string,
     remoteFilePath: string,
+    strategy: "REPLACE" | "KEEP",
   ): Promise<AddFileMethodError | undefined> {
     const addError = await sftp.addFile(
       this._client,
       localFilePath,
       remoteFilePath,
+      strategy,
     );
     if (addError) return addError;
   }

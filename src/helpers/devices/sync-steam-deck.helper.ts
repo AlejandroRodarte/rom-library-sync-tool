@@ -163,6 +163,7 @@ const syncSteamDeck = async (
           const steamDeckAddFileError = await steamDeck.addFile(
             dbRomFilePath,
             remoteRomFilePath,
+            "KEEP",
           );
           if (steamDeckAddFileError) {
             console.log(
