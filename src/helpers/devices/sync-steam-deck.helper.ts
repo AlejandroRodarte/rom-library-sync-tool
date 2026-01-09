@@ -7,7 +7,7 @@ import {
 } from "../../constants/paths.constants.js";
 import build from "../build/index.js";
 
-const updateSteamDeck = async (consoles: Consoles) => {
+const syncSteamDeck = async (consoles: Consoles) => {
   const deviceDirPaths = build.deviceDirPathsFromName("steam-deck");
 
   let failedFileFound = false;
@@ -227,4 +227,4 @@ const updateSteamDeck = async (consoles: Consoles) => {
   await steamDeck.disconnect();
 };
 
-export default updateSteamDeck;
+export default syncSteamDeck;

@@ -1,9 +1,9 @@
-import updateLocal from "./update-local.helper.js";
-import updateSteamDeck from "./update-steam-deck.helper.js";
+import syncLocal from "./sync-local.helper.js";
+import syncSteamDeck from "./sync-steam-deck.helper.js";
 
 const devices = {
-  updateSteamDeck,
-  updateLocal,
+  syncSteamDeck,
+  syncLocal,
 };
 
 export default devices;
