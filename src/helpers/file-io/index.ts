@@ -29,6 +29,8 @@ import readdir from "./readdir.helper.js";
 import symlinkExists from "./symlink-exists.helper.js";
 import unlink from "./unlink.helper.js";
 import symlink from "./symlink.helper.js";
+import createFileSymlink from "./create-file-symlink.helper.js";
+import deleteFileSymlink from "./delete-file-symlink.helper.js";
 
 const fileIO = {
   accessPath,
@@ -62,6 +64,8 @@ const fileIO = {
   symlinkExists,
   unlink,
   symlink,
+  createFileSymlink,
+  deleteFileSymlink,
 };
 
 export default fileIO;
