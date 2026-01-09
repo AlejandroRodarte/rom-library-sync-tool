@@ -1,5 +1,5 @@
-import type { Consoles } from "../../types.js";
+import type Device from "../../classes/device.class.js";
 
-const syncLocal = async (consoles: Consoles) => {};
+const syncLocal = async (device: Device) => {};
 
 export default syncLocal;

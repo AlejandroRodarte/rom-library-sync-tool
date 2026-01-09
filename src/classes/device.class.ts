@@ -93,7 +93,7 @@ class Device {
     switch (this._name) {
       case "local":
         if (!ENVIRONMENT.devices.local.sync) break;
-        await devices.syncLocal(this._consoles);
+        await devices.syncLocal(this);
         break;
       case "steam-deck":
         if (!ENVIRONMENT.devices.steamDeck.sync) break;
