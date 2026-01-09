@@ -14,6 +14,7 @@ import AppNotFoundError from "./app-not-found-error.class.js";
 import AppValidationError from "./app-validation-error.class.js";
 import AppWrongTypeError from "./app-wrong-type-error.class.js";
 import AppEntryExistsError from "./app-entry-exists-error.class.js";
+import FsCircularReferenceError from "./fs-circular-reference-error.class.js";
 
 const errorClasses = {
   AppNotFoundError,
@@ -27,6 +28,7 @@ const errorClasses = {
   FsNotFoundError,
   FsFileExistsError,
   FsWrongTypeError,
+  FsCircularReferenceError,
   SftpNotFoundError,
   SftpWrongTypeError,
   SftpBadPathError,
