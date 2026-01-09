@@ -10,6 +10,7 @@ class Console {
   private _scrappedTitles: Titles;
   private _selectedTitles: Map<number, Titles>;
   private _selectedRoms: RomSet;
+  private _skipped = false;
 
   constructor(name: ConsoleName) {
     this._name = name;
@@ -49,6 +50,14 @@ class Console {
       content += `Titles with ${romsSelected} selections: ${titles.size}.\n`;
 
     return content;
+  }
+
+  get skipped(): boolean {
+    return this._skipped;
+  }
+
+  set skipped(skipped: boolean) {
+    this._skipped = skipped;
   }
 
   public addTitle(
