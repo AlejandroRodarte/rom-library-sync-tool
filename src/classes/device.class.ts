@@ -97,7 +97,7 @@ class Device {
         break;
       case "steam-deck":
         if (!ENVIRONMENT.devices.steamDeck.sync) break;
-        await devices.syncSteamDeck(this._consoles);
+        await devices.syncSteamDeck(this);
         break;
     }
   }
