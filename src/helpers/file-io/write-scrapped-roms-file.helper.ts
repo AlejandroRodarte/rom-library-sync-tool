@@ -1,14 +1,14 @@
 import path from "node:path";
-import findDeleteAndOpenWriteOnlyFile, {
-  type FindDeleteAndOpenWriteOnlyFileError,
-} from "./find-delete-and-open-write-only-file.helper.js";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
 import type Device from "../../classes/device.class.js";
+import deleteAndOpenWriteOnlyFile, {
+  type DeleteAndOpenWriteOnlyFileError,
+} from "./delete-and-open-new-write-only-file.helper.js";
 
 export type WriteScrappedRomsFileError =
-  | FindDeleteAndOpenWriteOnlyFileError
+  | DeleteAndOpenWriteOnlyFileError
   | WriteToFileOrDeleteError;
 
 const writeScrappedRomsFile = async (
@@ -17,7 +17,7 @@ const writeScrappedRomsFile = async (
   const scrappedFilePath = path.join(device.paths.base, "scrapped.txt");
 
   const [scrappedFileHandle, scrappedFileError] =
-    await findDeleteAndOpenWriteOnlyFile(scrappedFilePath);
+    await deleteAndOpenWriteOnlyFile(scrappedFilePath);
   if (scrappedFileError) return scrappedFileError;
 
   let content = "";

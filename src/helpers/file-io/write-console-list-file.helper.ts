@@ -1,7 +1,4 @@
 import path from "node:path";
-import findAndDeleteFile, {
-  type FindAndDeleteFileError,
-} from "./find-and-delete-file.helper.js";
 import openNewWriteOnlyFile, {
   type OpenNewWriteOnlyFileError,
 } from "./open-new-write-only-file.helper.js";
@@ -9,9 +6,10 @@ import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
 import type Console from "../../classes/console.class.js";
+import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
 export type WriteConsoleListFileError =
-  | FindAndDeleteFileError
+  | DeleteFileError
   | OpenNewWriteOnlyFileError
   | WriteToFileOrDeleteError;
 
@@ -22,7 +20,7 @@ const writeConsoleListFile = async (
 ): Promise<WriteConsoleListFileError | undefined> => {
   const listFilePath = path.join(listsDirPath, `${name}.txt`);
 
-  const listFileDeleteError = await findAndDeleteFile(listFilePath, false);
+  const listFileDeleteError = await deleteFile(listFilePath, false);
   if (listFileDeleteError) return listFileDeleteError;
 
   const [listFileHandle, listFileOpenError] =

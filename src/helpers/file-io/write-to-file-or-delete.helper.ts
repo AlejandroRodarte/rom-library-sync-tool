@@ -1,13 +1,9 @@
 import type { FileHandle } from "node:fs/promises";
 import writeToFile, { type WriteToFileError } from "./write-to-file.helper.js";
-import findAndDeleteFile, {
-  type FindAndDeleteFileError,
-} from "./find-and-delete-file.helper.js";
 import type { PathLike } from "node:fs";
+import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
-export type WriteToFileOrDeleteError =
-  | WriteToFileError
-  | FindAndDeleteFileError;
+export type WriteToFileOrDeleteError = WriteToFileError | DeleteFileError;
 
 const writeToFileOrDelete = async (
   filePath: PathLike,
@@ -22,7 +18,7 @@ const writeToFileOrDelete = async (
     console.log("Closing file handle and deleting file.");
 
     await fileHandle.close();
-    const deleteError = await findAndDeleteFile(filePath);
+    const deleteError = await deleteFile(filePath, true);
     if (deleteError) return deleteError;
     return writeError;
   }

@@ -144,7 +144,10 @@ const syncLocal = async (device: Device) => {
     }
 
     if (failedFileIsEmpty) {
-      const failedFileDeleteError = await fileIO.deleteFile(failedFilePath);
+      const failedFileDeleteError = await fileIO.deleteFile(
+        failedFilePath,
+        true,
+      );
       if (failedFileDeleteError)
         console.log(
           `Was not able to delete failed file. Error message: ${failedFileDeleteError.message}.`,

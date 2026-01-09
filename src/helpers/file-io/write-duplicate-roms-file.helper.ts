@@ -1,14 +1,14 @@
 import path from "node:path";
-import findDeleteAndOpenWriteOnlyFile, {
-  type FindDeleteAndOpenWriteOnlyFileError,
-} from "./find-delete-and-open-write-only-file.helper.js";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
 import type Device from "../../classes/device.class.js";
+import deleteAndOpenWriteOnlyFile, {
+  type DeleteAndOpenWriteOnlyFileError,
+} from "./delete-and-open-new-write-only-file.helper.js";
 
 export type WriteDuplicateRomsFileError =
-  | FindDeleteAndOpenWriteOnlyFileError
+  | DeleteAndOpenWriteOnlyFileError
   | WriteToFileOrDeleteError;
 
 const writeDuplicateRomsFile = async (
@@ -17,7 +17,7 @@ const writeDuplicateRomsFile = async (
   const duplicatesFilePath = path.join(device.paths.base, "duplicates.txt");
 
   const [duplicatesFileHandle, duplicatesFileError] =
-    await findDeleteAndOpenWriteOnlyFile(duplicatesFilePath);
+    await deleteAndOpenWriteOnlyFile(duplicatesFilePath);
   if (duplicatesFileError) return duplicatesFileError;
 
   let content = "";

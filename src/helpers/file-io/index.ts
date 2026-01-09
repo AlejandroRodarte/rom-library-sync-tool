@@ -1,7 +1,6 @@
 import accessPath from "./access-path.helper.js";
 import deleteFile from "./delete-file.helper.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
-import findAndDeleteFile from "./find-and-delete-file.helper.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
 import openFile from "./open-file.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
@@ -17,7 +16,7 @@ import dirExists from "./dir-exists.helper.js";
 import dirExistsAndIsReadable from "./dir-exists-and-is-readable.helper.js";
 import fileExists from "./file-exists.helper.js";
 import fileIsEmpty from "./file-is-empty.helper.js";
-import findDeleteAndOpenWriteOnlyFile from "./find-delete-and-open-write-only-file.helper.js";
+import deleteAndOpenWriteOnlyFile from "./delete-and-open-new-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "./file-exists-and-read-utf8-lines.helper.js";
 import stats from "./stats.helper.js";
 import access from "./access.helper.js";
@@ -38,7 +37,6 @@ const fileIO = {
   deleteFile,
   readUtf8FileIntoString,
   readUtf8FileLines,
-  findAndDeleteFile,
   openFile,
   openNewWriteOnlyFile,
   writeToFile,
@@ -52,7 +50,7 @@ const fileIO = {
   dirExistsAndIsReadable,
   fileExists,
   fileIsEmpty,
-  findDeleteAndOpenWriteOnlyFile,
+  deleteAndOpenWriteOnlyFile,
   fileExistsAndReadUtf8Lines,
   stats,
   access,

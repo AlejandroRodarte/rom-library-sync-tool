@@ -1,9 +1,6 @@
 import path from "path";
 import type { DeviceDirPaths } from "../../types.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
-import findAndDeleteFile, {
-  type FindAndDeleteFileError,
-} from "./find-and-delete-file.helper.js";
 import readUtf8FileLines, {
   type ReadUtf8FileLinesError,
 } from "./read-utf8-file-lines.helper.js";
@@ -18,9 +15,10 @@ import writeDeleteFileLineToDiffFile, {
   type WriteDeleteFileLineToDiffFileError,
 } from "./write-delete-file-line-to-diff-file.helper.js";
 import type Console from "../../classes/console.class.js";
+import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
 export type WriteConsoleDiffFileError =
-  | FindAndDeleteFileError
+  | DeleteFileError
   | ReadUtf8FileLinesError
   | OpenNewWriteOnlyFileError
   | WriteAddFileLineToDiffFileError
@@ -37,7 +35,7 @@ const writeConsoleDiffFile = async (
   const listFileAccessError = await fileExistsAndIsReadable(listFilePath);
   if (listFileAccessError) listFileExists = false;
 
-  const diffFileDeleteError = await findAndDeleteFile(diffFilePath, false);
+  const diffFileDeleteError = await deleteFile(diffFilePath, false);
   if (diffFileDeleteError) return diffFileDeleteError;
 
   const [currentFilenames, listFileReadError] = listFileExists
