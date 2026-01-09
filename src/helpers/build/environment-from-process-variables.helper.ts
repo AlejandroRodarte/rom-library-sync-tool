@@ -62,6 +62,20 @@ const environmentFromProcessVariables = (): Environment => {
       "MEDIA_DATABASE_DIR_PATH must be a valid Unix path.",
     );
 
+  const gamelistsDatabaseDirPath = process.env.GAMELISTS_DATABASE_DIR_PATH;
+  if (!gamelistsDatabaseDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the GAMELISTS_DATABASE_DIR_PATH environment variable.",
+    );
+
+  const isGamelistsDatabaseDirPathValid = /^[^\0]+$/.test(
+    gamelistsDatabaseDirPath,
+  );
+  if (!isGamelistsDatabaseDirPathValid)
+    throw new AppValidationError(
+      "GAMELISTS_DATABASE_DIR_PATH must be a valid Unix path.",
+    );
+
   const rawLocalConsolesList = process.env.LOCAL_CONSOLES_LIST;
   if (!rawLocalConsolesList)
     throw new AppNotFoundError(
@@ -168,11 +182,28 @@ const environmentFromProcessVariables = (): Environment => {
     throw new AppValidationError(
       "STEAM_DECK_REMOTE_MEDIA_DIR_PATH must be a valid Unix path.",
     );
+
+  const steamDeckRemoteGamelistsDirPath =
+    process.env.STEAM_DECK_REMOTE_GAMELISTS_DIR_PATH;
+  if (!steamDeckRemoteGamelistsDirPath)
+    throw new AppNotFoundError(
+      "Please provide a valid path to the STEAM_DECK_REMOTE_GAMELISTS_DIR_PATH environment variable.",
+    );
+
+  const isSteamDeckRemoteGamelistsDirPathValid = /^[^\0]+$/.test(
+    steamDeckRemoteGamelistsDirPath,
+  );
+  if (!isSteamDeckRemoteGamelistsDirPathValid)
+    throw new AppValidationError(
+      "STEAM_DECK_REMOTE_GAMELISTS_DIR_PATH must be a valid Unix path.",
+    );
+
   return {
     paths: {
       dbs: {
         roms: romsDatabaseDirPath,
         media: mediaDatabaseDirPath,
+        gamelists: gamelistsDatabaseDirPath,
       },
     },
     devices: {
@@ -188,6 +219,7 @@ const environmentFromProcessVariables = (): Environment => {
         paths: {
           roms: steamDeckRemoteRomsDirPath,
           media: steamDeckRemoteMediaDirPath,
+          gamelists: steamDeckRemoteGamelistsDirPath,
         },
         sftp: {
           credentials: {

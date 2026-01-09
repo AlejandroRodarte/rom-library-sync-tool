@@ -43,6 +43,7 @@ export interface Environment {
     dbs: {
       roms: string;
       media: string;
+      gamelists: string;
     };
   };
   devices: {
@@ -58,6 +59,7 @@ export interface Environment {
       paths: {
         roms: string;
         media: string;
+        gamelists: string;
       };
       sftp: {
         credentials: {
