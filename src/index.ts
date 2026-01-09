@@ -2,13 +2,12 @@ import ENVIRONMENT from "./constants/environment.constant.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
-import { ROMS_DATABASE_DIR_PATH } from "./constants/paths.constants.js";
 import Device from "./classes/device.class.js";
 import unselect from "./helpers/unselect/index.js";
 
 const main = async () => {
   const dbRomsDirPathExistsError = await fileIO.dirExists(
-    ROMS_DATABASE_DIR_PATH,
+    ENVIRONMENT.paths.dbs.roms,
   );
   if (dbRomsDirPathExistsError) {
     console.log(dbRomsDirPathExistsError.message);

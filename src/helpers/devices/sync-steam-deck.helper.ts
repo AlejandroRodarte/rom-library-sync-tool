@@ -1,16 +1,13 @@
 import path from "path";
 import type { DiffAction } from "../../types.js";
 import fileIO from "../file-io/index.js";
-import {
-  ROMS_DATABASE_DIR_PATH,
-  STEAM_DECK_REMOTE_ROMS_DIR_PATH,
-} from "../../constants/paths.constants.js";
 import build from "../build/index.js";
 import type Device from "../../classes/device.class.js";
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
 import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import ENVIRONMENT from "../../constants/environment.constant.js";
 
 export type SyncSteamDeckError =
   | AppWrongTypeError
@@ -43,7 +40,7 @@ const syncSteamDeck = async (
     );
 
   const remoteRomsDirExistsError = await steamDeck.dirExists(
-    STEAM_DECK_REMOTE_ROMS_DIR_PATH,
+    ENVIRONMENT.devices.steamDeck.paths.roms,
   );
   if (remoteRomsDirExistsError)
     return new SftpNotFoundError(
@@ -51,7 +48,7 @@ const syncSteamDeck = async (
     );
 
   for (const [name, konsole] of device.consoles) {
-    const dbRomsDirPath = path.join(ROMS_DATABASE_DIR_PATH, name);
+    const dbRomsDirPath = path.join(ENVIRONMENT.paths.dbs.roms, name);
 
     const dbRomsDirPathExistsError =
       await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
@@ -63,7 +60,10 @@ const syncSteamDeck = async (
       continue;
     }
 
-    const remoteRomsDirPath = path.join(STEAM_DECK_REMOTE_ROMS_DIR_PATH, name);
+    const remoteRomsDirPath = path.join(
+      ENVIRONMENT.devices.steamDeck.paths.roms,
+      name,
+    );
 
     const remoteRomsDirPathExistsError =
       await steamDeck.dirExists(remoteRomsDirPath);
