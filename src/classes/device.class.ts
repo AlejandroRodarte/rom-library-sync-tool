@@ -38,7 +38,7 @@ class Device {
       failed: path.join(basePath, "failed"),
     };
 
-    this._consoles = new Map<string, Console>();
+    this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
       this.addConsole(consoleName, new Console(consoleName));
   }
