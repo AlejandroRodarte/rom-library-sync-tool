@@ -30,7 +30,7 @@ const syncLocal = async (device: Device) => {
       await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
     if (dbRomsDirPathExistsError) {
       console.log(
-        `Error: ${dbRomsDirPathExistsError.message}. Skipping this console.`,
+        `Error: ${dbRomsDirPathExistsError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -44,7 +44,7 @@ const syncLocal = async (device: Device) => {
       await fileIO.dirExists(localRomsDirPath);
     if (localRomsDirPathExistsError) {
       console.log(
-        `Error: ${localRomsDirPathExistsError.message}. Skipping this console.`,
+        `Error: ${localRomsDirPathExistsError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -57,7 +57,7 @@ const syncLocal = async (device: Device) => {
 
     if (failedFileOpenError) {
       console.log(
-        `Error: ${failedFileOpenError.message}. Skipping this console.`,
+        `Error: ${failedFileOpenError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -70,7 +70,7 @@ const syncLocal = async (device: Device) => {
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(`Error: ${diffFileError.message}. Skipping this console.`);
+      console.log(`Error: ${diffFileError.reason}. Skipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -84,7 +84,7 @@ const syncLocal = async (device: Device) => {
 
       if (diffActionBuildError) {
         console.log(
-          `Error: ${diffActionBuildError.message}. Adding diff line to failed file.`,
+          `Error: ${diffActionBuildError.reason}. Adding diff line to failed file.`,
         );
         failedDiffLines += `${diffLine}\n`;
         continue;
@@ -138,7 +138,7 @@ const syncLocal = async (device: Device) => {
 
     if (failedFileAccessError) {
       console.log(
-        `Unable to access failed file. Error message: ${failedFileAccessError.message}.`,
+        `Unable to access failed file. Error message: ${failedFileAccessError.reason}.`,
       );
       continue;
     }
@@ -150,7 +150,7 @@ const syncLocal = async (device: Device) => {
       );
       if (failedFileDeleteError)
         console.log(
-          `Was not able to delete failed file. Error message: ${failedFileDeleteError.message}.`,
+          `Was not able to delete failed file. Error message: ${failedFileDeleteError.reason}.`,
         );
     }
   }

@@ -82,7 +82,7 @@ class Device {
 
       if (buildTitlesError) {
         console.log(
-          `Error while reading database ROM directory for console ${consoleName}. Original error message: ${buildTitlesError.message}. Will skip this console. This means that NOTHING after this step will get processed.`,
+          `Error while reading database ROM directory for console ${consoleName}. Original error message: ${buildTitlesError.reason}. Will skip this console. This means that NOTHING after this step will get processed.`,
         );
         konsole.skipped = true;
         continue;

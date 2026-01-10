@@ -10,7 +10,7 @@ const main = async () => {
     ENVIRONMENT.paths.dbs.roms,
   );
   if (dbRomsDirPathExistsError) {
-    console.log(dbRomsDirPathExistsError.message);
+    console.log(dbRomsDirPathExistsError.reason);
     console.log("No ROMs directory exists. Terminating.");
     return;
   }
@@ -36,7 +36,7 @@ const main = async () => {
         device.paths.failed,
       ]);
     if (deviceDirsExistError) {
-      console.log(deviceDirsExistError.message);
+      console.log(deviceDirsExistError.reason);
       console.log("Continuing with the next device.");
       continue;
     }
@@ -63,9 +63,9 @@ const main = async () => {
     device.updateConsolesMetadata();
 
     const duplicatesFileError = await fileIO.writeDuplicateRomsFile(device);
-    if (duplicatesFileError) console.log(duplicatesFileError.message);
+    if (duplicatesFileError) console.log(duplicatesFileError.reason);
     const scrappedFileError = await fileIO.writeScrappedRomsFile(device);
-    if (scrappedFileError) console.log(scrappedFileError.message);
+    if (scrappedFileError) console.log(scrappedFileError.reason);
 
     for (const [_, konsole] of device.consoles)
       await fileIO.writeConsoleDiffFile(konsole, device.paths);

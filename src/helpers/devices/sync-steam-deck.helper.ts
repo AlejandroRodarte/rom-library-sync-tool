@@ -54,7 +54,7 @@ const syncSteamDeck = async (
       await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
     if (dbRomsDirPathExistsError) {
       console.log(
-        `Error: ${dbRomsDirPathExistsError.message}. Skipping this console.`,
+        `Error: ${dbRomsDirPathExistsError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -69,7 +69,7 @@ const syncSteamDeck = async (
       await steamDeck.dirExists(remoteRomsDirPath);
     if (remoteRomsDirPathExistsError) {
       console.log(
-        `Error: ${remoteRomsDirPathExistsError.message}. Skipping this console.`,
+        `Error: ${remoteRomsDirPathExistsError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -82,7 +82,7 @@ const syncSteamDeck = async (
 
     if (failedFileOpenError) {
       console.log(
-        `Error: ${failedFileOpenError.message}. Skipping this console.`,
+        `Error: ${failedFileOpenError.reason}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -95,7 +95,7 @@ const syncSteamDeck = async (
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(`Error: ${diffFileError.message}. Skipping this console.`);
+      console.log(`Error: ${diffFileError.reason}. Skipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -109,7 +109,7 @@ const syncSteamDeck = async (
 
       if (diffActionBuildError) {
         console.log(
-          `Error: ${diffActionBuildError.message}. Adding diff line to failed file.`,
+          `Error: ${diffActionBuildError.reason}. Adding diff line to failed file.`,
         );
         failedDiffLines += `${diffLine}\n`;
         continue;
@@ -139,7 +139,7 @@ const syncSteamDeck = async (
           const dbRomFileExistsError = await fileIO.fileExists(dbRomFilePath);
           if (dbRomFileExistsError) {
             console.log(
-              `Error: ${dbRomFileExistsError.message}. Adding diff action to failed file.`,
+              `Error: ${dbRomFileExistsError.reason}. Adding diff action to failed file.`,
             );
             failedDiffActions.push(diffAction);
             break;
@@ -167,7 +167,7 @@ const syncSteamDeck = async (
           );
           if (steamDeckAddFileError) {
             console.log(
-              `Something went wrong while transferring the file from ${dbRomFilePath} to ${remoteRomFilePath}. Error message: ${steamDeckAddFileError.message}. Adding this diff action to the failed file.`,
+              `Something went wrong while transferring the file from ${dbRomFilePath} to ${remoteRomFilePath}. Error message: ${steamDeckAddFileError.reason}. Adding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -186,7 +186,7 @@ const syncSteamDeck = async (
           );
           if (steamDeckRemoveFileError) {
             console.log(
-              `Something went wrong while removing file ${diffAction.data.filename} at ${remoteRomFilePath}. Error message: ${steamDeckRemoveFileError.message}. Adding this diff action to the failed file.`,
+              `Something went wrong while removing file ${diffAction.data.filename} at ${remoteRomFilePath}. Error message: ${steamDeckRemoveFileError.reason}. Adding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -220,7 +220,7 @@ const syncSteamDeck = async (
 
     if (failedFileAccessError) {
       console.log(
-        `Unable to access failed file. Error message: ${failedFileAccessError.message}.`,
+        `Unable to access failed file. Error message: ${failedFileAccessError.reason}.`,
       );
       continue;
     }
@@ -232,7 +232,7 @@ const syncSteamDeck = async (
       );
       if (failedFileDeleteError)
         console.log(
-          `Was not able to delete failed file. Error message: ${failedFileDeleteError.message}.`,
+          `Was not able to delete failed file. Error message: ${failedFileDeleteError.reason}.`,
         );
     }
   }
@@ -240,7 +240,7 @@ const syncSteamDeck = async (
   const disconnectError = await steamDeck.disconnect();
   if (disconnectError)
     console.log(
-      `Error while disconnecting from the Steam Deck. Error message: ${disconnectError.message}.`,
+      `Error while disconnecting from the Steam Deck. Error message: ${disconnectError.reason}.`,
     );
 };
 
