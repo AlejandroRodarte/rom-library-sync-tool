@@ -15,7 +15,7 @@ const environmentFromProcessVariables = (): Environment => {
     throw new AppValidationError(`SIMULATE_SYNC must be either a 0 or a 1.`);
   const simulateSync = +rawSimulateSync === 1 ? true : false;
 
-  const rawFilterDevicesList = (process.env.FILTER_DEVICES_LIST = "");
+  const rawFilterDevicesList = process.env.FILTER_DEVICES_LIST || "";
   const filterDevicesList = [...new Set(rawFilterDevicesList.split(","))];
   if (!typeGuards.isDevicesList(filterDevicesList))
     throw new AppValidationError(
@@ -134,12 +134,14 @@ const environmentFromProcessVariables = (): Environment => {
     },
     devices: {
       local: {
+        sync: syncDeviceNames.includes("local"),
         paths: {
           roms: localRomsDirPath,
         },
         consoles: localConsolesList,
       },
-      steamDeck: {
+      "steam-deck": {
+        sync: syncDeviceNames.includes("steam-deck"),
         paths: {
           roms: steamDeckRemoteRomsDirPath,
           media: steamDeckRemoteMediaDirPath,

@@ -11,7 +11,7 @@ const steamDeckSftpClient = async (): Promise<
   const sftpClient = new SftpClient("steam-deck");
 
   const connectError = await sftpClient.connect(
-    ENVIRONMENT.devices.steamDeck.sftp.credentials,
+    ENVIRONMENT.devices["steam-deck"].sftp.credentials,
   );
   if (connectError) return [undefined, connectError];
 

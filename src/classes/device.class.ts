@@ -108,8 +108,8 @@ class Device {
         await devices.syncLocal(this);
         break;
       case "steam-deck":
-        if (!ENVIRONMENT.devices.steamDeck.sync) break;
         await devices.syncSteamDeck(this);
+        if (!ENVIRONMENT.devices["steam-deck"].sync) break;
         break;
     }
   }

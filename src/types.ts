@@ -56,28 +56,7 @@ export interface Environment {
     };
   };
   devices: {
-    local: {
-      paths: {
-        roms: string;
-      };
-      consoles: ConsoleName[];
-    };
-    steamDeck: {
-      paths: {
-        roms: string;
-        media: string;
-        gamelists: string;
-      };
-      sftp: {
-        credentials: {
-          host: string;
-          port: number;
-          username: string;
-          password: string;
-        };
-      };
-      consoles: ConsoleName[];
-    };
+    [D in DeviceName]: DeviceData<D>;
   };
 }
 
@@ -134,3 +113,35 @@ export type SyncFlags = {
 
 export type DevicesListItem = DeviceName | "none" | "all";
 export type DevicesList = DevicesListItem[];
+
+interface LocalData {
+  sync: boolean;
+  paths: {
+    roms: string;
+  };
+  consoles: ConsoleName[];
+}
+
+interface SteamDeckData {
+  sync: boolean;
+  paths: {
+    roms: string;
+    media: string;
+    gamelists: string;
+  };
+  sftp: {
+    credentials: {
+      host: string;
+      port: number;
+      username: string;
+      password: string;
+    };
+  };
+  consoles: ConsoleName[];
+}
+
+export type DeviceData<D extends DeviceName> = D extends "local"
+  ? LocalData
+  : D extends "steam-deck"
+    ? SteamDeckData
+    : never;

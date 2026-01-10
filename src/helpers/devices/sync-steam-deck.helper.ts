@@ -40,7 +40,7 @@ const syncSteamDeck = async (
     );
 
   const remoteRomsDirExistsError = await steamDeck.dirExists(
-    ENVIRONMENT.devices.steamDeck.paths.roms,
+    ENVIRONMENT.devices["steam-deck"].paths.roms,
   );
   if (remoteRomsDirExistsError)
     return new SftpNotFoundError(
@@ -61,7 +61,7 @@ const syncSteamDeck = async (
     }
 
     const remoteRomsDirPath = path.join(
-      ENVIRONMENT.devices.steamDeck.paths.roms,
+      ENVIRONMENT.devices["steam-deck"].paths.roms,
       name,
     );
 
