@@ -57,6 +57,15 @@ class Device {
     );
   }
 
+  get pathsList(): string[] {
+    return [
+      this._paths.base,
+      this._paths.diffs,
+      this._paths.lists,
+      this._paths.failed,
+    ];
+  }
+
   public addConsole(
     consoleName: ConsoleName,
     konsole: Console,
