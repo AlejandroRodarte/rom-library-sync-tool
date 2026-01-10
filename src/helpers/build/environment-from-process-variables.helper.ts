@@ -3,7 +3,7 @@ import AppValidationError from "../../classes/errors/app-validation-error.class.
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import DEVICE_NAMES from "../../constants/device-names.constant.js";
-import type { Environment } from "../../types.js";
+import type { DeviceName, Environment } from "../../types.js";
 import typeGuards from "../typescript/guards/index.js";
 import validation from "../validation/index.js";
 import isStringIpv4Address from "../validation/is-string-ipv4-address.helper.js";
@@ -15,13 +15,25 @@ const environmentFromProcessVariables = (): Environment => {
     throw new AppValidationError(`SIMULATE_SYNC must be either a 0 or a 1.`);
   const simulateSync = +rawSimulateSync === 1 ? true : false;
 
-  const rawSyncDevicesList = process.env.SYNC_DEVICES_LIST || "";
-  const devicesList = [...new Set(rawSyncDevicesList.split(","))];
-  if (!typeGuards.isSyncDevicesList(devicesList))
+  const rawFilterDevicesList = (process.env.FILTER_DEVICES_LIST = "");
+  const filterDevicesList = [...new Set(rawFilterDevicesList.split(","))];
+  if (!typeGuards.isDevicesList(filterDevicesList))
     throw new AppValidationError(
-      `${devicesList} is not a valid list of devices to sync. Please inject SYNC_DEVICES_LIST with a comma-separated list of valid devices. Valid devices are: ${[...DEVICE_NAMES, "none"].join(", ")}.`,
+      `${filterDevicesList} is not a valid list of devices. Please provide FILTER_DEVICES_LIST with a comma-separated list of valid devices. Valid devices are: ${DEVICE_NAMES.join(", ")}. For convenience, use "none" and "all" to choose either no or all devices.`,
     );
-  const syncFlags = build.syncFlagsFromSyncDevicesList(devicesList);
+  const filterDeviceNames =
+    build.deviceNamesFromFilterDevicesList(filterDevicesList);
+
+  const rawSyncDevicesList = process.env.SYNC_DEVICES_LIST || "";
+  const syncDevicesList = [...new Set(rawSyncDevicesList.split(","))];
+  if (!typeGuards.isDevicesList(syncDevicesList))
+    throw new AppValidationError(
+      `${filterDevicesList} is not a valid list of devices. Please provide SYNC_DEVICES_LIST with a comma-separated list of valid devices. Valid devices are: ${DEVICE_NAMES.join(", ")}. For convenience, use "none" and "all" to choose either no or all devices.`,
+    );
+  const syncDeviceNames = build.deviceNamesFromSyncDevicesList(
+    syncDevicesList,
+    filterDeviceNames,
+  );
 
   const romsDatabaseDirPath = process.env.ROMS_DATABASE_DIR_PATH || "";
   if (!validation.isStringAbsoluteUnixPath(romsDatabaseDirPath))
@@ -107,6 +119,10 @@ const environmentFromProcessVariables = (): Environment => {
     options: {
       sync: {
         simulate: simulateSync,
+        devices: syncDeviceNames,
+      },
+      filter: {
+        devices: filterDeviceNames,
       },
     },
     paths: {
@@ -118,14 +134,12 @@ const environmentFromProcessVariables = (): Environment => {
     },
     devices: {
       local: {
-        sync: syncFlags.local,
         paths: {
           roms: localRomsDirPath,
         },
         consoles: localConsolesList,
       },
       steamDeck: {
-        sync: syncFlags["steam-deck"],
         paths: {
           roms: steamDeckRemoteRomsDirPath,
           media: steamDeckRemoteMediaDirPath,

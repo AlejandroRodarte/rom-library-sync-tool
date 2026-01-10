@@ -1,7 +1,7 @@
-import type { SyncDevicesItem } from "../../../types.js";
-import isSyncDevicesItem from "./is-sync-devices-item.helper.js";
+import type { DevicesListItem } from "../../../types.js";
+import isDevicesListItem from "./is-devices-list-item.helper.js";
 
-const isSyncDevicesList = (list: string[]): list is SyncDevicesItem[] =>
-  list.every((item) => isSyncDevicesItem(item));
+const isSyncDevicesList = (list: string[]): list is DevicesListItem[] =>
+  list.every((item) => isDevicesListItem(item));
 
 export default isSyncDevicesList;

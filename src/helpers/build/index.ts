@@ -10,6 +10,8 @@ import diffActionFromDiffLine from "./diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "./diff-line-from-diff-action.helper.js";
 import steamDeckSftpClient from "./steam-deck-sftp-client.helper.js";
 import syncFlagsFromSyncDevicesList from "./sync-flags-from-sync-devices-list.helper.js";
+import deviceNamesFromFilterDevicesList from "./device-names-from-filter-devices-list.helper.js";
+import deviceNamesFromSyncDevicesList from "./device-names-from-sync-devices-list.helper.js";
 
 const build = {
   emptyConsoles,
@@ -24,6 +26,8 @@ const build = {
   diffLineFromDiffAction,
   steamDeckSftpClient,
   syncFlagsFromSyncDevicesList,
+  deviceNamesFromFilterDevicesList,
+  deviceNamesFromSyncDevicesList,
 };
 
 export default build;

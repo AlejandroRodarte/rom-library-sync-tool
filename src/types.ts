@@ -40,8 +40,12 @@ export interface LabelsAndLanguages {
 
 export interface Environment {
   options: {
+    filter: {
+      devices: DeviceName[];
+    };
     sync: {
       simulate: boolean;
+      devices: DeviceName[];
     };
   };
   paths: {
@@ -53,14 +57,12 @@ export interface Environment {
   };
   devices: {
     local: {
-      sync: boolean;
       paths: {
         roms: string;
       };
       consoles: ConsoleName[];
     };
     steamDeck: {
-      sync: boolean;
       paths: {
         roms: string;
         media: string;
@@ -130,4 +132,5 @@ export type SyncFlags = {
   [K in DeviceName]: boolean;
 };
 
-export type SyncDevicesItem = DeviceName | "none";
+export type DevicesListItem = DeviceName | "none" | "all";
+export type DevicesList = DevicesListItem[];
