@@ -1,13 +1,17 @@
 import ENVIRONMENT from "./constants/environment.constant.js";
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
-import DEVICE_NAMES from "./constants/device-names.constant.js";
 import Device from "./classes/device.class.js";
 import unselect from "./helpers/unselect/index.js";
 import path from "node:path";
-import type { ConsoleName } from "./types.js";
+import build from "./helpers/build/index.js";
 
 const main = async () => {
+  const devices = ENVIRONMENT.options.filter.devices.map(
+    (deviceName) =>
+      new Device(deviceName, ENVIRONMENT.devices[deviceName].consoles),
+  );
+
   const readableDirPaths: string[] = [
     ENVIRONMENT.paths.dbs.roms,
     ENVIRONMENT.paths.dbs.media,
@@ -15,14 +19,7 @@ const main = async () => {
   ];
   const readableAndWritableDirPaths: string[] = [];
 
-  const devices = ENVIRONMENT.options.filter.devices.map(
-    (deviceName) =>
-      new Device(deviceName, ENVIRONMENT.devices[deviceName].consoles),
-  );
-
-  const uniqueConsoleNames: ConsoleName[] = [];
-
-  for (const device of devices) {
+  for (const device of devices)
     readableAndWritableDirPaths.push(
       device.paths.base,
       device.paths.diffs,
@@ -30,12 +27,7 @@ const main = async () => {
       device.paths.failed,
     );
 
-    for (const [consoleName] of device.consoles)
-      if (!uniqueConsoleNames.includes(consoleName))
-        uniqueConsoleNames.push(consoleName);
-  }
-
-  for (const consoleName of uniqueConsoleNames)
+  for (const consoleName of build.consoleNamesFromDevices(devices))
     readableDirPaths.push(
       path.join(ENVIRONMENT.paths.dbs.roms, consoleName),
       path.join(ENVIRONMENT.paths.dbs.media, consoleName),
