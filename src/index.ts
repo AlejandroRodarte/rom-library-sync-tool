@@ -4,49 +4,72 @@ import log from "./helpers/log/index.js";
 import DEVICE_NAMES from "./constants/device-names.constant.js";
 import Device from "./classes/device.class.js";
 import unselect from "./helpers/unselect/index.js";
+import path from "node:path";
+import type { ConsoleName } from "./types.js";
 
 const main = async () => {
-  const dbRomsDirPathExistsError = await fileIO.dirExists(
+  const readableDirPaths: string[] = [
     ENVIRONMENT.paths.dbs.roms,
+    ENVIRONMENT.paths.dbs.media,
+    ENVIRONMENT.paths.dbs.gamelists,
+  ];
+  const readableAndWritableDirPaths: string[] = [];
+
+  const devices = ENVIRONMENT.options.filter.devices.map(
+    (deviceName) =>
+      new Device(deviceName, ENVIRONMENT.devices[deviceName].consoles),
   );
-  if (dbRomsDirPathExistsError) {
-    console.log(dbRomsDirPathExistsError.reason);
-    console.log("No ROMs directory exists. Terminating.");
+
+  const uniqueConsoleNames: ConsoleName[] = [];
+
+  for (const device of devices) {
+    readableAndWritableDirPaths.push(
+      device.paths.base,
+      device.paths.diffs,
+      device.paths.lists,
+      device.paths.failed,
+    );
+
+    for (const [consoleName] of device.consoles)
+      if (!uniqueConsoleNames.includes(consoleName))
+        uniqueConsoleNames.push(consoleName);
+  }
+
+  for (const consoleName of uniqueConsoleNames)
+    readableDirPaths.push(
+      path.join(ENVIRONMENT.paths.dbs.roms, consoleName),
+      path.join(ENVIRONMENT.paths.dbs.media, consoleName),
+      path.join(ENVIRONMENT.paths.dbs.gamelists, consoleName),
+    );
+
+  const [areAllDirPathsReadable, readableDirPathsError] =
+    await fileIO.allDirsExistAndAreReadable(readableDirPaths);
+  if (readableDirPathsError) {
+    console.log(`${readableDirPathsError.reason}. Terminating.`);
+    return;
+  }
+  if (!areAllDirPathsReadable) {
+    console.log(
+      `Not all of the following directories exist and are readable:\n${readableDirPaths.join("\n")}\nMake sure all of them exist and are readable. Terminating.`,
+    );
     return;
   }
 
-  for (const deviceName of DEVICE_NAMES) {
-    const device = new Device(deviceName, [
-      "atari2600",
-      "atari7800",
-      "gamegear",
-      "gb",
-      "gba",
-      "gbc",
-      "mastersystem",
-      "nes",
-      "snes",
-    ]);
+  const [areAllDirPathsReadableAndWritable, readableAndWritableDirPathsError] =
+    await fileIO.allDirsExistAndAreReadableAndWritable(
+      readableAndWritableDirPaths,
+    );
+  if (readableAndWritableDirPathsError) {
+    console.log(`${readableAndWritableDirPathsError.reason}. Terminating.`);
+    return;
+  }
+  if (!areAllDirPathsReadableAndWritable) {
+    console.log(
+      `Not all of the following directories exist and are readable and writable:\n${readableDirPaths.join("\n")}\nMake sure all of them exist and are readable and writable. Terminating.`,
+    );
+  }
 
-    const [allDeviceDirsAreReady, deviceDirsExistError] =
-      await fileIO.allDirsExistAndAreReadableAndWritable([
-        device.paths.base,
-        device.paths.diffs,
-        device.paths.lists,
-        device.paths.failed,
-      ]);
-    if (deviceDirsExistError) {
-      console.log(deviceDirsExistError.reason);
-      console.log("Continuing with the next device.");
-      continue;
-    }
-    if (!allDeviceDirsAreReady) {
-      console.log(
-        "Not all device directories are read/write. Continuing with the next device.",
-      );
-      continue;
-    }
-
+  for (const device of devices) {
     await device.populateConsoles();
 
     for (const [_, konsole] of device.consoles) {
