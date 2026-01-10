@@ -145,3 +145,9 @@ export type DeviceData<D extends DeviceName> = D extends "local"
   : D extends "steam-deck"
     ? SteamDeckData
     : never;
+
+export interface ConsoleDbPaths {
+  roms: string;
+  media: string;
+  gamelists: string;
+}
