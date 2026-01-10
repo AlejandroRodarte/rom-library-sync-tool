@@ -1,5 +1,6 @@
 ## Priority
 
+- [ ] Instead of "skipping" consoles, make sure that all console dirs are available.
 - [ ] Finish implementation of `devices.syncLocal()`.
 - [ ] Copy over the `Logger` object I built for better logging support.
 - [ ] Add a new `LOG_LEVEL` environment variable to control log levels.
