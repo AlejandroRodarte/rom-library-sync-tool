@@ -1,20 +1,38 @@
-import type { ConsoleName, Rom, RomSet, Titles } from "../types.js";
+import path from "node:path";
+import type {
+  ConsoleDbPaths,
+  ConsoleName,
+  Rom,
+  RomSet,
+  Titles,
+} from "../types.js";
 import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
 import Title from "./title.class.js";
+import ENVIRONMENT from "../constants/environment.constant.js";
 
 export type AddTitleMethodError = AppEntryExistsError;
 
 class Console {
   private _name: ConsoleName;
   private _titles: Titles;
+  private _dbPaths: ConsoleDbPaths;
+
   private _scrappedTitles: Titles;
   private _selectedTitles: Map<number, Titles>;
   private _selectedRoms: RomSet;
+
   private _skipped = false;
 
   constructor(name: ConsoleName) {
     this._name = name;
     this._titles = new Map<string, Title>();
+
+    this._dbPaths = {
+      roms: path.join(ENVIRONMENT.paths.dbs.roms, this._name),
+      media: path.join(ENVIRONMENT.paths.dbs.media, this._name),
+      gamelists: path.join(ENVIRONMENT.paths.dbs.gamelists, this._name),
+    };
+
     this._selectedTitles = new Map<number, Titles>();
     this._scrappedTitles = new Map<string, Title>();
     this._selectedRoms = new Map<string, Rom>();
@@ -22,6 +40,14 @@ class Console {
 
   get name() {
     return this._name;
+  }
+
+  get dbPaths() {
+    return this._dbPaths;
+  }
+
+  get dbPathsList(): string[] {
+    return [this._dbPaths.roms, this._dbPaths.media, this._dbPaths.gamelists];
   }
 
   get selectedTitles() {
