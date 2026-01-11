@@ -86,8 +86,9 @@ class Device {
 
   public async populateConsoles() {
     for (const [consoleName, konsole] of this._consoles) {
-      const [titles, buildTitlesError] =
-        await build.titlesFromConsoleName(consoleName);
+      const [titles, buildTitlesError] = await build.titlesFromRomsDirPath(
+        konsole.dbPaths.roms,
+      );
 
       if (buildTitlesError) {
         console.log(

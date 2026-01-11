@@ -1,19 +1,15 @@
 import type { Titles } from "../../types.js";
 import titlesFromFilenames from "./titles-from-filenames.helper.js";
-import path from "node:path";
-import ENVIRONMENT from "../../constants/environment.constant.js";
 import fileIO from "../file-io/index.js";
 import type { ReaddirError } from "../file-io/readdir.helper.js";
 
-export type TitlesFromConsoleNameError = ReaddirError;
+export type TitlesFromRomsDirPath = ReaddirError;
 
-const titlesFromConsoleName = async (
-  consoleName: string,
-): Promise<[Titles, undefined] | [undefined, TitlesFromConsoleNameError]> => {
-  const consoleRomsDirPath = path.join(ENVIRONMENT.paths.dbs.roms, consoleName);
-
+const titlesFromRomsDirPath = async (
+  romsDirPath: string,
+): Promise<[Titles, undefined] | [undefined, TitlesFromRomsDirPath]> => {
   const [entries, readdirError] = await fileIO.readdir([
-    consoleRomsDirPath,
+    romsDirPath,
     { withFileTypes: true, encoding: "buffer" },
   ]);
 
@@ -26,4 +22,4 @@ const titlesFromConsoleName = async (
   return [titles, undefined];
 };
 
-export default titlesFromConsoleName;
+export default titlesFromRomsDirPath;

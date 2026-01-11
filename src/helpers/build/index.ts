@@ -1,5 +1,5 @@
 import emptyConsoles from "./empty-consoles.helper.js";
-import titlesFromConsoleName from "./titles-from-console-name.helper.js";
+import titlesFromRomsDirPath from "./titles-from-roms-dir-path.helper.js";
 import titlesFromFilenames from "./titles-from-filenames.helper.js";
 import labelsAndLanguagesFromFilename from "./labels-and-languages-from-filename.helper.js";
 import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
@@ -16,7 +16,7 @@ import consoleNamesFromDevices from "./console-names-from-devices.helper.js";
 
 const build = {
   emptyConsoles,
-  titlesFromConsoleName,
+  titlesFromRomsDirPath,
   titlesFromFilenames,
   labelsAndLanguagesFromFilename,
   specialFlagsFromRoms,
