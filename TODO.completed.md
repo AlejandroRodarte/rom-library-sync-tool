@@ -16,3 +16,5 @@
 - [x] Write helper for `fs.readdir`.
 - [x] Instead of "skipping" consoles, make sure that all console dirs are available.
 - [x] Finish implementation of `devices.syncLocal()`.
+- [x] Copy over the `Logger` object I built for better logging support.
+- [x] Add a new `LOG_LEVEL` environment variable to control log levels.

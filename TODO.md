@@ -1,7 +1,5 @@
 ## Priority
 
-- [ ] Copy over the `Logger` object I built for better logging support.
-- [ ] Add a new `LOG_LEVEL` environment variable to control log levels.
 - [ ] Integrate `SIMULATE_SYNC` environment variable into `devices.syncLocal()` and `devices.syncSteamDeck()`. They should log instead of actually adding/removing content.
 - [ ] Encapsulate duplicate code between `devices.syncLocal()` and `devices.syncSteamDeck()` inside functions.
 - [ ] Explore (and implement) the idea of letting `Device` be an interface, or an abstract class (think this through).
