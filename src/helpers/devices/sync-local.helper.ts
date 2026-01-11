@@ -18,6 +18,9 @@ import writeToFile from "../file-io/write-to-file.helper.js";
 import fileExists from "../file-io/file-exists.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
+import anyFileExists, {
+  type AnyFileExistsError,
+} from "../file-io/any-file-exists.helper.js";
 import type Device from "../../classes/device.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
 
@@ -36,13 +39,15 @@ const fileIO = {
   writeToFile,
   fileIsEmpty,
   deleteFile,
+  anyFileExists,
 };
 
 export type SyncLocalError =
   | AppWrongTypeError
   | FsFileExistsError
   | AllDirsExistAndAreReadableAndWritableError
-  | FsNotFoundError;
+  | FsNotFoundError
+  | AnyFileExistsError;
 
 const syncLocal = async (
   device: Device,
@@ -52,15 +57,14 @@ const syncLocal = async (
       `This functions expects a steam-deck device, NOT a ${device.name} device.`,
     );
 
-  for (const [name, _] of device.consoles) {
-    const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
-    const failedFileExistsError = await fileIO.fileExists(failedFilePath);
-
-    if (!failedFileExistsError)
-      return new FsFileExistsError(
-        `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
-      );
-  }
+  const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
+    device.consolesFailedFilePaths,
+  );
+  if (anyFileExistsError) return anyFileExistsError;
+  if (!anyFailedFileExists)
+    return new FsFileExistsError(
+      `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
+    );
 
   const localDirPaths = [environment.devices.local.paths.roms];
   for (const [consoleName] of device.consoles)
