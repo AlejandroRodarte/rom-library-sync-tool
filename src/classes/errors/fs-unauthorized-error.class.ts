@@ -6,19 +6,19 @@ class FsUnauthorizedError extends CustomError {
   code = "FS_UNAUTHORIZED_ERROR";
   message = "Unauthorized to perform this operation in the filesystem path.";
 
-  private _reason: string;
+  private _reasons: string[];
 
   constructor(reason: string) {
     super();
-    this._reason = reason;
+    this._reasons = [reason];
   }
 
-  get reason(): string {
-    return this._reason;
+  get reasons(): string[] {
+    return this._reasons;
   }
 
-  set reason(reason: string) {
-    this._reason = reason;
+  public addReason(reason: string): void {
+    this._reasons.push(reason);
   }
 }
 

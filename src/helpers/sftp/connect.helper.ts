@@ -25,16 +25,14 @@ const connect = async (
 
     switch (e.code) {
       case "ERR_NOT_CONNECTED":
-        return new SftpConnectionError(
-          `Client is not connected. Original error message: ${e.message}.`,
-        );
+        return new SftpConnectionError(`Client is not connected.`);
       case "ERR_BAD_AUTH":
         return new SftpBadCredentialsError(
-          `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}. Original error message: ${e.message}.`,
+          `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
         );
       default:
         return new UnknownError(
-          `Something went wrong while connecting via SFTP. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `Something went wrong while connecting via SFTP. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

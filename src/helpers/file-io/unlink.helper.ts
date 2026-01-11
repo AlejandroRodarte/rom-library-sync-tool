@@ -26,21 +26,19 @@ const unlink = async (
 
     switch (e.code) {
       case "ENOENT":
-        return new FsNotFoundError(
-          `No symlink was found at path ${path}. Original error message: ${e.message}.`,
-        );
+        return new FsNotFoundError(`No symlink was found at path ${path}.`);
       case "EACCES":
       case "EPERM":
         return new FsUnauthorizedError(
-          `This process is not authorized to delete symlink at ${path}. Original error message: ${e.message}.`,
+          `This process is not authorized to delete symlink at ${path}.`,
         );
       case "EISDIR":
         return new FsWrongTypeError(
-          `fs.unlink() only works with files, NOT directories. ${path} is a directory. Original error message: ${e.message}.`,
+          `fs.unlink() only works with files, NOT directories. ${path} is a directory.`,
         );
       default:
         return new UnknownError(
-          `Something bad happened while deleting symlink at path ${path}. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `Something bad happened while deleting symlink at path ${path}. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

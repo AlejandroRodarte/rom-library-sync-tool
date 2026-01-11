@@ -32,7 +32,7 @@ const syncLocal = async (device: Device) => {
       await fileIO.dirExists(localRomsDirPath);
     if (localRomsDirPathExistsError) {
       console.log(
-        `Error: ${localRomsDirPathExistsError.reason}. Skipping this console.`,
+        `Errors: ${localRomsDirPathExistsError.reasons}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -45,7 +45,7 @@ const syncLocal = async (device: Device) => {
 
     if (failedFileOpenError) {
       console.log(
-        `Error: ${failedFileOpenError.reason}. Skipping this console.`,
+        `Errors: ${failedFileOpenError.reasons}. Skipping this console.`,
       );
       konsole.skipped = true;
       continue;
@@ -58,7 +58,7 @@ const syncLocal = async (device: Device) => {
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(`Error: ${diffFileError.reason}. Skipping this console.`);
+      console.log(`Errors: ${diffFileError.reasons}. Skipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -72,7 +72,7 @@ const syncLocal = async (device: Device) => {
 
       if (diffActionBuildError) {
         console.log(
-          `Error: ${diffActionBuildError.reason}. Adding diff line to failed file.`,
+          `Errors: ${diffActionBuildError.reasons}. Adding diff line to failed file.`,
         );
         failedDiffLines += `${diffLine}\n`;
         continue;
@@ -126,7 +126,7 @@ const syncLocal = async (device: Device) => {
 
     if (failedFileAccessError) {
       console.log(
-        `Unable to access failed file. Error message: ${failedFileAccessError.reason}.`,
+        `Unable to access failed file. Error messages: ${failedFileAccessError.reasons}.`,
       );
       continue;
     }
@@ -138,7 +138,7 @@ const syncLocal = async (device: Device) => {
       );
       if (failedFileDeleteError)
         console.log(
-          `Was not able to delete failed file. Error message: ${failedFileDeleteError.reason}.`,
+          `Was not able to delete failed file. Error messages: ${failedFileDeleteError.reasons}.`,
         );
     }
   }

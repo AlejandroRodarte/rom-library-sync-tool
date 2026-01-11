@@ -29,7 +29,7 @@ const access = async (
         );
       default:
         return new UnknownError(
-          `Something bad happened while accessing path ${path}. Error code: ${e.code}.`,
+          `Something bad happened while accessing path ${path}. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

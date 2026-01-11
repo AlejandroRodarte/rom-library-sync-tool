@@ -27,7 +27,7 @@ const disconnect = async (
         );
       default:
         return new UnknownError(
-          `Something bad happened while trying to disconnect. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `Something bad happened while trying to disconnect. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

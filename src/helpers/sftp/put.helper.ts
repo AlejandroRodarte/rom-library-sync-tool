@@ -31,28 +31,28 @@ const put = async (
     switch (e.code) {
       case "ERR_NOT_CONNECTED":
         return new SftpConnectionError(
-          `Your client is not connected. Remote file path ${remoteFilePath} can not be accessed. Original error message: ${e.message}.`,
+          `Your client is not connected. Remote file path ${remoteFilePath} can not be accessed.`,
         );
       case "ERR_BAD_AUTH":
         return new SftpBadCredentialsError(
-          `Credentials for this client failed authentication. Remote file path ${remoteFilePath} can not be accessed. Original error message: ${e.message}.`,
+          `Credentials for this client failed authentication. Remote file path ${remoteFilePath} can not be accessed.`,
         );
       case "ERR_BAD_PATH":
         return new SftpBadPathError(
-          `Remote file path ${remoteFilePath} is faulty. Original error message: ${e.message}.`,
+          `Remote file path ${remoteFilePath} is faulty.`,
         );
       case "EACCES":
       case "EPERM":
         return new SftpUnauthorizedError(
-          `This process is NOT authorized to put file on remote file path ${remoteFilePath}. Original error message: ${e.message}.`,
+          `This process is NOT authorized to put file on remote file path ${remoteFilePath}.`,
         );
       case "EISDIR":
         return new SftpWrongTypeError(
-          `Remote file path ${remoteFilePath} is a directory, NOT a file. Original error message: ${e.message}.`,
+          `Remote file path ${remoteFilePath} is a directory, NOT a file.`,
         );
       default:
         return new UnknownError(
-          `An unknown error happened wile adding file from local file path ${localFilePath} to remote file path ${remoteFilePath}. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `An unknown error happened wile adding file from local file path ${localFilePath} to remote file path ${remoteFilePath}. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

@@ -14,7 +14,7 @@ const writeToFileOrDelete = async (
   const writeError = await writeToFile(fileHandle, content, encoding);
 
   if (writeError) {
-    console.log(writeError.reason);
+    console.log(writeError.reasons);
     console.log("Closing file handle and deleting file.");
 
     await fileHandle.close();

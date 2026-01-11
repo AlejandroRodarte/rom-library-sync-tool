@@ -58,24 +58,22 @@ const exists = async (
     switch (e.code) {
       case "ERR_NOT_CONNECTED":
         return new SftpConnectionError(
-          `Client is not connected. Unable to reach remote path ${remotePath}. Original error message: ${e.message}.`,
+          `Client is not connected. Unable to reach remote path ${remotePath}.`,
         );
       case "ERR_BAD_AUTH":
         return new SftpBadCredentialsError(
-          `Client suffers from bad/faulty authentication and credentials. Original error message: ${e.message}.`,
+          `Client suffers from bad/faulty authentication and credentials.`,
         );
       case "ERR_BAD_PATH":
-        return new SftpBadPathError(
-          `Remote path ${remotePath} is faulty. Original error message: ${e.message}.`,
-        );
+        return new SftpBadPathError(`Remote path ${remotePath} is faulty.`);
       case "EACCES":
       case "EPERM":
         return new SftpUnauthorizedError(
-          `Remote path ${remotePath} exists, but this process lacks the privileges to access it. Original error message: ${e.message}.`,
+          `Remote path ${remotePath} exists, but this process lacks the privileges to access it.`,
         );
       default:
         return new UnknownError(
-          `Something wrong happened while accessing remote path ${remotePath}. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `Something wrong happened while accessing remote path ${remotePath}. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

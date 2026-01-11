@@ -6,19 +6,19 @@ class FsWrongTypeError extends CustomError {
   code = "FS_WRONG_TYPE_ERROR";
   message = "The object found in the filesystem path is of the wrong type.";
 
-  private _reason: string;
+  private _reasons: string[];
 
   constructor(reason: string) {
     super();
-    this._reason = reason;
+    this._reasons = [reason];
   }
 
-  get reason(): string {
-    return this._reason;
+  get reasons(): string[] {
+    return this._reasons;
   }
 
-  set reason(reason: string) {
-    this._reason = reason;
+  public addReason(reason: string): void {
+    this._reasons.push(reason);
   }
 }
 

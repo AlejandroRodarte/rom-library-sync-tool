@@ -38,7 +38,7 @@ const writeToFile = async (
         );
       default:
         return new UnknownError(
-          `Something bad happened while writing to a file. Error code: ${e.code}`,
+          `Something bad happened while writing to a file. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

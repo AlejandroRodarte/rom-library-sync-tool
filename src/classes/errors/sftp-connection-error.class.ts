@@ -6,19 +6,19 @@ class SftpConnectionError extends CustomError {
   code = "SFTP_CONNECTION_ERROR";
   message = "An error happened while connecting via SFTP.";
 
-  private _reason: string;
+  private _reasons: string[];
 
   constructor(reason: string) {
     super();
-    this._reason = reason;
+    this._reasons = [reason];
   }
 
-  get reason(): string {
-    return this._reason;
+  get reasons(): string[] {
+    return this._reasons;
   }
 
-  set reason(reason: string) {
-    this._reason = reason;
+  public addReason(reason: string): void {
+    this._reasons.push(reason);
   }
 }
 

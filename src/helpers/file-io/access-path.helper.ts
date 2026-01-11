@@ -33,10 +33,7 @@ const accessPath = async (
         return new FsWrongTypeError(
           `Path ${path} exists, but is NOT a symbolic link.`,
         );
-    default:
-      return new UnknownError(
-        `Path ${path} exists, but is neither a file or a directory.`,
-      );
+      break;
   }
 };
 

@@ -27,25 +27,23 @@ const symlink = async (
 
     switch (e.code) {
       case "ENOENT":
-        return new FsNotFoundError(
-          `Symlink path ${dst} does not exist. Original error message: ${e.message}.`,
-        );
+        return new FsNotFoundError(`Symlink path ${dst} does not exist.`);
       case "EACCES":
       case "EPERM":
         return new FsUnauthorizedError(
-          `This process lacks privileges to create a symlink on ${dst}. Original error message: ${e.message}.`,
+          `This process lacks privileges to create a symlink on ${dst}.`,
         );
       case "ELOOP":
         return new FsCircularReferenceError(
-          `Can't create symlink at ${dst}, as it would create a circular reference, resulting in an infinite loop of symlinks. Original error message: ${e.message}.`,
+          `Can't create symlink at ${dst}, as it would create a circular reference, resulting in an infinite loop of symlinks.`,
         );
       case "EEXIST":
         return new FsFileExistsError(
-          `There is already an item on path ${dst}. Can not create symlink. Original error message: ${e.message}.`,
+          `There is already an item on path ${dst}. Can not create symlink.`,
         );
       default:
         return new UnknownError(
-          `There was an error trying to create symlink on ${dst} that links to pat ${src}. Error code: ${e.code}. Original error message: ${e.message}.`,
+          `There was an error trying to create symlink on ${dst} that links to pat ${src}. Error code: ${e.code}. Error message: ${e.message}.`,
         );
     }
   }

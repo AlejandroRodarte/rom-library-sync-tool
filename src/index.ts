@@ -13,7 +13,7 @@ const main = async () => {
 
   const validateDbPathsError = await app.validateDbPathsWithDevices(devices);
   if (validateDbPathsError) {
-    console.log(`${validateDbPathsError.reason}. Terminating.`);
+    console.log(`${validateDbPathsError.reasons}. Terminating.`);
     return;
   }
 
@@ -34,9 +34,9 @@ const main = async () => {
     device.updateConsolesMetadata();
 
     const duplicatesFileError = await fileIO.writeDuplicateRomsFile(device);
-    if (duplicatesFileError) console.log(duplicatesFileError.reason);
+    if (duplicatesFileError) console.log(duplicatesFileError.reasons);
     const scrappedFileError = await fileIO.writeScrappedRomsFile(device);
-    if (scrappedFileError) console.log(scrappedFileError.reason);
+    if (scrappedFileError) console.log(scrappedFileError.reasons);
 
     for (const [_, konsole] of device.consoles)
       await fileIO.writeConsoleDiffFile(konsole, device.paths);
