@@ -48,18 +48,6 @@ const syncSteamDeck = async (
     );
 
   for (const [name, konsole] of device.consoles) {
-    const dbRomsDirPath = path.join(ENVIRONMENT.paths.dbs.roms, name);
-
-    const dbRomsDirPathExistsError =
-      await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
-    if (dbRomsDirPathExistsError) {
-      console.log(
-        `Error: ${dbRomsDirPathExistsError.reason}. Skipping this console.`,
-      );
-      konsole.skipped = true;
-      continue;
-    }
-
     const remoteRomsDirPath = path.join(
       ENVIRONMENT.devices["steam-deck"].paths.roms,
       name,
@@ -132,7 +120,7 @@ const syncSteamDeck = async (
       switch (diffAction.type) {
         case "add-file": {
           const dbRomFilePath = path.join(
-            dbRomsDirPath,
+            konsole.dbPaths.roms,
             diffAction.data.filename,
           );
 

@@ -24,18 +24,6 @@ const syncLocal = async (device: Device) => {
   }
 
   for (const [name, konsole] of device.consoles) {
-    const dbRomsDirPath = path.join(ENVIRONMENT.paths.dbs.roms, name);
-
-    const dbRomsDirPathExistsError =
-      await fileIO.dirExistsAndIsReadable(dbRomsDirPath);
-    if (dbRomsDirPathExistsError) {
-      console.log(
-        `Error: ${dbRomsDirPathExistsError.reason}. Skipping this console.`,
-      );
-      konsole.skipped = true;
-      continue;
-    }
-
     const localRomsDirPath = path.join(
       ENVIRONMENT.devices.local.paths.roms,
       name,
