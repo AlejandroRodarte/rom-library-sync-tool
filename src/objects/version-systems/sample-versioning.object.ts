@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const sampleVersioning: VersionSystem = {
   pattern: /^Sample +[0-9]+$/,

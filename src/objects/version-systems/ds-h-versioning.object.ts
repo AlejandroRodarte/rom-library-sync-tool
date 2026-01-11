@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const dshVersioning: VersionSystem = {
   pattern: /^DS-H[0-9]+$/,

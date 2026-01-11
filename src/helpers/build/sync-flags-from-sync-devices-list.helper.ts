@@ -1,6 +1,7 @@
-import type { DevicesListItem, SyncFlags } from "../../types.js";
+import type { DevicesList } from "../../types/devices-list.type.js";
+import type { SyncFlags } from "../../types/sync-flags.type.js";
 
-const syncFlagsFromSyncDevicesList = (list: DevicesListItem[]): SyncFlags => {
+const syncFlagsFromSyncDevicesList = (list: DevicesList): SyncFlags => {
   const syncFlags: SyncFlags = {
     local: false,
     "steam-deck": false,

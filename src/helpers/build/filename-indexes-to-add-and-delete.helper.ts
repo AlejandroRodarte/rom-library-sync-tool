@@ -1,4 +1,4 @@
-import type { IndexesToAddAndDelete } from "../../types.js";
+import type { IndexesToAddAndDelete } from "../../interfaces/indexes-to-add-and-delete.interface.js";
 
 const filenameIndexesToAddAndDelete = (
   currentFilenames: string[],

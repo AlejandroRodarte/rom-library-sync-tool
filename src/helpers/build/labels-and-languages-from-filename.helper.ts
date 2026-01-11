@@ -1,5 +1,5 @@
 import LANGUAGE_BASE_PRIORITY_LIST from "../../constants/language-base-priority-list.constant.js";
-import type { LabelsAndLanguages } from "../../types.js";
+import type { LabelsAndLanguages } from "../../interfaces/labels-and-languages.interface.js";
 
 const labelsAndLanguagesFromFilename = (
   filename: string,

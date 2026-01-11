@@ -1,11 +1,5 @@
 import path from "node:path";
 
-import type {
-  ConsoleName,
-  Consoles,
-  DeviceDirPaths,
-  DeviceName,
-} from "../types.js";
 import Console from "./console.class.js";
 import { DEVICES_DIR_PATH } from "../constants/paths.constants.js";
 import AppNotFoundError from "./errors/app-not-found-error.class.js";
@@ -16,6 +10,10 @@ import titlesFromRomsDirPath from "../helpers/build/titles-from-roms-dir-path.he
 import syncLocal from "../helpers/devices/sync-local.helper.js";
 import syncSteamDeck from "../helpers/devices/sync-steam-deck.helper.js";
 import type { AllDirsExistAndAreReadableAndWritableError } from "../helpers/file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
+import type { DeviceName } from "../types/device-name.type.js";
+import type { DeviceDirPaths } from "../interfaces/device-dir-paths.interface.js";
+import type { ConsoleName } from "../types/console-name.type.js";
+import type { Consoles } from "../types/consoles.type.js";
 
 const build = {
   titlesFromRomsDirPath,

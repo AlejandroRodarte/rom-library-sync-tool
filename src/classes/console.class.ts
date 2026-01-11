@@ -1,14 +1,12 @@
 import path from "node:path";
-import type {
-  ConsoleDbPaths,
-  ConsoleName,
-  Rom,
-  RomSet,
-  Titles,
-} from "../types.js";
 import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
 import Title from "./title.class.js";
 import environment from "../objects/environment.object.js";
+import type { ConsoleName } from "../types/console-name.type.js";
+import type { Titles } from "../types/titles.type.js";
+import type { ConsoleDbPaths } from "../interfaces/console-db-paths.interface.js";
+import type { RomSet } from "../types/rom-set.type.js";
+import type { Rom } from "../interfaces/rom.interface.js";
 
 export type AddTitleMethodError = AppEntryExistsError;
 

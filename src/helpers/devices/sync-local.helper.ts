@@ -17,7 +17,7 @@ import fileExists from "../file-io/file-exists.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
 import type Device from "../../classes/device.class.js";
-import type { DiffAction } from "../../types.js";
+import type { DiffAction } from "../../types/diff-action.type.js";
 
 const build = {
   diffActionFromDiffLine,

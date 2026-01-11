@@ -1,4 +1,4 @@
-import type { DiffAction } from "../../types.js";
+import type { DiffAction } from "../../types/diff-action.type.js";
 
 const diffLineFromDiffAction = (diffAction: DiffAction): string => {
   switch (diffAction.type) {

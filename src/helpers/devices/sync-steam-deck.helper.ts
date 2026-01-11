@@ -14,12 +14,12 @@ import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lin
 import writeToFile from "../file-io/write-to-file.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
-import type { DiffAction } from "../../types.js";
 import type Device from "../../classes/device.class.js";
 import type {
   AllDirsExistMethodError,
   ConnectMethodError,
 } from "../../classes/sftp-client.class.js";
+import type { DiffAction } from "../../types/diff-action.type.js";
 
 const build = {
   steamDeckSftpClient,

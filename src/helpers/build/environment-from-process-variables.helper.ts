@@ -4,7 +4,7 @@ import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.j
 import ALL_LOG_LEVELS from "../../constants/all-log-levels.constant.js";
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import DEVICE_NAMES from "../../constants/device-names.constant.js";
-import type { Environment } from "../../types.js";
+import type { Environment } from "../../interfaces/environment.interface.js";
 import typeGuards from "../typescript/guards/index.js";
 import validation from "../validation/index.js";
 import isStringIpv4Address from "../validation/is-string-ipv4-address.helper.js";

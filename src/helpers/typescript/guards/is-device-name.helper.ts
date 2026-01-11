@@ -1,5 +1,5 @@
 import DEVICE_NAMES from "../../../constants/device-names.constant.js";
-import type { DeviceName } from "../../../types.js";
+import type { DeviceName } from "../../../types/device-name.type.js";
 
 const isDeviceName = (deviceName: string): deviceName is DeviceName =>
   DEVICE_NAMES.includes(deviceName as DeviceName);

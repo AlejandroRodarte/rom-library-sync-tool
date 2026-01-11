@@ -1,6 +1,5 @@
 import path from "path";
 
-import type { DeviceDirPaths } from "../../types.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import filenameIndexesToAddAndDelete from "../build/filename-indexes-to-add-and-delete.helper.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
@@ -17,6 +16,7 @@ import writeDeleteFileLineToDiffFile, {
   type WriteDeleteFileLineToDiffFileError,
 } from "./write-delete-file-line-to-diff-file.helper.js";
 import type Console from "../../classes/console.class.js";
+import type { DeviceDirPaths } from "../../interfaces/device-dir-paths.interface.js";
 
 const build = {
   filenameIndexesToAddAndDelete,

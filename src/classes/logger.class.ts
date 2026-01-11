@@ -1,5 +1,5 @@
 import { VALID_LOG_LEVELS } from "../constants/valid-log-levels.constant.js";
-import type { LogLevel } from "../types.js";
+import type { LogLevel } from "../types/log-level.type.js";
 
 class Logger {
   private _logLevel: LogLevel;

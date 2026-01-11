@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const betaVersioning: VersionSystem = {
   pattern: /^Beta +[0-9]+$/,

@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const revNumberVersioning: VersionSystem = {
   pattern: /^Rev +[0-9]+(\.[0-9]+)*$/,

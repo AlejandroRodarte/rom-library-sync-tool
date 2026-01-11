@@ -1,4 +1,5 @@
-import type { DeviceName, DevicesList } from "../../types.js";
+import type { DeviceName } from "../../types/device-name.type.js";
+import type { DevicesList } from "../../types/devices-list.type.js";
 import typeGuards from "../typescript/guards/index.js";
 
 const deviceNamesFromFilterDevicesList = (list: DevicesList): DeviceName[] => {

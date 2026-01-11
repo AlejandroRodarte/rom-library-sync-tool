@@ -1,5 +1,6 @@
 import Console from "../../classes/console.class.js";
-import type { ConsoleName, Consoles } from "../../types.js";
+import type { ConsoleName } from "../../types/console-name.type.js";
+import type { Consoles } from "../../types/consoles.type.js";
 
 const emptyConsoles = (consoleNames: ConsoleName[]): Consoles => {
   const consoles: Consoles = new Map<ConsoleName, Console>();

@@ -1,5 +1,6 @@
 import type Title from "../../classes/title.class.js";
-import type { RomIdAndVersion, VersionSystem } from "../../types.js";
+import type { RomIdAndVersion } from "../../interfaces/rom-id-and-version.interface.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const byVersionSystem = (
   title: Title,

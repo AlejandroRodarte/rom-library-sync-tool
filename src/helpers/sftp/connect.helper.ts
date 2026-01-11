@@ -1,10 +1,10 @@
 import Client from "ssh2-sftp-client";
 
-import type { SftpCredentials } from "../../types.js";
 import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
 import UnknownError from "../../classes/errors/unknown-error.class.js";
 import typeGuards from "../typescript/guards/index.js";
 import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
+import type { SftpCredentials } from "../../interfaces/sftp-credentials.interface.js";
 
 export type ConnectError =
   | SftpConnectionError

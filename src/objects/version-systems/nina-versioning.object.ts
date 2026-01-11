@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const ninaVersioning: VersionSystem = {
   pattern: /^NINA\-[0-9]+$/,

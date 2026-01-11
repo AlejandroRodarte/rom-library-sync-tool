@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const revUppercasedLetterVersioning: VersionSystem = {
   pattern: /^REV\-[a-zA-Z]$/,

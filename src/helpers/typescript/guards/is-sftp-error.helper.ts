@@ -1,4 +1,4 @@
-import type { SftpError } from "../../../types.js";
+import type { SftpError } from "../../../interfaces/sftp-error.interface.js";
 
 const isSftpError = (error: unknown): error is SftpError => {
   if (error instanceof Error) {

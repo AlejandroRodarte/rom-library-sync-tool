@@ -1,7 +1,7 @@
-import type { Titles } from "../../types.js";
 import titlesFromFilenames from "./titles-from-filenames.helper.js";
 import type { ReaddirError } from "../file-io/readdir.helper.js";
 import readdir from "../file-io/readdir.helper.js";
+import type { Titles } from "../../types/titles.type.js";
 
 const fileIO = {
   readdir,

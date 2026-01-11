@@ -1,4 +1,4 @@
-import type { DevicesListItem } from "../../../types.js";
+import type { DevicesListItem } from "../../../types/devices-list-item.type.js";
 import isDeviceName from "./is-device-name.helper.js";
 
 const isDevicesListItem = (s: string): s is DevicesListItem =>

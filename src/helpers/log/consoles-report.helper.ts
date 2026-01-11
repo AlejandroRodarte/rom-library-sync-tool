@@ -1,5 +1,5 @@
 import logger from "../../objects/logger.object.js";
-import type { Consoles } from "../../types.js";
+import type { Consoles } from "../../types/consoles.type.js";
 
 const consolesReport = (consoles: Consoles): void => {
   for (const [_, konsole] of consoles) logger.info(konsole.report);

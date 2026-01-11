@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const mbcVersioning: VersionSystem = {
   pattern: /^MBC[0-9]+$/,

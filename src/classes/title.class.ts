@@ -1,8 +1,10 @@
 import { v7 } from "uuid";
 
-import type { Rom, RomSet, SpecialFlags } from "../types.js";
 import AppNotFoundError from "./errors/app-not-found-error.class.js";
 import specialFlagsFromRoms from "../helpers/build/special-flags-from-roms.helper.js";
+import type { RomSet } from "../types/rom-set.type.js";
+import type { Rom } from "../interfaces/rom.interface.js";
+import type { SpecialFlags } from "../interfaces/special-flags.interface.js";
 
 const build = {
   specialFlagsFromRoms,

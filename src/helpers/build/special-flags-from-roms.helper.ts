@@ -5,7 +5,8 @@ import {
   SAMPLE_LABEL_SEGMENT,
   VIRTUAL_CONSOLE_LABEL_SEGMENT,
 } from "../../constants/label-segments.constants.js";
-import type { Rom, SpecialFlags } from "../../types.js";
+import type { Rom } from "../../interfaces/rom.interface.js";
+import type { SpecialFlags } from "../../interfaces/special-flags.interface.js";
 
 const UNRELEASED_LABEL_SEGMENT_LIST = [
   BETA_LABEL_SEGMENT,

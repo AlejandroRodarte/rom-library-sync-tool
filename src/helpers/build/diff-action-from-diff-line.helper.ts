@@ -1,7 +1,7 @@
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
-import type { DiffAction } from "../../types.js";
+import type { DiffAction } from "../../types/diff-action.type.js";
 
 export type DiffActionFromDiffLineError =
   | AppValidationError

@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const rDotCDotVersioning: VersionSystem = {
   pattern: /^R\.C\.#[0-9]+$/,

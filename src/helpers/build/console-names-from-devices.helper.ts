@@ -1,13 +1,12 @@
 import type Device from "../../classes/device.class.js";
-import type { ConsoleName } from "../../types.js";
+import type { ConsoleName } from "../../types/console-name.type.js";
 
 const consoleNamesFromDevices = (devices: Device[]) => {
   const consoleNames: ConsoleName[] = [];
 
   for (const device of devices)
     for (const [consoleName] of device.consoles)
-      if (!consoleNames.includes(consoleName))
-        consoleNames.push(consoleName);
+      if (!consoleNames.includes(consoleName)) consoleNames.push(consoleName);
 
   return consoleNames;
 };

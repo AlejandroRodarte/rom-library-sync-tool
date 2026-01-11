@@ -1,5 +1,4 @@
 import Client from "ssh2-sftp-client";
-import type { SftpCredentials } from "../types.js";
 import sftp from "../helpers/sftp/index.js";
 import type { AddFileError } from "../helpers/sftp/add-file.helper.js";
 import type { DeleteFileError } from "../helpers/sftp/delete-file.helper.js";
@@ -9,6 +8,7 @@ import SftpDisconnectionError from "./errors/sftp-disconnection-error.class.js";
 import type { DisconnectError } from "../helpers/sftp/disconnect.helper.js";
 import type { ExistsError } from "../helpers/sftp/exists.helper.js";
 import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
+import type { SftpCredentials } from "../interfaces/sftp-credentials.interface.js";
 
 export type ConnectMethodError = SftpConnectionError | ConnectError;
 export type DisconnectMethodError = SftpDisconnectionError | DisconnectError;

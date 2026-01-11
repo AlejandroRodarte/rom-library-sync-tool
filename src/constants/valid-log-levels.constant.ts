@@ -1,4 +1,4 @@
-import type { LogLevel } from "../types.js";
+import type { LogLevel } from "../types/log-level.type.js";
 import ALL_LOG_LEVELS from "./all-log-levels.constant.js";
 
 type ValidLogLevels = Omit<

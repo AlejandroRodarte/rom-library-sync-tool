@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const dateVersioning: VersionSystem = {
   pattern: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,

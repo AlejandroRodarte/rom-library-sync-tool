@@ -1,6 +1,7 @@
-import type { Titles, Rom } from "../../types.js";
 import labelsAndLanguagesFromFilename from "./labels-and-languages-from-filename.helper.js";
 import Title from "../../classes/title.class.js";
+import type { Titles } from "../../types/titles.type.js";
+import type { Rom } from "../../interfaces/rom.interface.js";
 
 const titlesFromFilenames = (filenames: string[]): Titles => {
   const titles = new Map<string, Title>();

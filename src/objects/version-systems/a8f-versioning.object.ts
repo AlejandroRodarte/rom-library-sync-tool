@@ -1,4 +1,4 @@
-import type { VersionSystem } from "../../types.js";
+import type { VersionSystem } from "../../interfaces/version-system.interface.js";
 
 const a8fVersioning: VersionSystem = {
   pattern: /^A8F[A-Z]$/,
