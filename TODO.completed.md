@@ -14,3 +14,5 @@
     - For the local device, we would simulate the creation and deletion of symlinks by just logging what would happen.
     - For the steam-deck device, we would simulate the transfer of new files and remote deletion by just logging what would happen. For this to work, we would still need the steam deck to be connected.
 - [x] Write helper for `fs.readdir`.
+- [x] Instead of "skipping" consoles, make sure that all console dirs are available.
+- [x] Finish implementation of `devices.syncLocal()`.
