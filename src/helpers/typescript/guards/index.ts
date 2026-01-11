@@ -5,6 +5,7 @@ import isErrnoException from "./is-errno-exception.helper.js";
 import isSftpError from "./is-sftp-error.helper.js";
 import isDevicesListItem from "./is-devices-list-item.helper.js";
 import isDevicesList from "./is-devices-list.helper.js";
+import isLogLevel from "./is-log-level.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -14,6 +15,7 @@ const typeGuards = {
   isConsoleList,
   isDevicesListItem,
   isDevicesList,
+  isLogLevel,
 };
 
 export default typeGuards;

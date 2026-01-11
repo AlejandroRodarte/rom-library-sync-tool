@@ -1,15 +1,22 @@
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
+import ALL_LOG_LEVELS from "../../constants/all-log-levels.constant.js";
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import DEVICE_NAMES from "../../constants/device-names.constant.js";
-import type { DeviceName, Environment } from "../../types.js";
+import type { Environment } from "../../types.js";
 import typeGuards from "../typescript/guards/index.js";
 import validation from "../validation/index.js";
 import isStringIpv4Address from "../validation/is-string-ipv4-address.helper.js";
 import build from "./index.js";
 
 const environmentFromProcessVariables = (): Environment => {
+  const logLevel = (process.env.LOG_LEVEL || "info").toUpperCase();
+  if (!typeGuards.isLogLevel(logLevel))
+    throw new AppValidationError(
+      `${logLevel} is not a valid log level. Please choose one from the following and assign it to the LOG_LEVEL environment variable: ${ALL_LOG_LEVELS.join(", ")}.`,
+    );
+
   const rawSimulateSync = process.env.SIMULATE_SYNC || "";
   if (!validation.isStringZeroOrOne(rawSimulateSync))
     throw new AppValidationError(`SIMULATE_SYNC must be either a 0 or a 1.`);
@@ -123,6 +130,9 @@ const environmentFromProcessVariables = (): Environment => {
       },
       filter: {
         devices: filterDeviceNames,
+      },
+      log: {
+        level: logLevel,
       },
     },
     paths: {

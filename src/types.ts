@@ -1,5 +1,6 @@
 import type Console from "./classes/console.class.js";
 import type Title from "./classes/title.class.js";
+import type ALL_LOG_LEVELS from "./constants/all-log-levels.constant.js";
 import type CONSOLE_NAMES from "./constants/console-names.constant.js";
 import type DEVICE_NAMES from "./constants/device-names.constant.js";
 
@@ -46,6 +47,9 @@ export interface Environment {
     sync: {
       simulate: boolean;
       devices: DeviceName[];
+    };
+    log: {
+      level: LogLevel;
     };
   };
   paths: {
@@ -151,3 +155,5 @@ export interface ConsoleDbPaths {
   media: string;
   gamelists: string;
 }
+
+export type LogLevel = (typeof ALL_LOG_LEVELS)[number];
