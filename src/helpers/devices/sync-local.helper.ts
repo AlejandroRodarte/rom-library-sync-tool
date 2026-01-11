@@ -6,6 +6,7 @@ import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.j
 import ENVIRONMENT from "../../constants/environment.constant.js";
 import type { DiffAction } from "../../types.js";
 import build from "../build/index.js";
+import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 
 const syncLocal = async (device: Device) => {
   if (device.name !== "local")
@@ -23,20 +24,27 @@ const syncLocal = async (device: Device) => {
       );
   }
 
-  for (const [name, konsole] of device.consoles) {
-    const localRomsDirPath = path.join(
-      ENVIRONMENT.devices.local.paths.roms,
-      name,
+  const localDirPaths = [ENVIRONMENT.devices.local.paths.roms];
+  for (const [consoleName] of device.consoles)
+    localDirPaths.push(
+      path.join(ENVIRONMENT.devices.local.paths.roms, consoleName),
     );
-    const localRomsDirPathExistsError =
-      await fileIO.dirExists(localRomsDirPath);
-    if (localRomsDirPathExistsError) {
-      console.log(
-        `Errors: ${localRomsDirPathExistsError.reasons}. Skipping this console.`,
-      );
-      konsole.skipped = true;
-      continue;
-    }
+
+  const [allLocalDirsExist, allDirsExistError] =
+    await fileIO.allDirsExistAndAreReadableAndWritable(localDirPaths);
+  if (allDirsExistError) {
+    allDirsExistError.addReason(
+      `Something went wrong while validating all local device directories.`,
+    );
+    return allDirsExistError;
+  }
+  if (!allLocalDirsExist)
+    return new FsNotFoundError(
+      `Not all of the following directories exist and are read/write:\n${localDirPaths.join("\n")}. Please verify they do before syncing this device.`,
+    );
+
+  for (const [name, konsole] of device.consoles) {
+    const localRomsDirPath = path.join(ENVIRONMENT.devices.local.paths.roms);
 
     const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
 
@@ -92,11 +100,44 @@ const syncLocal = async (device: Device) => {
       );
 
     for (const diffAction of diffActions) {
+      const dbRomFilePath = path.join(
+        konsole.dbPaths.roms,
+        diffAction.data.filename,
+      );
+
+      const localRomSymlinkPath = path.join(
+        localRomsDirPath,
+        diffAction.data.filename,
+      );
+
       switch (diffAction.type) {
         case "add-file": {
+          const addSymlinkError = await fileIO.createFileSymlink(
+            dbRomFilePath,
+            localRomSymlinkPath,
+            "KEEP",
+          );
+
+          if (addSymlinkError) {
+            console.log(
+              `Something went wrong adding symlink ${localRomSymlinkPath} for file ${dbRomFilePath}. Error messages: ${addSymlinkError.reasons}. Adding this operation to the failed file.`,
+            );
+            failedDiffActions.push(diffAction);
+          }
           break;
         }
         case "remove-file": {
+          const removeSymlinkError = await fileIO.deleteFileSymlink(
+            localRomSymlinkPath,
+            false,
+          );
+
+          if (removeSymlinkError) {
+            console.log(
+              `Something went wrong deleting symlink ${localRomSymlinkPath}. Error messages: ${removeSymlinkError.reasons}. Adding this operation to the failed file.`,
+            );
+            failedDiffActions.push(diffAction);
+          }
           break;
         }
       }
