@@ -136,18 +136,18 @@ const syncSteamDeck = async (
       );
 
     for (const diffAction of diffActions) {
+      const dbRomFilePath = path.join(
+        konsole.dbPaths.roms,
+        diffAction.data.filename,
+      );
+
+      const remoteRomFilePath = path.join(
+        remoteRomsDirPath,
+        diffAction.data.filename,
+      );
+
       switch (diffAction.type) {
         case "add-file": {
-          const dbRomFilePath = path.join(
-            konsole.dbPaths.roms,
-            diffAction.data.filename,
-          );
-
-          const remoteRomFilePath = path.join(
-            remoteRomsDirPath,
-            diffAction.data.filename,
-          );
-
           const steamDeckAddFileError = await steamDeck.addFile(
             dbRomFilePath,
             remoteRomFilePath,
@@ -160,24 +160,22 @@ const syncSteamDeck = async (
             );
             failedDiffActions.push(diffAction);
           }
+
           break;
         }
         case "remove-file": {
-          const remoteRomFilePath = path.join(
-            remoteRomsDirPath,
-            diffAction.data.filename,
-          );
-
           const steamDeckRemoveFileError = await steamDeck.deleteFile(
             remoteRomFilePath,
             false,
           );
+
           if (steamDeckRemoveFileError) {
             console.log(
               `Something went wrong while removing file ${diffAction.data.filename} at ${remoteRomFilePath}. Error messages: ${steamDeckRemoveFileError.reasons}. Adding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
+
           break;
         }
       }
