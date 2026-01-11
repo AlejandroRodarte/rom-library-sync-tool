@@ -14,6 +14,9 @@ import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lin
 import writeToFile from "../file-io/write-to-file.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
+import anyFileExists, {
+  type AnyFileExistsError,
+} from "../file-io/any-file-exists.helper.js";
 import type Device from "../../classes/device.class.js";
 import type {
   AllDirsExistMethodError,
@@ -34,6 +37,7 @@ const fileIO = {
   writeToFile,
   fileIsEmpty,
   deleteFile,
+  anyFileExists,
 };
 
 export type SyncSteamDeckError =
@@ -41,7 +45,8 @@ export type SyncSteamDeckError =
   | FsFileExistsError
   | ConnectMethodError
   | AllDirsExistMethodError
-  | SftpNotFoundError;
+  | SftpNotFoundError
+  | AnyFileExistsError;
 
 const syncSteamDeck = async (
   device: Device,
@@ -51,15 +56,17 @@ const syncSteamDeck = async (
       `This functions expects a steam-deck device, NOT a ${device.name} device.`,
     );
 
-  for (const [name, _] of device.consoles) {
-    const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
-    const failedFileExistsError = await fileIO.fileExists(failedFilePath);
-
-    if (!failedFileExistsError)
-      return new FsFileExistsError(
-        `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
-      );
-  }
+  const failedFilePaths = device.consoles
+    .keys()
+    .map((cn) => path.join(device.paths.failed, `${cn}.failed.txt`))
+    .toArray();
+  const [anyFailedFileExists, anyFileExistsError] =
+    await fileIO.anyFileExists(failedFilePaths);
+  if (anyFileExistsError) return anyFileExistsError;
+  if (!anyFailedFileExists)
+    return new FsFileExistsError(
+      `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
+    );
 
   const [steamDeck, sftpClientError] = await build.steamDeckSftpClient();
   if (sftpClientError) {
