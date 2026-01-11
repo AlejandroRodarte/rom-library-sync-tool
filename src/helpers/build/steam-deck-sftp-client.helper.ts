@@ -1,7 +1,7 @@
 import SftpClient, {
   type ConnectMethodError,
 } from "../../classes/sftp-client.class.js";
-import ENVIRONMENT from "../../constants/environment.constant.js";
+import environment from "../../objects/environment.object.js";
 
 export type SteamDeckSftpClientError = ConnectMethodError;
 
@@ -11,7 +11,7 @@ const steamDeckSftpClient = async (): Promise<
   const sftpClient = new SftpClient("steam-deck");
 
   const connectError = await sftpClient.connect(
-    ENVIRONMENT.devices["steam-deck"].sftp.credentials,
+    environment.devices["steam-deck"].sftp.credentials,
   );
   if (connectError) return [undefined, connectError];
 

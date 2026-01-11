@@ -8,7 +8,8 @@ import type { Environment } from "../../types.js";
 import typeGuards from "../typescript/guards/index.js";
 import validation from "../validation/index.js";
 import isStringIpv4Address from "../validation/is-string-ipv4-address.helper.js";
-import build from "./index.js";
+import deviceNamesFromFilterDevicesList from "./device-names-from-filter-devices-list.helper.js";
+import deviceNamesFromSyncDevicesList from "./device-names-from-sync-devices-list.helper.js";
 
 const environmentFromProcessVariables = (): Environment => {
   const logLevel = (process.env.LOG_LEVEL || "info").toUpperCase();
@@ -28,8 +29,7 @@ const environmentFromProcessVariables = (): Environment => {
     throw new AppValidationError(
       `${filterDevicesList} is not a valid list of devices. Please provide FILTER_DEVICES_LIST with a comma-separated list of valid devices. Valid devices are: ${DEVICE_NAMES.join(", ")}. For convenience, use "none" and "all" to choose either no or all devices.`,
     );
-  const filterDeviceNames =
-    build.deviceNamesFromFilterDevicesList(filterDevicesList);
+  const filterDeviceNames = deviceNamesFromFilterDevicesList(filterDevicesList);
 
   const rawSyncDevicesList = process.env.SYNC_DEVICES_LIST || "";
   const syncDevicesList = [...new Set(rawSyncDevicesList.split(","))];
@@ -37,7 +37,7 @@ const environmentFromProcessVariables = (): Environment => {
     throw new AppValidationError(
       `${filterDevicesList} is not a valid list of devices. Please provide SYNC_DEVICES_LIST with a comma-separated list of valid devices. Valid devices are: ${DEVICE_NAMES.join(", ")}. For convenience, use "none" and "all" to choose either no or all devices.`,
     );
-  const syncDeviceNames = build.deviceNamesFromSyncDevicesList(
+  const syncDeviceNames = deviceNamesFromSyncDevicesList(
     syncDevicesList,
     filterDeviceNames,
   );

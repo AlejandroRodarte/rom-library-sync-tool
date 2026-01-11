@@ -5,13 +5,13 @@ import build from "../build/index.js";
 import type Device from "../../classes/device.class.js";
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
-import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
-import ENVIRONMENT from "../../constants/environment.constant.js";
 import type {
   AllDirsExistMethodError,
   ConnectMethodError,
 } from "../../classes/sftp-client.class.js";
+import logger from "../../objects/logger.object.js";
+import environment from "../../objects/environment.object.js";
 
 export type SyncSteamDeckError =
   | AppWrongTypeError
@@ -47,13 +47,13 @@ const syncSteamDeck = async (
   }
 
   const remoteDirPaths = [
-    ENVIRONMENT.devices["steam-deck"].paths.roms,
-    ENVIRONMENT.devices["steam-deck"].paths.media,
-    ENVIRONMENT.devices["steam-deck"].paths.gamelists,
+    environment.devices["steam-deck"].paths.roms,
+    environment.devices["steam-deck"].paths.media,
+    environment.devices["steam-deck"].paths.gamelists,
   ];
   for (const [consoleName] of device.consoles)
     remoteDirPaths.push(
-      path.join(ENVIRONMENT.devices["steam-deck"].paths.roms, consoleName),
+      path.join(environment.devices["steam-deck"].paths.roms, consoleName),
     );
   const [allRemoteDirsExist, allDirsExistError] =
     await steamDeck.allDirsExist(remoteDirPaths);
@@ -70,7 +70,7 @@ const syncSteamDeck = async (
 
   for (const [consoleName, konsole] of device.consoles) {
     const remoteRomsDirPath = path.join(
-      ENVIRONMENT.devices["steam-deck"].paths.roms,
+      environment.devices["steam-deck"].paths.roms,
       consoleName,
     );
 
@@ -83,9 +83,7 @@ const syncSteamDeck = async (
       await fileIO.openNewWriteOnlyFile(failedFilePath);
 
     if (failedFileOpenError) {
-      console.log(
-        `Error messages: ${failedFileOpenError.reasons}. Skipping this console.`,
-      );
+      logger.warn(`${failedFileOpenError.toString()}\nSkipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -100,9 +98,7 @@ const syncSteamDeck = async (
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(
-        `Error messages: ${diffFileError.reasons}. Skipping this console.`,
-      );
+      logger.warn(`${diffFileError.toString()}\nSkipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -115,8 +111,8 @@ const syncSteamDeck = async (
         build.diffActionFromDiffLine(diffLine);
 
       if (diffActionBuildError) {
-        console.log(
-          `Error: ${diffActionBuildError.reasons}. Adding diff line to failed file.`,
+        logger.warn(
+          `${diffActionBuildError.toString()}\nAdding diff line to failed file.`,
         );
         failedDiffLines += `${diffLine}\n`;
         continue;
@@ -131,7 +127,7 @@ const syncSteamDeck = async (
       "utf8",
     );
     if (failedFileWriteError)
-      console.log(
+      logger.error(
         `Console: ${konsole.name}. Failed to write failed diff lines to file. Will output content to standard output. Make sure to copy it elsewhere.\n${failedDiffLines}`,
       );
 
@@ -155,8 +151,8 @@ const syncSteamDeck = async (
           );
 
           if (steamDeckAddFileError) {
-            console.log(
-              `Something went wrong while transferring the file from ${dbRomFilePath} to ${remoteRomFilePath}. Error messages: ${steamDeckAddFileError.reasons}. Adding this diff action to the failed file.`,
+            logger.warn(
+              `Something went wrong while transferring the file from ${dbRomFilePath} to ${remoteRomFilePath}.\n${steamDeckAddFileError.toString()}\nAdding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -170,8 +166,8 @@ const syncSteamDeck = async (
           );
 
           if (steamDeckRemoveFileError) {
-            console.log(
-              `Something went wrong while removing file ${diffAction.data.filename} at ${remoteRomFilePath}. Error messages: ${steamDeckRemoveFileError.reasons}. Adding this diff action to the failed file.`,
+            logger.warn(
+              `Something went wrong while removing file ${diffAction.data.filename} at ${remoteRomFilePath}.\n${steamDeckRemoveFileError.toString()}.\nAdding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -194,7 +190,7 @@ const syncSteamDeck = async (
       "utf8",
     );
     if (secondFailedFileWriteError)
-      console.log(
+      logger.error(
         `Console: ${konsole.name}. Failed to write failed diff lines to file. Will output content to standard output. Make sure to copy it elsewhere.\n${failedDiffLines}`,
       );
 
@@ -204,8 +200,8 @@ const syncSteamDeck = async (
       await fileIO.fileIsEmpty(failedFilePath);
 
     if (failedFileAccessError) {
-      console.log(
-        `Unable to access failed file. Error messages: ${failedFileAccessError.reasons}.`,
+      logger.warn(
+        `Unable to access failed file.\n${failedFileAccessError.toString()}`,
       );
       continue;
     }
@@ -216,16 +212,16 @@ const syncSteamDeck = async (
         true,
       );
       if (failedFileDeleteError)
-        console.log(
-          `Was not able to delete failed file. Error messages: ${failedFileDeleteError.reasons}.`,
+        logger.error(
+          `Was not able to delete failed file.\n${failedFileDeleteError.toString()}`,
         );
     }
   }
 
   const disconnectError = await steamDeck.disconnect();
   if (disconnectError)
-    console.log(
-      `Error while disconnecting from the Steam Deck. Error messages: ${disconnectError.reasons}.`,
+    logger.error(
+      `Error while disconnecting from the Steam Deck.\n${disconnectError.toString()}\n`,
     );
 };
 

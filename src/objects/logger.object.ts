@@ -1,6 +1,6 @@
+import environment from "./environment.object.js";
 import Logger from "../classes/logger.class.js";
-import ENVIRONMENT from "../constants/environment.constant.js";
 
-const logger = new Logger(ENVIRONMENT.options.log.level);
+const logger = new Logger(environment.options.log.level);
 
 export default logger;

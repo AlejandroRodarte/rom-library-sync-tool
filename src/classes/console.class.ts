@@ -8,7 +8,7 @@ import type {
 } from "../types.js";
 import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
 import Title from "./title.class.js";
-import ENVIRONMENT from "../constants/environment.constant.js";
+import environment from "../objects/environment.object.js";
 
 export type AddTitleMethodError = AppEntryExistsError;
 
@@ -28,9 +28,9 @@ class Console {
     this._titles = new Map<string, Title>();
 
     this._dbPaths = {
-      roms: path.join(ENVIRONMENT.paths.dbs.roms, this._name),
-      media: path.join(ENVIRONMENT.paths.dbs.media, this._name),
-      gamelists: path.join(ENVIRONMENT.paths.dbs.gamelists, this._name),
+      roms: path.join(environment.paths.dbs.roms, this._name),
+      media: path.join(environment.paths.dbs.media, this._name),
+      gamelists: path.join(environment.paths.dbs.gamelists, this._name),
     };
 
     this._selectedTitles = new Map<number, Titles>();

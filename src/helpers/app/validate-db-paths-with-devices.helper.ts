@@ -1,11 +1,11 @@
 import path from "path";
-import ENVIRONMENT from "../../constants/environment.constant.js";
 import build from "../build/index.js";
 import fileIO from "../file-io/index.js";
 import type Device from "../../classes/device.class.js";
 import type { AllDirsExistAndAreReadableAndWritableError } from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
 import type { AllDirsExistAndAreReadableError } from "../file-io/all-dirs-exist-and-are-readable.helper.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
+import environment from "../../objects/environment.object.js";
 
 export type ValidateDbPathsWithDevicesError =
   | AllDirsExistAndAreReadableError
@@ -16,16 +16,16 @@ const validateDbPathsWithDevices = async (
   devices: Device[],
 ): Promise<ValidateDbPathsWithDevicesError | undefined> => {
   const readableDirPaths: string[] = [
-    ENVIRONMENT.paths.dbs.roms,
-    ENVIRONMENT.paths.dbs.media,
-    ENVIRONMENT.paths.dbs.gamelists,
+    environment.paths.dbs.roms,
+    environment.paths.dbs.media,
+    environment.paths.dbs.gamelists,
   ];
 
   for (const consoleName of build.consoleNamesFromDevices(devices))
     readableDirPaths.push(
-      path.join(ENVIRONMENT.paths.dbs.roms, consoleName),
-      path.join(ENVIRONMENT.paths.dbs.media, consoleName),
-      path.join(ENVIRONMENT.paths.dbs.gamelists, consoleName),
+      path.join(environment.paths.dbs.roms, consoleName),
+      path.join(environment.paths.dbs.media, consoleName),
+      path.join(environment.paths.dbs.gamelists, consoleName),
     );
 
   const [areAllDirPathsReadable, readableDirPathsError] =

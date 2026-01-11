@@ -3,10 +3,11 @@ import type Device from "../../classes/device.class.js";
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import fileIO from "../file-io/index.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
-import ENVIRONMENT from "../../constants/environment.constant.js";
 import type { DiffAction } from "../../types.js";
 import build from "../build/index.js";
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import logger from "../../objects/logger.object.js";
+import environment from "../../objects/environment.object.js";
 
 const syncLocal = async (device: Device) => {
   if (device.name !== "local")
@@ -24,10 +25,10 @@ const syncLocal = async (device: Device) => {
       );
   }
 
-  const localDirPaths = [ENVIRONMENT.devices.local.paths.roms];
+  const localDirPaths = [environment.devices.local.paths.roms];
   for (const [consoleName] of device.consoles)
     localDirPaths.push(
-      path.join(ENVIRONMENT.devices.local.paths.roms, consoleName),
+      path.join(environment.devices.local.paths.roms, consoleName),
     );
 
   const [allLocalDirsExist, allDirsExistError] =
@@ -44,7 +45,7 @@ const syncLocal = async (device: Device) => {
     );
 
   for (const [name, konsole] of device.consoles) {
-    const localRomsDirPath = path.join(ENVIRONMENT.devices.local.paths.roms);
+    const localRomsDirPath = path.join(environment.devices.local.paths.roms);
 
     const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
 
@@ -52,9 +53,7 @@ const syncLocal = async (device: Device) => {
       await fileIO.openNewWriteOnlyFile(failedFilePath);
 
     if (failedFileOpenError) {
-      console.log(
-        `Errors: ${failedFileOpenError.reasons}. Skipping this console.`,
-      );
+      logger.warn(`${failedFileOpenError.toString()}\nSkipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -66,7 +65,7 @@ const syncLocal = async (device: Device) => {
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(`Errors: ${diffFileError.reasons}. Skipping this console.`);
+      logger.warn(`${diffFileError.toString()}\nSkipping this console.`);
       konsole.skipped = true;
       continue;
     }
@@ -79,8 +78,8 @@ const syncLocal = async (device: Device) => {
         build.diffActionFromDiffLine(diffLine);
 
       if (diffActionBuildError) {
-        console.log(
-          `Errors: ${diffActionBuildError.reasons}. Adding diff line to failed file.`,
+        logger.warn(
+          `${diffActionBuildError.toString()}\nAdding diff line to failed file.`,
         );
         failedDiffLines += `${diffLine}\n`;
         continue;
@@ -95,7 +94,7 @@ const syncLocal = async (device: Device) => {
       "utf8",
     );
     if (failedFileWriteError)
-      console.log(
+      logger.error(
         `Console: ${konsole.name}. Failed to write failed diff lines to file. Will output content to standard output. Make sure to copy it elsewhere.\n${failedDiffLines}`,
       );
 
@@ -119,8 +118,8 @@ const syncLocal = async (device: Device) => {
           );
 
           if (addSymlinkError) {
-            console.log(
-              `Something went wrong adding symlink ${localRomSymlinkPath} for file ${dbRomFilePath}. Error messages: ${addSymlinkError.reasons}. Adding this operation to the failed file.`,
+            logger.warn(
+              `Something went wrong adding symlink ${localRomSymlinkPath} for file ${dbRomFilePath}.\n${addSymlinkError.toString()}\n.Adding this operation to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -133,8 +132,8 @@ const syncLocal = async (device: Device) => {
           );
 
           if (removeSymlinkError) {
-            console.log(
-              `Something went wrong deleting symlink ${localRomSymlinkPath}. Error messages: ${removeSymlinkError.reasons}. Adding this operation to the failed file.`,
+            logger.warn(
+              `Something went wrong deleting symlink ${localRomSymlinkPath}.\n${removeSymlinkError.toString()}\nAdding this operation to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
@@ -156,7 +155,7 @@ const syncLocal = async (device: Device) => {
       "utf8",
     );
     if (secondFailedFileWriteError)
-      console.log(
+      logger.error(
         `Console: ${konsole.name}. Failed to write failed diff lines to file. Will output content to standard output. Make sure to copy it elsewhere.\n${failedDiffLines}`,
       );
 
@@ -166,8 +165,8 @@ const syncLocal = async (device: Device) => {
       await fileIO.fileIsEmpty(failedFilePath);
 
     if (failedFileAccessError) {
-      console.log(
-        `Unable to access failed file. Error messages: ${failedFileAccessError.reasons}.`,
+      logger.error(
+        `Unable to access failed file.\n${failedFileAccessError.toString()}`,
       );
       continue;
     }
@@ -178,8 +177,8 @@ const syncLocal = async (device: Device) => {
         true,
       );
       if (failedFileDeleteError)
-        console.log(
-          `Was not able to delete failed file. Error messages: ${failedFileDeleteError.reasons}.`,
+        logger.error(
+          `Was not able to delete failed file.\n${failedFileDeleteError.toString()}`,
         );
     }
   }

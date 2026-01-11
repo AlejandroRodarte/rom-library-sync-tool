@@ -11,8 +11,9 @@ import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
 import Console from "./console.class.js";
 import type { AllDirsExistAndAreReadableAndWritableError } from "../helpers/file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
 import build from "../helpers/build/index.js";
-import ENVIRONMENT from "../constants/environment.constant.js";
 import devices from "../helpers/devices/index.js";
+import logger from "../objects/logger.object.js";
+import environment from "../objects/environment.object.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type AllPathsAreValidMethodError =
@@ -91,8 +92,8 @@ class Device {
       );
 
       if (buildTitlesError) {
-        console.log(
-          `Error while reading database ROM directory for console ${consoleName}. Error messages: ${buildTitlesError.reasons}. Will skip this console. This means that NOTHING after this step will get processed.`,
+        logger.warn(
+          `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
         );
         konsole.skipped = true;
         continue;
@@ -114,11 +115,11 @@ class Device {
   public async sync() {
     switch (this._name) {
       case "local":
-        if (!ENVIRONMENT.devices.local.sync) break;
+        if (!environment.devices.local.sync) break;
         await devices.syncLocal(this);
         break;
       case "steam-deck":
-        if (!ENVIRONMENT.devices["steam-deck"].sync) break;
+        if (!environment.devices["steam-deck"].sync) break;
         await devices.syncSteamDeck(this);
         break;
     }

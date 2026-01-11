@@ -1,19 +1,22 @@
-import ENVIRONMENT from "./constants/environment.constant.js";
+import environment from "./objects/environment.object.js";
+import logger from "./objects/logger.object.js";
+
+import Device from "./classes/device.class.js";
+
 import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
-import Device from "./classes/device.class.js";
 import unselect from "./helpers/unselect/index.js";
 import app from "./helpers/app/index.js";
 
 const main = async () => {
-  const devices = ENVIRONMENT.options.filter.devices.map(
+  const devices = environment.options.filter.devices.map(
     (deviceName) =>
-      new Device(deviceName, ENVIRONMENT.devices[deviceName].consoles),
+      new Device(deviceName, environment.devices[deviceName].consoles),
   );
 
   const validateDbPathsError = await app.validateDbPathsWithDevices(devices);
   if (validateDbPathsError) {
-    console.log(`${validateDbPathsError.reasons}. Terminating.`);
+    logger.error(`${validateDbPathsError.toString()}\nTerminating.`);
     return;
   }
 
@@ -34,9 +37,9 @@ const main = async () => {
     device.updateConsolesMetadata();
 
     const duplicatesFileError = await fileIO.writeDuplicateRomsFile(device);
-    if (duplicatesFileError) console.log(duplicatesFileError.reasons);
+    if (duplicatesFileError) logger.error(duplicatesFileError.toString());
     const scrappedFileError = await fileIO.writeScrappedRomsFile(device);
-    if (scrappedFileError) console.log(scrappedFileError.reasons);
+    if (scrappedFileError) logger.error(scrappedFileError.toString());
 
     for (const [_, konsole] of device.consoles)
       await fileIO.writeConsoleDiffFile(konsole, device.paths);

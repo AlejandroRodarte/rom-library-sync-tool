@@ -1,7 +1,8 @@
+import logger from "../../objects/logger.object.js";
 import type { Consoles } from "../../types.js";
 
 const consolesReport = (consoles: Consoles): void => {
-  for (const [_, konsole] of consoles) console.log(konsole.report);
+  for (const [_, konsole] of consoles) logger.info(konsole.report);
 
   const romsSelectedTotals = new Map<number, number>();
 
@@ -15,9 +16,9 @@ const consolesReport = (consoles: Consoles): void => {
     }
   }
 
-  console.log(`***** All-Consoles Report *****`);
+  logger.info(`***** All-Consoles Report *****`);
   for (const [romsSelected, total] of romsSelectedTotals)
-    console.log(`Titles with ${romsSelected} selections: ${total}.`);
+    logger.info(`Titles with ${romsSelected} selections: ${total}.`);
 };
 
 export default consolesReport;
