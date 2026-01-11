@@ -39,31 +39,36 @@ const syncSteamDeck = async (
       `An error happened while connecting to the Steam Deck via SFTP.\nOriginal error message: ${sftpClientError.message}.`,
     );
 
-  const remoteRomsDirExistsError = await steamDeck.dirExists(
+  const remoteDirPaths = [
     ENVIRONMENT.devices["steam-deck"].paths.roms,
-  );
-  if (remoteRomsDirExistsError)
+    ENVIRONMENT.devices["steam-deck"].paths.media,
+    ENVIRONMENT.devices["steam-deck"].paths.gamelists,
+  ];
+  for (const [consoleName] of device.consoles)
+    remoteDirPaths.push(
+      path.join(ENVIRONMENT.devices["steam-deck"].paths.roms, consoleName),
+    );
+  const [allRemoteDirsExist, allDirsExistError] =
+    await steamDeck.allDirsExist(remoteDirPaths);
+  if (allDirsExistError)
+    return new SftpConnectionError(
+      `An error happened while veryfing all remote directories. Original error message: ${allDirsExistError.message}.`,
+    );
+  if (!allRemoteDirsExist)
     return new SftpNotFoundError(
-      `An error happened while verifying if the Steam Deck ROMs directory exists.\nOriginal error message: ${remoteRomsDirExistsError.message}.`,
+      `Not all of the following directories exist:\n${remoteDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,
     );
 
-  for (const [name, konsole] of device.consoles) {
+  for (const [consoleName, konsole] of device.consoles) {
     const remoteRomsDirPath = path.join(
       ENVIRONMENT.devices["steam-deck"].paths.roms,
-      name,
+      consoleName,
     );
 
-    const remoteRomsDirPathExistsError =
-      await steamDeck.dirExists(remoteRomsDirPath);
-    if (remoteRomsDirPathExistsError) {
-      console.log(
-        `Error: ${remoteRomsDirPathExistsError.reason}. Skipping this console.`,
-      );
-      konsole.skipped = true;
-      continue;
-    }
-
-    const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
+    const failedFilePath = path.join(
+      device.paths.failed,
+      `${consoleName}.failed.txt`,
+    );
 
     const [failedFileHandle, failedFileOpenError] =
       await fileIO.openNewWriteOnlyFile(failedFilePath);
@@ -76,7 +81,10 @@ const syncSteamDeck = async (
       continue;
     }
 
-    const diffFilePath = path.join(device.paths.diffs, `${name}.diff.txt`);
+    const diffFilePath = path.join(
+      device.paths.diffs,
+      `${consoleName}.diff.txt`,
+    );
 
     const [diffLines, diffFileError] =
       await fileIO.fileExistsAndReadUtf8Lines(diffFilePath);
