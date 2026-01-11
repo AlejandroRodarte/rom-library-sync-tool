@@ -1,6 +1,6 @@
+import DEVICE_NAMES from "../../constants/device-names.constant.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import type { DevicesList } from "../../types/devices-list.type.js";
-import typeGuards from "../typescript/guards/index.js";
 
 const deviceNamesFromFilterDevicesList = (list: DevicesList): DeviceName[] => {
   const filterDeviceNames: DeviceName[] = [];
@@ -10,8 +10,7 @@ const deviceNamesFromFilterDevicesList = (list: DevicesList): DeviceName[] => {
       break;
     } else if (deviceItem === "all") {
       filterDeviceNames.length = 0;
-      list
-        .filter((d) => typeGuards.isDeviceName(d))
+      DEVICE_NAMES
         .forEach((d) => filterDeviceNames.push(d));
       break;
     } else filterDeviceNames.push(deviceItem);
