@@ -100,7 +100,9 @@ const syncSteamDeck = async (
     let failedDiffLines = "";
 
     if (diffFileError) {
-      console.log(`Error messages: ${diffFileError.reasons}. Skipping this console.`);
+      console.log(
+        `Error messages: ${diffFileError.reasons}. Skipping this console.`,
+      );
       konsole.skipped = true;
       continue;
     }
