@@ -8,6 +8,7 @@ import type { ConnectError } from "../helpers/sftp/connect.helper.js";
 import SftpDisconnectionError from "./errors/sftp-disconnection-error.class.js";
 import type { DisconnectError } from "../helpers/sftp/disconnect.helper.js";
 import type { ExistsError } from "../helpers/sftp/exists.helper.js";
+import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
 
 export type ConnectMethodError = SftpConnectionError | ConnectError;
 export type DisconnectMethodError = SftpDisconnectionError | DisconnectError;
@@ -15,6 +16,7 @@ export type AddFileMethodError = AddFileError;
 export type DeleteFileMethodError = DeleteFileError;
 export type FileExistsMethodError = ExistsError;
 export type DirExistsMethodError = ExistsError;
+export type AllDirsExistMethodError = ExistsError;
 
 class SftpClient {
   private _client: Client;
@@ -62,6 +64,25 @@ class SftpClient {
   ): Promise<DirExistsMethodError | undefined> {
     const existsError = await sftp.exists(this._client, dirPath, "dir");
     if (existsError) return existsError;
+  }
+
+  public async allDirsExist(
+    dirPaths: string[],
+  ): Promise<[boolean, undefined] | [undefined, AllDirsExistMethodError]> {
+    let allDirsExist = true;
+
+    for (const dirPath of dirPaths) {
+      const existsError = await this.dirExists(dirPath);
+
+      if (existsError) {
+        if (existsError instanceof SftpNotFoundError) {
+          allDirsExist = false;
+          break;
+        } else return [undefined, existsError];
+      }
+    }
+
+    return [allDirsExist, undefined];
   }
 
   public async addFile(
