@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/node": "^25.0.1",
     "@types/ssh2-sftp-client": "^9.0.6",
+    "madge": "^8.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
