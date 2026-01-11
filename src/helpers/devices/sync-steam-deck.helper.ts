@@ -56,12 +56,9 @@ const syncSteamDeck = async (
       `This functions expects a steam-deck device, NOT a ${device.name} device.`,
     );
 
-  const failedFilePaths = device.consoles
-    .keys()
-    .map((cn) => path.join(device.paths.failed, `${cn}.failed.txt`))
-    .toArray();
-  const [anyFailedFileExists, anyFileExistsError] =
-    await fileIO.anyFileExists(failedFilePaths);
+  const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
+    device.consolesFailedFilePaths,
+  );
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
     return new FsFileExistsError(
