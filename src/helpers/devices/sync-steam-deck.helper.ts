@@ -143,42 +143,23 @@ const syncSteamDeck = async (
             diffAction.data.filename,
           );
 
-          const dbRomFileExistsError = await fileIO.fileExists(dbRomFilePath);
-          if (dbRomFileExistsError) {
-            console.log(
-              `Error: ${dbRomFileExistsError.reasons}. Adding diff action to failed file.`,
-            );
-            failedDiffActions.push(diffAction);
-            break;
-          }
-
           const remoteRomFilePath = path.join(
             remoteRomsDirPath,
             diffAction.data.filename,
           );
-
-          const remoteRomFileExistsError =
-            steamDeck.fileExists(remoteRomFilePath);
-
-          if (!remoteRomFileExistsError) {
-            console.log(
-              `ROM ${diffAction.data.filename} already exists in ${remoteRomFilePath}. Omitting.`,
-            );
-            break;
-          }
 
           const steamDeckAddFileError = await steamDeck.addFile(
             dbRomFilePath,
             remoteRomFilePath,
             "KEEP",
           );
+
           if (steamDeckAddFileError) {
             console.log(
               `Something went wrong while transferring the file from ${dbRomFilePath} to ${remoteRomFilePath}. Error messages: ${steamDeckAddFileError.reasons}. Adding this diff action to the failed file.`,
             );
             failedDiffActions.push(diffAction);
           }
-
           break;
         }
         case "remove-file": {
@@ -197,7 +178,6 @@ const syncSteamDeck = async (
             );
             failedDiffActions.push(diffAction);
           }
-
           break;
         }
       }
