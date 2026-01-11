@@ -1,11 +1,22 @@
 import path from "path";
-import build from "../build/index.js";
-import fileIO from "../file-io/index.js";
+
 import type Device from "../../classes/device.class.js";
-import type { AllDirsExistAndAreReadableAndWritableError } from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
-import type { AllDirsExistAndAreReadableError } from "../file-io/all-dirs-exist-and-are-readable.helper.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import environment from "../../objects/environment.object.js";
+import consoleNamesFromDevices from "../build/console-names-from-devices.helper.js";
+import allDirsExistAndAreReadable from "../file-io/all-dirs-exist-and-are-readable.helper.js";
+import allDirsExistAndAreReadableAndWritable from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
+import type { AllDirsExistAndAreReadableAndWritableError } from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
+import type { AllDirsExistAndAreReadableError } from "../file-io/all-dirs-exist-and-are-readable.helper.js";
+
+const build = {
+  consoleNamesFromDevices,
+};
+
+const fileIO = {
+  allDirsExistAndAreReadable,
+  allDirsExistAndAreReadableAndWritable,
+};
 
 export type ValidateDbPathsWithDevicesError =
   | AllDirsExistAndAreReadableError

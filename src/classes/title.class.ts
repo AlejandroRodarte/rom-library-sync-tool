@@ -1,7 +1,12 @@
 import { v7 } from "uuid";
+
 import type { Rom, RomSet, SpecialFlags } from "../types.js";
-import build from "../helpers/build/index.js";
 import AppNotFoundError from "./errors/app-not-found-error.class.js";
+import specialFlagsFromRoms from "../helpers/build/special-flags-from-roms.helper.js";
+
+const build = {
+  specialFlagsFromRoms,
+};
 
 class Title {
   private _name: string;

@@ -1,7 +1,7 @@
 import type { ConsoleName } from "../../../types.js";
-import typeGuards from "./index.js";
+import isConsoleName from "./is-console-name.helper.js";
 
 const isConsoleList = (consoleList: string[]): consoleList is ConsoleName[] =>
-  consoleList.every((consoleName) => typeGuards.isConsoleName(consoleName));
+  consoleList.every((consoleName) => isConsoleName(consoleName));
 
 export default isConsoleList;

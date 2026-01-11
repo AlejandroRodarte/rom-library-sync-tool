@@ -1,7 +1,11 @@
 import type { Titles } from "../../types.js";
 import titlesFromFilenames from "./titles-from-filenames.helper.js";
-import fileIO from "../file-io/index.js";
 import type { ReaddirError } from "../file-io/readdir.helper.js";
+import readdir from "../file-io/readdir.helper.js";
+
+const fileIO = {
+  readdir,
+};
 
 export type TitlesFromRomsDirPath = ReaddirError;
 

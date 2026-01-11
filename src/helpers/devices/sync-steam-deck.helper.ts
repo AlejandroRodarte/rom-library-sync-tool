@@ -1,17 +1,40 @@
 import path from "path";
-import type { DiffAction } from "../../types.js";
-import fileIO from "../file-io/index.js";
-import build from "../build/index.js";
-import type Device from "../../classes/device.class.js";
+
 import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import logger from "../../objects/logger.object.js";
+import environment from "../../objects/environment.object.js";
+import steamDeckSftpClient from "../build/steam-deck-sftp-client.helper.js";
+import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
+import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
+import fileExists from "../file-io/file-exists.helper.js";
+import openNewWriteOnlyFile from "../file-io/open-new-write-only-file.helper.js";
+import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
+import writeToFile from "../file-io/write-to-file.helper.js";
+import fileIsEmpty from "../file-io/file-is-empty.helper.js";
+import deleteFile from "../file-io/delete-file.helper.js";
+import type { DiffAction } from "../../types.js";
+import type Device from "../../classes/device.class.js";
 import type {
   AllDirsExistMethodError,
   ConnectMethodError,
 } from "../../classes/sftp-client.class.js";
-import logger from "../../objects/logger.object.js";
-import environment from "../../objects/environment.object.js";
+
+const build = {
+  steamDeckSftpClient,
+  diffActionFromDiffLine,
+  diffLineFromDiffAction,
+};
+
+const fileIO = {
+  fileExists,
+  openNewWriteOnlyFile,
+  fileExistsAndReadUtf8Lines,
+  writeToFile,
+  fileIsEmpty,
+  deleteFile,
+};
 
 export type SyncSteamDeckError =
   | AppWrongTypeError

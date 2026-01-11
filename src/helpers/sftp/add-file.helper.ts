@@ -1,10 +1,16 @@
 import Client from "ssh2-sftp-client";
-import fileIO from "../file-io/index.js";
+
+import fileExists, {
+  type FileExistsError,
+} from "../file-io/file-exists.helper.js";
+import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
 import exists, { type ExistsError } from "./exists.helper.js";
 import put, { type PutError } from "./put.helper.js";
-import type { FileExistsError } from "../file-io/file-exists.helper.js";
-import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
 import sftpDelete, { type DeleteError } from "./delete.helper.js";
+
+const fileIO = {
+  fileExists,
+};
 
 export type AddFileError =
   | FileExistsError
