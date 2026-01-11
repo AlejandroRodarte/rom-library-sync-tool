@@ -7,7 +7,9 @@ import logger from "../../objects/logger.object.js";
 import environment from "../../objects/environment.object.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
-import allDirsExistAndAreReadableAndWritable from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
+import allDirsExistAndAreReadableAndWritable, {
+  type AllDirsExistAndAreReadableAndWritableError,
+} from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
 import openNewWriteOnlyFile from "../file-io/open-new-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
 import createFileSymlink from "../file-io/create-file-symlink.helper.js";
@@ -36,7 +38,15 @@ const fileIO = {
   deleteFile,
 };
 
-const syncLocal = async (device: Device) => {
+export type SyncLocalError =
+  | AppWrongTypeError
+  | FsFileExistsError
+  | AllDirsExistAndAreReadableAndWritableError
+  | FsNotFoundError;
+
+const syncLocal = async (
+  device: Device,
+): Promise<SyncLocalError | undefined> => {
   if (device.name !== "local")
     return new AppWrongTypeError(
       `This functions expects a steam-deck device, NOT a ${device.name} device.`,
