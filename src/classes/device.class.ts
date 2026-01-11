@@ -76,6 +76,13 @@ class Device {
     ];
   }
 
+  get consolesFailedFilePaths(): string[] {
+    return this._consoles
+      .keys()
+      .map((cn) => path.join(this._paths.failed, `${cn}.failed.txt`))
+      .toArray();
+  }
+
   public addConsole(
     consoleName: ConsoleName,
     konsole: Console,
