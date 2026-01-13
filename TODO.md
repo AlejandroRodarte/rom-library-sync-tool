@@ -1,25 +1,26 @@
 ## Priority
 
-- [ ] Integrate `SIMULATE_SYNC` environment variable into `devices.syncLocal()` and `devices.syncSteamDeck()`. They should log instead of actually adding/removing content.
-- [ ] Encapsulate duplicate code between `devices.syncLocal()` and `devices.syncSteamDeck()` inside functions.
+- [ ] Implement `list` mode for all devices.
+- [ ] Test `list` mode on both `Local` and `SteamDeck` devices.
+- [ ] Implement `diff` mode for all devices.
+- [ ] Test `diff` mode on both `Local` and `SteamDeck` devices.
 - [ ] Consider renaming `syncLocal()` and `syncSteamDeck()` to `syncLocalRoms()` and `syncSteamDeckRoms()`.
-- [ ] Create a new `syncSteamDeckRomMetadata()` function that transfer the database's `<console>/gamelist.xml` to the Steam Deck for ROM metadata sync.
-- [ ] Parse the database's `<console>/gamelist.xml` files so we end up with a `Map<string, string>`. Keys are ROM filenames. Values are ES-DE title names.
-- [ ] (Steam Deck Only) Use the `<console>/gamelist.xml` parser's map to build our `Titles` object with keys being ES-DE title names (if it exists), or defaulting to the title extracted from the ROM filename (the current and only strategy).
 - [ ] Create two new functions: `syncLocalMedia()` and `syncSteamDeckMedia()` that will sync ES-DE downloaded media on our devices.
-    - They will use the same diff files on `devices/<device>/diff/` to sync media.
-    - For the `Local` device, only `add-file` operations will be processed (`remove-file` operations will be ignored because this device uses the database's media directly).
-    - `Local/add-file` will check if media has been downloaded for the new ROM file. If it hasn't, it will log this into a file inside `devices/local/failed/images`.
-    - For the `SteamDeck` device, both `add-file` and `remove-file` operations will be processed.
-    - `SteamDeck/add-file` will try to add the ROM file's downloaded media into its storage. If it fails, it will log it into a file inside `devices/steam-deck/failed/images`.
-    - `SteamDeck/remove-file` will try to delete the ROM file's downloaded media from its storage. If it fails, it will log it into a file inside `devices/steam-deck/failed/images`.
-- [ ] Respawn `syncLocal()`, which now should run both `syncLocalRoms()` and `syncLocalMedia()`.
-- [ ] Respawn `syncSteamDeck()`, which now should run `syncSteamDeckRoms()`, `syncSteamDeckRomMetadata()`, and `syncSteamDeckMedia()`.
+- [ ] Respawn `syncLocal()`, which now should run `syncLocalRoms()`.
+- [ ] Respawn `syncSteamDeck()`, which now should run `syncSteamDeckRoms()`, `syncSteamDeckMedia()`, and `syncSteamDeckMetadata()`.
+- [ ] Integrate `SIMULATE_SYNC` whenever it's needed.
+- [ ] Implement `sync` mode for all devices.
+- [ ] Simulate `sync` mode on both `Local` and `SteamDeck` devices. Make sure to run the `list` mode before simulating.
+- [ ] Test real `sync` mode on both `Local` and `SteamDeck` devices.
+- [ ] Implement `diff-sync` mode for all devices.
+- [ ] Test `diff-sync` mode on both `Local` and `SteamDeck` devices.
 
 ---
 
 ## Backlog
 
+- [ ] Parse the database's `<console>/gamelist.xml` files so we end up with a `Map<string, string>`. Keys are ROM filenames. Values are ES-DE title names.
+- [ ] (Steam Deck Only) Use the `<console>/gamelist.xml` parser's map to build our `Titles` object with keys being ES-DE title names (if it exists), or defaulting to the title extracted from the ROM filename (the current and only strategy).
 - [ ] Move duplicate code in versioning systems to functions.
 - [ ] Migrate ROM labels and languages from arrays to sets.
 - [ ] Check if Steam Deck has the last ROM from each diff file.
