@@ -21,12 +21,13 @@ import fileIO from "../../helpers/file-io/index.js";
 import databasePaths from "../../objects/database-paths.object.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-skip-flags.interface.js";
+import type { Debug } from "../../interfaces/debug.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 
 const LOCAL = "local" as const;
 
-class Local implements Device {
+class Local implements Device, Debug {
   private _name: typeof LOCAL = LOCAL;
 
   private _paths: LocalPaths;
@@ -150,6 +151,16 @@ class Local implements Device {
       logger.warn(
         `${syncError.toString()}\nWe were unable to sync this console.`,
       );
+  };
+
+  debug: () => string = () => {
+    let content = "Local { ";
+
+    content += `name: ${this._name}, `;
+    content += `console-names: ${this._consoleNames.join(",")}, `;
+    content += "}";
+
+    return content;
   };
 
   get filterableConsoles(): Consoles {

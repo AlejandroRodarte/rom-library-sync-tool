@@ -25,18 +25,20 @@ import type { SteamDeckConsolesSkipFlags } from "../../interfaces/steam-deck-con
 import type { MediaName } from "../../types/media-name.type.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
 import fileIO from "../../helpers/file-io/index.js";
+import type { Debug } from "../../interfaces/debug.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 
 const STEAM_DECK = "steam-deck" as const;
 
-class SteamDeck implements Device {
+class SteamDeck implements Device, Debug {
   private _name: typeof STEAM_DECK = STEAM_DECK;
 
   private _paths: SteamDeckPaths;
 
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
+  private _mediaNames: MediaName[];
 
   private _consoleSkipFlags: ConsoleContent<SteamDeckConsolesSkipFlags> =
     Object.fromEntries(
@@ -60,9 +62,12 @@ class SteamDeck implements Device {
       ]),
     ) as ConsoleContent<SteamDeckConsolesSkipFlags>;
 
-  constructor(consoleNames: ConsoleName[]) {
+  constructor(consoleNames: ConsoleName[], mediaNames: MediaName[]) {
     const uniqueConsoleNames = [...new Set(consoleNames)];
     this._consoleNames = uniqueConsoleNames;
+
+    const uniqueMediaNames = [...new Set(mediaNames)];
+    this._mediaNames = uniqueMediaNames;
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
@@ -151,6 +156,16 @@ class SteamDeck implements Device {
     },
   };
 
+  debug: () => string = () => {
+    let content = "SteamDeck { ";
+
+    content += `name: ${this._name}, `;
+    content += `console-names: ${this._consoleNames.join(",")}, `;
+    content += `media-names: ${this._mediaNames.join(",")}, `;
+    content += "}";
+
+    return content;
+  };
   get filterableConsoles(): Consoles {
     return new Map(
       [...this._consoles.entries()].filter(
