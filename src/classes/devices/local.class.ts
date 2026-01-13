@@ -35,9 +35,14 @@ class Local implements Device, Debug {
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
 
-  private _consoleSkipFlags: ConsoleContent<LocalConsolesSkipFlags> =
-    Object.fromEntries(
-      CONSOLE_NAMES.map((c) => [
+  private _consoleSkipFlags: Partial<ConsoleContent<LocalConsolesSkipFlags>>;
+
+  constructor(consoleNames: ConsoleName[]) {
+    const uniqueConsoleNames = [...new Set(consoleNames)];
+    this._consoleNames = uniqueConsoleNames;
+
+    this._consoleSkipFlags = Object.fromEntries(
+      this._consoleNames.map((c) => [
         c,
         {
           global: false,
@@ -45,11 +50,7 @@ class Local implements Device, Debug {
           sync: false,
         },
       ]),
-    ) as ConsoleContent<LocalConsolesSkipFlags>;
-
-  constructor(consoleNames: ConsoleName[]) {
-    const uniqueConsoleNames = [...new Set(consoleNames)];
-    this._consoleNames = uniqueConsoleNames;
+    ) as Partial<ConsoleContent<LocalConsolesSkipFlags>>;
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
@@ -77,9 +78,11 @@ class Local implements Device, Debug {
           `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
         );
 
-        this._consoleSkipFlags[consoleName].global = true;
-        this._consoleSkipFlags[consoleName].filter = true;
-        this._consoleSkipFlags[consoleName].sync = true;
+        if (this._consoleSkipFlags[consoleName]) {
+          this._consoleSkipFlags[consoleName].global = true;
+          this._consoleSkipFlags[consoleName].filter = true;
+          this._consoleSkipFlags[consoleName].sync = true;
+        }
 
         continue;
       }
@@ -132,7 +135,9 @@ class Local implements Device, Debug {
           logger.warn(
             `${diffError.toString()}\nSince we were not able to generate the diff file, we will skip this console when sync-ing.`,
           );
-          this._consoleSkipFlags[consoleName].sync = true;
+
+          if (this._consoleSkipFlags[consoleName])
+            this._consoleSkipFlags[consoleName].sync = true;
         }
       }
     },
@@ -167,6 +172,7 @@ class Local implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter,
       ),
@@ -177,6 +183,7 @@ class Local implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync,

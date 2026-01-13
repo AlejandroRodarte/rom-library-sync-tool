@@ -40,9 +40,19 @@ class SteamDeck implements Device, Debug {
   private _consoleNames: ConsoleName[];
   private _mediaNames: MediaName[];
 
-  private _consoleSkipFlags: ConsoleContent<SteamDeckConsolesSkipFlags> =
-    Object.fromEntries(
-      CONSOLE_NAMES.map((c) => [
+  private _consoleSkipFlags: Partial<
+    ConsoleContent<SteamDeckConsolesSkipFlags>
+  >;
+
+  constructor(consoleNames: ConsoleName[], mediaNames: MediaName[]) {
+    const uniqueConsoleNames = [...new Set(consoleNames)];
+    this._consoleNames = uniqueConsoleNames;
+
+    const uniqueMediaNames = [...new Set(mediaNames)];
+    this._mediaNames = uniqueMediaNames;
+
+    this._consoleSkipFlags = Object.fromEntries(
+      this._consoleNames.map((c) => [
         c,
         {
           global: false,
@@ -53,21 +63,14 @@ class SteamDeck implements Device, Debug {
             media: {
               global: false,
               names: Object.fromEntries(
-                MEDIA_NAMES.map((m) => [m, false]),
-              ) as MediaContent<boolean>,
+                this._mediaNames.map((m) => [m, false]),
+              ) as Partial<MediaContent<boolean>>,
             },
             metadata: false,
           },
         },
       ]),
-    ) as ConsoleContent<SteamDeckConsolesSkipFlags>;
-
-  constructor(consoleNames: ConsoleName[], mediaNames: MediaName[]) {
-    const uniqueConsoleNames = [...new Set(consoleNames)];
-    this._consoleNames = uniqueConsoleNames;
-
-    const uniqueMediaNames = [...new Set(mediaNames)];
-    this._mediaNames = uniqueMediaNames;
+    ) as Partial<ConsoleContent<SteamDeckConsolesSkipFlags>>;
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
@@ -95,9 +98,11 @@ class SteamDeck implements Device, Debug {
           `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
         );
 
-        this._consoleSkipFlags[consoleName].global = true;
-        this._consoleSkipFlags[consoleName].filter = true;
-        this._consoleSkipFlags[consoleName].sync.global = true;
+        if (this._consoleSkipFlags[consoleName]) {
+          this._consoleSkipFlags[consoleName].global = true;
+          this._consoleSkipFlags[consoleName].filter = true;
+          this._consoleSkipFlags[consoleName].sync.global = true;
+        }
 
         continue;
       }
@@ -150,7 +155,9 @@ class SteamDeck implements Device, Debug {
           logger.warn(
             `${diffError.toString()}\nSince we were not able to generate the diff file, we will skip this console when sync-ing.`,
           );
-          this._consoleSkipFlags[consoleName].sync.roms = true;
+
+          if (this._consoleSkipFlags[consoleName])
+            this._consoleSkipFlags[consoleName].sync.roms = true;
         }
       }
     },
@@ -170,6 +177,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter,
       ),
@@ -180,6 +188,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global,
@@ -191,6 +200,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
@@ -203,6 +213,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
@@ -215,6 +226,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
@@ -227,6 +239,7 @@ class SteamDeck implements Device, Debug {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
+          this._consoleSkipFlags[consoleName] &&
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
