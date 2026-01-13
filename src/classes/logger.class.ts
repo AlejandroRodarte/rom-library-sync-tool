@@ -28,7 +28,7 @@ class Logger {
 
   public debug(...msgs: string[]): void {
     if (this._shouldPrintDebugLog)
-      for (const msg of msgs) console.log(chalk.grey(`[DEBUG]: ${msg}`));
+      for (const msg of msgs) console.log(chalk.cyan(`[DEBUG]: ${msg}`));
   }
 
   public info(...msgs: string[]): void {
