@@ -18,3 +18,5 @@
 - [x] Finish implementation of `devices.syncLocal()`.
 - [x] Copy over the `Logger` object I built for better logging support.
 - [x] Add a new `LOG_LEVEL` environment variable to control log levels.
+- [x] Explore (and implement) the idea of letting `Device` be an interface, or an abstract class (think this through).
+- [x] Create two new classes that extend/implement `Device`: `Local` and `SteamDeck`.

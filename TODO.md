@@ -2,8 +2,6 @@
 
 - [ ] Integrate `SIMULATE_SYNC` environment variable into `devices.syncLocal()` and `devices.syncSteamDeck()`. They should log instead of actually adding/removing content.
 - [ ] Encapsulate duplicate code between `devices.syncLocal()` and `devices.syncSteamDeck()` inside functions.
-- [ ] Explore (and implement) the idea of letting `Device` be an interface, or an abstract class (think this through).
-- [ ] Create two new classes that extend/implement `Device`: `Local` and `SteamDeck`.
 - [ ] Test real sync on both `Local` and `SteamDeck` devices.
 - [ ] Consider renaming `syncLocal()` and `syncSteamDeck()` to `syncLocalRoms()` and `syncSteamDeckRoms()`.
 - [ ] Create a new `syncSteamDeckRomMetadata()` function that transfer the database's `<console>/gamelist.xml` to the Steam Deck for ROM metadata sync.
