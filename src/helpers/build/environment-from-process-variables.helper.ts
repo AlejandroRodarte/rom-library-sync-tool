@@ -346,6 +346,46 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckSyncMediaNames,
   );
 
+  /*
+   * Lists for special `sync-list` mode
+   */
+  const syncListDeviceNames = intersectStringArraySimple(
+    syncDeviceNames,
+    listDeviceNames,
+  );
+  const localSyncListConsoleNames = intersectStringArraySimple(
+    localSyncConsoleNames,
+    localListConsoleNames,
+  );
+  const steamDeckSyncListConsoleNames = intersectStringArraySimple(
+    steamDeckSyncConsoleNames,
+    steamDeckListConsoleNames,
+  );
+  const steamDeckSyncListMediaNames = intersectStringArraySimple(
+    steamDeckSyncMediaNames,
+    steamDeckListMediaNames,
+  );
+
+  /*
+   * Lists for special `diff-sync-list` and `list-diff-sync-list` modes
+   */
+  const diffSyncListDeviceNames = intersectStringArraySimple(
+    diffDeviceNames,
+    syncListDeviceNames,
+  );
+  const localDiffSyncListConsoleNames = intersectStringArraySimple(
+    localDiffConsoleNames,
+    localSyncListConsoleNames,
+  );
+  const steamDeckDiffSyncListConsoleNames = intersectStringArraySimple(
+    steamDeckDiffConsoleNames,
+    steamDeckSyncListConsoleNames,
+  );
+  const steamDeckDiffSyncListMediaNames = intersectStringArraySimple(
+    steamDeckDiffMediaNames,
+    steamDeckSyncListMediaNames,
+  );
+
   return {
     options: {
       log: {
@@ -372,7 +412,20 @@ const environmentFromProcessVariables = (): Environment => {
         devices: syncDeviceNames,
       },
       "diff-sync": {
-        devices: diffDeviceNames,
+        simulate: simulateSync,
+        devices: diffSyncDeviceNames,
+      },
+      "sync-list": {
+        simulate: simulateSync,
+        devices: syncListDeviceNames,
+      },
+      "diff-sync-list": {
+        simulate: simulateSync,
+        devices: diffSyncListDeviceNames,
+      },
+      "list-diff-sync-list": {
+        simulate: simulateSync,
+        devices: diffSyncListDeviceNames,
       },
     },
     devices: {
@@ -392,6 +445,15 @@ const environmentFromProcessVariables = (): Environment => {
           },
           "diff-sync": {
             consoles: localDiffSyncConsoleNames,
+          },
+          "sync-list": {
+            consoles: localSyncListConsoleNames,
+          },
+          "diff-sync-list": {
+            consoles: localDiffSyncListConsoleNames,
+          },
+          "list-diff-sync-list": {
+            consoles: localDiffSyncListConsoleNames,
           },
         },
       },
@@ -417,6 +479,18 @@ const environmentFromProcessVariables = (): Environment => {
           "diff-sync": {
             consoles: steamDeckDiffSyncConsoleNames,
             medias: steamDeckDiffSyncMediaNames,
+          },
+          "sync-list": {
+            consoles: steamDeckSyncListConsoleNames,
+            medias: steamDeckSyncListMediaNames,
+          },
+          "diff-sync-list": {
+            consoles: steamDeckDiffSyncListConsoleNames,
+            medias: steamDeckDiffSyncListMediaNames,
+          },
+          "list-diff-sync-list": {
+            consoles: steamDeckDiffSyncListConsoleNames,
+            medias: steamDeckDiffSyncListMediaNames,
           },
         },
         sftp: {
