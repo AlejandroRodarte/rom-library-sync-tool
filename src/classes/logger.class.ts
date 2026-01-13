@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { VALID_LOG_LEVELS } from "../constants/valid-log-levels.constant.js";
 import type { LogLevel } from "../types/log-level.type.js";
 
@@ -20,34 +21,36 @@ class Logger {
     this._shouldPrintFatalLog = VALID_LOG_LEVELS.FATAL.includes(this._logLevel);
   }
 
-  public trace(msg: string): void {
+  public trace(...msgs: string[]): void {
     if (this._shouldPrintTraceLog)
-      console.log("\x1b[37m%s\x1b[0m", `[TRACE]: ${msg}`);
+      for (const msg of msgs) console.log(chalk.white(`[TRACE]: ${msg}`));
   }
 
-  public debug(msg: string): void {
+  public debug(...msgs: string[]): void {
     if (this._shouldPrintDebugLog)
-      console.log("\x1b[90m%s\x1b[0m", `[DEBUG]: ${msg}`);
+      for (const msg of msgs) console.log(chalk.grey(`[DEBUG]: ${msg}`));
   }
 
-  public info(msg: string): void {
+  public info(...msgs: string[]): void {
     if (this._shouldPrintInfoLog)
-      console.log("\x1b[36m%s\x1b[0m", `[INFO]: ${msg}`);
+      for (const msg of msgs)
+        console.log(chalk.rgb(130, 200, 229)(`[INFO]: ${msg}`));
   }
 
-  public warn(msg: string): void {
+  public warn(...msgs: string[]): void {
     if (this._shouldPrintWarnLog)
-      console.log("\x1b[33m%s\x1b[0m", `[WARN]: ${msg}`);
+      for (const msg of msgs) console.log(chalk.yellow(`[WARN]: ${msg}`));
   }
 
-  public error(msg: string): void {
+  public error(...msgs: string[]): void {
     if (this._shouldPrintErrorLog)
-      console.log("\x1b[35m%s\x1b[0m", `[ERROR]: ${msg}`);
+      for (const msg of msgs)
+        console.log(chalk.rgb(255, 127, 0)(`[ERROR]: ${msg}`));
   }
 
-  public fatal(msg: string): void {
+  public fatal(...msgs: string[]): void {
     if (this._shouldPrintFatalLog)
-      console.log("\x1b[31m%s\x1b[0m", `[FATAL]: ${msg}`);
+      for (const msg of msgs) console.log(chalk.red(`[FATAL]: ${msg}`));
   }
 }
 
