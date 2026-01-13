@@ -2,7 +2,6 @@
 
 - [ ] Integrate `SIMULATE_SYNC` environment variable into `devices.syncLocal()` and `devices.syncSteamDeck()`. They should log instead of actually adding/removing content.
 - [ ] Encapsulate duplicate code between `devices.syncLocal()` and `devices.syncSteamDeck()` inside functions.
-- [ ] Test real sync on both `Local` and `SteamDeck` devices.
 - [ ] Consider renaming `syncLocal()` and `syncSteamDeck()` to `syncLocalRoms()` and `syncSteamDeckRoms()`.
 - [ ] Create a new `syncSteamDeckRomMetadata()` function that transfer the database's `<console>/gamelist.xml` to the Steam Deck for ROM metadata sync.
 - [ ] Parse the database's `<console>/gamelist.xml` files so we end up with a `Map<string, string>`. Keys are ROM filenames. Values are ES-DE title names.
@@ -16,8 +15,6 @@
     - `SteamDeck/remove-file` will try to delete the ROM file's downloaded media from its storage. If it fails, it will log it into a file inside `devices/steam-deck/failed/images`.
 - [ ] Respawn `syncLocal()`, which now should run both `syncLocalRoms()` and `syncLocalMedia()`.
 - [ ] Respawn `syncSteamDeck()`, which now should run `syncSteamDeckRoms()`, `syncSteamDeckRomMetadata()`, and `syncSteamDeckMedia()`.
-- [ ] Make sure to integrate `SIMULATE_SYNC` into all `sync`-related functions.
-- [ ] Simulate and test that all sync functions are working.
 
 ---
 
