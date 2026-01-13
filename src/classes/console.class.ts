@@ -1,10 +1,7 @@
-import path from "node:path";
 import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
 import Title from "./title.class.js";
-import environment from "../objects/environment.object.js";
 import type { ConsoleName } from "../types/console-name.type.js";
 import type { Titles } from "../types/titles.type.js";
-import type { ConsoleDbPaths } from "../interfaces/console-db-paths.interface.js";
 import type { RomSet } from "../types/rom-set.type.js";
 import type { Rom } from "../interfaces/rom.interface.js";
 
@@ -13,23 +10,14 @@ export type AddTitleMethodError = AppEntryExistsError;
 class Console {
   private _name: ConsoleName;
   private _titles: Titles;
-  private _dbPaths: ConsoleDbPaths;
 
   private _scrappedTitles: Titles;
   private _selectedTitles: Map<number, Titles>;
   private _selectedRoms: RomSet;
 
-  private _skipped = false;
-
   constructor(name: ConsoleName) {
     this._name = name;
     this._titles = new Map<string, Title>();
-
-    this._dbPaths = {
-      roms: path.join(environment.paths.dbs.roms, this._name),
-      media: path.join(environment.paths.dbs.media, this._name),
-      gamelists: path.join(environment.paths.dbs.gamelists, this._name),
-    };
 
     this._selectedTitles = new Map<number, Titles>();
     this._scrappedTitles = new Map<string, Title>();
@@ -38,14 +26,6 @@ class Console {
 
   get name() {
     return this._name;
-  }
-
-  get dbPaths() {
-    return this._dbPaths;
-  }
-
-  get dbPathsList(): string[] {
-    return [this._dbPaths.roms, this._dbPaths.media, this._dbPaths.gamelists];
   }
 
   get selectedTitles() {
@@ -74,14 +54,6 @@ class Console {
       content += `Titles with ${romsSelected} selections: ${titles.size}.\n`;
 
     return content;
-  }
-
-  get skipped(): boolean {
-    return this._skipped;
-  }
-
-  set skipped(skipped: boolean) {
-    this._skipped = skipped;
   }
 
   public addTitle(

@@ -4,7 +4,6 @@ import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.j
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
 import logger from "../../objects/logger.object.js";
-import environment from "../../objects/environment.object.js";
 import steamDeckSftpClient from "../build/steam-deck-sftp-client.helper.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
@@ -17,12 +16,13 @@ import deleteFile from "../file-io/delete-file.helper.js";
 import anyFileExists, {
   type AnyFileExistsError,
 } from "../file-io/any-file-exists.helper.js";
-import type Device from "../../classes/device.class.js";
 import type {
   AllDirsExistMethodError,
   ConnectMethodError,
 } from "../../classes/sftp-client.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
+import type SteamDeck from "../../classes/devices/steam-deck.class.js";
+import databasePaths from "../../objects/database-paths.object.js";
 
 const build = {
   steamDeckSftpClient,
@@ -49,15 +49,10 @@ export type SyncSteamDeckError =
   | AnyFileExistsError;
 
 const syncSteamDeck = async (
-  device: Device,
+  steamDeck: SteamDeck,
 ): Promise<SyncSteamDeckError | undefined> => {
-  if (device.name !== "steam-deck")
-    return new AppWrongTypeError(
-      `This functions expects a steam-deck device, NOT a ${device.name} device.`,
-    );
-
   const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
-    device.consolesFailedFilePaths,
+    steamDeck.allFailedFilePaths,
   );
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
@@ -65,7 +60,8 @@ const syncSteamDeck = async (
       `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
     );
 
-  const [steamDeck, sftpClientError] = await build.steamDeckSftpClient();
+  const [steamDeckSftpClient, sftpClientError] =
+    await build.steamDeckSftpClient();
   if (sftpClientError) {
     sftpClientError.addReason(
       `An error happened while connecting to the Steam Deck via SFTP.`,
@@ -73,62 +69,35 @@ const syncSteamDeck = async (
     return sftpClientError;
   }
 
-  const remoteDirPaths = [
-    environment.devices["steam-deck"].paths.roms,
-    environment.devices["steam-deck"].paths.media,
-    environment.devices["steam-deck"].paths.gamelists,
-  ];
-  for (const [consoleName] of device.consoles)
-    remoteDirPaths.push(
-      path.join(environment.devices["steam-deck"].paths.roms, consoleName),
-    );
-  const [allRemoteDirsExist, allDirsExistError] =
-    await steamDeck.allDirsExist(remoteDirPaths);
-  if (allDirsExistError) {
-    allDirsExistError.addReason(
+  const [allRemoteDirsExist, allRemoteDirsExistError] =
+    await steamDeckSftpClient.allDirsExist(steamDeck.allSyncDirPaths);
+  if (allRemoteDirsExistError) {
+    allRemoteDirsExistError.addReason(
       `An error happened while veryfing all remote directories.`,
     );
-    return allDirsExistError;
+    return allRemoteDirsExistError;
   }
   if (!allRemoteDirsExist)
     return new SftpNotFoundError(
-      `Not all of the following directories exist:\n${remoteDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,
+      `Not all of the following directories exist:\n${steamDeck.allSyncDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,
     );
 
-  for (const [consoleName, konsole] of device.consoles) {
-    const remoteRomsDirPath = path.join(
-      environment.devices["steam-deck"].paths.roms,
-      consoleName,
-    );
-
-    const failedFilePath = path.join(
-      device.paths.failed,
-      `${consoleName}.failed.txt`,
-    );
+  for (const [consoleName, konsole] of steamDeck.consoles()) {
+    const romsRemoteDirPath = steamDeck.getConsoleRomsSyncDirPath(consoleName);
+    const romsFailedFilePath =
+      steamDeck.getConsoleRomsFailedFilePath(consoleName);
+    const romsDiffFilePath = steamDeck.getConsoleRomsDiffFilePath(consoleName);
 
     const [failedFileHandle, failedFileOpenError] =
-      await fileIO.openNewWriteOnlyFile(failedFilePath);
+      await fileIO.openNewWriteOnlyFile(romsFailedFilePath);
 
-    if (failedFileOpenError) {
-      logger.warn(`${failedFileOpenError.toString()}\nSkipping this console.`);
-      konsole.skipped = true;
-      continue;
-    }
-
-    const diffFilePath = path.join(
-      device.paths.diffs,
-      `${consoleName}.diff.txt`,
-    );
+    if (failedFileOpenError) return failedFileOpenError;
 
     const [diffLines, diffFileError] =
-      await fileIO.fileExistsAndReadUtf8Lines(diffFilePath);
+      await fileIO.fileExistsAndReadUtf8Lines(romsDiffFilePath);
     let failedDiffLines = "";
 
-    if (diffFileError) {
-      logger.warn(`${diffFileError.toString()}\nSkipping this console.`);
-      konsole.skipped = true;
-      continue;
-    }
+    if (diffFileError) return diffFileError;
 
     const diffActions: DiffAction[] = [];
     const failedDiffActions: DiffAction[] = [];
@@ -160,18 +129,18 @@ const syncSteamDeck = async (
 
     for (const diffAction of diffActions) {
       const dbRomFilePath = path.join(
-        konsole.dbPaths.roms,
+        databasePaths.getConsoleDatabaseRomDirPath(consoleName),
         diffAction.data.filename,
       );
 
       const remoteRomFilePath = path.join(
-        remoteRomsDirPath,
+        romsRemoteDirPath,
         diffAction.data.filename,
       );
 
       switch (diffAction.type) {
         case "add-file": {
-          const steamDeckAddFileError = await steamDeck.addFile(
+          const steamDeckAddFileError = await steamDeckSftpClient.addFile(
             dbRomFilePath,
             remoteRomFilePath,
             "KEEP",
@@ -187,7 +156,7 @@ const syncSteamDeck = async (
           break;
         }
         case "remove-file": {
-          const steamDeckRemoveFileError = await steamDeck.deleteFile(
+          const steamDeckRemoveFileError = await steamDeckSftpClient.deleteFile(
             remoteRomFilePath,
             false,
           );
@@ -224,7 +193,7 @@ const syncSteamDeck = async (
     await failedFileHandle.close();
 
     const [failedFileIsEmpty, failedFileAccessError] =
-      await fileIO.fileIsEmpty(failedFilePath);
+      await fileIO.fileIsEmpty(romsFailedFilePath);
 
     if (failedFileAccessError) {
       logger.warn(
@@ -235,7 +204,7 @@ const syncSteamDeck = async (
 
     if (failedFileIsEmpty) {
       const failedFileDeleteError = await fileIO.deleteFile(
-        failedFilePath,
+        romsFailedFilePath,
         true,
       );
       if (failedFileDeleteError)
@@ -245,7 +214,7 @@ const syncSteamDeck = async (
     }
   }
 
-  const disconnectError = await steamDeck.disconnect();
+  const disconnectError = await steamDeckSftpClient.disconnect();
   if (disconnectError)
     logger.error(
       `Error while disconnecting from the Steam Deck.\n${disconnectError.toString()}\n`,

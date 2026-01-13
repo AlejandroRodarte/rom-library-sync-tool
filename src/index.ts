@@ -1,51 +1,35 @@
 import environment from "./objects/environment.object.js";
 import logger from "./objects/logger.object.js";
 
-import Device from "./classes/device.class.js";
-
-import fileIO from "./helpers/file-io/index.js";
 import log from "./helpers/log/index.js";
-import unselect from "./helpers/unselect/index.js";
 import app from "./helpers/app/index.js";
+import Local from "./classes/devices/local.class.js";
+import SteamDeck from "./classes/devices/steam-deck.class.js";
+import type { Device } from "./interfaces/device.interface.js";
 
 const main = async () => {
-  const devices = environment.options.filter.devices.map(
-    (deviceName) =>
-      new Device(deviceName, environment.devices[deviceName].consoles),
-  );
-
-  const validateDbPathsError = await app.validateDbPathsWithDevices(devices);
-  if (validateDbPathsError) {
-    logger.error(`${validateDbPathsError.toString()}\nTerminating.`);
+  const dbPathsError = await app.validateDatabasePaths();
+  if (dbPathsError) {
+    logger.error(`${dbPathsError.toString()}\nTerminating.`);
     return;
   }
 
+  const local = new Local(environment.devices.local.modes["diff-sync"].consoles);
+  const steamDeck = new SteamDeck(environment.devices["steam-deck"].modes["diff-sync"].consoles);
+
+  const devices: Device[] = [local, steamDeck];
+
   for (const device of devices) {
-    await device.populateConsoles();
-
-    for (const [_, konsole] of device.consoles) {
-      switch (device.name) {
-        case "local":
-          konsole.unselectTitles(unselect.byLocalDevice);
-          break;
-        case "steam-deck":
-          konsole.unselectTitles(unselect.bySteamDeckDevice);
-          break;
-      }
-    }
-
-    device.updateConsolesMetadata();
-
-    const duplicatesFileError = await fileIO.writeDuplicateRomsFile(device);
-    if (duplicatesFileError) logger.error(duplicatesFileError.toString());
-    const scrappedFileError = await fileIO.writeScrappedRomsFile(device);
-    if (scrappedFileError) logger.error(scrappedFileError.toString());
-
-    for (const [_, konsole] of device.consoles)
-      await fileIO.writeConsoleDiffFile(konsole, device.paths);
+    await device.populate();
+    device.filter();
+    device.update();
+    
+    await device.write.scrapped();
+    await device.write.duplicates();
+    await device.write.diffs();
 
     await device.sync();
-    log.consolesReport(device.consoles);
+    log.consolesReport(device.consoles());
   }
 };
 

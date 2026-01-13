@@ -6,6 +6,13 @@ import isSftpError from "./is-sftp-error.helper.js";
 import isDevicesListItem from "./is-devices-list-item.helper.js";
 import isDevicesList from "./is-devices-list.helper.js";
 import isLogLevel from "./is-log-level.helper.js";
+import isMediaName from "./is-media-name.helper.js";
+import isMediaList from "./is-media-list.helper.js";
+import isMediasListItem from "./is-medias-list-item.helper.js";
+import isMediasList from "./is-medias-list.helper.js";
+import isConsolesListItem from "./is-consoles-list-item.helper.js";
+import isConsolesList from "./is-consoles-list.helper.js";
+import isModeName from "./is-mode-name.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -16,6 +23,13 @@ const typeGuards = {
   isDevicesListItem,
   isDevicesList,
   isLogLevel,
+  isMediaName,
+  isMediaList,
+  isMediasListItem,
+  isMediasList,
+  isConsolesListItem,
+  isConsolesList,
+  isModeName,
 };
 
 export default typeGuards;

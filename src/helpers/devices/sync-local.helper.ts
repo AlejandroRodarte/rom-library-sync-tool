@@ -21,8 +21,9 @@ import deleteFile from "../file-io/delete-file.helper.js";
 import anyFileExists, {
   type AnyFileExistsError,
 } from "../file-io/any-file-exists.helper.js";
-import type Device from "../../classes/device.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
+import type Local from "../../classes/devices/local.class.js";
+import databasePaths from "../../objects/database-paths.object.js";
 
 const build = {
   diffActionFromDiffLine,
@@ -49,16 +50,9 @@ export type SyncLocalError =
   | FsNotFoundError
   | AnyFileExistsError;
 
-const syncLocal = async (
-  device: Device,
-): Promise<SyncLocalError | undefined> => {
-  if (device.name !== "local")
-    return new AppWrongTypeError(
-      `This functions expects a steam-deck device, NOT a ${device.name} device.`,
-    );
-
+const syncLocal = async (local: Local): Promise<SyncLocalError | undefined> => {
   const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
-    device.consolesFailedFilePaths,
+    local.allFailedFilePaths,
   );
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
@@ -66,14 +60,8 @@ const syncLocal = async (
       `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
     );
 
-  const localDirPaths = [environment.devices.local.paths.roms];
-  for (const [consoleName] of device.consoles)
-    localDirPaths.push(
-      path.join(environment.devices.local.paths.roms, consoleName),
-    );
-
   const [allLocalDirsExist, allDirsExistError] =
-    await fileIO.allDirsExistAndAreReadableAndWritable(localDirPaths);
+    await fileIO.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
   if (allDirsExistError) {
     allDirsExistError.addReason(
       `Something went wrong while validating all local device directories.`,
@@ -82,34 +70,24 @@ const syncLocal = async (
   }
   if (!allLocalDirsExist)
     return new FsNotFoundError(
-      `Not all of the following directories exist and are read/write:\n${localDirPaths.join("\n")}. Please verify they do before syncing this device.`,
+      `Not all of the following directories exist and are read/write:\n${local.allSyncDirPaths.join("\n")}. Please verify they do before syncing this device.`,
     );
 
-  for (const [name, konsole] of device.consoles) {
-    const localRomsDirPath = path.join(environment.devices.local.paths.roms);
-
-    const failedFilePath = path.join(device.paths.failed, `${name}.failed.txt`);
+  for (const [consoleName, konsole] of local.syncableConsoles) {
+    const romsFailedFilePath = local.getConsoleRomsFailedFilePath(consoleName);
+    const romsDiffFilePath = local.getConsoleRomsDiffFilePath(consoleName);
+    const localRomsDirPath = local.getConsoleRomsSyncDirPath(consoleName);
 
     const [failedFileHandle, failedFileOpenError] =
-      await fileIO.openNewWriteOnlyFile(failedFilePath);
+      await fileIO.openNewWriteOnlyFile(romsFailedFilePath);
 
-    if (failedFileOpenError) {
-      logger.warn(`${failedFileOpenError.toString()}\nSkipping this console.`);
-      konsole.skipped = true;
-      continue;
-    }
-
-    const diffFilePath = path.join(device.paths.diffs, `${name}.diff.txt`);
+    if (failedFileOpenError) return failedFileOpenError;
 
     const [diffLines, diffFileError] =
-      await fileIO.fileExistsAndReadUtf8Lines(diffFilePath);
+      await fileIO.fileExistsAndReadUtf8Lines(romsDiffFilePath);
     let failedDiffLines = "";
 
-    if (diffFileError) {
-      logger.warn(`${diffFileError.toString()}\nSkipping this console.`);
-      konsole.skipped = true;
-      continue;
-    }
+    if (diffFileError) return diffFileError;
 
     const diffActions: DiffAction[] = [];
     const failedDiffActions: DiffAction[] = [];
@@ -141,7 +119,7 @@ const syncLocal = async (
 
     for (const diffAction of diffActions) {
       const dbRomFilePath = path.join(
-        konsole.dbPaths.roms,
+        databasePaths.getConsoleDatabaseRomDirPath(consoleName),
         diffAction.data.filename,
       );
 
@@ -203,7 +181,7 @@ const syncLocal = async (
     await failedFileHandle.close();
 
     const [failedFileIsEmpty, failedFileAccessError] =
-      await fileIO.fileIsEmpty(failedFilePath);
+      await fileIO.fileIsEmpty(romsFailedFilePath);
 
     if (failedFileAccessError) {
       logger.error(
@@ -214,7 +192,7 @@ const syncLocal = async (
 
     if (failedFileIsEmpty) {
       const failedFileDeleteError = await fileIO.deleteFile(
-        failedFilePath,
+        romsFailedFilePath,
         true,
       );
       if (failedFileDeleteError)

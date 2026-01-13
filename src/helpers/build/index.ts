@@ -12,7 +12,10 @@ import steamDeckSftpClient from "./steam-deck-sftp-client.helper.js";
 import syncFlagsFromSyncDevicesList from "./sync-flags-from-sync-devices-list.helper.js";
 import deviceNamesFromFilterDevicesList from "./device-names-from-filter-devices-list.helper.js";
 import deviceNamesFromSyncDevicesList from "./device-names-from-sync-devices-list.helper.js";
-import consoleNamesFromDevices from "./console-names-from-devices.helper.js";
+import deviceNamesFromDevicesList from "./device-names-from-devices-list.helper.js";
+import consoleNamesFromConsolesList from "./console-names-from-consoles-list.helper.js";
+import mediaNamesFromMediasList from "./media-names-from-medias-list.helper.js";
+import intersectStringArraySimple from "./intersect-string-array-simple.helper.js";
 
 const build = {
   emptyConsoles,
@@ -29,7 +32,10 @@ const build = {
   syncFlagsFromSyncDevicesList,
   deviceNamesFromFilterDevicesList,
   deviceNamesFromSyncDevicesList,
-  consoleNamesFromDevices,
+  deviceNamesFromDevicesList,
+  consoleNamesFromConsolesList,
+  mediaNamesFromMediasList,
+  intersectStringArraySimple,
 };
 
 export default build;

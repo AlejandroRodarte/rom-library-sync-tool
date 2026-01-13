@@ -1,5 +1,3 @@
-import path from "path";
-
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import filenameIndexesToAddAndDelete from "../build/filename-indexes-to-add-and-delete.helper.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
@@ -16,7 +14,6 @@ import writeDeleteFileLineToDiffFile, {
   type WriteDeleteFileLineToDiffFileError,
 } from "./write-delete-file-line-to-diff-file.helper.js";
 import type Console from "../../classes/console.class.js";
-import type { DeviceDirPaths } from "../../interfaces/device-dir-paths.interface.js";
 
 const build = {
   filenameIndexesToAddAndDelete,
@@ -31,20 +28,20 @@ export type WriteConsoleDiffFileError =
 
 const writeConsoleDiffFile = async (
   konsole: Console,
-  devicePaths: DeviceDirPaths,
+  filePaths: {
+    list: string;
+    diff: string;
+  },
 ): Promise<WriteConsoleDiffFileError | undefined> => {
-  const listFilePath = path.join(devicePaths.lists, `${konsole.name}.txt`);
-  const diffFilePath = path.join(devicePaths.diffs, `${konsole.name}.diff.txt`);
-
   let listFileExists = true;
-  const listFileAccessError = await fileExistsAndIsReadable(listFilePath);
+  const listFileAccessError = await fileExistsAndIsReadable(filePaths.list);
   if (listFileAccessError) listFileExists = false;
 
-  const diffFileDeleteError = await deleteFile(diffFilePath, false);
+  const diffFileDeleteError = await deleteFile(filePaths.diff, false);
   if (diffFileDeleteError) return diffFileDeleteError;
 
   const [currentFilenames, listFileReadError] = listFileExists
-    ? await readUtf8FileLines(listFilePath)
+    ? await readUtf8FileLines(filePaths.list)
     : [[], undefined];
   if (listFileReadError) return listFileReadError;
 
@@ -53,8 +50,9 @@ const writeConsoleDiffFile = async (
     .map((rom) => rom.filename)
     .toArray();
 
-  const [diffFileHandle, diffFileOpenError] =
-    await openNewWriteOnlyFile(diffFilePath);
+  const [diffFileHandle, diffFileOpenError] = await openNewWriteOnlyFile(
+    filePaths.diff,
+  );
   if (diffFileOpenError) return diffFileOpenError;
 
   const indexes = build.filenameIndexesToAddAndDelete(
@@ -68,7 +66,7 @@ const writeConsoleDiffFile = async (
 
     const diffFileWriteError = await writeAddFileLineToDiffFile(
       filenameToAdd,
-      diffFilePath,
+      filePaths.diff,
       diffFileHandle,
     );
 
@@ -81,7 +79,7 @@ const writeConsoleDiffFile = async (
 
     const diffFileWriteError = await writeDeleteFileLineToDiffFile(
       filenameToDelete,
-      diffFilePath,
+      filePaths.diff,
       diffFileHandle,
     );
 

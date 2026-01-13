@@ -1,0 +1,313 @@
+import path from "node:path";
+
+import devices from "../../helpers/devices/index.js";
+import type { Device } from "../../interfaces/device.interface.js";
+import type { LocalPaths } from "../../interfaces/local-paths.interface.js";
+import environment from "../../objects/environment.object.js";
+import type { ConsoleName } from "../../types/console-name.type.js";
+import type { Consoles } from "../../types/consoles.type.js";
+import type { DeviceName } from "../../types/device-name.type.js";
+import Console from "../console.class.js";
+import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
+import AppNotFoundError from "../errors/app-not-found-error.class.js";
+import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
+import CONSOLE_NAMES from "../../constants/console-names.constant.js";
+import type { ConsolePaths } from "../../types/console-paths.types.js";
+import build from "../../helpers/build/index.js";
+import logger from "../../objects/logger.object.js";
+import unselect from "../../helpers/unselect/index.js";
+import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
+import fileIO from "../../helpers/file-io/index.js";
+import databasePaths from "../../objects/database-paths.object.js";
+import type { ConsoleContent } from "../../types/console-content.type.js";
+import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-skip-flags.interface.js";
+
+export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
+
+const LOCAL = "local" as const;
+
+class Local implements Device {
+  private _name: typeof LOCAL = LOCAL;
+
+  private _paths: LocalPaths;
+
+  private _consoles: Consoles;
+  private _consoleNames: ConsoleName[];
+
+  private _consoleSkipFlags: ConsoleContent<LocalConsolesSkipFlags> =
+    Object.fromEntries(
+      CONSOLE_NAMES.map((c) => [
+        c,
+        {
+          global: false,
+          filter: false,
+          sync: false,
+        },
+      ]),
+    ) as ConsoleContent<LocalConsolesSkipFlags>;
+
+  constructor(consoleNames: ConsoleName[]) {
+    const uniqueConsoleNames = [...new Set(consoleNames)];
+    this._consoleNames = uniqueConsoleNames;
+
+    this._consoles = new Map<ConsoleName, Console>();
+    for (const consoleName of this._consoleNames)
+      this._addConsole(consoleName, new Console(consoleName));
+
+    this._paths = this._initLocalPaths();
+  }
+
+  name: () => DeviceName = () => {
+    return this._name;
+  };
+
+  consoles: () => Consoles = () => {
+    return this._consoles;
+  };
+
+  populate: () => Promise<void> = async () => {
+    for (const [consoleName, konsole] of this._consoles) {
+      const [titles, buildTitlesError] = await build.titlesFromRomsDirPath(
+        databasePaths.getConsoleDatabaseRomDirPath(consoleName),
+      );
+
+      if (buildTitlesError) {
+        logger.warn(
+          `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
+        );
+
+        this._consoleSkipFlags[consoleName].global = true;
+        this._consoleSkipFlags[consoleName].filter = true;
+        this._consoleSkipFlags[consoleName].sync = true;
+
+        continue;
+      }
+
+      for (const [titleName, title] of titles)
+        konsole.addTitle(titleName, title);
+    }
+  };
+
+  filter: () => void = () => {
+    for (const [, konsole] of this.filterableConsoles)
+      konsole.unselectTitles(unselect.bySteamDeckDevice);
+  };
+
+  update: () => void = () => {
+    for (const [, konsole] of this.filterableConsoles) {
+      konsole.updateSelectedRoms();
+      konsole.updateScrappedTitles();
+      konsole.updateScrappedTitles();
+    }
+  };
+
+  write: DeviceWriteMethods = {
+    duplicates: async () => {
+      const writeError = await fileIO.writeDuplicateRomsFile(
+        this.filterableConsoles,
+        this._paths.files.fileIO.logs.duplicates,
+      );
+      if (writeError) logger.error(writeError.toString());
+    },
+    scrapped: async () => {
+      const writeError = await fileIO.writeScrappedRomsFile(
+        this.filterableConsoles,
+        this._paths.files.fileIO.logs.scrapped,
+      );
+      if (writeError) logger.error(writeError.toString());
+    },
+    diffs: async () => {
+      for (const [consoleName, konsole] of this.filterableConsoles) {
+        // 1. couldn't delete previous diff file (if it existed)
+        // 2. couldn't read list file
+        // 3. couldn't open a new diff file
+        // 4. couldn't write to the diff file
+        const diffError = await fileIO.writeConsoleDiffFile(konsole, {
+          list: this._paths.files.fileIO.lists.roms.consoles[consoleName],
+          diff: this._paths.files.fileIO.diffs.roms.consoles[consoleName],
+        });
+
+        if (diffError) {
+          logger.warn(
+            `${diffError.toString()}\nSince we were not able to generate the diff file, we will skip this console when sync-ing.`,
+          );
+          this._consoleSkipFlags[consoleName].sync = true;
+        }
+      }
+    },
+  };
+
+  sync: () => Promise<void> = async () => {
+    if (!environment.modes.sync.devices.includes("local")) return;
+
+    // 1. there are .failed.txt filenames for this device
+    // 2. not all device sync dir paths exist
+    // 3. failed to open new .failed.txt file to write on
+    // 4. failed to open .diff.txt file
+    const syncError = await devices.syncLocal(this);
+
+    if (syncError)
+      logger.warn(
+        `${syncError.toString()}\nWe were unable to sync this console.`,
+      );
+  };
+
+  get filterableConsoles(): Consoles {
+    return new Map(
+      [...this._consoles.entries()].filter(
+        ([consoleName]) =>
+          !this._consoleSkipFlags[consoleName].global &&
+          !this._consoleSkipFlags[consoleName].filter,
+      ),
+    );
+  }
+
+  get syncableConsoles(): Consoles {
+    return new Map(
+      [...this._consoles.entries()].filter(
+        ([consoleName]) =>
+          !this._consoleSkipFlags[consoleName].global &&
+          !this._consoleSkipFlags[consoleName].filter &&
+          !this._consoleSkipFlags[consoleName].sync,
+      ),
+    );
+  }
+
+  get allFailedFilePaths(): string[] {
+    return Object.entries(this._paths.files.fileIO.failed.roms.consoles).map(
+      ([, path]) => path,
+    );
+  }
+
+  get allSyncDirPaths(): string[] {
+    const paths = [this._paths.dirs.sync.roms.base];
+
+    for (const consoleName of CONSOLE_NAMES) {
+      if (!this._consoleNames.includes(consoleName)) continue;
+      paths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
+    }
+
+    return paths;
+  }
+
+  public getConsoleRomsFailedFilePath(consoleName: ConsoleName): string {
+    return this._paths.files.fileIO.failed.roms.consoles[consoleName];
+  }
+
+  public getConsoleRomsDiffFilePath(consoleName: ConsoleName): string {
+    return this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+  }
+
+  public getConsoleRomsSyncDirPath(consoleName: ConsoleName): string {
+    return this._paths.dirs.sync.roms.consoles[consoleName];
+  }
+
+  private _addConsole(
+    consoleName: ConsoleName,
+    konsole: Console,
+  ): AddConsoleMethodError | undefined {
+    if (!this._consoleNames.includes(consoleName))
+      return new AppNotFoundError(
+        `Device ${this._name} is NOT related to console ${consoleName}. This device supports the following consoles: ${this._consoleNames.join(", ")}.`,
+      );
+
+    const consoleExists = this._consoles.has(consoleName);
+    if (consoleExists)
+      return new AppEntryExistsError(
+        `There is already an entry for console ${consoleName}.`,
+      );
+
+    this._consoles.set(consoleName, konsole);
+  }
+
+  private _initLocalPaths(): LocalPaths {
+    const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
+
+    const logsDirPath = path.join(baseDirPath, "logs");
+
+    const listsDirPath = path.join(baseDirPath, "lists");
+    const romsListsDirPath = path.join(listsDirPath, "roms");
+
+    const diffsDirPath = path.join(baseDirPath, "diffs");
+    const romsDiffsDirPath = path.join(diffsDirPath, "roms");
+
+    const failedDirPath = path.join(baseDirPath, "failed");
+    const romsFailedDirPath = path.join(failedDirPath, "roms");
+
+    const paths: LocalPaths = {
+      dirs: {
+        fileIO: {
+          base: baseDirPath,
+          logs: {
+            base: logsDirPath,
+          },
+          lists: {
+            base: listsDirPath,
+            roms: romsListsDirPath,
+          },
+          diffs: {
+            base: diffsDirPath,
+            roms: romsDiffsDirPath,
+          },
+          failed: {
+            base: failedDirPath,
+            roms: romsFailedDirPath,
+          },
+        },
+        sync: {
+          roms: {
+            base: environment.devices.local.paths.roms,
+            consoles: Object.fromEntries(
+              CONSOLE_NAMES.map((c) => [
+                c,
+                path.join(environment.devices.local.paths.roms, c),
+              ]),
+            ) as ConsolePaths,
+          },
+        },
+      },
+      files: {
+        fileIO: {
+          logs: {
+            duplicates: path.join(logsDirPath, "duplicates.log.txt"),
+            scrapped: path.join(logsDirPath, "scrapped.log.txt"),
+          },
+          lists: {
+            roms: {
+              consoles: Object.fromEntries(
+                CONSOLE_NAMES.map((c) => [
+                  c,
+                  path.join(romsListsDirPath, `${c}.list.txt`),
+                ]),
+              ) as ConsolePaths,
+            },
+          },
+          diffs: {
+            roms: {
+              consoles: Object.fromEntries(
+                CONSOLE_NAMES.map((c) => [
+                  c,
+                  path.join(romsDiffsDirPath, `${c}.diff.txt`),
+                ]),
+              ) as ConsolePaths,
+            },
+          },
+          failed: {
+            roms: {
+              consoles: Object.fromEntries(
+                CONSOLE_NAMES.map((c) => [
+                  c,
+                  path.join(romsFailedDirPath, `${c}.failed.txt`),
+                ]),
+              ) as ConsolePaths,
+            },
+          },
+        },
+      },
+    };
+
+    return paths;
+  }
+}
+
+export default Local;

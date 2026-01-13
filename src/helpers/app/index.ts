@@ -1,7 +1,7 @@
-import validateDbPathsWithDevices from "./validate-db-paths-with-devices.helper.js";
+import validateDatabasePaths from "./validate-database-paths.helper.js";
 
 const app = {
-  validateDbPathsWithDevices,
+  validateDatabasePaths,
 };
 
 export default app;

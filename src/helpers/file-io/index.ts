@@ -31,6 +31,7 @@ import symlink from "./symlink.helper.js";
 import createFileSymlink from "./create-file-symlink.helper.js";
 import deleteFileSymlink from "./delete-file-symlink.helper.js";
 import allDirsExistAndAreReadable from "./all-dirs-exist-and-are-readable.helper.js";
+import allFilesExistAndAreReadable from "./all-files-exist-and-are-readable.helper.js";
 
 const fileIO = {
   accessPath,
@@ -66,6 +67,7 @@ const fileIO = {
   createFileSymlink,
   deleteFileSymlink,
   allDirsExistAndAreReadable,
+  allFilesExistAndAreReadable,
 };
 
 export default fileIO;

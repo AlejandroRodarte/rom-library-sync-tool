@@ -1,9 +1,9 @@
 import type { ConsoleName } from "../types/console-name.type.js";
+import type { ModeContent } from "../types/mode-content.type.js";
 
 export interface LocalData {
-  sync: boolean;
   paths: {
     roms: string;
   };
-  consoles: ConsoleName[];
+  modes: ModeContent<{ consoles: ConsoleName[] }>;
 }

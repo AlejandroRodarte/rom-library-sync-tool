@@ -2,7 +2,6 @@ import type { PathLike } from "node:fs";
 import access, { type AccessError } from "./access.helper.js";
 import stats, { type StatsError } from "./stats.helper.js";
 import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
 
 export type AccessPathError = AccessError | StatsError | FsWrongTypeError;
 
