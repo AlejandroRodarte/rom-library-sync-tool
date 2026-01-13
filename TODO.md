@@ -7,9 +7,7 @@
 - [ ] Create a new `syncSteamDeckRomMetadata()` function that transfer the database's `<console>/gamelist.xml` to the Steam Deck for ROM metadata sync.
 - [ ] Parse the database's `<console>/gamelist.xml` files so we end up with a `Map<string, string>`. Keys are ROM filenames. Values are ES-DE title names.
 - [ ] (Steam Deck Only) Use the `<console>/gamelist.xml` parser's map to build our `Titles` object with keys being ES-DE title names (if it exists), or defaulting to the title extracted from the ROM filename (the current and only strategy).
-- [ ] Let the `devices/<device>/failed/` subfolder host two new subfolders: `failed/diffs`, and `failed/images`.
-    - `failed/diffs` will host all failed operations that occurred while `syncLocalRoms()` and `syncSteamDeckRoms()` ran.
-    - `failed/images` will host all failed operations that occurred while `syncLocalMedia()` and `syncSteamDeckMedia()` ran.
+- [ ] Let the `devices/<device>/failed/` subfolder host two new subfolders: `failed/roms`, and `failed/media`.
 - [ ] Create two new functions: `syncLocalMedia()` and `syncSteamDeckMedia()` that will sync ES-DE downloaded media on our devices.
     - They will use the same diff files on `devices/<device>/diff/` to sync media.
     - For the `Local` device, only `add-file` operations will be processed (`remove-file` operations will be ignored because this device uses the database's media directly).
