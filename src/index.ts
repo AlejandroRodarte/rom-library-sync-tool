@@ -5,6 +5,7 @@ import type { Device } from "./interfaces/device.interface.js";
 import Local from "./classes/devices/local.class.js";
 import SteamDeck from "./classes/devices/steam-deck.class.js";
 import type { Debug } from "./interfaces/debug.interface.js";
+import Fs from "./classes/device-io/fs.class.js";
 
 const main = async () => {
   logger.trace("main() function starts");
@@ -17,12 +18,15 @@ const main = async () => {
   let local: Local | undefined;
   let steamDeck: SteamDeck | undefined;
 
+  const fs = new Fs();
+
   if (environment.modes[mode].devices.includes("local")) {
     logger.trace("Creating and adding Local device");
 
     local = new Local(
       environment.devices.local.modes[mode].consoles,
       environment.devices.local,
+      fs,
     );
     devices.push(local);
 

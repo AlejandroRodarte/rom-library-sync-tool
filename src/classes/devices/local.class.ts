@@ -23,6 +23,7 @@ import type { Debug } from "../../interfaces/debug.interface.js";
 import writeToFileOrDelete from "../../helpers/file-io/write-to-file-or-delete.helper.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
 import type { LocalData } from "../../interfaces/local-data.interface.js";
+import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -42,9 +43,12 @@ class Local implements Device, Debug {
 
   private _consoleSkipFlags: Partial<ConsoleContent<LocalConsolesSkipFlags>>;
 
+  private _deviceFileIO: DeviceFileIO;
+
   constructor(
     consoleNames: ConsoleName[],
     env: Environment["devices"][typeof LOCAL],
+    deviceFileIO: DeviceFileIO,
   ) {
     const uniqueConsoleNames = [...new Set(consoleNames)];
     this._consoleNames = uniqueConsoleNames;
@@ -66,6 +70,8 @@ class Local implements Device, Debug {
 
     this._paths = this._initLocalPaths(env.paths);
     this._modes = env.modes;
+
+    this._deviceFileIO = deviceFileIO;
   }
 
   name: () => DeviceName = () => {
@@ -198,18 +204,36 @@ class Local implements Device, Debug {
         logger.debug(
           `ROM list filepath for console ${consoleName}: ${listFilePath}`,
         );
+        logger.trace(
+          `About to attempt to fetch entries from device dirpath ${romsDirPath}`,
+        );
+
+        const [lsEntries, lsError] = await this._deviceFileIO.ls(romsDirPath);
+        if (lsError) {
+          logger.error(`${lsError.toString()}. Skipping.`);
+          continue;
+        }
+
+        logger.info(
+          `Successfully fetched entries from device dirpath ${romsDirPath}`,
+        );
+        logger.trace(
+          `About to attempt to filter out entries found at ${romsDirPath} so only symlinks to files remain.`,
+        );
 
         const [fileSymlinkEntries, readDirError] =
-          await fileIO.readDirAndGetFileSymlinks(romsDirPath);
+          await fileIO.getFileSymlinksFromDeviceFileIOLsEntries(lsEntries);
 
         if (readDirError) {
           logger.error(`${readDirError.toString()}. Skipping.`);
           continue;
         }
 
-        logger.trace(`Successfully fetched file symlinks from ${romsDirPath}.`);
+        logger.info(
+          `Successfully obtained file symlinks found at ${romsDirPath}.`,
+        );
 
-        const filenames = fileSymlinkEntries.map((e) => e.name.toString());
+        const filenames = fileSymlinkEntries.map((e) => e.name);
 
         logger.trace(
           `Deleting ${listFilePath} to create a new one and get its file handle.`,
