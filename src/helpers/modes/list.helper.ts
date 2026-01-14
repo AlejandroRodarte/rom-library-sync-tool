@@ -16,11 +16,17 @@ const list = async (devices: (Device & Debug)[]) => {
   logger.trace("modes.list() function starts");
 
   const mode = environment.options.mode;
+  logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
   if (!allowedModes.includes(mode))
     throw new AppWrongTypeError(
       `Mode ${mode} is NOT supported for the list task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
+
+  for (const device of devices) {
+    logger.trace(`Calling device.write.lists() for device ${device.name()}`);
+    await device.write.lists();
+  }
 
   logger.trace("modes.list() function ends");
 };
