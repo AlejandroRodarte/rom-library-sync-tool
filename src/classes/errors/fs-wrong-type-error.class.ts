@@ -26,7 +26,7 @@ class FsWrongTypeError extends CustomError {
 
     content += `!!!!! Error !!!!!\n`;
     content += `Type: ${this.type}\n`;
-    content += `Status code: ${this.code}\n`;
+    content += `Status code: ${this.status}\n`;
     content += `Code: ${this.code}.\n`;
     content += `Message: ${this.message}\n`;
 
