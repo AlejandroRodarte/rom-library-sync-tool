@@ -2,11 +2,11 @@ import fileExistsAndIsReadable, {
   type FileExistsAndIsReadableError,
 } from "./file-exists-and-is-readable.helper.js";
 import type { PathLike } from "node:fs";
-import type { StatsError } from "./stat.helper.js";
+import type { StatError } from "./stat.helper.js";
 import stat from "./stat.helper.js";
 import type { FileExistsError } from "./file-exists.helper.js";
 
-export type FileIsEmptyError = FileExistsAndIsReadableError | StatsError;
+export type FileIsEmptyError = FileExistsAndIsReadableError | StatError;
 
 const fileIsEmpty = async (
   filePath: PathLike,

@@ -6,11 +6,11 @@ import UnknownError from "../../classes/errors/unknown-error.class.js";
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
 
-export type StatsError = UnknownError | FsNotFoundError | FsUnauthorizedError;
+export type StatError = UnknownError | FsNotFoundError | FsUnauthorizedError;
 
 const stat = async (
   path: PathLike,
-): Promise<[Stats, undefined] | [undefined, StatsError]> => {
+): Promise<[Stats, undefined] | [undefined, StatError]> => {
   try {
     const stats = await fs.stat(path);
     return [stats, undefined];

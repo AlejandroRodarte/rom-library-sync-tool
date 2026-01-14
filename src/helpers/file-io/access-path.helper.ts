@@ -1,9 +1,9 @@
 import type { PathLike } from "node:fs";
 import access, { type AccessError } from "./access.helper.js";
-import stat, { type StatsError } from "./stat.helper.js";
+import stat, { type StatError } from "./stat.helper.js";
 import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
 
-export type AccessPathError = AccessError | StatsError | FsWrongTypeError;
+export type AccessPathError = AccessError | StatError | FsWrongTypeError;
 
 const accessPath = async (
   type: "file" | "dir" | "link",
