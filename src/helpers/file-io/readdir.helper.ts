@@ -35,16 +35,14 @@ const readdir = async (
       case "ENOENT":
         return [
           undefined,
-          new FsNotFoundError(
-            `Directory path ${path} was not found. Original error message: ${e.message}.`,
-          ),
+          new FsNotFoundError(`Directory path ${path} was not found.`),
         ];
       case "EACCES":
       case "EPERM":
         return [
           undefined,
           new FsUnauthorizedError(
-            `This process is not authorized to read directory contents at ${path}. Original error message: ${e.message}.`,
+            `This process is not authorized to read directory contents at ${path}.`,
           ),
         ];
       case "ENOTDIR":
