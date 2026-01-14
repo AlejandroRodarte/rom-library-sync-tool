@@ -407,23 +407,18 @@ const environmentFromProcessVariables = (): Environment => {
         devices: diffDeviceNames,
       },
       sync: {
-        simulate: simulateSync,
         devices: syncDeviceNames,
       },
       "diff-sync": {
-        simulate: simulateSync,
         devices: diffSyncDeviceNames,
       },
       "sync-list": {
-        simulate: simulateSync,
         devices: syncListDeviceNames,
       },
       "diff-sync-list": {
-        simulate: simulateSync,
         devices: diffSyncListDeviceNames,
       },
       "list-diff-sync-list": {
-        simulate: simulateSync,
         devices: diffSyncListDeviceNames,
       },
     },
@@ -440,18 +435,23 @@ const environmentFromProcessVariables = (): Environment => {
             consoles: localDiffConsoleNames,
           },
           sync: {
+            simulate: simulateSync,
             consoles: localSyncConsoleNames,
           },
           "diff-sync": {
+            simulate: simulateSync,
             consoles: localDiffSyncConsoleNames,
           },
           "sync-list": {
+            simulate: simulateSync,
             consoles: localSyncListConsoleNames,
           },
           "diff-sync-list": {
+            simulate: simulateSync,
             consoles: localDiffSyncListConsoleNames,
           },
           "list-diff-sync-list": {
+            simulate: simulateSync,
             consoles: localDiffSyncListConsoleNames,
           },
         },
@@ -472,22 +472,27 @@ const environmentFromProcessVariables = (): Environment => {
             medias: steamDeckDiffMediaNames,
           },
           sync: {
+            simulate: simulateSync,
             consoles: steamDeckSyncConsoleNames,
             medias: steamDeckSyncMediaNames,
           },
           "diff-sync": {
+            simulate: simulateSync,
             consoles: steamDeckDiffSyncConsoleNames,
             medias: steamDeckDiffSyncMediaNames,
           },
           "sync-list": {
+            simulate: simulateSync,
             consoles: steamDeckSyncListConsoleNames,
             medias: steamDeckSyncListMediaNames,
           },
           "diff-sync-list": {
+            simulate: simulateSync,
             consoles: steamDeckDiffSyncListConsoleNames,
             medias: steamDeckDiffSyncListMediaNames,
           },
           "list-diff-sync-list": {
+            simulate: simulateSync,
             consoles: steamDeckDiffSyncListConsoleNames,
             medias: steamDeckDiffSyncListMediaNames,
           },

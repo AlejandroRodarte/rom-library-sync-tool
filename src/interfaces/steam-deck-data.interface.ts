@@ -1,7 +1,6 @@
-import type { ConsoleName } from "../types/console-name.type.js";
-import type { MediaName } from "../types/media-name.type.js";
-import type { ModeContent } from "../types/mode-content.type.js";
 import type { SftpCredentials } from "./sftp-credentials.interface.js";
+import type { SteamDeckModeData } from "./steam-deck-mode-data.interface.js";
+import type { ModeName } from "../types/mode-name.type.js";
 
 export interface SteamDeckData {
   paths: {
@@ -9,7 +8,9 @@ export interface SteamDeckData {
     media: string;
     metadata: string;
   };
-  modes: ModeContent<{ consoles: ConsoleName[]; medias: MediaName[] }>;
+  modes: {
+    [M in ModeName]: SteamDeckModeData<M>;
+  };
   sftp: {
     credentials: SftpCredentials;
   };

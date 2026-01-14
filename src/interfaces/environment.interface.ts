@@ -18,7 +18,7 @@ export interface Environment {
       metadata: string;
     };
   };
-  modes: ModeContent<{ devices: DeviceName[]; simulate?: boolean }>;
+  modes: ModeContent<{ devices: DeviceName[] }>;
   devices: {
     [D in DeviceName]: DeviceData<D>;
   };
