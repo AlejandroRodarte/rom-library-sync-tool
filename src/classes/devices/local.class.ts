@@ -3,7 +3,6 @@ import path from "node:path";
 import devices from "../../helpers/devices/index.js";
 import type { Device } from "../../interfaces/device.interface.js";
 import type { LocalPaths } from "../../interfaces/local-paths.interface.js";
-import environment from "../../objects/environment.object.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
@@ -22,6 +21,8 @@ import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-skip-flags.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import writeToFileOrDelete from "../../helpers/file-io/write-to-file-or-delete.helper.js";
+import type { Environment } from "../../interfaces/environment.interface.js";
+import type { LocalData } from "../../interfaces/local-data.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -34,13 +35,17 @@ class Local implements Device, Debug {
   private _name: typeof LOCAL = LOCAL;
 
   private _paths: LocalPaths;
+  private _modes: LocalData["modes"];
 
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
 
   private _consoleSkipFlags: Partial<ConsoleContent<LocalConsolesSkipFlags>>;
 
-  constructor(consoleNames: ConsoleName[]) {
+  constructor(
+    consoleNames: ConsoleName[],
+    env: Environment["devices"][typeof LOCAL],
+  ) {
     const uniqueConsoleNames = [...new Set(consoleNames)];
     this._consoleNames = uniqueConsoleNames;
 
@@ -59,7 +64,8 @@ class Local implements Device, Debug {
     for (const consoleName of this._consoleNames)
       this._addConsole(consoleName, new Console(consoleName));
 
-    this._paths = this._initLocalPaths();
+    this._paths = this._initLocalPaths(env.paths);
+    this._modes = env.modes;
   }
 
   name: () => DeviceName = () => {
@@ -287,8 +293,6 @@ class Local implements Device, Debug {
   };
 
   sync: () => Promise<void> = async () => {
-    if (!environment.modes.sync.devices.includes("local")) return;
-
     // 1. there are .failed.txt filenames for this device
     // 2. not all device sync dir paths exist
     // 3. failed to open new .failed.txt file to write on
@@ -403,7 +407,9 @@ class Local implements Device, Debug {
     this._consoles.set(consoleName, konsole);
   }
 
-  private _initLocalPaths(): LocalPaths {
+  private _initLocalPaths(
+    envPaths: Environment["devices"][typeof LOCAL]["paths"],
+  ): LocalPaths {
     const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
 
     const logsDirPath = path.join(baseDirPath, "logs");
@@ -439,12 +445,9 @@ class Local implements Device, Debug {
         },
         sync: {
           roms: {
-            base: environment.devices.local.paths.roms,
+            base: envPaths.roms,
             consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [
-                c,
-                path.join(environment.devices.local.paths.roms, c),
-              ]),
+              this._consoleNames.map((c) => [c, path.join(envPaths.roms, c)]),
             ) as Partial<ConsolePaths>,
           },
         },

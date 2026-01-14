@@ -20,7 +20,10 @@ const main = async () => {
   if (environment.modes[mode].devices.includes("local")) {
     logger.trace("Creating and adding Local device");
 
-    local = new Local(environment.devices.local.modes[mode].consoles);
+    local = new Local(
+      environment.devices.local.modes[mode].consoles,
+      environment.devices.local,
+    );
     devices.push(local);
 
     logger.debug(local.debug());
@@ -32,7 +35,7 @@ const main = async () => {
     steamDeck = new SteamDeck(
       environment.devices["steam-deck"].modes[mode].consoles,
       environment.devices["steam-deck"].modes[mode].medias,
-      environment.devices["steam-deck"].sftp.credentials,
+      environment.devices["steam-deck"],
     );
     devices.push(steamDeck);
 

@@ -25,7 +25,8 @@ import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.i
 import fileIO from "../../helpers/file-io/index.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import SftpClient from "../sftp-client.class.js";
-import type { SftpCredentials } from "../../interfaces/sftp-credentials.interface.js";
+import type { Environment } from "../../interfaces/environment.interface.js";
+import type { SteamDeckData } from "../../interfaces/steam-deck-data.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -38,6 +39,7 @@ class SteamDeck implements Device, Debug {
   private _name: typeof STEAM_DECK = STEAM_DECK;
 
   private _paths: SteamDeckPaths;
+  private _modes: SteamDeckData["modes"];
 
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
@@ -52,7 +54,7 @@ class SteamDeck implements Device, Debug {
   constructor(
     consoleNames: ConsoleName[],
     mediaNames: MediaName[],
-    sftpCredentials: SftpCredentials,
+    env: Environment["devices"][typeof STEAM_DECK],
   ) {
     const uniqueConsoleNames = [...new Set(consoleNames)];
     this._consoleNames = uniqueConsoleNames;
@@ -85,8 +87,10 @@ class SteamDeck implements Device, Debug {
     for (const consoleName of this._consoleNames)
       this.addConsole(consoleName, new Console(consoleName));
 
-    this._paths = this._initSteamDeckPaths();
-    this._sftpClient = new SftpClient(this._name, sftpCredentials);
+    this._paths = this._initSteamDeckPaths(env.paths);
+    this._sftpClient = new SftpClient(this._name, env.sftp.credentials);
+
+    this._modes = env.modes;
   }
 
   name: () => DeviceName = () => {
@@ -401,7 +405,9 @@ class SteamDeck implements Device, Debug {
     this._consoles.set(consoleName, konsole);
   }
 
-  private _initSteamDeckPaths(): SteamDeckPaths {
+  private _initSteamDeckPaths(
+    paths: Environment["devices"][typeof STEAM_DECK]["paths"],
+  ): SteamDeckPaths {
     const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
 
     const logsDirPath = path.join(baseDirPath, "logs");
@@ -418,7 +424,7 @@ class SteamDeck implements Device, Debug {
     const romsFailedDirPath = path.join(failedDirPath, "roms");
     const mediaFailedDirPath = path.join(failedDirPath, "media");
 
-    const paths: SteamDeckPaths = {
+    const steamDeckPaths: SteamDeckPaths = {
       dirs: {
         fileIO: {
           base: baseDirPath,
@@ -587,11 +593,7 @@ class SteamDeck implements Device, Debug {
             consoles: Object.fromEntries(
               this._consoleNames.map((c) => [
                 c,
-                path.join(
-                  environment.devices["steam-deck"].paths.metadata,
-                  c,
-                  "gamelist.xml",
-                ),
+                path.join(paths.metadata, c, "gamelist.xml"),
               ]),
             ) as Partial<ConsolePaths>,
           },
@@ -599,7 +601,7 @@ class SteamDeck implements Device, Debug {
       },
     };
 
-    return paths;
+    return steamDeckPaths;
   }
 }
 
