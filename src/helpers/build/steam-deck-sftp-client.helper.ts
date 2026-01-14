@@ -8,11 +8,12 @@ export type SteamDeckSftpClientError = ConnectMethodError;
 const steamDeckSftpClient = async (): Promise<
   [SftpClient, undefined] | [undefined, SteamDeckSftpClientError]
 > => {
-  const sftpClient = new SftpClient("steam-deck");
-
-  const connectError = await sftpClient.connect(
+  const sftpClient = new SftpClient(
+    "steam-deck",
     environment.devices["steam-deck"].sftp.credentials,
   );
+
+  const connectError = await sftpClient.connect();
   if (connectError) return [undefined, connectError];
 
   return [sftpClient, undefined];

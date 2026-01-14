@@ -32,6 +32,7 @@ const main = async () => {
     steamDeck = new SteamDeck(
       environment.devices["steam-deck"].modes[mode].consoles,
       environment.devices["steam-deck"].modes[mode].medias,
+      environment.devices["steam-deck"].sftp.credentials,
     );
     devices.push(steamDeck);
 

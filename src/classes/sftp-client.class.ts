@@ -19,22 +19,26 @@ export type DirExistsMethodError = ExistsError;
 export type AllDirsExistMethodError = ExistsError;
 
 class SftpClient {
+  private _credentials: SftpCredentials;
   private _client: Client;
   private _connected = false;
 
-  constructor(name: string) {
+  constructor(name: string, credentials: SftpCredentials) {
+    this._credentials = credentials;
     this._client = new Client(name);
   }
 
-  public async connect(
-    credentials: SftpCredentials,
-  ): Promise<ConnectMethodError | undefined> {
+  get connected() {
+    return this._connected;
+  }
+
+  public async connect(): Promise<ConnectMethodError | undefined> {
     if (this._connected)
       return new SftpConnectionError(
         "This client is already connected to a remote device.",
       );
 
-    const connectionError = await sftp.connect(this._client, credentials);
+    const connectionError = await sftp.connect(this._client, this._credentials);
     if (connectionError) return connectionError;
 
     this._connected = true;

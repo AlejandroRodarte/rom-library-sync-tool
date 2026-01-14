@@ -24,6 +24,8 @@ import type { MediaName } from "../../types/media-name.type.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
 import fileIO from "../../helpers/file-io/index.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
+import SftpClient from "../sftp-client.class.js";
+import type { SftpCredentials } from "../../interfaces/sftp-credentials.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -45,7 +47,13 @@ class SteamDeck implements Device, Debug {
     ConsoleContent<SteamDeckConsolesSkipFlags>
   >;
 
-  constructor(consoleNames: ConsoleName[], mediaNames: MediaName[]) {
+  private _sftpClient: SftpClient;
+
+  constructor(
+    consoleNames: ConsoleName[],
+    mediaNames: MediaName[],
+    sftpCredentials: SftpCredentials,
+  ) {
     const uniqueConsoleNames = [...new Set(consoleNames)];
     this._consoleNames = uniqueConsoleNames;
 
@@ -78,6 +86,7 @@ class SteamDeck implements Device, Debug {
       this.addConsole(consoleName, new Console(consoleName));
 
     this._paths = this._initSteamDeckPaths();
+    this._sftpClient = new SftpClient(this._name, sftpCredentials);
   }
 
   name: () => DeviceName = () => {
@@ -319,6 +328,24 @@ class SteamDeck implements Device, Debug {
     }
 
     return [...basePaths, ...mediaSyncPaths, ...metadataSyncPaths];
+  }
+
+  private async _connect() {
+    logger.trace(
+      `Beggining attempt to connect to device ${this._name} via SFTP.`,
+    );
+
+    if (this._sftpClient.connected) {
+      logger.warn(
+        `SFTP Client for device ${this.name} is already connected. Doing nothing.`,
+      );
+      return;
+    }
+
+    const connectError = await this._sftpClient.connect();
+    if (connectError) return connectError;
+
+    logger.info(`Succesfully connected to ${this._name} device.`);
   }
 
   public getConsoleRomsFailedFilePath(
