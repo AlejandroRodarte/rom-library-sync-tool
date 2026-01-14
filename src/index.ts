@@ -1,36 +1,57 @@
 import environment from "./objects/environment.object.js";
 import logger from "./objects/logger.object.js";
-
-import log from "./helpers/log/index.js";
-import app from "./helpers/app/index.js";
+import modes from "./helpers/modes/index.js";
+import type { Device } from "./interfaces/device.interface.js";
 import Local from "./classes/devices/local.class.js";
 import SteamDeck from "./classes/devices/steam-deck.class.js";
-import type { Device } from "./interfaces/device.interface.js";
+import type { Debug } from "./interfaces/debug.interface.js";
 
 const main = async () => {
-  const dbPathsError = await app.validateDatabasePaths();
-  if (dbPathsError) {
-    logger.error(`${dbPathsError.toString()}\nTerminating.`);
-    return;
+  logger.trace("main() function starts");
+
+  const mode = environment.options.mode;
+  logger.debug(`Mode: ${mode}`);
+
+  const devices: (Device & Debug)[] = [];
+
+  let local: Local | undefined;
+  let steamDeck: SteamDeck | undefined;
+
+  if (environment.modes[mode].devices.includes("local")) {
+    logger.trace("Creating and adding Local device");
+
+    local = new Local(environment.devices.local.modes[mode].consoles);
+    devices.push(local);
+
+    logger.debug(local.debug());
   }
 
-  const local = new Local(environment.devices.local.modes["diff-sync"].consoles);
-  const steamDeck = new SteamDeck(environment.devices["steam-deck"].modes["diff-sync"].consoles);
+  if (environment.modes[mode].devices.includes("steam-deck")) {
+    logger.trace("Creating and adding Steam Deck device");
 
-  const devices: Device[] = [local, steamDeck];
+    steamDeck = new SteamDeck(
+      environment.devices["steam-deck"].modes[mode].consoles,
+      environment.devices["steam-deck"].modes[mode].medias,
+    );
+    devices.push(steamDeck);
 
-  for (const device of devices) {
-    await device.populate();
-    device.filter();
-    device.update();
-    
-    await device.write.scrapped();
-    await device.write.duplicates();
-    await device.write.diffs();
-
-    await device.sync();
-    log.consolesReport(device.consoles());
+    logger.debug(steamDeck.debug());
   }
+
+  logger.debug(`amount of devices to process: ${devices.length}`);
+
+  logger.trace("switch (mode) statement starts");
+  switch (mode) {
+    case "list":
+      logger.trace(`entering the "list" case`);
+      await modes.list(devices);
+      break;
+    default:
+      logger.warn(`Mode ${mode} not implemented yet`);
+  }
+  logger.trace("switch (mode) statement ends");
+
+  logger.trace("main() function ends");
 };
 
 main();
