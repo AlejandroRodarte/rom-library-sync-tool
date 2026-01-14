@@ -126,6 +126,45 @@ class Local implements Device, Debug {
     lists: async () => {
       logger.trace(`device.write.lists() starts for console ${this._name}.`);
 
+      logger.trace(
+        `Building list of directories to validate before actually writing list files for device ${this._name}.`,
+      );
+
+      const allDirPathsToValidate = [
+        this._paths.dirs.fileIO.base,
+        this._paths.dirs.fileIO.lists.base,
+        this._paths.dirs.fileIO.lists.roms,
+        this._paths.dirs.sync.roms.base,
+      ];
+
+      for (const consoleName of this._consoleNames)
+        if (this._paths.dirs.sync.roms.consoles[consoleName])
+          allDirPathsToValidate.push(
+            this._paths.dirs.sync.roms.consoles[consoleName],
+          );
+
+      logger.debug(`Directory paths to validate: `, ...allDirPathsToValidate);
+
+      const [allDirsAreValid, allDirsAreValidError] =
+        await fileIO.allDirsExistAndAreReadable(allDirPathsToValidate);
+
+      if (allDirsAreValidError) {
+        logger.error(
+          `${allDirsAreValidError.toString()}. Will NOT write list files for device ${this._name}.`,
+        );
+        return;
+      }
+      if (!allDirsAreValid) {
+        logger.error(
+          `Not all of the following directories exist and are read-write: ${allDirPathsToValidate.join(", ")}. Please make sure all of them are valid before attempting to write the list files for device ${this._name}.`,
+        );
+        return;
+      }
+
+      logger.info(
+        `All list-relevant directories for device ${this._name} are valid. Continuing.`,
+      );
+
       for (const consoleName of this._consoleNames) {
         logger.trace(`starting to write list file for console ${consoleName}`);
 
