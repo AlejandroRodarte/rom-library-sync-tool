@@ -9,7 +9,6 @@ import deviceDirPathsFromName from "./device-dir-paths-from-name.helper.js";
 import diffActionFromDiffLine from "./diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "./diff-line-from-diff-action.helper.js";
 import steamDeckSftpClient from "./steam-deck-sftp-client.helper.js";
-import syncFlagsFromSyncDevicesList from "./sync-flags-from-sync-devices-list.helper.js";
 import deviceNamesFromFilterDevicesList from "./device-names-from-filter-devices-list.helper.js";
 import deviceNamesFromSyncDevicesList from "./device-names-from-sync-devices-list.helper.js";
 import deviceNamesFromDevicesList from "./device-names-from-devices-list.helper.js";
@@ -29,7 +28,6 @@ const build = {
   diffActionFromDiffLine,
   diffLineFromDiffAction,
   steamDeckSftpClient,
-  syncFlagsFromSyncDevicesList,
   deviceNamesFromFilterDevicesList,
   deviceNamesFromSyncDevicesList,
   deviceNamesFromDevicesList,
