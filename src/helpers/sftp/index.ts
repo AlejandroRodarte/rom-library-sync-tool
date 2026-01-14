@@ -5,6 +5,7 @@ import exists from "./exists.helper.js";
 import sftpDelete from "./delete.helper.js";
 import addFile from "./add-file.helper.js";
 import deleteFile from "./delete-file.helper.js";
+import list from "./list.helper.js";
 
 const sftp = {
   connect,
@@ -14,6 +15,7 @@ const sftp = {
   delete: sftpDelete,
   addFile,
   deleteFile,
+  list,
 };
 
 export default sftp;
