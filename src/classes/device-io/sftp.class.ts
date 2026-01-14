@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-entry.interface.js";
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
@@ -22,6 +23,7 @@ class Sftp implements DeviceFileIO {
 
     const lsEntries: DeviceFileIOLsEntry[] = dirEntries.map((d) => ({
       name: d.name,
+      path: path.join(dirPath, d.name),
       is: {
         file: d.type === "l",
         dir: d.type === "d",
