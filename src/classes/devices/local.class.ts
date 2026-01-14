@@ -122,6 +122,7 @@ class Local implements Device, Debug {
       );
       if (writeError) logger.error(writeError.toString());
     },
+    lists: async () => {},
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
         if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
