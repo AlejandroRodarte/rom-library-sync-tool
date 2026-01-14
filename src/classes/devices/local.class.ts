@@ -194,8 +194,8 @@ class Local implements Device, Debug {
           continue;
         }
 
-        logger.trace(
-          `Successfully populated ${listFilePath} with contents from ${romsDirPath}.`,
+        logger.info(
+          `Successfully generated ROMs list file at ${listFilePath} with contents from ROMs dir at ${romsDirPath}`,
         );
       }
 
