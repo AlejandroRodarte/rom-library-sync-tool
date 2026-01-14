@@ -1,17 +1,19 @@
 import path from "path";
 
-import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 import logger from "../../objects/logger.object.js";
-import environment from "../../objects/environment.object.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
 import allDirsExistAndAreReadableAndWritable, {
   type AllDirsExistAndAreReadableAndWritableError,
 } from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
-import openNewWriteOnlyFile from "../file-io/open-new-write-only-file.helper.js";
-import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
+import openNewWriteOnlyFile, {
+  type OpenNewWriteOnlyFileError,
+} from "../file-io/open-new-write-only-file.helper.js";
+import fileExistsAndReadUtf8Lines, {
+  type FileExistsAndReadUtf8Lines,
+} from "../file-io/file-exists-and-read-utf8-lines.helper.js";
 import createFileSymlink from "../file-io/create-file-symlink.helper.js";
 import deleteFileSymlink from "../file-io/delete-file-symlink.helper.js";
 import writeToFile from "../file-io/write-to-file.helper.js";
@@ -24,6 +26,11 @@ import anyFileExists, {
 import type { DiffAction } from "../../types/diff-action.type.js";
 import type Local from "../../classes/devices/local.class.js";
 import databasePaths from "../../objects/database-paths.object.js";
+import type {
+  GetConsoleRomsDiffFilePath,
+  GetConsoleRomsFailedFilePathError,
+  GetConsoleRomsSyncDirPath,
+} from "../../classes/devices/local.class.js";
 
 const build = {
   diffActionFromDiffLine,
@@ -44,11 +51,15 @@ const fileIO = {
 };
 
 export type SyncLocalError =
-  | AppWrongTypeError
+  | AnyFileExistsError
   | FsFileExistsError
   | AllDirsExistAndAreReadableAndWritableError
   | FsNotFoundError
-  | AnyFileExistsError;
+  | GetConsoleRomsFailedFilePathError
+  | GetConsoleRomsDiffFilePath
+  | GetConsoleRomsSyncDirPath
+  | OpenNewWriteOnlyFileError
+  | FileExistsAndReadUtf8Lines;
 
 const syncLocal = async (local: Local): Promise<SyncLocalError | undefined> => {
   const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
@@ -74,9 +85,17 @@ const syncLocal = async (local: Local): Promise<SyncLocalError | undefined> => {
     );
 
   for (const [consoleName, konsole] of local.syncableConsoles) {
-    const romsFailedFilePath = local.getConsoleRomsFailedFilePath(consoleName);
-    const romsDiffFilePath = local.getConsoleRomsDiffFilePath(consoleName);
-    const localRomsDirPath = local.getConsoleRomsSyncDirPath(consoleName);
+    const [romsFailedFilePath, failedFilePathError] =
+      local.getConsoleRomsFailedFilePath(consoleName);
+    if (failedFilePathError) return failedFilePathError;
+
+    const [romsDiffFilePath, diffFilePathError] =
+      local.getConsoleRomsDiffFilePath(consoleName);
+    if (diffFilePathError) return diffFilePathError;
+
+    const [localRomsDirPath, romsDirPathError] =
+      local.getConsoleRomsSyncDirPath(consoleName);
+    if (romsDirPathError) return romsDirPathError;
 
     const [failedFileHandle, failedFileOpenError] =
       await fileIO.openNewWriteOnlyFile(romsFailedFilePath);

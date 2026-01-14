@@ -1,14 +1,17 @@
 import path from "path";
 
-import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
 import logger from "../../objects/logger.object.js";
-import steamDeckSftpClient from "../build/steam-deck-sftp-client.helper.js";
+import steamDeckSftpClient, {
+  type SteamDeckSftpClientError,
+} from "../build/steam-deck-sftp-client.helper.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
 import fileExists from "../file-io/file-exists.helper.js";
-import openNewWriteOnlyFile from "../file-io/open-new-write-only-file.helper.js";
+import openNewWriteOnlyFile, {
+  type OpenNewWriteOnlyFileError,
+} from "../file-io/open-new-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
 import writeToFile from "../file-io/write-to-file.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
@@ -16,13 +19,16 @@ import deleteFile from "../file-io/delete-file.helper.js";
 import anyFileExists, {
   type AnyFileExistsError,
 } from "../file-io/any-file-exists.helper.js";
-import type {
-  AllDirsExistMethodError,
-  ConnectMethodError,
-} from "../../classes/sftp-client.class.js";
+import type { AllDirsExistMethodError } from "../../classes/sftp-client.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
 import type SteamDeck from "../../classes/devices/steam-deck.class.js";
 import databasePaths from "../../objects/database-paths.object.js";
+import type {
+  GetConsoleRomsDiffFilePath,
+  GetConsoleRomsFailedFilePathError,
+  GetConsoleRomsSyncDirPath,
+} from "../../classes/devices/steam-deck.class.js";
+import type { FileExistsAndIsReadableError } from "../file-io/file-exists-and-is-readable.helper.js";
 
 const build = {
   steamDeckSftpClient,
@@ -41,12 +47,16 @@ const fileIO = {
 };
 
 export type SyncSteamDeckError =
-  | AppWrongTypeError
+  | AnyFileExistsError
   | FsFileExistsError
-  | ConnectMethodError
+  | SteamDeckSftpClientError
   | AllDirsExistMethodError
   | SftpNotFoundError
-  | AnyFileExistsError;
+  | GetConsoleRomsFailedFilePathError
+  | GetConsoleRomsDiffFilePath
+  | GetConsoleRomsSyncDirPath
+  | OpenNewWriteOnlyFileError
+  | FileExistsAndIsReadableError;
 
 const syncSteamDeck = async (
   steamDeck: SteamDeck,
@@ -82,11 +92,18 @@ const syncSteamDeck = async (
       `Not all of the following directories exist:\n${steamDeck.allSyncDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,
     );
 
-  for (const [consoleName, konsole] of steamDeck.consoles()) {
-    const romsRemoteDirPath = steamDeck.getConsoleRomsSyncDirPath(consoleName);
-    const romsFailedFilePath =
+  for (const [consoleName, konsole] of steamDeck.romsSyncableConsoles) {
+    const [romsFailedFilePath, failedFilePathError] =
       steamDeck.getConsoleRomsFailedFilePath(consoleName);
-    const romsDiffFilePath = steamDeck.getConsoleRomsDiffFilePath(consoleName);
+    if (failedFilePathError) return failedFilePathError;
+
+    const [romsDiffFilePath, diffFilePathError] =
+      steamDeck.getConsoleRomsDiffFilePath(consoleName);
+    if (diffFilePathError) return diffFilePathError;
+
+    const [romsRemoteDirPath, romsDirPathError] =
+      steamDeck.getConsoleRomsSyncDirPath(consoleName);
+    if (romsDirPathError) return romsDirPathError;
 
     const [failedFileHandle, failedFileOpenError] =
       await fileIO.openNewWriteOnlyFile(romsFailedFilePath);

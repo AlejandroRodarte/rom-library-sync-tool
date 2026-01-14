@@ -1,6 +1,5 @@
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
 import ALL_LOG_LEVELS from "../../constants/all-log-levels.constant.js";
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import DEVICE_NAMES from "../../constants/device-names.constant.js";

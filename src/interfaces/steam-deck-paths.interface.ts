@@ -15,7 +15,7 @@ export interface SteamDeckPaths {
         roms: string; // devices/steam-deck/lists/roms/
         media: {
           base: string; // devices/steam-deck/lists/media/
-          names: MediaPaths; // devices/steam-deck/lists/media/<media-name>/
+          names: Partial<MediaPaths>; // devices/steam-deck/lists/media/<media-name>/
         };
       };
       diffs: {
@@ -23,7 +23,7 @@ export interface SteamDeckPaths {
         roms: string; // devices/steam-deck/diffs/roms/
         media: {
           base: string; // devices/steam-deck/diffs/media/
-          names: MediaPaths; // devices/steam-deck/diffs/media/<media-name>/
+          names: Partial<MediaPaths>; // devices/steam-deck/diffs/media/<media-name>/
         };
       };
       failed: {
@@ -31,22 +31,24 @@ export interface SteamDeckPaths {
         roms: string; // devices/steam-deck/failed/roms/
         media: {
           base: string; // devices/steam-deck/failed/media/
-          names: MediaPaths; // devices/steam-deck/failed/media/<media-name>/
+          names: Partial<MediaPaths>; // devices/steam-deck/failed/media/<media-name>/
         };
       };
     };
     sync: {
       roms: {
         base: string; // $STEAM_DECK_REMOTE_ROMS_DIR_PATH/
-        consoles: ConsolePaths; // $STEAM_DECK_REMOTE_ROMS_DIR_PATH/<console>/
+        consoles: Partial<ConsolePaths>; // $STEAM_DECK_REMOTE_ROMS_DIR_PATH/<console>/
       };
       media: {
         base: string; // $STEAM_DECK_REMOTE_MEDIA_DIR_PATH/
-        consoles: ConsoleContent<{ base: string; names: MediaPaths }>; // $STEAM_DECK_REMOTE_MEDIA_DIR_PATH/<console>/<media-name>/
+        consoles: Partial<
+          ConsoleContent<{ base: string; names: Partial<MediaPaths> }>
+        >; // $STEAM_DECK_REMOTE_MEDIA_DIR_PATH/<console>/<media-name>/
       };
       metadata: {
         base: string; // $STEAM_DECK_REMOTE_METADATA_DIR_PATH/
-        consoles: ConsolePaths; // $STEAM_DECK_REMOTE_METADATA_DIR_PATH/<console>/
+        consoles: Partial<ConsolePaths>; // $STEAM_DECK_REMOTE_METADATA_DIR_PATH/<console>/
       };
     };
   };
@@ -58,26 +60,26 @@ export interface SteamDeckPaths {
       };
       lists: {
         roms: {
-          consoles: ConsolePaths; // devices/steam-deck/lists/roms/<console>.list.txt
+          consoles: Partial<ConsolePaths>; // devices/steam-deck/lists/roms/<console>.list.txt
         };
-        media: MediaContent<ConsolePaths>; // devices/steam-deck/lists/media/<media-name>/<console>.list.txt
+        media: Partial<MediaContent<Partial<ConsolePaths>>>; // devices/steam-deck/lists/media/<media-name>/<console>.list.txt
       };
       diffs: {
         roms: {
-          consoles: ConsolePaths; // devices/steam-deck/diffs/roms/<console>.diff.txt
+          consoles: Partial<ConsolePaths>; // devices/steam-deck/diffs/roms/<console>.diff.txt
         };
-        media: MediaContent<ConsolePaths>; // devices/steam-deck/diffs/media/<media-name>/<console>.diff.txt
+        media: Partial<MediaContent<Partial<ConsolePaths>>>; // devices/steam-deck/diffs/media/<media-name>/<console>.diff.txt
       };
       failed: {
         roms: {
-          consoles: ConsolePaths; // devices/steam-deck/failed/roms/<console>.failed.txt
+          consoles: Partial<ConsolePaths>; // devices/steam-deck/failed/roms/<console>.failed.txt
         };
-        media: MediaContent<ConsolePaths>; // devices/steam-deck/failed/media/<media-name>/<console>.failed.txt
+        media: Partial<MediaContent<Partial<ConsolePaths>>>; // devices/steam-deck/failed/media/<media-name>/<console>.failed.txt
       };
     };
     sync: {
       metadata: {
-        consoles: ConsolePaths; // $STEAM_DECK_REMOTE_METADATA_DIR_PATH/<console>/gamelist.xml
+        consoles: Partial<ConsolePaths>; // $STEAM_DECK_REMOTE_METADATA_DIR_PATH/<console>/gamelist.xml
       };
     };
   };

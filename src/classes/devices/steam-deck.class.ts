@@ -10,10 +10,8 @@ import Console from "../console.class.js";
 import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
-import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
 import type { SteamDeckPaths } from "../../interfaces/steam-deck-paths.interface.js";
-import MEDIA_NAMES from "../../constants/media-names.constant.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
@@ -28,6 +26,9 @@ import fileIO from "../../helpers/file-io/index.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
+export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
+export type GetConsoleRomsDiffFilePath = AppNotFoundError;
+export type GetConsoleRomsSyncDirPath = AppNotFoundError;
 
 const STEAM_DECK = "steam-deck" as const;
 
@@ -146,6 +147,20 @@ class SteamDeck implements Device, Debug {
     },
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
+        if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
+          logger.warn(
+            `There is no ROM list filepath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
+        if (!this._paths.files.fileIO.diffs.roms.consoles[consoleName]) {
+          logger.warn(
+            `There is no ROM diff filepath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
         const diffError = await fileIO.writeConsoleDiffFile(konsole, {
           list: this._paths.files.fileIO.lists.roms.consoles[consoleName],
           diff: this._paths.files.fileIO.diffs.roms.consoles[consoleName],
@@ -256,11 +271,13 @@ class SteamDeck implements Device, Debug {
 
     const mediaFailedPaths: string[] = [];
 
-    for (const mediaName of MEDIA_NAMES)
-      for (const consoleName of CONSOLE_NAMES)
-        mediaFailedPaths.push(
-          this._paths.files.fileIO.failed.media[mediaName][consoleName],
-        );
+    for (const mediaName of this._mediaNames)
+      if (this._paths.files.fileIO.failed.media[mediaName])
+        for (const consoleName of this._consoleNames)
+          if (this._paths.files.fileIO.failed.media[mediaName][consoleName])
+            mediaFailedPaths.push(
+              this._paths.files.fileIO.failed.media[mediaName][consoleName],
+            );
 
     return [...romsFailedPaths, ...mediaFailedPaths];
   }
@@ -276,38 +293,66 @@ class SteamDeck implements Device, Debug {
     const mediaSyncPaths: string[] = [];
     const metadataSyncPaths: string[] = [];
 
-    for (const consoleName of CONSOLE_NAMES) {
-      if (!this._consoleNames.includes(consoleName)) continue;
+    for (const consoleName of this._consoleNames) {
+      if (this._paths.dirs.sync.media.consoles[consoleName]) {
+        basePaths.push(this._paths.dirs.sync.media.consoles[consoleName].base);
 
-      basePaths.push(this._paths.dirs.sync.media.consoles[consoleName].base);
-
-      romsSyncPaths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
-      metadataSyncPaths.push(
-        this._paths.dirs.sync.metadata.consoles[consoleName],
-      );
-
-      for (const mediaName of MEDIA_NAMES) {
-        // TODO: if (!this._mediaNames.includes(mediaName)) continue;
-        // requires STEAM_DECK_MEDIAS_LIST environment variable
-        mediaSyncPaths.push(
-          this._paths.dirs.sync.media.consoles[consoleName].names[mediaName],
-        );
+        for (const mediaName of this._mediaNames)
+          if (
+            this._paths.dirs.sync.media.consoles[consoleName].names[mediaName]
+          )
+            mediaSyncPaths.push(
+              this._paths.dirs.sync.media.consoles[consoleName].names[
+                mediaName
+              ],
+            );
       }
+
+      if (this._paths.dirs.sync.roms.consoles[consoleName])
+        romsSyncPaths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
+
+      if (this._paths.dirs.sync.metadata.consoles[consoleName])
+        metadataSyncPaths.push(
+          this._paths.dirs.sync.metadata.consoles[consoleName],
+        );
     }
 
     return [...basePaths, ...mediaSyncPaths, ...metadataSyncPaths];
   }
 
-  public getConsoleRomsFailedFilePath(consoleName: ConsoleName): string {
-    return this._paths.files.fileIO.failed.roms.consoles[consoleName];
+  public getConsoleRomsFailedFilePath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsFailedFilePathError] {
+    const path = this._paths.files.fileIO.failed.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(
+        `No ROM failed filepath for console ${consoleName}.`,
+      ),
+    ];
   }
 
-  public getConsoleRomsDiffFilePath(consoleName: ConsoleName): string {
-    return this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+  public getConsoleRomsDiffFilePath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsDiffFilePath] {
+    const path = this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(`No ROM diff filepath for console ${consoleName}.`),
+    ];
   }
 
-  public getConsoleRomsSyncDirPath(consoleName: ConsoleName): string {
-    return this._paths.dirs.sync.roms.consoles[consoleName];
+  public getConsoleRomsSyncDirPath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsSyncDirPath] {
+    const path = this._paths.dirs.sync.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(`No ROM sync dirpath for console ${consoleName}.`),
+    ];
   }
 
   public addConsole(
@@ -358,8 +403,11 @@ class SteamDeck implements Device, Debug {
             media: {
               base: mediaListsDirPath,
               names: Object.fromEntries(
-                MEDIA_NAMES.map((m) => [m, path.join(mediaListsDirPath, m)]),
-              ) as MediaPaths,
+                this._mediaNames.map((m) => [
+                  m,
+                  path.join(mediaListsDirPath, m),
+                ]),
+              ) as Partial<MediaPaths>,
             },
           },
           diffs: {
@@ -368,8 +416,11 @@ class SteamDeck implements Device, Debug {
             media: {
               base: mediaDiffsDirPath,
               names: Object.fromEntries(
-                MEDIA_NAMES.map((m) => [m, path.join(mediaDiffsDirPath, m)]),
-              ) as MediaPaths,
+                this._mediaNames.map((m) => [
+                  m,
+                  path.join(mediaDiffsDirPath, m),
+                ]),
+              ) as Partial<MediaPaths>,
             },
           },
           failed: {
@@ -378,8 +429,11 @@ class SteamDeck implements Device, Debug {
             media: {
               base: mediaFailedDirPath,
               names: Object.fromEntries(
-                MEDIA_NAMES.map((m) => [m, path.join(mediaFailedDirPath, m)]),
-              ) as MediaPaths,
+                this._mediaNames.map((m) => [
+                  m,
+                  path.join(mediaFailedDirPath, m),
+                ]),
+              ) as Partial<MediaPaths>,
             },
           },
         },
@@ -387,16 +441,16 @@ class SteamDeck implements Device, Debug {
           roms: {
             base: environment.devices["steam-deck"].paths.roms,
             consoles: Object.fromEntries(
-              CONSOLE_NAMES.map((c) => [
+              this._consoleNames.map((c) => [
                 c,
                 path.join(environment.devices["steam-deck"].paths.roms, c),
               ]),
-            ) as ConsolePaths,
+            ) as Partial<ConsolePaths>,
           },
           media: {
             base: path.join(environment.devices["steam-deck"].paths.media),
             consoles: Object.fromEntries(
-              CONSOLE_NAMES.map((c) => [
+              this._consoleNames.map((c) => [
                 c,
                 {
                   base: path.join(
@@ -404,7 +458,7 @@ class SteamDeck implements Device, Debug {
                     c,
                   ),
                   names: Object.fromEntries(
-                    MEDIA_NAMES.map((m) => [
+                    this._mediaNames.map((m) => [
                       m,
                       path.join(
                         environment.devices["steam-deck"].paths.media,
@@ -412,19 +466,21 @@ class SteamDeck implements Device, Debug {
                         m,
                       ),
                     ]),
-                  ),
+                  ) as Partial<MediaPaths>,
                 },
               ]),
-            ) as ConsoleContent<{ base: string; names: MediaPaths }>,
+            ) as Partial<
+              ConsoleContent<{ base: string; names: Partial<MediaPaths> }>
+            >,
           },
           metadata: {
             base: path.join(environment.devices["steam-deck"].paths.metadata),
             consoles: Object.fromEntries(
-              CONSOLE_NAMES.map((c) => [
+              this._consoleNames.map((c) => [
                 c,
                 path.join(environment.devices["steam-deck"].paths.metadata, c),
               ]),
-            ) as ConsolePaths,
+            ) as Partial<ConsolePaths>,
           },
         },
       },
@@ -437,71 +493,71 @@ class SteamDeck implements Device, Debug {
           lists: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsListsDirPath, `${c}.list.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
             media: Object.fromEntries(
-              MEDIA_NAMES.map((m) => [
+              this._mediaNames.map((m) => [
                 m,
                 Object.fromEntries(
-                  CONSOLE_NAMES.map((c) => [
+                  this._consoleNames.map((c) => [
                     c,
                     path.join(mediaListsDirPath, m, `${c}.list.txt`),
                   ]),
-                ),
+                ) as Partial<ConsolePaths>,
               ]),
-            ) as MediaContent<ConsolePaths>,
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
           diffs: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsDiffsDirPath, `${c}.diff.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
             media: Object.fromEntries(
-              MEDIA_NAMES.map((m) => [
+              this._mediaNames.map((m) => [
                 m,
                 Object.fromEntries(
-                  CONSOLE_NAMES.map((c) => [
+                  this._consoleNames.map((c) => [
                     c,
                     path.join(mediaDiffsDirPath, m, `${c}.diff.txt`),
                   ]),
-                ),
+                ) as Partial<ConsolePaths>,
               ]),
-            ) as MediaContent<ConsolePaths>,
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
           failed: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsFailedDirPath, `${c}.failed.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
             media: Object.fromEntries(
-              MEDIA_NAMES.map((m) => [
+              this._mediaNames.map((m) => [
                 m,
                 Object.fromEntries(
-                  CONSOLE_NAMES.map((c) => [
+                  this._consoleNames.map((c) => [
                     c,
                     path.join(mediaFailedDirPath, m, `${c}.failed.txt`),
                   ]),
-                ),
+                ) as Partial<ConsolePaths>,
               ]),
-            ) as MediaContent<ConsolePaths>,
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
         },
         sync: {
           metadata: {
             consoles: Object.fromEntries(
-              CONSOLE_NAMES.map((c) => [
+              this._consoleNames.map((c) => [
                 c,
                 path.join(
                   environment.devices["steam-deck"].paths.metadata,
@@ -509,7 +565,7 @@ class SteamDeck implements Device, Debug {
                   "gamelist.xml",
                 ),
               ]),
-            ) as ConsolePaths,
+            ) as Partial<ConsolePaths>,
           },
         },
       },

@@ -11,7 +11,6 @@ import Console from "../console.class.js";
 import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
-import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
 import build from "../../helpers/build/index.js";
 import logger from "../../objects/logger.object.js";
@@ -24,6 +23,9 @@ import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-ski
 import type { Debug } from "../../interfaces/debug.interface.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
+export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
+export type GetConsoleRomsDiffFilePath = AppNotFoundError;
+export type GetConsoleRomsSyncDirPath = AppNotFoundError;
 
 const LOCAL = "local" as const;
 
@@ -122,6 +124,20 @@ class Local implements Device, Debug {
     },
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
+        if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
+          logger.warn(
+            `There is no ROM list filepath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
+        if (!this._paths.files.fileIO.diffs.roms.consoles[consoleName]) {
+          logger.warn(
+            `There is no ROM diff filepath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
         // 1. couldn't delete previous diff file (if it existed)
         // 2. couldn't read list file
         // 3. couldn't open a new diff file
@@ -200,24 +216,46 @@ class Local implements Device, Debug {
   get allSyncDirPaths(): string[] {
     const paths = [this._paths.dirs.sync.roms.base];
 
-    for (const consoleName of CONSOLE_NAMES) {
-      if (!this._consoleNames.includes(consoleName)) continue;
-      paths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
-    }
+    for (const consoleName of this._consoleNames)
+      if (this._paths.dirs.sync.roms.consoles[consoleName])
+        paths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
 
     return paths;
   }
 
-  public getConsoleRomsFailedFilePath(consoleName: ConsoleName): string {
-    return this._paths.files.fileIO.failed.roms.consoles[consoleName];
+  public getConsoleRomsFailedFilePath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsFailedFilePathError] {
+    const path = this._paths.files.fileIO.failed.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(
+        `No ROM failed filepath for console ${consoleName}.`,
+      ),
+    ];
   }
 
-  public getConsoleRomsDiffFilePath(consoleName: ConsoleName): string {
-    return this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+  public getConsoleRomsDiffFilePath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsDiffFilePath] {
+    const path = this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(`No ROM diff filepath for console ${consoleName}.`),
+    ];
   }
 
-  public getConsoleRomsSyncDirPath(consoleName: ConsoleName): string {
-    return this._paths.dirs.sync.roms.consoles[consoleName];
+  public getConsoleRomsSyncDirPath(
+    consoleName: ConsoleName,
+  ): [string, undefined] | [undefined, GetConsoleRomsSyncDirPath] {
+    const path = this._paths.dirs.sync.roms.consoles[consoleName];
+    if (path) return [path, undefined];
+    return [
+      undefined,
+      new AppNotFoundError(`No ROM sync dirpath for console ${consoleName}.`),
+    ];
   }
 
   private _addConsole(
@@ -276,11 +314,11 @@ class Local implements Device, Debug {
           roms: {
             base: environment.devices.local.paths.roms,
             consoles: Object.fromEntries(
-              CONSOLE_NAMES.map((c) => [
+              this._consoleNames.map((c) => [
                 c,
                 path.join(environment.devices.local.paths.roms, c),
               ]),
-            ) as ConsolePaths,
+            ) as Partial<ConsolePaths>,
           },
         },
       },
@@ -293,31 +331,31 @@ class Local implements Device, Debug {
           lists: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsListsDirPath, `${c}.list.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
           },
           diffs: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsDiffsDirPath, `${c}.diff.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
           },
           failed: {
             roms: {
               consoles: Object.fromEntries(
-                CONSOLE_NAMES.map((c) => [
+                this._consoleNames.map((c) => [
                   c,
                   path.join(romsFailedDirPath, `${c}.failed.txt`),
                 ]),
-              ) as ConsolePaths,
+              ) as Partial<ConsolePaths>,
             },
           },
         },
