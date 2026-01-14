@@ -9,14 +9,16 @@ import type { DisconnectError } from "../helpers/sftp/disconnect.helper.js";
 import type { ExistsError } from "../helpers/sftp/exists.helper.js";
 import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
 import type { SftpCredentials } from "../interfaces/sftp-credentials.interface.js";
+import type { ListError } from "../helpers/sftp/list.helper.js";
 
-export type ConnectMethodError = SftpConnectionError | ConnectError;
-export type DisconnectMethodError = SftpDisconnectionError | DisconnectError;
+export type ConnectMethodError = ConnectError;
+export type DisconnectMethodError = DisconnectError;
 export type AddFileMethodError = AddFileError;
 export type DeleteFileMethodError = DeleteFileError;
 export type FileExistsMethodError = ExistsError;
 export type DirExistsMethodError = ExistsError;
-export type AllDirsExistMethodError = ExistsError;
+export type AllDirsExistMethodError = DirExistsMethodError;
+export type ListMethodError = ListError;
 
 class SftpClient {
   private _credentials: SftpCredentials;
@@ -54,6 +56,14 @@ class SftpClient {
     if (disconnectionError) return disconnectionError;
 
     this._connected = false;
+  }
+
+  public async list(
+    remoteDirPath: string,
+  ): Promise<[Client.FileInfo[], undefined] | [undefined, ListMethodError]> {
+    const [entries, listError] = await sftp.list(this._client, remoteDirPath);
+    if (listError) return [undefined, listError];
+    return [entries, undefined];
   }
 
   public async fileExists(
