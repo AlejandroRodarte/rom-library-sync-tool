@@ -190,9 +190,18 @@ class Local implements Device, Debug {
         );
 
         if (writeError) {
-          logger.error(`${writeError.toString()}. Skipping.`);
+          logger.error(
+            `${writeError.toString()}. Skipping and closing file handle`,
+          );
+          await listFileHandle.close();
           continue;
         }
+
+        logger.trace(
+          `Finished writing to file ${listFilePath}. Closing file handle.`,
+        );
+
+        await listFileHandle.close();
 
         logger.info(
           `Successfully generated ROMs list file at ${listFilePath} with contents from ROMs dir at ${romsDirPath}`,
