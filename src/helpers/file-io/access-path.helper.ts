@@ -1,6 +1,6 @@
 import type { PathLike } from "node:fs";
 import access, { type AccessError } from "./access.helper.js";
-import stats, { type StatsError } from "./stats.helper.js";
+import stat, { type StatsError } from "./stat.helper.js";
 import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
 
 export type AccessPathError = AccessError | StatsError | FsWrongTypeError;
@@ -13,7 +13,7 @@ const accessPath = async (
   const accessError = await access(path, mode);
   if (accessError) return accessError;
 
-  const [pathStats, statsError] = await stats(path);
+  const [pathStats, statsError] = await stat(path);
   if (statsError) return statsError;
 
   switch (type) {

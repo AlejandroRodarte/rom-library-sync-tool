@@ -8,7 +8,7 @@ import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.clas
 
 export type StatsError = UnknownError | FsNotFoundError | FsUnauthorizedError;
 
-const stats = async (
+const stat = async (
   path: PathLike,
 ): Promise<[Stats, undefined] | [undefined, StatsError]> => {
   try {
@@ -48,4 +48,4 @@ const stats = async (
   }
 };
 
-export default stats;
+export default stat;

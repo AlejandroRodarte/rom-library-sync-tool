@@ -18,7 +18,7 @@ import fileExists from "./file-exists.helper.js";
 import fileIsEmpty from "./file-is-empty.helper.js";
 import deleteAndOpenWriteOnlyFile from "./delete-and-open-new-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "./file-exists-and-read-utf8-lines.helper.js";
-import stats from "./stats.helper.js";
+import stat from "./stat.helper.js";
 import access from "./access.helper.js";
 import anyFileExists from "./any-file-exists.helper.js";
 import allDirsExistAndAreReadableAndWritable from "./all-dirs-exist-and-are-readable-and-writable.helper.js";
@@ -54,7 +54,7 @@ const fileIO = {
   fileIsEmpty,
   deleteAndOpenWriteOnlyFile,
   fileExistsAndReadUtf8Lines,
-  stats,
+  stat,
   access,
   anyFileExists,
   allDirsExistAndAreReadableAndWritable,
