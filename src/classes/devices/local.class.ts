@@ -21,6 +21,7 @@ import databasePaths from "../../objects/database-paths.object.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-skip-flags.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
+import writeToFileOrDelete from "../../helpers/file-io/write-to-file-or-delete.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -122,7 +123,84 @@ class Local implements Device, Debug {
       );
       if (writeError) logger.error(writeError.toString());
     },
-    lists: async () => {},
+    lists: async () => {
+      logger.trace(`device.write.lists() starts for console ${this._name}.`);
+
+      for (const consoleName of this._consoleNames) {
+        logger.trace(`starting to write list file for console ${consoleName}`);
+
+        const romsDirPath = this._paths.dirs.sync.roms.consoles[consoleName];
+        if (!romsDirPath) {
+          logger.warn(
+            `There is no ROM sync dirpath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
+        logger.debug(
+          `ROMs sync dirpath for console ${consoleName}: ${romsDirPath}`,
+        );
+
+        const listFilePath =
+          this._paths.files.fileIO.lists.roms.consoles[consoleName];
+        if (!listFilePath) {
+          logger.warn(
+            `There is no ROM list filepath for console ${consoleName}. Skipping.`,
+          );
+          continue;
+        }
+
+        logger.debug(
+          `ROM list filepath for console ${consoleName}: ${listFilePath}`,
+        );
+
+        const [fileSymlinkEntries, readDirError] =
+          await fileIO.readDirAndGetFileSymlinks(romsDirPath);
+
+        if (readDirError) {
+          logger.error(`${readDirError.toString()}. Skipping.`);
+          continue;
+        }
+
+        logger.trace(`Successfully fetched file symlinks from ${romsDirPath}.`);
+
+        const filenames = fileSymlinkEntries.map((e) => e.name.toString());
+
+        logger.trace(
+          `Deleting ${listFilePath} to create a new one and get its file handle.`,
+        );
+
+        const [listFileHandle, listFileError] =
+          await fileIO.deleteAndOpenWriteOnlyFile(listFilePath);
+
+        if (listFileError) {
+          logger.error(`${listFileError.toString()}. Skipping.`);
+          continue;
+        }
+
+        logger.trace(
+          `Successfully created a new file at ${listFilePath}. About to attempt to write contents into it.`,
+        );
+
+        const writeError = await writeToFileOrDelete(
+          listFilePath,
+          listFileHandle,
+          `${filenames.join("\n")}\n`,
+          "utf8",
+        );
+
+        if (writeError) {
+          logger.error(`${writeError.toString()}. Skipping.`);
+          continue;
+        }
+
+        logger.trace(
+          `Successfully populated ${listFilePath} with contents from ${romsDirPath}.`,
+        );
+      }
+
+      logger.trace(`device.write.lists() ends for console ${this._name}.`);
+    },
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
         if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
