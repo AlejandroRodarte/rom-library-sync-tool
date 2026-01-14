@@ -8,9 +8,9 @@ class UnknownError extends CustomError {
 
   private _reasons: string[];
 
-  constructor(reason: string) {
+  constructor(...reasons: string[]) {
     super();
-    this._reasons = [reason];
+    this._reasons = reasons;
   }
 
   get reasons(): string[] {
@@ -26,7 +26,7 @@ class UnknownError extends CustomError {
 
     content += `!!!!! Error !!!!!\n`;
     content += `Type: ${this.type}\n`;
-    content += `Status code: ${this.code}\n`;
+    content += `Status code: ${this.status}\n`;
     content += `Code: ${this.code}.\n`;
     content += `Message: ${this.message}\n`;
 

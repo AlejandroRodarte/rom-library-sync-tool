@@ -8,9 +8,9 @@ class SftpConnectionError extends CustomError {
 
   private _reasons: string[];
 
-  constructor(reason: string) {
+  constructor(...reasons: string[]) {
     super();
-    this._reasons = [reason];
+    this._reasons = reasons;
   }
 
   get reasons(): string[] {
