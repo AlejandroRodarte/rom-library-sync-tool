@@ -1,32 +1,25 @@
-import readdir, { type ReaddirError } from "./readdir.helper.js";
+import { type ReaddirError } from "./readdir.helper.js";
 import path from "path";
 import realpath, { type RealpathError } from "./realpath.helper.js";
 import stat, { type StatError } from "./stat.helper.js";
-import type { Dirent } from "fs";
+import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-entry.interface.js";
 
-export type ReadDirAndGetFileSymlinksError =
+export type GetFileSymlinksFromDeviceFileIOLsEntries =
   | ReaddirError
   | RealpathError
   | StatError;
 
-const readDirAndGetFileSymlinks = async (
-  dirPath: string,
+const getFileSymlinksFromDeviceFileIOLsEntries = async (
+  list: DeviceFileIOLsEntry[],
 ): Promise<
-  | [Dirent<NonSharedBuffer>[], undefined]
-  | [undefined, ReadDirAndGetFileSymlinksError]
+  | [DeviceFileIOLsEntry[], undefined]
+  | [undefined, GetFileSymlinksFromDeviceFileIOLsEntries]
 > => {
-  const [entries, readDirError] = await readdir([
-    dirPath,
-    { withFileTypes: true, encoding: "buffer" },
-  ]);
-
-  if (readDirError) return [undefined, readDirError];
-
-  const symlinks = entries.filter((e) => e.isSymbolicLink());
+  const symlinks = list.filter((e) => e.is.link);
   const symlinkEntryIndexesToDelete: number[] = [];
 
   for (const [index, symlink] of symlinks.entries()) {
-    const symlinkPath = path.resolve(dirPath, symlink.name.toString());
+    const symlinkPath = path.resolve(symlink.path);
 
     const [targetPath, realpathError] = await realpath(symlinkPath);
     if (realpathError) return [undefined, realpathError];
@@ -42,4 +35,4 @@ const readDirAndGetFileSymlinks = async (
   return [symlinks, undefined];
 };
 
-export default readDirAndGetFileSymlinks;
+export default getFileSymlinksFromDeviceFileIOLsEntries;

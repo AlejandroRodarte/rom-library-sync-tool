@@ -32,7 +32,7 @@ import createFileSymlink from "./create-file-symlink.helper.js";
 import deleteFileSymlink from "./delete-file-symlink.helper.js";
 import allDirsExistAndAreReadable from "./all-dirs-exist-and-are-readable.helper.js";
 import allFilesExistAndAreReadable from "./all-files-exist-and-are-readable.helper.js";
-import readDirAndGetFileSymlinks from "./read-dir-and-get-file-symlinks.helper.js";
+import getFileSymlinksFromDeviceFileIOLsEntries from "./get-file-symlinks-from-device-file-io-ls-entries.helper.js";
 import realpath from "./realpath.helper.js";
 
 const fileIO = {
@@ -70,7 +70,7 @@ const fileIO = {
   deleteFileSymlink,
   allDirsExistAndAreReadable,
   allFilesExistAndAreReadable,
-  readDirAndGetFileSymlinks,
+  getFileSymlinksFromDeviceFileIOLsEntries,
   realpath,
 };
 
