@@ -1,10 +1,10 @@
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import symlink, { type SymlinkError } from "../wrappers/modules/fs/symlink.helper.js";
+import unlink, { type UnlinkError } from "../wrappers/modules/fs/unlink.helper.js";
 import fileExists, { type FileExistsError } from "./file-exists.helper.js";
 import symlinkExists, {
   type SymlinkExistsError,
 } from "./symlink-exists.helper.js";
-import symlink, { type SymlinkError } from "./symlink.helper.js";
-import unlink, { type UnlinkError } from "./unlink.helper.js";
 
 export type CreateFileSymlinkError =
   | FileExistsError
@@ -23,7 +23,7 @@ const createFileSymlink = async (
   const symlinkExistsError = await symlinkExists(symlinkPath);
   if (symlinkExistsError) {
     if (symlinkExistsError instanceof FsNotFoundError) {
-      const createSymlinkError = await symlink([filePath, symlinkPath, "file"]);
+      const createSymlinkError = await symlink(filePath, symlinkPath, "file");
       if (createSymlinkError) return createSymlinkError;
       else return undefined;
     } else symlinkExistsError;
@@ -31,7 +31,7 @@ const createFileSymlink = async (
 
   switch (strategyIsSymlinkExists) {
     case "REPLACE":
-      const symlinkDeleteError = unlink([symlinkPath]);
+      const symlinkDeleteError = unlink(symlinkPath);
       if (symlinkDeleteError) return symlinkDeleteError;
       return undefined;
     case "KEEP":

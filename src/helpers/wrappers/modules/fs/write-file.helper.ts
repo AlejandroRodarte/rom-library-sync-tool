@@ -1,23 +1,21 @@
-import fs, { type FileHandle } from "node:fs/promises";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
+import fs from "node:fs/promises";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
 
-export type WriteToFileError =
+export type WriteFileError =
   | UnknownError
   | FsNotFoundError
   | FsUnauthorizedError
   | FsWrongTypeError;
 
-const writeToFile = async (
-  fileHandle: FileHandle,
-  content: string,
-  encoding: BufferEncoding,
-): Promise<WriteToFileError | undefined> => {
+const writeFile = async (
+  ...args: Parameters<typeof fs.writeFile>
+): Promise<WriteFileError | undefined> => {
   try {
-    await fs.writeFile(fileHandle, content, { encoding });
+    await fs.writeFile(...args);
   } catch (e: unknown) {
     if (!typeGuards.isErrnoException(e))
       return new UnknownError(
@@ -44,4 +42,4 @@ const writeToFile = async (
   }
 };
 
-export default writeToFile;
+export default writeFile;

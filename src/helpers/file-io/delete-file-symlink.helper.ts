@@ -1,7 +1,7 @@
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 import type UnknownError from "../../classes/errors/unknown-error.class.js";
+import unlink, { type UnlinkError } from "../wrappers/modules/fs/unlink.helper.js";
 import symlinkExists from "./symlink-exists.helper.js";
-import unlink, { type UnlinkError } from "./unlink.helper.js";
 
 export type DeleteFileSymlinkError = UnknownError | UnlinkError;
 
@@ -20,7 +20,7 @@ const deleteFileSymlink = async (
 
   if (symlinkExistsError) return symlinkExistsError;
 
-  const unlinkError = await unlink([symlinkPath]);
+  const unlinkError = await unlink(symlinkPath);
   if (unlinkError) return unlinkError;
 };
 

@@ -1,8 +1,8 @@
 import Client from "ssh2-sftp-client";
-import SftpDisconnectionError from "../../classes/errors/sftp-disconnection-error.class.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import typeGuards from "../typescript/guards/index.js";
-import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import SftpDisconnectionError from "../../../../classes/errors/sftp-disconnection-error.class.js";
+import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 
 export type DisconnectError =
   | SftpDisconnectionError

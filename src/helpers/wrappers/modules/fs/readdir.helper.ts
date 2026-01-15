@@ -1,10 +1,9 @@
 import fs from "node:fs/promises";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
-import type { Dirent } from "node:fs";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
 
 export type ReaddirError =
   | UnknownError
@@ -13,9 +12,10 @@ export type ReaddirError =
   | FsWrongTypeError;
 
 const readdir = async (
-  args: Parameters<typeof fs.readdir>,
+  ...args: Parameters<typeof fs.readdir>
 ): Promise<
-  [Dirent<NonSharedBuffer>[], undefined] | [undefined, ReaddirError]
+  | [Awaited<ReturnType<typeof fs.readdir>>, undefined]
+  | [undefined, ReaddirError]
 > => {
   const [path] = args;
 

@@ -1,12 +1,12 @@
-import fs, { type FileHandle } from "node:fs/promises";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
-import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
+import fs from "node:fs/promises";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
+import FsFileExistsError from "../../../../classes/errors/fs-file-exists-error.class.js";
 
-export type OpenFileError =
+export type OpenError =
   | UnknownError
   | FsNotFoundError
   | FsUnauthorizedError
@@ -15,7 +15,9 @@ export type OpenFileError =
 
 const open = async (
   ...args: Parameters<typeof fs.open>
-): Promise<[FileHandle, undefined] | [undefined, OpenFileError]> => {
+): Promise<
+  [Awaited<ReturnType<typeof fs.open>>, undefined] | [undefined, OpenError]
+> => {
   const [filePath, flags] = args;
 
   try {

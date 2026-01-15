@@ -1,7 +1,7 @@
 import type { PathLike } from "node:fs";
-import access, { type AccessError } from "./access.helper.js";
-import stat, { type StatError } from "./stat.helper.js";
 import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
+import access, { type AccessError } from "../wrappers/modules/fs/access.helper.js";
+import stat, { type StatError } from "../wrappers/modules/fs/stat.helper.js";
 
 export type AccessPathError = AccessError | StatError | FsWrongTypeError;
 

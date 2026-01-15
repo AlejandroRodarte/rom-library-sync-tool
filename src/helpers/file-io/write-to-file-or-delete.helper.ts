@@ -1,10 +1,10 @@
 import type { FileHandle } from "node:fs/promises";
-import writeToFile, { type WriteToFileError } from "./write-to-file.helper.js";
 import type { PathLike } from "node:fs";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 import logger from "../../objects/logger.object.js";
+import writeFile, { type WriteFileError } from "../wrappers/modules/fs/write-file.helper.js";
 
-export type WriteToFileOrDeleteError = WriteToFileError | DeleteFileError;
+export type WriteToFileOrDeleteError = WriteFileError | DeleteFileError;
 
 const writeToFileOrDelete = async (
   filePath: PathLike,
@@ -12,7 +12,7 @@ const writeToFileOrDelete = async (
   content: string,
   encoding: BufferEncoding,
 ): Promise<undefined | WriteToFileOrDeleteError> => {
-  const writeError = await writeToFile(fileHandle, content, encoding);
+  const writeError = await writeFile(fileHandle, content, encoding);
 
   if (writeError) {
     logger.error(writeError.toString());

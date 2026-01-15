@@ -1,8 +1,8 @@
 import type { PathLike } from "node:fs";
-import open, { type OpenFileError } from "./open.helper.js";
 import type { FileHandle } from "node:fs/promises";
+import open, { type OpenError } from "../wrappers/modules/fs/open.helper.js";
 
-export type OpenNewWriteOnlyFileError = OpenFileError;
+export type OpenNewWriteOnlyFileError = OpenError;
 
 const openNewWriteOnlyFile = async (
   filePath: PathLike,

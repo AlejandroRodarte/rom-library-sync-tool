@@ -16,7 +16,6 @@ import fileExistsAndReadUtf8Lines, {
 } from "../file-io/file-exists-and-read-utf8-lines.helper.js";
 import createFileSymlink from "../file-io/create-file-symlink.helper.js";
 import deleteFileSymlink from "../file-io/delete-file-symlink.helper.js";
-import writeToFile from "../file-io/write-to-file.helper.js";
 import fileExists from "../file-io/file-exists.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
@@ -31,6 +30,7 @@ import type {
   GetConsoleRomsFailedFilePathError,
   GetConsoleRomsSyncDirPath,
 } from "../../classes/devices/local.class.js";
+import writeFile from "../wrappers/modules/fs/write-file.helper.js";
 
 const build = {
   diffActionFromDiffLine,
@@ -44,7 +44,7 @@ const fileIO = {
   fileExistsAndReadUtf8Lines,
   createFileSymlink,
   deleteFileSymlink,
-  writeToFile,
+  writeFile,
   fileIsEmpty,
   deleteFile,
   anyFileExists,
@@ -126,7 +126,7 @@ const syncLocal = async (local: Local): Promise<SyncLocalError | undefined> => {
       diffActions.push(diffAction);
     }
 
-    const failedFileWriteError = await fileIO.writeToFile(
+    const failedFileWriteError = await fileIO.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -187,7 +187,7 @@ const syncLocal = async (local: Local): Promise<SyncLocalError | undefined> => {
       failedDiffLines += `${diffLine}\n`;
     }
 
-    const secondFailedFileWriteError = await fileIO.writeToFile(
+    const secondFailedFileWriteError = await fileIO.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",

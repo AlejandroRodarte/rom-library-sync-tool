@@ -1,18 +1,17 @@
 import fs from "node:fs/promises";
-import type { PathLike } from "node:fs";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
 
 export type AccessError = UnknownError | FsNotFoundError | FsUnauthorizedError;
 
 const access = async (
-  path: PathLike,
-  mode?: number,
+  ...args: Parameters<typeof fs.access>
 ): Promise<AccessError | undefined> => {
+  const [path, mode] = args;
   try {
-    await fs.access(path, mode);
+    await fs.access(...args);
   } catch (e: unknown) {
     if (!typeGuards.isErrnoException(e))
       return new UnknownError(

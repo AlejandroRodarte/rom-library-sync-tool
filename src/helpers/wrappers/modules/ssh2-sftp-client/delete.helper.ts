@@ -1,11 +1,11 @@
 import Client from "ssh2-sftp-client";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
-import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
-import SftpBadPathError from "../../classes/errors/sftp-bad-path.class.js";
-import SftpUnauthorizedError from "../../classes/errors/sftp-unauthorized-error.class.js";
-import SftpWrongTypeError from "../../classes/errors/sftp-wrong-type-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
+import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credentials.class.js";
+import SftpBadPathError from "../../../../classes/errors/sftp-bad-path.class.js";
+import SftpUnauthorizedError from "../../../../classes/errors/sftp-unauthorized-error.class.js";
+import SftpWrongTypeError from "../../../../classes/errors/sftp-wrong-type-error.class.js";
 
 export type DeleteError =
   | UnknownError
@@ -17,11 +17,12 @@ export type DeleteError =
 
 const sftpDelete = async (
   client: Client,
-  remoteFilePath: string,
-  fileMustExist = false,
+  ...args: Parameters<typeof client.delete>
 ): Promise<DeleteError | undefined> => {
+  const [remoteFilePath] = args;
+
   try {
-    await client.delete(remoteFilePath, fileMustExist);
+    await client.delete(...args);
   } catch (e: unknown) {
     if (!typeGuards.isSftpError(e))
       return new UnknownError(

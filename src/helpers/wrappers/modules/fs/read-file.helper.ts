@@ -1,22 +1,26 @@
 import fs from "node:fs/promises";
-import type { PathLike } from "node:fs";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
 
-export type ReadUtf8FileIntoStringError =
+export type ReadFileError =
   | UnknownError
   | FsNotFoundError
   | FsUnauthorizedError
   | FsWrongTypeError;
 
-const readUtf8FileIntoString = async (
-  filePath: PathLike,
-): Promise<[string, undefined] | [undefined, ReadUtf8FileIntoStringError]> => {
+const readFile = async (
+  ...args: Parameters<typeof fs.readFile>
+): Promise<
+  | [Awaited<ReturnType<typeof fs.readFile>>, undefined]
+  | [undefined, ReadFileError]
+> => {
+  const [filePath] = args;
+
   try {
-    const buffer = await fs.readFile(filePath, { encoding: "utf8", flag: "r" });
+    const buffer = await fs.readFile(...args);
     return [buffer, undefined];
   } catch (e: unknown) {
     if (!typeGuards.isErrnoException(e))
@@ -57,4 +61,4 @@ const readUtf8FileIntoString = async (
   }
 };
 
-export default readUtf8FileIntoString;
+export default readFile;

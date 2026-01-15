@@ -1,10 +1,8 @@
 import Client from "ssh2-sftp-client";
-
-import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import typeGuards from "../typescript/guards/index.js";
-import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
-import type { SftpCredentials } from "../../interfaces/sftp-credentials.interface.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
+import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credentials.class.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 
 export type ConnectError =
   | SftpConnectionError
@@ -13,10 +11,12 @@ export type ConnectError =
 
 const connect = async (
   client: Client,
-  credentials: SftpCredentials,
+  ...args: Parameters<typeof client.connect>
 ): Promise<ConnectError | undefined> => {
+  const [credentials] = args;
+
   try {
-    await client.connect(credentials);
+    await client.connect(...args);
   } catch (e: unknown) {
     if (!typeGuards.isSftpError(e))
       return new SftpConnectionError(

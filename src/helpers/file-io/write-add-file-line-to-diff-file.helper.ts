@@ -1,8 +1,8 @@
 import type { PathLike } from "node:fs";
+import type { FileHandle } from "node:fs/promises";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
-import type { FileHandle } from "node:fs/promises";
 
 export type WriteAddFileLineToDiffFileError = WriteToFileOrDeleteError;
 

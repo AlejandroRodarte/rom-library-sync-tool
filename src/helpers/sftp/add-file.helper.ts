@@ -1,20 +1,20 @@
 import Client from "ssh2-sftp-client";
 
-import fileExists, {
-  type FileExistsError,
+import fileIOFileExists, {
+  type FileExistsError as FileIOFileExistsError,
 } from "../file-io/file-exists.helper.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
-import exists, { type ExistsError } from "./exists.helper.js";
-import put, { type PutError } from "./put.helper.js";
-import sftpDelete, { type DeleteError } from "./delete.helper.js";
+import put, { type PutError } from "../wrappers/modules/ssh2-sftp-client/put.helper.js";
+import sftpDelete, { type DeleteError } from "../wrappers/modules/ssh2-sftp-client/delete.helper.js";
+import fileExists, { type FileExistsError as SftpFileExistsError } from "./file-exists.helper.js";
 
 const fileIO = {
-  fileExists,
+  fileExists: fileIOFileExists,
 };
 
 export type AddFileError =
-  | FileExistsError
-  | ExistsError
+  | FileIOFileExistsError
+  | SftpFileExistsError
   | PutError
   | DeleteError;
 
@@ -27,7 +27,7 @@ const addFile = async (
   const localFileExistsError = await fileIO.fileExists(localFilePath);
   if (localFileExistsError) return localFileExistsError;
 
-  const remoteFileExistsError = await exists(client, remoteFilePath, "file");
+  const remoteFileExistsError = await fileExists(client, remoteFilePath);
 
   if (remoteFileExistsError) {
     if (remoteFileExistsError instanceof SftpNotFoundError) {

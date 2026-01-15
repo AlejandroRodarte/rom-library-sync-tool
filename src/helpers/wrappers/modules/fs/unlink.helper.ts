@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import typeGuards from "../typescript/guards/index.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
 
 export type UnlinkError =
   | UnknownError
@@ -12,7 +12,7 @@ export type UnlinkError =
   | FsWrongTypeError;
 
 const unlink = async (
-  args: Parameters<typeof fs.unlink>,
+  ...args: Parameters<typeof fs.unlink>
 ): Promise<UnlinkError | undefined> => {
   const [path] = args;
 

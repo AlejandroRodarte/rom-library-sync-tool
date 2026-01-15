@@ -1,4 +1,3 @@
-import path from "node:path";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";

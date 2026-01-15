@@ -1,11 +1,11 @@
 import Client from "ssh2-sftp-client";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import typeGuards from "../typescript/guards/index.js";
-import SftpConnectionError from "../../classes/errors/sftp-connection-error.class.js";
-import SftpBadCredentialsError from "../../classes/errors/sftp-bad-credentials.class.js";
-import SftpBadPathError from "../../classes/errors/sftp-bad-path.class.js";
-import SftpUnauthorizedError from "../../classes/errors/sftp-unauthorized-error.class.js";
-import SftpWrongTypeError from "../../classes/errors/sftp-wrong-type-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
+import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credentials.class.js";
+import SftpBadPathError from "../../../../classes/errors/sftp-bad-path.class.js";
+import SftpUnauthorizedError from "../../../../classes/errors/sftp-unauthorized-error.class.js";
+import SftpWrongTypeError from "../../../../classes/errors/sftp-wrong-type-error.class.js";
 
 export type ListError =
   | UnknownError
@@ -18,7 +18,9 @@ export type ListError =
 const list = async (
   client: Client,
   ...args: Parameters<typeof client.list>
-): Promise<[Client.FileInfo[], undefined] | [undefined, ListError]> => {
+): Promise<
+  [Awaited<ReturnType<typeof client.list>>, undefined] | [undefined, ListError]
+> => {
   const [remoteDirPath] = args;
 
   try {

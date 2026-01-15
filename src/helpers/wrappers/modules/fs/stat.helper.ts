@@ -1,18 +1,19 @@
-import type { PathLike } from "fs";
-import type { Stats } from "node:fs";
 import fs from "node:fs/promises";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
 
 export type StatError = UnknownError | FsNotFoundError | FsUnauthorizedError;
 
 const stat = async (
-  path: PathLike,
-): Promise<[Stats, undefined] | [undefined, StatError]> => {
+  ...args: Parameters<typeof fs.stat>
+): Promise<
+  [Awaited<ReturnType<typeof fs.stat>>, undefined] | [undefined, StatError]
+> => {
+  const [path] = args;
   try {
-    const stats = await fs.stat(path);
+    const stats = await fs.stat(...args);
     return [stats, undefined];
   } catch (e: unknown) {
     if (!typeGuards.isErrnoException(e))

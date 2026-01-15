@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
-import typeGuards from "../typescript/guards/index.js";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../classes/errors/fs-unauthorized-error.class.js";
-import FsCircularReferenceError from "../../classes/errors/fs-circular-reference-error.class.js";
+import typeGuards from "../../../typescript/guards/index.js";
+import UnknownError from "../../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
+import FsCircularReferenceError from "../../../../classes/errors/fs-circular-reference-error.class.js";
+import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
 
 export type RealpathError =
   | UnknownError
@@ -13,7 +13,10 @@ export type RealpathError =
 
 const realpath = async (
   ...args: Parameters<typeof fs.realpath>
-): Promise<[string, undefined] | [undefined, RealpathError]> => {
+): Promise<
+  | [Awaited<ReturnType<typeof fs.realpath>>, undefined]
+  | [undefined, RealpathError]
+> => {
   const [path] = args;
 
   try {

@@ -13,7 +13,6 @@ import openNewWriteOnlyFile, {
   type OpenNewWriteOnlyFileError,
 } from "../file-io/open-new-write-only-file.helper.js";
 import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
-import writeToFile from "../file-io/write-to-file.helper.js";
 import fileIsEmpty from "../file-io/file-is-empty.helper.js";
 import deleteFile from "../file-io/delete-file.helper.js";
 import anyFileExists, {
@@ -29,6 +28,7 @@ import type {
   GetConsoleRomsSyncDirPath,
 } from "../../classes/devices/steam-deck.class.js";
 import type { FileExistsAndIsReadableError } from "../file-io/file-exists-and-is-readable.helper.js";
+import writeFile from "../wrappers/modules/fs/write-file.helper.js";
 
 const build = {
   steamDeckSftpClient,
@@ -40,7 +40,7 @@ const fileIO = {
   fileExists,
   openNewWriteOnlyFile,
   fileExistsAndReadUtf8Lines,
-  writeToFile,
+  writeFile,
   fileIsEmpty,
   deleteFile,
   anyFileExists,
@@ -134,7 +134,7 @@ const syncSteamDeck = async (
       diffActions.push(diffAction);
     }
 
-    const failedFileWriteError = await fileIO.writeToFile(
+    const failedFileWriteError = await fileIO.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -197,7 +197,7 @@ const syncSteamDeck = async (
       failedDiffLines += `${diffLine}\n`;
     }
 
-    const secondFailedFileWriteError = await fileIO.writeToFile(
+    const secondFailedFileWriteError = await fileIO.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
