@@ -13,6 +13,8 @@ import isMediasList from "./is-medias-list.helper.js";
 import isConsolesListItem from "./is-consoles-list-item.helper.js";
 import isConsolesList from "./is-consoles-list.helper.js";
 import isModeName from "./is-mode-name.helper.js";
+import isRight from "./is-right.helper.js";
+import isRightList from "./is-right-list.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -30,6 +32,8 @@ const typeGuards = {
   isConsolesListItem,
   isConsolesList,
   isModeName,
+  isRight,
+  isRightList,
 };
 
 export default typeGuards;
