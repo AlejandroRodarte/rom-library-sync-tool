@@ -3,6 +3,7 @@ import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-ent
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
 import type SftpClient from "../sftp-client.class.js";
+import type DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
 
 class Sftp implements DeviceFileIO {
   private _client: SftpClient;
@@ -32,6 +33,18 @@ class Sftp implements DeviceFileIO {
     }));
 
     return [lsEntries, undefined];
+  };
+
+  exists: (
+    type: "file" | "dir" | "link",
+    path: string,
+    rights?: "r" | "w" | "rw",
+  ) => Promise<DeviceFileIOExistsError | undefined> = async (
+    type,
+    path,
+    rights,
+  ) => {
+    return undefined;
   };
 }
 

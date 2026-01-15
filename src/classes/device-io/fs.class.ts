@@ -3,6 +3,9 @@ import readdir from "../../helpers/file-io/readdir.helper.js";
 import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-entry.interface.js";
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
+import DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
+import fileExists from "../../helpers/file-io/file-exists.helper.js";
+import fileExistsAndIsReadable from "../../helpers/file-io/file-exists-and-is-readable.helper.js";
 
 class Fs implements DeviceFileIO {
   ls: (
@@ -33,6 +36,17 @@ class Fs implements DeviceFileIO {
     });
 
     return [lsEntries, undefined];
+  };
+  exists: (
+    type: "file" | "dir" | "link",
+    path: string,
+    rights?: "r" | "w" | "rw",
+  ) => Promise<DeviceFileIOExistsError | undefined> = async (
+    type,
+    path,
+    rights,
+  ) => {
+    return undefined;
   };
 }
 
