@@ -2,7 +2,7 @@ import accessPath from "./access-path.helper.js";
 import deleteFile from "./delete-file.helper.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
-import openFile from "./open-file.helper.js";
+import open from "./open.helper.js";
 import readUtf8FileLines from "./read-utf8-file-lines.helper.js";
 import readUtf8FileIntoString from "./read-utf8-file-into-string.helper.js";
 import writeToFile from "./write-to-file.helper.js";
@@ -41,7 +41,7 @@ const fileIO = {
   deleteFile,
   readUtf8FileIntoString,
   readUtf8FileLines,
-  openFile,
+  open,
   openNewWriteOnlyFile,
   writeToFile,
   writeConsoleDiffFile,

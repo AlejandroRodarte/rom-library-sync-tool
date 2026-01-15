@@ -1,5 +1,4 @@
 import fs, { type FileHandle } from "node:fs/promises";
-import type { PathLike } from "node:fs";
 import typeGuards from "../typescript/guards/index.js";
 import UnknownError from "../../classes/errors/unknown-error.class.js";
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
@@ -14,12 +13,13 @@ export type OpenFileError =
   | FsWrongTypeError
   | FsFileExistsError;
 
-const openFile = async (
-  filePath: PathLike,
-  flags: string,
+const open = async (
+  ...args: Parameters<typeof fs.open>
 ): Promise<[FileHandle, undefined] | [undefined, OpenFileError]> => {
+  const [filePath, flags] = args;
+
   try {
-    const handle = await fs.open(filePath, flags);
+    const handle = await fs.open(...args);
     return [handle, undefined];
   } catch (e: unknown) {
     if (!typeGuards.isErrnoException(e))
@@ -71,4 +71,4 @@ const openFile = async (
   }
 };
 
-export default openFile;
+export default open;
