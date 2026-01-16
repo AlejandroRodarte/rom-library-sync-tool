@@ -12,8 +12,8 @@ import deviceNamesFromDevicesList from "./device-names-from-devices-list.helper.
 import consoleNamesFromConsolesList from "./console-names-from-consoles-list.helper.js";
 import mediaNamesFromMediasList from "./media-names-from-medias-list.helper.js";
 import intersectStringArraySimple from "./intersect-string-array-simple.helper.js";
-import rightsFromDecimal from "./file-rights-from-decimal.helper.js";
 import integerFromRights from "./integer-from-rights.helper.js";
+import rightsFromMode from "./rights-from-mode.helper.js";
 
 const build = {
   titlesFromRomsDirPath,
@@ -30,8 +30,8 @@ const build = {
   consoleNamesFromConsolesList,
   mediaNamesFromMediasList,
   intersectStringArraySimple,
-  rightsFromDecimal,
   integerFromRights,
+  rightsFromMode,
 };
 
 export default build;
