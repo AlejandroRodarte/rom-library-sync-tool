@@ -19,7 +19,7 @@ class DatabasePaths {
     const basePaths = [
       this._paths.dirs.roms.base,
       this._paths.dirs.media.base,
-      this._paths.dirs.metadata.base,
+      this._paths.dirs["es-de-gamelists"].base,
     ];
 
     const romsPaths: string[] = [];
@@ -28,7 +28,9 @@ class DatabasePaths {
 
     for (const consoleName of CONSOLE_NAMES) {
       romsPaths.push(this._paths.dirs.roms.consoles[consoleName]);
-      metadataPaths.push(this._paths.dirs.metadata.consoles[consoleName]);
+      metadataPaths.push(
+        this._paths.dirs["es-de-gamelists"].consoles[consoleName],
+      );
 
       for (const mediaName of MEDIA_NAMES)
         mediaPaths.push(
@@ -43,7 +45,7 @@ class DatabasePaths {
     const paths: string[] = [];
 
     for (const consoleName of CONSOLE_NAMES)
-      paths.push(this._paths.files.metadata.consoles[consoleName]);
+      paths.push(this._paths.files["es-de-gamelists"].consoles[consoleName]);
 
     return paths;
   }
@@ -53,47 +55,51 @@ class DatabasePaths {
   }
 
   private _initDatabasePaths(): IDatabasePaths {
-    const paths = {
+    const paths: IDatabasePaths = {
       dirs: {
         roms: {
-          base: environment.paths.db.roms,
+          base: environment.database.paths.roms,
           consoles: Object.fromEntries(
             CONSOLE_NAMES.map((c) => [
               c,
-              path.join(environment.paths.db.roms, c),
+              path.join(environment.database.paths.roms, c),
             ]),
           ) as ConsolePaths,
         },
         media: {
-          base: environment.paths.db.media,
+          base: environment.database.paths.media,
           consoles: Object.fromEntries(
             CONSOLE_NAMES.map((c) => [
               c,
               Object.fromEntries(
                 MEDIA_NAMES.map((m) => [
                   m,
-                  path.join(environment.paths.db.media, c, m),
+                  path.join(environment.database.paths.media, c, m),
                 ]),
               ),
             ]),
           ) as ConsoleContent<MediaPaths>,
         },
-        metadata: {
-          base: environment.paths.db.metadata,
+        "es-de-gamelists": {
+          base: environment.database.paths["es-de-gamelists"],
           consoles: Object.fromEntries(
             CONSOLE_NAMES.map((c) => [
               c,
-              path.join(environment.paths.db.metadata, c),
+              path.join(environment.database.paths["es-de-gamelists"], c),
             ]),
           ) as ConsolePaths,
         },
       },
       files: {
-        metadata: {
+        "es-de-gamelists": {
           consoles: Object.fromEntries(
             CONSOLE_NAMES.map((c) => [
               c,
-              path.join(environment.paths.db.metadata, c, "gamelist.xml"),
+              path.join(
+                environment.database.paths["es-de-gamelists"],
+                c,
+                "gamelist.xml",
+              ),
             ]),
           ) as ConsolePaths,
         },

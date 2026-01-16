@@ -1,9 +1,9 @@
-import syncLocal from "./sync-local.helper.js";
-import syncSteamDeck from "./sync-steam-deck.helper.js";
+import syncAlejandroG751JT from "./sync-alejandro-g751jt.helper.js";
+import syncSteamDeckLCDAlejandro from "./sync-steam-deck-lcd-alejandro.helper.js";
 
 const devices = {
-  syncSteamDeck,
-  syncLocal,
+  syncSteamDeckLCDAlejandro,
+  syncAlejandroG751JT,
 };
 
 export default devices;

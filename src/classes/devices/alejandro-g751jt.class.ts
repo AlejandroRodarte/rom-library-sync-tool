@@ -2,7 +2,6 @@ import path from "node:path";
 
 import devices from "../../helpers/devices/index.js";
 import type { Device } from "../../interfaces/device.interface.js";
-import type { LocalPaths } from "../../interfaces/local-paths.interface.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
@@ -18,40 +17,54 @@ import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.i
 import fileIO from "../../helpers/file-io/index.js";
 import databasePaths from "../../objects/database-paths.object.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
-import type { LocalConsolesSkipFlags } from "../../interfaces/local-consoles-skip-flags.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import writeToFileOrDelete from "../../helpers/file-io/write-to-file-or-delete.helper.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
-import type { LocalData } from "../../interfaces/local-data.interface.js";
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
+import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import type { AlejandroG751JTConsolesSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-consoles-skip-flags.interface.js";
+import type { MediaName } from "../../types/media-name.type.js";
+import type { MediaContent } from "../../types/media-content.type.js";
+import Fs from "../device-io/fs.class.js";
+import Sftp from "../device-io/sftp.class.js";
+import SftpClient from "../sftp-client.class.js";
+import type { ContentTargetName } from "../../types/content-target-name.type.js";
+import type { MediaPaths } from "../../types/media-paths.type.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
 
-const LOCAL = "local" as const;
+const ALEJANDRO_G751JT = "alejandro-g751jt" as const;
 
-class Local implements Device, Debug {
-  private _name: typeof LOCAL = LOCAL;
+class AlejandroG751JT implements Device, Debug {
+  private _name: typeof ALEJANDRO_G751JT = ALEJANDRO_G751JT;
 
-  private _paths: LocalPaths;
-  private _modes: LocalData["modes"];
+  private _paths: AlejandroG751JTPaths;
 
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
+  private _consoleSkipFlags: Partial<
+    ConsoleContent<AlejandroG751JTConsolesSkipFlags>
+  >;
 
-  private _consoleSkipFlags: Partial<ConsoleContent<LocalConsolesSkipFlags>>;
+  private _mediaNames: MediaName[];
+  private _contentTargetNames: ContentTargetName[];
 
   private _deviceFileIO: DeviceFileIO;
 
-  constructor(
-    consoleNames: ConsoleName[],
-    env: Environment["devices"][typeof LOCAL],
-    deviceFileIO: DeviceFileIO,
-  ) {
-    const uniqueConsoleNames = [...new Set(consoleNames)];
+  constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT]) {
+    const uniqueConsoleNames = [...new Set(envData.console.names)];
     this._consoleNames = uniqueConsoleNames;
+
+    const uniqueMediaNames = [...new Set(envData.media.names)];
+    this._mediaNames = uniqueMediaNames;
+
+    const uniqueContentTargetNames = [
+      ...new Set(envData["content-targets"].names),
+    ];
+    this._contentTargetNames = uniqueContentTargetNames;
 
     this._consoleSkipFlags = Object.fromEntries(
       this._consoleNames.map((c) => [
@@ -59,19 +72,44 @@ class Local implements Device, Debug {
         {
           global: false,
           filter: false,
-          sync: false,
+          sync: {
+            global: false,
+            "content-targets": {
+              roms: false,
+              media: {
+                global: false,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [m, false]),
+                ) as Partial<MediaContent<boolean>>,
+              },
+              "es-de-gamelists": false,
+            },
+          },
         },
       ]),
-    ) as Partial<ConsoleContent<LocalConsolesSkipFlags>>;
+    ) as Partial<ConsoleContent<AlejandroG751JTConsolesSkipFlags>>;
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
       this._addConsole(consoleName, new Console(consoleName));
 
-    this._paths = this._initLocalPaths(env.paths);
-    this._modes = env.modes;
+    this._paths = this._initAlejandroG751JTPaths(
+      envData["content-targets"].paths,
+    );
 
-    this._deviceFileIO = deviceFileIO;
+    switch (envData.fileIO.strategy) {
+      case "fs":
+        this._deviceFileIO = new Fs();
+        break;
+      case "sftp":
+        this._deviceFileIO = new Sftp(
+          new SftpClient(
+            ALEJANDRO_G751JT,
+            envData.fileIO.data.sftp.credentials,
+          ),
+        );
+        break;
+    }
   }
 
   name: () => DeviceName = () => {
@@ -96,7 +134,7 @@ class Local implements Device, Debug {
         if (this._consoleSkipFlags[consoleName]) {
           this._consoleSkipFlags[consoleName].global = true;
           this._consoleSkipFlags[consoleName].filter = true;
-          this._consoleSkipFlags[consoleName].sync = true;
+          this._consoleSkipFlags[consoleName].sync.global = true;
         }
 
         continue;
@@ -124,14 +162,14 @@ class Local implements Device, Debug {
     duplicates: async () => {
       const writeError = await fileIO.writeDuplicateRomsFile(
         this.filterableConsoles,
-        this._paths.files.fileIO.logs.duplicates,
+        this._paths.files.project.logs.duplicates,
       );
       if (writeError) logger.error(writeError.toString());
     },
     scrapped: async () => {
       const writeError = await fileIO.writeScrappedRomsFile(
         this.filterableConsoles,
-        this._paths.files.fileIO.logs.scrapped,
+        this._paths.files.project.logs.scrapped,
       );
       if (writeError) logger.error(writeError.toString());
     },
@@ -142,23 +180,72 @@ class Local implements Device, Debug {
         `Building list of directories to validate before actually writing list files for device ${this._name}.`,
       );
 
-      const allDirPathsToValidate = [
-        this._paths.dirs.fileIO.base,
-        this._paths.dirs.fileIO.lists.base,
-        this._paths.dirs.fileIO.lists.roms,
-        this._paths.dirs.sync.roms.base,
+      const projectDirPathsToValidate: string[] = [
+        this._paths.dirs.project.base,
+        this._paths.dirs.project.lists.base,
+        this._paths.dirs.project.lists["content-targets"].roms,
+        this._paths.dirs.project.lists["content-targets"].media.base,
       ];
 
-      for (const consoleName of this._consoleNames)
-        if (this._paths.dirs.sync.roms.consoles[consoleName])
-          allDirPathsToValidate.push(
-            this._paths.dirs.sync.roms.consoles[consoleName],
+      const contentTargetDirPathsToValidate: string[] = [
+        this._paths.dirs["content-targets"].roms.base,
+        this._paths.dirs["content-targets"].media.base,
+        this._paths.dirs["content-targets"]["es-de-gamelists"].base,
+      ];
+
+      for (const consoleName of this._consoleNames) {
+        const contentTargetRomDirPath =
+          this._paths.dirs["content-targets"].roms.consoles[consoleName];
+        if (contentTargetRomDirPath)
+          contentTargetDirPathsToValidate.push(contentTargetRomDirPath);
+
+        const contentTargetEsDeGamelistsDirPath =
+          this._paths.dirs["content-targets"]["es-de-gamelists"].consoles[
+            consoleName
+          ];
+        if (contentTargetEsDeGamelistsDirPath)
+          contentTargetDirPathsToValidate.push(
+            contentTargetEsDeGamelistsDirPath,
           );
 
-      logger.debug(`Directory paths to validate: `, ...allDirPathsToValidate);
+        for (const mediaName of this._mediaNames) {
+          const projectMediaDirPath =
+            this._paths.dirs.project.lists["content-targets"].media.names[
+              mediaName
+            ];
+          if (projectMediaDirPath)
+            projectDirPathsToValidate.push(projectMediaDirPath);
+        }
+
+        const contentTargetMediaDirPath =
+          this._paths.dirs["content-targets"].media.consoles[consoleName];
+
+        if (contentTargetMediaDirPath) {
+          contentTargetDirPathsToValidate.push(contentTargetMediaDirPath.base);
+
+          for (const mediaName of this._mediaNames) {
+            const contentTargetMediaNameDirPath =
+              contentTargetMediaDirPath.names[mediaName];
+            if (contentTargetMediaNameDirPath)
+              contentTargetDirPathsToValidate.push(
+                contentTargetMediaNameDirPath,
+              );
+          }
+        }
+      }
+
+      logger.debug(
+        `Project directories to validate: `,
+        ...projectDirPathsToValidate,
+      );
+
+      logger.debug(
+        `Content target directories to validate: `,
+        ...contentTargetDirPathsToValidate,
+      );
 
       const [allDirsAreValid, allDirsAreValidError] =
-        await fileIO.allDirsExistAndAreReadable(allDirPathsToValidate);
+        await fileIO.allDirsExistAndAreReadable(projectDirPathsToValidate);
 
       if (allDirsAreValidError) {
         logger.error(
@@ -168,7 +255,7 @@ class Local implements Device, Debug {
       }
       if (!allDirsAreValid) {
         logger.error(
-          `Not all of the following directories exist and are read-write: ${allDirPathsToValidate.join(", ")}. Please make sure all of them are valid before attempting to write the list files for device ${this._name}.`,
+          `Not all of the following directories exist and are read-write: ${projectDirPathsToValidate.join(", ")}. Please make sure all of them are valid before attempting to write the list files for device ${this._name}.`,
         );
         return;
       }
@@ -180,7 +267,8 @@ class Local implements Device, Debug {
       for (const consoleName of this._consoleNames) {
         logger.trace(`starting to write list file for console ${consoleName}`);
 
-        const romsDirPath = this._paths.dirs.sync.roms.consoles[consoleName];
+        const romsDirPath =
+          this._paths.dirs["content-targets"].roms.consoles[consoleName];
         if (!romsDirPath) {
           logger.warn(
             `There is no ROM sync dirpath for console ${consoleName}. Skipping.`,
@@ -193,7 +281,7 @@ class Local implements Device, Debug {
         );
 
         const listFilePath =
-          this._paths.files.fileIO.lists.roms.consoles[consoleName];
+          this._paths.files.project.lists.roms.consoles[consoleName];
         if (!listFilePath) {
           logger.warn(
             `There is no ROM list filepath for console ${consoleName}. Skipping.`,
@@ -281,14 +369,14 @@ class Local implements Device, Debug {
     },
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
-        if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
+        if (!this._paths.files.project.lists.roms.consoles[consoleName]) {
           logger.warn(
             `There is no ROM list filepath for console ${consoleName}. Skipping.`,
           );
           continue;
         }
 
-        if (!this._paths.files.fileIO.diffs.roms.consoles[consoleName]) {
+        if (!this._paths.files.project.diffs.roms.consoles[consoleName]) {
           logger.warn(
             `There is no ROM diff filepath for console ${consoleName}. Skipping.`,
           );
@@ -300,8 +388,8 @@ class Local implements Device, Debug {
         // 3. couldn't open a new diff file
         // 4. couldn't write to the diff file
         const diffError = await fileIO.writeConsoleDiffFile(konsole, {
-          list: this._paths.files.fileIO.lists.roms.consoles[consoleName],
-          diff: this._paths.files.fileIO.diffs.roms.consoles[consoleName],
+          list: this._paths.files.project.lists.roms.consoles[consoleName],
+          diff: this._paths.files.project.diffs.roms.consoles[consoleName],
         });
 
         if (diffError) {
@@ -310,7 +398,7 @@ class Local implements Device, Debug {
           );
 
           if (this._consoleSkipFlags[consoleName])
-            this._consoleSkipFlags[consoleName].sync = true;
+            this._consoleSkipFlags[consoleName].sync.global = true;
         }
       }
     },
@@ -321,7 +409,7 @@ class Local implements Device, Debug {
     // 2. not all device sync dir paths exist
     // 3. failed to open new .failed.txt file to write on
     // 4. failed to open .diff.txt file
-    const syncError = await devices.syncLocal(this);
+    const syncError = await devices.syncAlejandroG751JT(this);
 
     if (syncError)
       logger.warn(
@@ -363,17 +451,19 @@ class Local implements Device, Debug {
   }
 
   get allFailedFilePaths(): string[] {
-    return Object.entries(this._paths.files.fileIO.failed.roms.consoles).map(
+    return Object.entries(this._paths.files.project.failed.roms.consoles).map(
       ([, path]) => path,
     );
   }
 
   get allSyncDirPaths(): string[] {
-    const paths = [this._paths.dirs.sync.roms.base];
+    const paths = [this._paths.dirs["content-targets"].roms.base];
 
     for (const consoleName of this._consoleNames)
-      if (this._paths.dirs.sync.roms.consoles[consoleName])
-        paths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
+      if (this._paths.dirs["content-targets"].roms.consoles[consoleName])
+        paths.push(
+          this._paths.dirs["content-targets"].roms.consoles[consoleName],
+        );
 
     return paths;
   }
@@ -381,7 +471,7 @@ class Local implements Device, Debug {
   public getConsoleRomsFailedFilePath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsFailedFilePathError] {
-    const path = this._paths.files.fileIO.failed.roms.consoles[consoleName];
+    const path = this._paths.files.project.failed.roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -394,7 +484,7 @@ class Local implements Device, Debug {
   public getConsoleRomsDiffFilePath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsDiffFilePath] {
-    const path = this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+    const path = this._paths.files.project.diffs.roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -405,7 +495,7 @@ class Local implements Device, Debug {
   public getConsoleRomsSyncDirPath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsSyncDirPath] {
-    const path = this._paths.dirs.sync.roms.consoles[consoleName];
+    const path = this._paths.dirs["content-targets"].roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -431,53 +521,120 @@ class Local implements Device, Debug {
     this._consoles.set(consoleName, konsole);
   }
 
-  private _initLocalPaths(
-    envPaths: Environment["devices"][typeof LOCAL]["paths"],
-  ): LocalPaths {
+  private _initAlejandroG751JTPaths(
+    contentTargetPaths: Environment["device"]["data"][typeof ALEJANDRO_G751JT]["content-targets"]["paths"],
+  ): AlejandroG751JTPaths {
     const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
 
     const logsDirPath = path.join(baseDirPath, "logs");
 
     const listsDirPath = path.join(baseDirPath, "lists");
     const romsListsDirPath = path.join(listsDirPath, "roms");
+    const mediaListsDirPath = path.join(listsDirPath, "media");
 
     const diffsDirPath = path.join(baseDirPath, "diffs");
     const romsDiffsDirPath = path.join(diffsDirPath, "roms");
+    const mediaDiffsDirPath = path.join(diffsDirPath, "media");
 
     const failedDirPath = path.join(baseDirPath, "failed");
     const romsFailedDirPath = path.join(failedDirPath, "roms");
+    const mediaFailedDirPath = path.join(failedDirPath, "media");
 
-    const paths: LocalPaths = {
+    const paths: AlejandroG751JTPaths = {
       dirs: {
-        fileIO: {
+        project: {
           base: baseDirPath,
           logs: {
             base: logsDirPath,
           },
           lists: {
             base: listsDirPath,
-            roms: romsListsDirPath,
+            "content-targets": {
+              roms: romsListsDirPath,
+              media: {
+                base: mediaListsDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaListsDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
+            },
           },
           diffs: {
             base: diffsDirPath,
-            roms: romsDiffsDirPath,
+            "content-targets": {
+              roms: romsDiffsDirPath,
+              media: {
+                base: mediaDiffsDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaDiffsDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
+            },
           },
           failed: {
             base: failedDirPath,
-            roms: romsFailedDirPath,
+            "content-targets": {
+              roms: romsFailedDirPath,
+              media: {
+                base: mediaFailedDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaFailedDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
+            },
           },
         },
-        sync: {
+        "content-targets": {
           roms: {
-            base: envPaths.roms,
+            base: contentTargetPaths.roms,
             consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [c, path.join(envPaths.roms, c)]),
+              this._consoleNames.map((c) => [
+                c,
+                path.join(contentTargetPaths.roms, c),
+              ]),
+            ) as Partial<ConsolePaths>,
+          },
+          media: {
+            base: contentTargetPaths.media,
+            consoles: Object.fromEntries(
+              this._consoleNames.map((c) => [
+                c,
+                {
+                  base: path.join(contentTargetPaths.media, c),
+                  names: Object.fromEntries(
+                    this._mediaNames.map((m) => [
+                      m,
+                      path.join(contentTargetPaths.media, c, m),
+                    ]),
+                  ) as Partial<MediaPaths>,
+                },
+              ]),
+            ) as Partial<
+              ConsoleContent<{ base: string; names: Partial<MediaPaths> }>
+            >,
+          },
+          "es-de-gamelists": {
+            base: contentTargetPaths["es-de-gamelists"],
+            consoles: Object.fromEntries(
+              this._consoleNames.map((c) => [
+                c,
+                path.join(contentTargetPaths["es-de-gamelists"], c),
+              ]),
             ) as Partial<ConsolePaths>,
           },
         },
       },
       files: {
-        fileIO: {
+        project: {
           logs: {
             duplicates: path.join(logsDirPath, "duplicates.log.txt"),
             scrapped: path.join(logsDirPath, "scrapped.log.txt"),
@@ -491,6 +648,17 @@ class Local implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
+            media: Object.fromEntries(
+              this._mediaNames.map((m) => [
+                m,
+                Object.fromEntries(
+                  this._consoleNames.map((c) => [
+                    c,
+                    path.join(mediaListsDirPath, m, `${c}.list.txt`),
+                  ]),
+                ) as Partial<ConsolePaths>,
+              ]),
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
           diffs: {
             roms: {
@@ -501,6 +669,17 @@ class Local implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
+            media: Object.fromEntries(
+              this._mediaNames.map((m) => [
+                m,
+                Object.fromEntries(
+                  this._consoleNames.map((c) => [
+                    c,
+                    path.join(mediaDiffsDirPath, m, `${c}.diff.txt`),
+                  ]),
+                ) as Partial<ConsolePaths>,
+              ]),
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
           failed: {
             roms: {
@@ -511,6 +690,31 @@ class Local implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
+            media: Object.fromEntries(
+              this._mediaNames.map((m) => [
+                m,
+                Object.fromEntries(
+                  this._consoleNames.map((c) => [
+                    c,
+                    path.join(mediaFailedDirPath, m, `${c}.failed.txt`),
+                  ]),
+                ) as Partial<ConsolePaths>,
+              ]),
+            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
+          },
+        },
+        "content-targets": {
+          "es-de-gamelists": {
+            consoles: Object.fromEntries(
+              this._consoleNames.map((c) => [
+                c,
+                path.join(
+                  contentTargetPaths["es-de-gamelists"],
+                  c,
+                  "gamelist.xml",
+                ),
+              ]),
+            ),
           },
         },
       },
@@ -520,4 +724,4 @@ class Local implements Device, Debug {
   }
 }
 
-export default Local;
+export default AlejandroG751JT;

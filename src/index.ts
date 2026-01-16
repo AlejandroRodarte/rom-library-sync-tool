@@ -2,10 +2,9 @@ import environment from "./objects/environment.object.js";
 import logger from "./objects/logger.object.js";
 import modes from "./helpers/modes/index.js";
 import type { Device } from "./interfaces/device.interface.js";
-import Local from "./classes/devices/local.class.js";
-import SteamDeck from "./classes/devices/steam-deck.class.js";
+import AlejandroG751JT from "./classes/devices/alejandro-g751jt.class.js";
+import SteamDeckLCDAlejandro from "./classes/devices/steam-deck-lcd-alejandro.class.js";
 import type { Debug } from "./interfaces/debug.interface.js";
-import Fs from "./classes/device-io/fs.class.js";
 
 const main = async () => {
   logger.trace("main() function starts");
@@ -15,35 +14,29 @@ const main = async () => {
 
   const devices: (Device & Debug)[] = [];
 
-  let local: Local | undefined;
-  let steamDeck: SteamDeck | undefined;
+  let alejandroG751JT: AlejandroG751JT | undefined;
+  let steamDeckLCDAlejandro: SteamDeckLCDAlejandro | undefined;
 
-  const fs = new Fs();
+  if (environment.device.names.includes("alejandro-g751jt")) {
+    logger.trace("Creating and adding new alejandro-g751jt device");
 
-  if (environment.modes[mode].devices.includes("local")) {
-    logger.trace("Creating and adding Local device");
-
-    local = new Local(
-      environment.devices.local.modes[mode].consoles,
-      environment.devices.local,
-      fs,
+    alejandroG751JT = new AlejandroG751JT(
+      environment.device.data["alejandro-g751jt"],
     );
-    devices.push(local);
+    devices.push(alejandroG751JT);
 
-    logger.debug(local.debug());
+    logger.debug(alejandroG751JT.debug());
   }
 
-  if (environment.modes[mode].devices.includes("steam-deck")) {
-    logger.trace("Creating and adding Steam Deck device");
+  if (environment.device.names.includes("steam-deck-lcd-alejandro")) {
+    logger.trace("Creating and adding new steam-deck-lcd-alejandro device");
 
-    steamDeck = new SteamDeck(
-      environment.devices["steam-deck"].modes[mode].consoles,
-      environment.devices["steam-deck"].modes[mode].medias,
-      environment.devices["steam-deck"],
+    steamDeckLCDAlejandro = new SteamDeckLCDAlejandro(
+      environment.device.data["steam-deck-lcd-alejandro"],
     );
-    devices.push(steamDeck);
+    devices.push(steamDeckLCDAlejandro);
 
-    logger.debug(steamDeck.debug());
+    logger.debug(steamDeckLCDAlejandro.debug());
   }
 
   logger.debug(`amount of devices to process: ${devices.length}`);

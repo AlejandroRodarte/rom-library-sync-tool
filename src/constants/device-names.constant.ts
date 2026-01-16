@@ -1,3 +1,3 @@
-const DEVICE_NAMES = ["local", "steam-deck"] as const;
+const DEVICE_NAMES = ["alejandro-g751jt", "steam-deck-lcd-alejandro"] as const;
 
 export default DEVICE_NAMES;

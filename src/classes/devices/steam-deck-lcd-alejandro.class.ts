@@ -2,7 +2,6 @@ import path from "node:path";
 
 import devices from "../../helpers/devices/index.js";
 import type { Device } from "../../interfaces/device.interface.js";
-import environment from "../../objects/environment.object.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
@@ -11,7 +10,6 @@ import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
-import type { SteamDeckPaths } from "../../interfaces/steam-deck-paths.interface.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
@@ -19,48 +17,55 @@ import build from "../../helpers/build/index.js";
 import logger from "../../objects/logger.object.js";
 import unselect from "../../helpers/unselect/index.js";
 import databasePaths from "../../objects/database-paths.object.js";
-import type { SteamDeckConsolesSkipFlags } from "../../interfaces/steam-deck-consoles-skip-flags.interface.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
 import fileIO from "../../helpers/file-io/index.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import SftpClient from "../sftp-client.class.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
-import type { SteamDeckData } from "../../interfaces/steam-deck-data.interface.js";
+import type { SteamDeckLCDAlejandroPaths } from "../../interfaces/devices/steam-deck-lcd-alejandro/steam-deck-lcd-alejandro-paths.interface.js";
+import type { SteamDeckLCDAlejandroConsoleSkipFlags } from "../../interfaces/devices/steam-deck-lcd-alejandro/steam-deck-lcd-alejandro-consoles-skip-flags.interface.js";
+import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
+import type { ContentTargetName } from "../../types/content-target-name.type.js";
+import Sftp from "../device-io/sftp.class.js";
+import Fs from "../device-io/fs.class.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
 
-const STEAM_DECK = "steam-deck" as const;
+const STEAM_DECK_LCD_ALEJANDRO = "steam-deck-lcd-alejandro" as const;
 
-class SteamDeck implements Device, Debug {
-  private _name: typeof STEAM_DECK = STEAM_DECK;
+class SteamDeckLCDAlejandro implements Device, Debug {
+  private _name: typeof STEAM_DECK_LCD_ALEJANDRO = STEAM_DECK_LCD_ALEJANDRO;
 
-  private _paths: SteamDeckPaths;
-  private _modes: SteamDeckData["modes"];
+  private _paths: SteamDeckLCDAlejandroPaths;
 
   private _consoles: Consoles;
   private _consoleNames: ConsoleName[];
-  private _mediaNames: MediaName[];
-
   private _consoleSkipFlags: Partial<
-    ConsoleContent<SteamDeckConsolesSkipFlags>
+    ConsoleContent<SteamDeckLCDAlejandroConsoleSkipFlags>
   >;
 
-  private _sftpClient: SftpClient;
+  private _mediaNames: MediaName[];
+  private _contentTargetNames: ContentTargetName[];
+
+  private _deviceFileIO: DeviceFileIO;
 
   constructor(
-    consoleNames: ConsoleName[],
-    mediaNames: MediaName[],
-    env: Environment["devices"][typeof STEAM_DECK],
+    envData: Environment["device"]["data"][typeof STEAM_DECK_LCD_ALEJANDRO],
   ) {
-    const uniqueConsoleNames = [...new Set(consoleNames)];
+    const uniqueConsoleNames = [...new Set(envData.console.names)];
     this._consoleNames = uniqueConsoleNames;
 
-    const uniqueMediaNames = [...new Set(mediaNames)];
+    const uniqueMediaNames = [...new Set(envData.media.names)];
     this._mediaNames = uniqueMediaNames;
+
+    const uniqueContentTargetNames = [
+      ...new Set(envData["content-targets"].names),
+    ];
+    this._contentTargetNames = uniqueContentTargetNames;
 
     this._consoleSkipFlags = Object.fromEntries(
       this._consoleNames.map((c) => [
@@ -70,27 +75,42 @@ class SteamDeck implements Device, Debug {
           filter: false,
           sync: {
             global: false,
-            roms: false,
-            media: {
-              global: false,
-              names: Object.fromEntries(
-                this._mediaNames.map((m) => [m, false]),
-              ) as Partial<MediaContent<boolean>>,
+            "content-targets": {
+              roms: false,
+              media: {
+                global: false,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [m, false]),
+                ) as Partial<MediaContent<boolean>>,
+              },
+              "es-de-gamelists": false,
             },
-            metadata: false,
           },
         },
       ]),
-    ) as Partial<ConsoleContent<SteamDeckConsolesSkipFlags>>;
+    ) as Partial<ConsoleContent<SteamDeckLCDAlejandroConsoleSkipFlags>>;
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
       this.addConsole(consoleName, new Console(consoleName));
 
-    this._paths = this._initSteamDeckPaths(env.paths);
-    this._sftpClient = new SftpClient(this._name, env.sftp.credentials);
+    this._paths = this._initSteamDeckLCDAlejandroPaths(
+      envData["content-targets"].paths,
+    );
 
-    this._modes = env.modes;
+    switch (envData.fileIO.strategy) {
+      case "fs":
+        this._deviceFileIO = new Fs();
+        break;
+      case "sftp":
+        this._deviceFileIO = new Sftp(
+          new SftpClient(
+            STEAM_DECK_LCD_ALEJANDRO,
+            envData.fileIO.data.sftp.credentials,
+          ),
+        );
+        break;
+    }
   }
 
   name: () => DeviceName = () => {
@@ -140,35 +160,35 @@ class SteamDeck implements Device, Debug {
   };
 
   sync: () => Promise<void> = async () => {
-    await devices.syncSteamDeck(this);
+    await devices.syncSteamDeckLCDAlejandro(this);
   };
 
   write: DeviceWriteMethods = {
     duplicates: async () => {
       const writeError = await fileIO.writeDuplicateRomsFile(
         this.filterableConsoles,
-        this._paths.files.fileIO.logs.duplicates,
+        this._paths.files.project.logs.duplicates,
       );
       if (writeError) logger.error(writeError.toString());
     },
     scrapped: async () => {
       const writeError = await fileIO.writeScrappedRomsFile(
         this.filterableConsoles,
-        this._paths.files.fileIO.logs.scrapped,
+        this._paths.files.project.logs.scrapped,
       );
       if (writeError) logger.error(writeError.toString());
     },
     lists: async () => {},
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
-        if (!this._paths.files.fileIO.lists.roms.consoles[consoleName]) {
+        if (!this._paths.files.project.lists.roms.consoles[consoleName]) {
           logger.warn(
             `There is no ROM list filepath for console ${consoleName}. Skipping.`,
           );
           continue;
         }
 
-        if (!this._paths.files.fileIO.diffs.roms.consoles[consoleName]) {
+        if (!this._paths.files.project.diffs.roms.consoles[consoleName]) {
           logger.warn(
             `There is no ROM diff filepath for console ${consoleName}. Skipping.`,
           );
@@ -176,8 +196,8 @@ class SteamDeck implements Device, Debug {
         }
 
         const diffError = await fileIO.writeConsoleDiffFile(konsole, {
-          list: this._paths.files.fileIO.lists.roms.consoles[consoleName],
-          diff: this._paths.files.fileIO.diffs.roms.consoles[consoleName],
+          list: this._paths.files.project.lists.roms.consoles[consoleName],
+          diff: this._paths.files.project.diffs.roms.consoles[consoleName],
         });
 
         if (diffError) {
@@ -186,7 +206,8 @@ class SteamDeck implements Device, Debug {
           );
 
           if (this._consoleSkipFlags[consoleName])
-            this._consoleSkipFlags[consoleName].sync.roms = true;
+            this._consoleSkipFlags[consoleName].sync["content-targets"].roms =
+              true;
         }
       }
     },
@@ -233,7 +254,7 @@ class SteamDeck implements Device, Debug {
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
-          !this._consoleSkipFlags[consoleName].sync.roms,
+          !this._consoleSkipFlags[consoleName].sync["content-targets"].roms,
       ),
     );
   }
@@ -246,12 +267,13 @@ class SteamDeck implements Device, Debug {
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
-          !this._consoleSkipFlags[consoleName].sync.media.global,
+          !this._consoleSkipFlags[consoleName].sync["content-targets"].media
+            .global,
       ),
     );
   }
 
-  get metadataSyncableConsoles(): Consoles {
+  get allEsDeGamelistsSyncableConsoles(): Consoles {
     return new Map(
       [...this._consoles.entries()].filter(
         ([consoleName]) =>
@@ -259,7 +281,9 @@ class SteamDeck implements Device, Debug {
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
-          !this._consoleSkipFlags[consoleName].sync.metadata,
+          !this._consoleSkipFlags[consoleName].sync["content-targets"][
+            "es-de-gamelists"
+          ],
       ),
     );
   }
@@ -272,35 +296,37 @@ class SteamDeck implements Device, Debug {
           !this._consoleSkipFlags[consoleName].global &&
           !this._consoleSkipFlags[consoleName].filter &&
           !this._consoleSkipFlags[consoleName].sync.global &&
-          !this._consoleSkipFlags[consoleName].sync.media.global &&
-          !this._consoleSkipFlags[consoleName].sync.media.names[mediaName],
+          !this._consoleSkipFlags[consoleName].sync["content-targets"].media
+            .global &&
+          !this._consoleSkipFlags[consoleName].sync["content-targets"].media
+            .names[mediaName],
       ),
     );
   }
 
   get allFailedFilePaths(): string[] {
     const romsFailedPaths = Object.entries(
-      this._paths.files.fileIO.failed.roms.consoles,
+      this._paths.files.project.failed.roms.consoles,
     ).map(([, path]) => path);
 
     const mediaFailedPaths: string[] = [];
 
     for (const mediaName of this._mediaNames)
-      if (this._paths.files.fileIO.failed.media[mediaName])
+      if (this._paths.files.project.failed.media[mediaName])
         for (const consoleName of this._consoleNames)
-          if (this._paths.files.fileIO.failed.media[mediaName][consoleName])
+          if (this._paths.files.project.failed.media[mediaName][consoleName])
             mediaFailedPaths.push(
-              this._paths.files.fileIO.failed.media[mediaName][consoleName],
+              this._paths.files.project.failed.media[mediaName][consoleName],
             );
 
     return [...romsFailedPaths, ...mediaFailedPaths];
   }
 
   get allSyncDirPaths(): string[] {
-    const basePaths = [
-      this._paths.dirs.sync.roms.base,
-      this._paths.dirs.sync.media.base,
-      this._paths.dirs.sync.metadata.base,
+    const basePaths: string[] = [
+      this._paths.dirs["content-targets"].roms.base,
+      this._paths.dirs["content-targets"].media.base,
+      this._paths.dirs["content-targets"]["es-de-gamelists"].base,
     ];
 
     const romsSyncPaths: string[] = [];
@@ -308,54 +334,46 @@ class SteamDeck implements Device, Debug {
     const metadataSyncPaths: string[] = [];
 
     for (const consoleName of this._consoleNames) {
-      if (this._paths.dirs.sync.media.consoles[consoleName]) {
-        basePaths.push(this._paths.dirs.sync.media.consoles[consoleName].base);
+      if (this._paths.dirs["content-targets"].media.consoles[consoleName]) {
+        basePaths.push(
+          this._paths.dirs["content-targets"].media.consoles[consoleName].base,
+        );
 
         for (const mediaName of this._mediaNames)
           if (
-            this._paths.dirs.sync.media.consoles[consoleName].names[mediaName]
+            this._paths.dirs["content-targets"].media.consoles[consoleName]
+              .names[mediaName]
           )
             mediaSyncPaths.push(
-              this._paths.dirs.sync.media.consoles[consoleName].names[
-                mediaName
-              ],
+              this._paths.dirs["content-targets"].media.consoles[consoleName]
+                .names[mediaName],
             );
       }
 
-      if (this._paths.dirs.sync.roms.consoles[consoleName])
-        romsSyncPaths.push(this._paths.dirs.sync.roms.consoles[consoleName]);
+      if (this._paths.dirs["content-targets"].roms.consoles[consoleName])
+        romsSyncPaths.push(
+          this._paths.dirs["content-targets"].roms.consoles[consoleName],
+        );
 
-      if (this._paths.dirs.sync.metadata.consoles[consoleName])
+      if (
+        this._paths.dirs["content-targets"]["es-de-gamelists"].consoles[
+          consoleName
+        ]
+      )
         metadataSyncPaths.push(
-          this._paths.dirs.sync.metadata.consoles[consoleName],
+          this._paths.dirs["content-targets"]["es-de-gamelists"].consoles[
+            consoleName
+          ],
         );
     }
 
     return [...basePaths, ...mediaSyncPaths, ...metadataSyncPaths];
   }
 
-  private async _connect() {
-    logger.trace(
-      `Beggining attempt to connect to device ${this._name} via SFTP.`,
-    );
-
-    if (this._sftpClient.connected) {
-      logger.warn(
-        `SFTP Client for device ${this.name} is already connected. Doing nothing.`,
-      );
-      return;
-    }
-
-    const connectError = await this._sftpClient.connect();
-    if (connectError) return connectError;
-
-    logger.info(`Succesfully connected to ${this._name} device.`);
-  }
-
   public getConsoleRomsFailedFilePath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsFailedFilePathError] {
-    const path = this._paths.files.fileIO.failed.roms.consoles[consoleName];
+    const path = this._paths.files.project.failed.roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -368,7 +386,7 @@ class SteamDeck implements Device, Debug {
   public getConsoleRomsDiffFilePath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsDiffFilePath] {
-    const path = this._paths.files.fileIO.diffs.roms.consoles[consoleName];
+    const path = this._paths.files.project.diffs.roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -379,7 +397,7 @@ class SteamDeck implements Device, Debug {
   public getConsoleRomsSyncDirPath(
     consoleName: ConsoleName,
   ): [string, undefined] | [undefined, GetConsoleRomsSyncDirPath] {
-    const path = this._paths.dirs.sync.roms.consoles[consoleName];
+    const path = this._paths.dirs["content-targets"].roms.consoles[consoleName];
     if (path) return [path, undefined];
     return [
       undefined,
@@ -405,9 +423,9 @@ class SteamDeck implements Device, Debug {
     this._consoles.set(consoleName, konsole);
   }
 
-  private _initSteamDeckPaths(
-    paths: Environment["devices"][typeof STEAM_DECK]["paths"],
-  ): SteamDeckPaths {
+  private _initSteamDeckLCDAlejandroPaths(
+    contentTargetPaths: Environment["device"]["data"][typeof STEAM_DECK_LCD_ALEJANDRO]["content-targets"]["paths"],
+  ): SteamDeckLCDAlejandroPaths {
     const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
 
     const logsDirPath = path.join(baseDirPath, "logs");
@@ -424,81 +442,80 @@ class SteamDeck implements Device, Debug {
     const romsFailedDirPath = path.join(failedDirPath, "roms");
     const mediaFailedDirPath = path.join(failedDirPath, "media");
 
-    const steamDeckPaths: SteamDeckPaths = {
+    const paths: SteamDeckLCDAlejandroPaths = {
       dirs: {
-        fileIO: {
+        project: {
           base: baseDirPath,
           logs: {
             base: logsDirPath,
           },
           lists: {
             base: listsDirPath,
-            roms: romsListsDirPath,
-            media: {
-              base: mediaListsDirPath,
-              names: Object.fromEntries(
-                this._mediaNames.map((m) => [
-                  m,
-                  path.join(mediaListsDirPath, m),
-                ]),
-              ) as Partial<MediaPaths>,
+            "content-targets": {
+              roms: romsListsDirPath,
+              media: {
+                base: mediaListsDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaListsDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
             },
           },
           diffs: {
             base: diffsDirPath,
-            roms: romsDiffsDirPath,
-            media: {
-              base: mediaDiffsDirPath,
-              names: Object.fromEntries(
-                this._mediaNames.map((m) => [
-                  m,
-                  path.join(mediaDiffsDirPath, m),
-                ]),
-              ) as Partial<MediaPaths>,
+            "content-targets": {
+              roms: romsDiffsDirPath,
+              media: {
+                base: mediaDiffsDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaDiffsDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
             },
           },
           failed: {
             base: failedDirPath,
-            roms: romsFailedDirPath,
-            media: {
-              base: mediaFailedDirPath,
-              names: Object.fromEntries(
-                this._mediaNames.map((m) => [
-                  m,
-                  path.join(mediaFailedDirPath, m),
-                ]),
-              ) as Partial<MediaPaths>,
+            "content-targets": {
+              roms: romsFailedDirPath,
+              media: {
+                base: mediaFailedDirPath,
+                names: Object.fromEntries(
+                  this._mediaNames.map((m) => [
+                    m,
+                    path.join(mediaFailedDirPath, m),
+                  ]),
+                ) as Partial<MediaPaths>,
+              },
             },
           },
         },
-        sync: {
+        "content-targets": {
           roms: {
-            base: environment.devices["steam-deck"].paths.roms,
+            base: contentTargetPaths.roms,
             consoles: Object.fromEntries(
               this._consoleNames.map((c) => [
                 c,
-                path.join(environment.devices["steam-deck"].paths.roms, c),
+                path.join(contentTargetPaths.roms, c),
               ]),
             ) as Partial<ConsolePaths>,
           },
           media: {
-            base: path.join(environment.devices["steam-deck"].paths.media),
+            base: contentTargetPaths.media,
             consoles: Object.fromEntries(
               this._consoleNames.map((c) => [
                 c,
                 {
-                  base: path.join(
-                    environment.devices["steam-deck"].paths.media,
-                    c,
-                  ),
+                  base: path.join(contentTargetPaths.media, c),
                   names: Object.fromEntries(
                     this._mediaNames.map((m) => [
                       m,
-                      path.join(
-                        environment.devices["steam-deck"].paths.media,
-                        c,
-                        m,
-                      ),
+                      path.join(contentTargetPaths.media, c, m),
                     ]),
                   ) as Partial<MediaPaths>,
                 },
@@ -507,19 +524,19 @@ class SteamDeck implements Device, Debug {
               ConsoleContent<{ base: string; names: Partial<MediaPaths> }>
             >,
           },
-          metadata: {
-            base: path.join(environment.devices["steam-deck"].paths.metadata),
+          "es-de-gamelists": {
+            base: contentTargetPaths["es-de-gamelists"],
             consoles: Object.fromEntries(
               this._consoleNames.map((c) => [
                 c,
-                path.join(environment.devices["steam-deck"].paths.metadata, c),
+                path.join(contentTargetPaths["es-de-gamelists"], c),
               ]),
             ) as Partial<ConsolePaths>,
           },
         },
       },
       files: {
-        fileIO: {
+        project: {
           logs: {
             duplicates: path.join(logsDirPath, "duplicates.log.txt"),
             scrapped: path.join(logsDirPath, "scrapped.log.txt"),
@@ -588,21 +605,25 @@ class SteamDeck implements Device, Debug {
             ) as Partial<MediaContent<Partial<ConsolePaths>>>,
           },
         },
-        sync: {
-          metadata: {
+        "content-targets": {
+          "es-de-gamelists": {
             consoles: Object.fromEntries(
               this._consoleNames.map((c) => [
                 c,
-                path.join(paths.metadata, c, "gamelist.xml"),
+                path.join(
+                  contentTargetPaths["es-de-gamelists"],
+                  c,
+                  "gamelist.xml",
+                ),
               ]),
-            ) as Partial<ConsolePaths>,
+            ),
           },
         },
       },
     };
 
-    return steamDeckPaths;
+    return paths;
   }
 }
 
-export default SteamDeck;
+export default SteamDeckLCDAlejandro;
