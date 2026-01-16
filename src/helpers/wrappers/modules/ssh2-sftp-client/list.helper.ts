@@ -6,6 +6,7 @@ import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credent
 import SftpBadPathError from "../../../../classes/errors/sftp-bad-path.class.js";
 import SftpUnauthorizedError from "../../../../classes/errors/sftp-unauthorized-error.class.js";
 import SftpWrongTypeError from "../../../../classes/errors/sftp-wrong-type-error.class.js";
+import SftpNotFoundError from "../../../../classes/errors/sftp-not-found-error.class.js";
 
 export type ListError =
   | UnknownError
@@ -13,7 +14,8 @@ export type ListError =
   | SftpBadCredentialsError
   | SftpBadPathError
   | SftpUnauthorizedError
-  | SftpWrongTypeError;
+  | SftpWrongTypeError
+  | SftpNotFoundError;
 
 const list = async (
   client: Client,
@@ -54,6 +56,11 @@ const list = async (
         return [
           undefined,
           new SftpBadPathError(`Remote path ${remoteDirPath} is faulty.`),
+        ];
+      case "ENOENT":
+        return [
+          undefined,
+          new SftpNotFoundError(`Remote path ${remoteDirPath} does not exist.`),
         ];
       case "EACCES":
       case "EPERM":
