@@ -1,3 +1,4 @@
+import access from "./access.helper.js";
 import addFile from "./add-file.helper.js";
 import deleteFile from "./delete-file.helper.js";
 import dirExists from "./dir-exists.helper.js";
@@ -8,6 +9,7 @@ const sftp = {
   deleteFile,
   fileExists,
   dirExists,
+  access,
 };
 
 export default sftp;
