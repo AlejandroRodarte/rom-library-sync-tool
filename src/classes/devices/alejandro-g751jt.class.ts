@@ -30,6 +30,7 @@ import Sftp from "../device-io/sftp.class.js";
 import SftpClient from "../sftp-client.class.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
+import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -50,9 +51,13 @@ class AlejandroG751JT implements Device, Debug {
   >;
 
   private _mediaNames: MediaName[];
-  private _contentTargetNames: ContentTargetName[];
-
   private _deviceFileIO: DeviceFileIO;
+
+  private _shouldProcessContentTargets: ContentTargetContent<boolean> = {
+    roms: false,
+    media: false,
+    "es-de-gamelists": false,
+  }
 
   constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT]) {
     const uniqueConsoleNames = [...new Set(envData.console.names)];
@@ -64,7 +69,9 @@ class AlejandroG751JT implements Device, Debug {
     const uniqueContentTargetNames = [
       ...new Set(envData["content-targets"].names),
     ];
-    this._contentTargetNames = uniqueContentTargetNames;
+
+    for (const contentTargetName of uniqueContentTargetNames)
+      this._shouldProcessContentTargets[contentTargetName] = true;
 
     this._consoleSkipFlags = Object.fromEntries(
       this._consoleNames.map((c) => [
