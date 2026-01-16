@@ -25,8 +25,8 @@ import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g7
 import type { AlejandroG751JTConsolesSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-consoles-skip-flags.interface.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
-import Fs from "../device-io/fs.class.js";
-import Sftp from "../device-io/sftp.class.js";
+import Fs from "../device-file-io/fs.class.js";
+import Sftp from "../device-file-io/sftp.class.js";
 import SftpClient from "../sftp-client.class.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";

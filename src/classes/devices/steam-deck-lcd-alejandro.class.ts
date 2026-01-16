@@ -27,8 +27,8 @@ import type { SteamDeckLCDAlejandroPaths } from "../../interfaces/devices/steam-
 import type { SteamDeckLCDAlejandroConsoleSkipFlags } from "../../interfaces/devices/steam-deck-lcd-alejandro/steam-deck-lcd-alejandro-consoles-skip-flags.interface.js";
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
-import Sftp from "../device-io/sftp.class.js";
-import Fs from "../device-io/fs.class.js";
+import Sftp from "../device-file-io/sftp.class.js";
+import Fs from "../device-file-io/fs.class.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
