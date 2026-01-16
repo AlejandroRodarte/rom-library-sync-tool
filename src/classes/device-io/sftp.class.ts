@@ -3,7 +3,10 @@ import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-ent
 import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
 import type SftpClient from "../sftp-client.class.js";
-import type DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
+import DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
+import exists from "../../helpers/wrappers/modules/ssh2-sftp-client/exists.helper.js";
+import access from "../../helpers/sftp/access.helper.js";
+import build from "../../helpers/build/index.js";
 
 class Sftp implements DeviceFileIO {
   private _client: SftpClient;
@@ -44,7 +47,16 @@ class Sftp implements DeviceFileIO {
     path,
     rights,
   ) => {
-    return undefined;
+    let mode = 0;
+
+    if (rights) {
+      const [rightsMode, modeError] = build.modeFromRights(rights);
+      if (modeError) return new DeviceFileIOExistsError(modeError.reasons);
+      mode = rightsMode;
+    }
+
+    const existsError = await this._client.exists(type, path, mode);
+    if (existsError) return new DeviceFileIOExistsError(existsError.reasons);
   };
 }
 
