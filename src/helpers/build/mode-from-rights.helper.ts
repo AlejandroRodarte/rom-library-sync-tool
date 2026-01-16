@@ -1,7 +1,7 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import typeGuards from "../typescript/guards/index.js";
 
-const integerFromRights = (
+const modeFromRights = (
   rights: string,
 ): [number, undefined] | [undefined, AppValidationError] => {
   if (!rights) return [0, undefined];
@@ -42,4 +42,4 @@ const integerFromRights = (
   return [acc, undefined];
 };
 
-export default integerFromRights;
+export default modeFromRights;
