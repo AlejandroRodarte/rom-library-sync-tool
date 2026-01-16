@@ -1,4 +1,4 @@
-import accessPath from "./access-path.helper.js";
+import access from "./access.helper.js";
 import deleteFile from "./delete-file.helper.js";
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
 import openNewWriteOnlyFile from "./open-new-write-only-file.helper.js";
@@ -28,7 +28,7 @@ import getFileSymlinksFromDeviceFileIOLsEntries from "./get-file-symlinks-from-d
 import open from "../wrappers/modules/fs/open.helper.js";
 
 const fileIO = {
-  accessPath,
+  access,
   fileExistsAndIsReadable,
   deleteFile,
   readUtf8FileLines,

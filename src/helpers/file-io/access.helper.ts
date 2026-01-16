@@ -1,16 +1,18 @@
 import type { PathLike } from "node:fs";
 import FsWrongTypeError from "../../classes/errors/fs-wrong-type-error.class.js";
-import access, { type AccessError } from "../wrappers/modules/fs/access.helper.js";
+import rawAccess, {
+  type AccessError,
+} from "../wrappers/modules/fs/access.helper.js";
 import stat, { type StatError } from "../wrappers/modules/fs/stat.helper.js";
 
 export type AccessPathError = AccessError | StatError | FsWrongTypeError;
 
-const accessPath = async (
+const access = async (
   type: "file" | "dir" | "link",
   path: PathLike,
   mode?: number,
 ): Promise<undefined | AccessPathError> => {
-  const accessError = await access(path, mode);
+  const accessError = await rawAccess(path, mode);
   if (accessError) return accessError;
 
   const [pathStats, statsError] = await stat(path);
@@ -36,4 +38,4 @@ const accessPath = async (
   }
 };
 
-export default accessPath;
+export default access;
