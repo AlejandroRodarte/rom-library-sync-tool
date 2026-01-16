@@ -4,8 +4,6 @@ import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js"
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
 import type SftpClient from "../sftp-client.class.js";
 import DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
-import exists from "../../helpers/wrappers/modules/ssh2-sftp-client/exists.helper.js";
-import access from "../../helpers/sftp/access.helper.js";
 import build from "../../helpers/build/index.js";
 
 class Sftp implements DeviceFileIO {
