@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpDisconnectionError extends CustomError {
   readonly type = "SftpDisconnectionError";
-  status = 301;
-  code = "SFTP_DISCONNECTION_ERROR";
-  message = "An error happened while disconnecting via SFTP.";
+  readonly status = 301;
+  readonly code = "SFTP_DISCONNECTION_ERROR";
+  readonly message = "An error happened while disconnecting via SFTP.";
 
   private _reasons: string[];
 

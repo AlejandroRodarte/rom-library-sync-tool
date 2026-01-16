@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpNotFoundError extends CustomError {
   readonly type = "SftpNotFoundError";
-  status = 302;
-  code = "SFTP_NOT_FOUND_ERROR";
-  message = "The object was not found in the remote filesystem.";
+  readonly status = 302;
+  readonly code = "SFTP_NOT_FOUND_ERROR";
+  readonly message = "The object was not found in the remote filesystem.";
 
   private _reasons: string[];
 

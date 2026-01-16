@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class DeviceFileIOLsError extends CustomError {
   readonly type = "DeviceFileIOLsError";
-  status = 400;
-  code = "DEVICE_FILE_IO_LS_ERROR";
-  message =
+  readonly status = 400;
+  readonly code = "DEVICE_FILE_IO_LS_ERROR";
+  readonly message =
     "A problem occured while fetching contents from a device directory.";
 
   private _reasons: string[];

@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class AppNotFoundError extends CustomError {
   readonly type = "AppNotFoundError";
-  status = 100;
-  code = "APP_NOT_FOUND_ERROR";
-  message = "The object was not found in app memory.";
+  readonly status = 100;
+  readonly code = "APP_NOT_FOUND_ERROR";
+  readonly message = "The object was not found in app memory.";
 
   private _reasons: string[];
 

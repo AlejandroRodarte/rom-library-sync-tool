@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class FsFileExistsError extends CustomError {
   readonly type = "FsFileExistsError";
-  status = 203;
-  code = "FS_FILE_EXISTS_ERROR";
-  message = "File already exists in the given filesystem path.";
+  readonly status = 203;
+  readonly code = "FS_FILE_EXISTS_ERROR";
+  readonly message = "File already exists in the given filesystem path.";
 
   private _reasons: string[];
 

@@ -2,9 +2,10 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class FsWrongTypeError extends CustomError {
   readonly type = "FsWrongTypeError";
-  status = 202;
-  code = "FS_WRONG_TYPE_ERROR";
-  message = "The object found in the filesystem path is of the wrong type.";
+  readonly status = 202;
+  readonly code = "FS_WRONG_TYPE_ERROR";
+  readonly message =
+    "The object found in the filesystem path is of the wrong type.";
 
   private _reasons: string[];
 

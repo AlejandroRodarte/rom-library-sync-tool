@@ -2,9 +2,10 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class FsUnauthorizedError extends CustomError {
   readonly type = "FsUnauthorizedError";
-  status = 201;
-  code = "FS_UNAUTHORIZED_ERROR";
-  message = "Unauthorized to perform this operation in the filesystem path.";
+  readonly status = 201;
+  readonly code = "FS_UNAUTHORIZED_ERROR";
+  readonly message =
+    "Unauthorized to perform this operation in the filesystem path.";
 
   private _reasons: string[];
 

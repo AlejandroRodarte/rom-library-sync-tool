@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpBadCredentialsError extends CustomError {
   readonly type = "SftpBadCredentialsError";
-  status = 306;
-  code = "SFTP_BAD_CREDENTIALS_ERROR";
-  message = "SFTP credentials lead to a bad authentication procedure.";
+  readonly status = 306;
+  readonly code = "SFTP_BAD_CREDENTIALS_ERROR";
+  readonly message = "SFTP credentials lead to a bad authentication procedure.";
 
   private _reasons: string[];
 

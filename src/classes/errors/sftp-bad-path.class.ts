@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpBadPathError extends CustomError {
   readonly type = "SftpBadPathError";
-  status = 304;
-  code = "SFTP_BAD_PATH_ERROR";
-  message = "The remote path that was provided is faulty.";
+  readonly status = 304;
+  readonly code = "SFTP_BAD_PATH_ERROR";
+  readonly message = "The remote path that was provided is faulty.";
 
   private _reasons: string[];
 

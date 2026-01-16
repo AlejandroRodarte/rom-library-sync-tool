@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpConnectionError extends CustomError {
   readonly type = "SftpConnectionError";
-  status = 300;
-  code = "SFTP_CONNECTION_ERROR";
-  message = "An error happened while connecting via SFTP.";
+  readonly status = 300;
+  readonly code = "SFTP_CONNECTION_ERROR";
+  readonly message = "An error happened while connecting via SFTP.";
 
   private _reasons: string[];
 

@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class DeviceFileIOExistsError extends CustomError {
   readonly type = "DeviceFileIOExistsError";
-  status = 401;
-  code = "DEVICE_FILE_IO_EXISTS_ERROR";
-  message =
+  readonly status = 401;
+  readonly code = "DEVICE_FILE_IO_EXISTS_ERROR";
+  readonly message =
     "A problem occured while confirming the existence of a file|dir|link in the requested path.";
 
   private _reasons: string[];

@@ -2,9 +2,9 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class UnknownError extends CustomError {
   readonly type = "UnknownError";
-  status = 999;
-  code = "UNKNOWN_ERROR";
-  message = "An unknown error has occured.";
+  readonly status = 999;
+  readonly code = "UNKNOWN_ERROR";
+  readonly message = "An unknown error has occured.";
 
   private _reasons: string[];
 

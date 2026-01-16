@@ -57,12 +57,11 @@ const access = async (
   const [remotePathStats, statError] = await stat(client, path);
   if (statError) return statError;
 
-  const [remotePathRights, remotePathRightsError] = build.fileRightsFromDecimal(
-    remotePathStats.mode,
-  );
+  const [remotePathRights, remotePathRightsError] =
+    build.fileRightsFromDecimalMode(remotePathStats.mode);
   if (remotePathRightsError) return remotePathRightsError;
 
-  const [desiredRights, desiredRightsError] = build.rightsFromInteger(mode);
+  const [desiredRights, desiredRightsError] = build.rightsFromMode(mode);
   if (desiredRightsError) return desiredRightsError;
 
   if (!remotePathRights.user.includes(desiredRights))

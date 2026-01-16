@@ -2,9 +2,10 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class FsCircularReferenceError extends CustomError {
   readonly type = "FsCircularReferenceError";
-  status = 204;
-  code = "FS_CIRCULAR_REFERENCE_ERROR";
-  message = "The symlink to be created would create a circular reference.";
+  readonly status = 204;
+  readonly code = "FS_CIRCULAR_REFERENCE_ERROR";
+  readonly message =
+    "The symlink to be created would create a circular reference.";
 
   private _reasons: string[];
 

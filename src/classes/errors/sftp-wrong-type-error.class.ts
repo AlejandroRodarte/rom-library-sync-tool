@@ -2,9 +2,10 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpWrongTypeError extends CustomError {
   readonly type = "SftpWrongTypeError";
-  status = 303;
-  code = "SFTP_WRONG_TYPE_ERROR";
-  message = "The object found in the remote filesystem is of the wrong type.";
+  readonly status = 303;
+  readonly code = "SFTP_WRONG_TYPE_ERROR";
+  readonly message =
+    "The object found in the remote filesystem is of the wrong type.";
 
   private _reasons: string[];
 

@@ -2,9 +2,10 @@ import CustomError from "./custom-error.abstract.class.js";
 
 class SftpUnauthorizedError extends CustomError {
   readonly type = "SftpUnauthorizedError";
-  status = 305;
-  code = "SFTP_UNAUTHORIZED_ERROR";
-  message = "Unauthorized to perform this operation in the remote filesystem.";
+  readonly status = 305;
+  readonly code = "SFTP_UNAUTHORIZED_ERROR";
+  readonly message =
+    "Unauthorized to perform this operation in the remote filesystem.";
 
   private _reasons: string[];
 
