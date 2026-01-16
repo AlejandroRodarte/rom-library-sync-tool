@@ -31,6 +31,7 @@ import SftpClient from "../sftp-client.class.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
+import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -428,7 +429,9 @@ class AlejandroG751JT implements Device, Debug {
     let content = "Local { ";
 
     content += `name: ${this._name}, `;
+    content += `content-targets: ${CONTENT_TARGET_NAMES.filter((c) => this._shouldProcessContentTargets[c] === true).join(", ")}, `
     content += `console-names: ${this._consoleNames.join(",")}, `;
+    content += `media-names: ${this._mediaNames.join(", ")} `;
     content += "}";
 
     return content;
