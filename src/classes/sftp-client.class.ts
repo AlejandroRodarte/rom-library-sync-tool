@@ -5,13 +5,24 @@ import SftpConnectionError from "./errors/sftp-connection-error.class.js";
 import SftpDisconnectionError from "./errors/sftp-disconnection-error.class.js";
 import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
 import type { SftpCredentials } from "../interfaces/sftp-credentials.interface.js";
-import connect, { type ConnectError } from "../helpers/wrappers/modules/ssh2-sftp-client/connect.helper.js";
-import disconnect, { type DisconnectError } from "../helpers/wrappers/modules/ssh2-sftp-client/disconnect.helper.js";
-import list, { type ListError } from "../helpers/wrappers/modules/ssh2-sftp-client/list.helper.js";
-import fileExists, { type FileExistsError } from "../helpers/sftp/file-exists.helper.js";
-import dirExists, { type DirExistsError } from "../helpers/sftp/dir-exists.helper.js";
+import connect, {
+  type ConnectError,
+} from "../helpers/wrappers/modules/ssh2-sftp-client/connect.helper.js";
+import disconnect, {
+  type DisconnectError,
+} from "../helpers/wrappers/modules/ssh2-sftp-client/disconnect.helper.js";
+import list, {
+  type ListError,
+} from "../helpers/wrappers/modules/ssh2-sftp-client/list.helper.js";
+import fileExists, {
+  type FileExistsError,
+} from "../helpers/sftp/file-exists.helper.js";
+import dirExists, {
+  type DirExistsError,
+} from "../helpers/sftp/dir-exists.helper.js";
 import deleteFile from "../helpers/sftp/delete-file.helper.js";
 import addFile from "../helpers/sftp/add-file.helper.js";
+import access, { type AccessError } from "../helpers/sftp/access.helper.js";
 
 export type ConnectMethodError = ConnectError;
 export type DisconnectMethodError = DisconnectError;
@@ -21,6 +32,7 @@ export type FileExistsMethodError = FileExistsError;
 export type DirExistsMethodError = DirExistsError;
 export type AllDirsExistMethodError = DirExistsMethodError;
 export type ListMethodError = ListError;
+export type ExistsMethodError = AccessError;
 
 class SftpClient {
   private _credentials: SftpCredentials;
@@ -66,6 +78,15 @@ class SftpClient {
     const [entries, listError] = await list(this._client, remoteDirPath);
     if (listError) return [undefined, listError];
     return [entries, undefined];
+  }
+
+  public async exists(
+    type: "file" | "dir" | "link",
+    path: string,
+    mode?: number,
+  ): Promise<ExistsMethodError | undefined> {
+    const accessError = await access(this._client, type, path, mode);
+    if (accessError) return accessError;
   }
 
   public async fileExists(
