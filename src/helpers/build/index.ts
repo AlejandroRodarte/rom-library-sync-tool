@@ -13,6 +13,7 @@ import consoleNamesFromConsolesList from "./console-names-from-consoles-list.hel
 import mediaNamesFromMediasList from "./media-names-from-medias-list.helper.js";
 import intersectStringArraySimple from "./intersect-string-array-simple.helper.js";
 import integerFromRights from "./integer-from-rights.helper.js";
+import fileRightsFromDecimalMode from "./file-rights-from-decimal-mode.helper.js";
 import rightsFromMode from "./rights-from-mode.helper.js";
 
 const build = {
@@ -31,6 +32,7 @@ const build = {
   mediaNamesFromMediasList,
   intersectStringArraySimple,
   integerFromRights,
+  fileRightsFromDecimalMode,
   rightsFromMode,
 };
 

@@ -1,9 +1,11 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import type { FileRights } from "../../interfaces/file-rights.helper.js";
 
-const rightsFromDecimal = (
+export type FileRightsFromDecimalError = AppValidationError;
+
+const fileRightsFromDecimalMode = (
   decimal: number,
-): [FileRights, undefined] | [undefined, AppValidationError] => {
+): [FileRights, undefined] | [undefined, FileRightsFromDecimalError] => {
   const rights: FileRights = {
     user: "",
     group: "",
@@ -75,4 +77,4 @@ const rightsFromDecimal = (
   return [rights, undefined];
 };
 
-export default rightsFromDecimal;
+export default fileRightsFromDecimalMode;
