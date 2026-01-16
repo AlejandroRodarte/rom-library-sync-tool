@@ -58,7 +58,7 @@ class AlejandroG751JT implements Device, Debug {
     roms: false,
     media: false,
     "es-de-gamelists": false,
-  }
+  };
 
   constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT]) {
     const uniqueConsoleNames = [...new Set(envData.console.names)];
@@ -429,7 +429,7 @@ class AlejandroG751JT implements Device, Debug {
     let content = "Local { ";
 
     content += `name: ${this._name}, `;
-    content += `content-targets: ${CONTENT_TARGET_NAMES.filter((c) => this._shouldProcessContentTargets[c] === true).join(", ")}, `
+    content += `content-targets: ${CONTENT_TARGET_NAMES.filter((c) => this._shouldProcessContentTargets[c] === true).join(", ")}, `;
     content += `console-names: ${this._consoleNames.join(",")}, `;
     content += `media-names: ${this._mediaNames.join(", ")} `;
     content += "}";
