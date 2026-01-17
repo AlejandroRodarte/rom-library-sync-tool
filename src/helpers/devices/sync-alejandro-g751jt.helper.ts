@@ -5,23 +5,6 @@ import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 import logger from "../../objects/logger.object.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
-import allDirsExistAndAreReadableAndWritable, {
-  type AllDirsExistAndAreReadableAndWritableError,
-} from "../file-io/all-dirs-exist-and-are-readable-and-writable.helper.js";
-import openNewWriteOnlyFile, {
-  type OpenNewWriteOnlyFileError,
-} from "../file-io/open-new-write-only-file.helper.js";
-import fileExistsAndReadUtf8Lines, {
-  type FileExistsAndReadUtf8Lines,
-} from "../file-io/file-exists-and-read-utf8-lines.helper.js";
-import createFileSymlink from "../file-io/create-file-symlink.helper.js";
-import deleteFileSymlink from "../file-io/delete-file-symlink.helper.js";
-import fileExists from "../file-io/file-exists.helper.js";
-import fileIsEmpty from "../file-io/file-is-empty.helper.js";
-import deleteFile from "../file-io/delete-file.helper.js";
-import anyFileExists, {
-  type AnyFileExistsError,
-} from "../file-io/any-file-exists.helper.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
 import type AlejandroG751JT from "../../classes/devices/alejandro-g751jt.class.js";
 import databasePaths from "../../objects/database-paths.object.js";
@@ -31,13 +14,30 @@ import type {
   GetConsoleRomsSyncDirPath,
 } from "../../classes/devices/alejandro-g751jt.class.js";
 import writeFile from "../wrappers/modules/fs/write-file.helper.js";
+import fileExists from "../extras/fs/file-exists.helper.js";
+import allDirsExistAndAreReadableAndWritable, {
+  type AllDirsExistAndAreReadableAndWritableError,
+} from "../extras/fs/all-dirs-exist-and-are-readable-and-writable.helper.js";
+import openNewWriteOnlyFile, {
+  type OpenNewWriteOnlyFileError,
+} from "../extras/fs/open-new-write-only-file.helper.js";
+import fileExistsAndReadUtf8Lines, {
+  type FileExistsAndReadUtf8Lines,
+} from "../extras/fs/file-exists-and-read-utf8-lines.helper.js";
+import createFileSymlink from "../extras/fs/create-file-symlink.helper.js";
+import deleteFileSymlink from "../extras/fs/delete-file-symlink.helper.js";
+import fileIsEmpty from "../extras/fs/file-is-empty.helper.js";
+import deleteFile from "../extras/fs/delete-file.helper.js";
+import anyFileExists, {
+  type AnyFileExistsError,
+} from "../extras/fs/any-file-exists.helper.js";
 
 const build = {
   diffActionFromDiffLine,
   diffLineFromDiffAction,
 };
 
-const fileIO = {
+const fsExtras = {
   fileExists,
   allDirsExistAndAreReadableAndWritable,
   openNewWriteOnlyFile,
@@ -50,7 +50,7 @@ const fileIO = {
   anyFileExists,
 };
 
-export type SyncLocalError =
+export type SyncAlejandroG751JTError =
   | AnyFileExistsError
   | FsFileExistsError
   | AllDirsExistAndAreReadableAndWritableError
@@ -63,10 +63,9 @@ export type SyncLocalError =
 
 const syncAlejandroG751JT = async (
   local: AlejandroG751JT,
-): Promise<SyncLocalError | undefined> => {
-  const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
-    local.allFailedFilePaths,
-  );
+): Promise<SyncAlejandroG751JTError | undefined> => {
+  const [anyFailedFileExists, anyFileExistsError] =
+    await fsExtras.anyFileExists(local.allFailedFilePaths);
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
     return new FsFileExistsError(
@@ -74,7 +73,7 @@ const syncAlejandroG751JT = async (
     );
 
   const [allLocalDirsExist, allDirsExistError] =
-    await fileIO.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
+    await fsExtras.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
   if (allDirsExistError) return allDirsExistError;
   if (!allLocalDirsExist)
     return new FsNotFoundError(
@@ -95,12 +94,12 @@ const syncAlejandroG751JT = async (
     if (romsDirPathError) return romsDirPathError;
 
     const [failedFileHandle, failedFileOpenError] =
-      await fileIO.openNewWriteOnlyFile(romsFailedFilePath);
+      await fsExtras.openNewWriteOnlyFile(romsFailedFilePath);
 
     if (failedFileOpenError) return failedFileOpenError;
 
     const [diffLines, diffFileError] =
-      await fileIO.fileExistsAndReadUtf8Lines(romsDiffFilePath);
+      await fsExtras.fileExistsAndReadUtf8Lines(romsDiffFilePath);
     let failedDiffLines = "";
 
     if (diffFileError) return diffFileError;
@@ -123,7 +122,7 @@ const syncAlejandroG751JT = async (
       diffActions.push(diffAction);
     }
 
-    const failedFileWriteError = await fileIO.writeFile(
+    const failedFileWriteError = await fsExtras.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -146,7 +145,7 @@ const syncAlejandroG751JT = async (
 
       switch (diffAction.type) {
         case "add-file": {
-          const addSymlinkError = await fileIO.createFileSymlink(
+          const addSymlinkError = await fsExtras.createFileSymlink(
             dbRomFilePath,
             localRomSymlinkPath,
             "KEEP",
@@ -161,7 +160,7 @@ const syncAlejandroG751JT = async (
           break;
         }
         case "remove-file": {
-          const removeSymlinkError = await fileIO.deleteFileSymlink(
+          const removeSymlinkError = await fsExtras.deleteFileSymlink(
             localRomSymlinkPath,
             false,
           );
@@ -184,7 +183,7 @@ const syncAlejandroG751JT = async (
       failedDiffLines += `${diffLine}\n`;
     }
 
-    const secondFailedFileWriteError = await fileIO.writeFile(
+    const secondFailedFileWriteError = await fsExtras.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -197,7 +196,7 @@ const syncAlejandroG751JT = async (
     await failedFileHandle.close();
 
     const [failedFileIsEmpty, failedFileAccessError] =
-      await fileIO.fileIsEmpty(romsFailedFilePath);
+      await fsExtras.fileIsEmpty(romsFailedFilePath);
 
     if (failedFileAccessError) {
       logger.error(
@@ -207,7 +206,7 @@ const syncAlejandroG751JT = async (
     }
 
     if (failedFileIsEmpty) {
-      const failedFileDeleteError = await fileIO.deleteFile(
+      const failedFileDeleteError = await fsExtras.deleteFile(
         romsFailedFilePath,
         true,
       );

@@ -19,7 +19,6 @@ import unselect from "../../helpers/unselect/index.js";
 import databasePaths from "../../objects/database-paths.object.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
-import fileIO from "../../helpers/file-io/index.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import SftpClient from "../sftp-client.class.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
@@ -29,11 +28,28 @@ import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js"
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
 import Sftp from "../device-file-io/sftp.class.js";
 import Fs from "../device-file-io/fs.class.js";
+import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
+import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
+import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
+import allDirsExistAndAreReadable from "../../helpers/extras/fs/all-dirs-exist-and-are-readable.helper.js";
+import getFileSymlinksFromDeviceFileIOLsEntries from "../../helpers/extras/fs/get-file-symlinks-from-device-file-io-ls-entries.helper.js";
+import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
+import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
+
+const fsExtras = {
+  writeDuplicateRomsFile,
+  writeScrappedRomsFile,
+  writeToFileOrDelete,
+  allDirsExistAndAreReadable,
+  getFileSymlinksFromDeviceFileIOLsEntries,
+  deleteAndOpenWriteOnlyFile,
+  writeConsoleDiffFile,
+};
 
 const STEAM_DECK_LCD_ALEJANDRO = "steam-deck-lcd-alejandro" as const;
 
@@ -165,14 +181,14 @@ class SteamDeckLCDAlejandro implements Device, Debug {
 
   write: DeviceWriteMethods = {
     duplicates: async () => {
-      const writeError = await fileIO.writeDuplicateRomsFile(
+      const writeError = await fsExtras.writeDuplicateRomsFile(
         this.filterableConsoles,
         this._paths.files.project.logs.duplicates,
       );
       if (writeError) logger.error(writeError.toString());
     },
     scrapped: async () => {
-      const writeError = await fileIO.writeScrappedRomsFile(
+      const writeError = await fsExtras.writeScrappedRomsFile(
         this.filterableConsoles,
         this._paths.files.project.logs.scrapped,
       );
@@ -195,7 +211,7 @@ class SteamDeckLCDAlejandro implements Device, Debug {
           continue;
         }
 
-        const diffError = await fileIO.writeConsoleDiffFile(konsole, {
+        const diffError = await fsExtras.writeConsoleDiffFile(konsole, {
           list: this._paths.files.project.lists.roms.consoles[consoleName],
           diff: this._paths.files.project.diffs.roms.consoles[consoleName],
         });

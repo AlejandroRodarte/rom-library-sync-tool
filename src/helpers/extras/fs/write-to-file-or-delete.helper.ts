@@ -1,8 +1,8 @@
 import type { FileHandle } from "node:fs/promises";
 import type { PathLike } from "node:fs";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
-import logger from "../../objects/logger.object.js";
-import writeFile, { type WriteFileError } from "../wrappers/modules/fs/write-file.helper.js";
+import logger from "../../../objects/logger.object.js";
+import writeFile, { type WriteFileError } from "../../wrappers/modules/fs/write-file.helper.js";
 
 export type WriteToFileOrDeleteError = WriteFileError | DeleteFileError;
 

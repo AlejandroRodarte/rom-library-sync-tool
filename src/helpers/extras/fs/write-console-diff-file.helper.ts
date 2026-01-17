@@ -1,5 +1,5 @@
 import fileExistsAndIsReadable from "./file-exists-and-is-readable.helper.js";
-import filenameIndexesToAddAndDelete from "../build/filename-indexes-to-add-and-delete.helper.js";
+import filenameIndexesToAddAndDelete from "../../build/filename-indexes-to-add-and-delete.helper.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 import readUtf8FileLines, {
   type ReadUtf8FileLinesError,
@@ -13,7 +13,7 @@ import writeAddFileLineToDiffFile, {
 import writeDeleteFileLineToDiffFile, {
   type WriteDeleteFileLineToDiffFileError,
 } from "./write-delete-file-line-to-diff-file.helper.js";
-import type Console from "../../classes/console.class.js";
+import type Console from "../../../classes/console.class.js";
 
 const build = {
   filenameIndexesToAddAndDelete,

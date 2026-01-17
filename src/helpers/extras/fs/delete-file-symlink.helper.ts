@@ -1,6 +1,6 @@
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
-import type UnknownError from "../../classes/errors/unknown-error.class.js";
-import unlink, { type UnlinkError } from "../wrappers/modules/fs/unlink.helper.js";
+import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
+import type UnknownError from "../../../classes/errors/unknown-error.class.js";
+import unlink, { type UnlinkError } from "../../wrappers/modules/fs/unlink.helper.js";
 import symlinkExists from "./symlink-exists.helper.js";
 
 export type DeleteFileSymlinkError = UnknownError | UnlinkError;

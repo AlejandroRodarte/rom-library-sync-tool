@@ -4,10 +4,10 @@ import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js"
 import DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
 import readdir from "../../helpers/wrappers/modules/fs/readdir.helper.js";
 import build from "../../helpers/build/index.js";
-import access from "../../helpers/file-io/access.helper.js";
 import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
 import deviceFileIOFsExistsMethodSpecificErrorCodeDictionary from "../../dictionaries/interfaces/device-file-io/implementors/fs/device-file-io-fs-exists-method-specific-error-code-dictionary.dictionary.js";
 import deviceFileIOFsLsMethodSpecificErrorCodeDictionary from "../../dictionaries/interfaces/device-file-io/implementors/fs/device-file-io-fs-ls-method-specific-error-code-dictionary.dictionary.js";
+import access from "../../helpers/extras/fs/access.helper.js";
 
 class Fs implements DeviceFileIO {
   ls: (

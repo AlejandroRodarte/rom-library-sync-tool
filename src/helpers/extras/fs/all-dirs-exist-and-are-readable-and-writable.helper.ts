@@ -1,7 +1,7 @@
 import type { PathLike } from "node:fs";
 import type { DirExistsAndIsReadableAndWritableError } from "./dir-exists-and-is-readable-and-writable.helper.js";
 import dirExistsAndIsReadableAndWritable from "./dir-exists-and-is-readable-and-writable.helper.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
 
 export type AllDirsExistAndAreReadableAndWritableError =
   DirExistsAndIsReadableAndWritableError;

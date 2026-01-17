@@ -1,8 +1,8 @@
 import path from "path";
-import type { DeviceFileIOLsEntry } from "../../interfaces/device-file-io-ls-entry.interface.js";
-import realpath, { type RealpathError } from "../wrappers/modules/fs/realpath.helper.js";
-import stat, { type StatError } from "../wrappers/modules/fs/stat.helper.js";
-import type { ReaddirError } from "../wrappers/modules/fs/readdir.helper.js";
+import type { DeviceFileIOLsEntry } from "../../../interfaces/device-file-io-ls-entry.interface.js";
+import realpath, { type RealpathError } from "../../wrappers/modules/fs/realpath.helper.js";
+import stat, { type StatError } from "../../wrappers/modules/fs/stat.helper.js";
+import type { ReaddirError } from "../../wrappers/modules/fs/readdir.helper.js";
 
 export type GetFileSymlinksFromDeviceFileIOLsEntries =
   | ReaddirError

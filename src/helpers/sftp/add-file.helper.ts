@@ -1,19 +1,25 @@
 import Client from "ssh2-sftp-client";
 
-import fileIOFileExists, {
-  type FileExistsError as FileIOFileExistsError,
-} from "../file-io/file-exists.helper.js";
 import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
-import put, { type PutError } from "../wrappers/modules/ssh2-sftp-client/put.helper.js";
-import sftpDelete, { type DeleteError } from "../wrappers/modules/ssh2-sftp-client/delete.helper.js";
-import fileExists, { type FileExistsError as SftpFileExistsError } from "./file-exists.helper.js";
+import put, {
+  type PutError,
+} from "../wrappers/modules/ssh2-sftp-client/put.helper.js";
+import sftpDelete, {
+  type DeleteError,
+} from "../wrappers/modules/ssh2-sftp-client/delete.helper.js";
+import sftpFileExists, {
+  type FileExistsError as SftpFileExistsError,
+} from "./file-exists.helper.js";
+import fsFileExists, {
+  type FileExistsError as FsFileExistsError,
+} from "../extras/fs/file-exists.helper.js";
 
-const fileIO = {
-  fileExists: fileIOFileExists,
+const fsExtras = {
+  fileExists: fsFileExists,
 };
 
 export type AddFileError =
-  | FileIOFileExistsError
+  | FsFileExistsError
   | SftpFileExistsError
   | PutError
   | DeleteError;
@@ -24,10 +30,10 @@ const addFile = async (
   remoteFilePath: string,
   strategyIfRemoteFileExists: "REPLACE" | "KEEP" = "KEEP",
 ): Promise<AddFileError | undefined> => {
-  const localFileExistsError = await fileIO.fileExists(localFilePath);
+  const localFileExistsError = await fsExtras.fileExists(localFilePath);
   if (localFileExistsError) return localFileExistsError;
 
-  const remoteFileExistsError = await fileExists(client, remoteFilePath);
+  const remoteFileExistsError = await sftpFileExists(client, remoteFilePath);
 
   if (remoteFileExistsError) {
     if (remoteFileExistsError instanceof SftpNotFoundError) {

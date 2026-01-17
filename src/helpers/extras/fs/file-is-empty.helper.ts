@@ -3,7 +3,7 @@ import fileExistsAndIsReadable, {
   type FileExistsAndIsReadableError,
 } from "./file-exists-and-is-readable.helper.js";
 import type { FileExistsError } from "./file-exists.helper.js";
-import stat, { type StatError } from "../wrappers/modules/fs/stat.helper.js";
+import stat, { type StatError } from "../../wrappers/modules/fs/stat.helper.js";
 
 export type FileIsEmptyError = FileExistsAndIsReadableError | StatError;
 

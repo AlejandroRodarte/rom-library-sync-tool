@@ -1,6 +1,6 @@
 import type { PathLike } from "node:fs";
 import type { FileHandle } from "node:fs/promises";
-import open, { type OpenError } from "../wrappers/modules/fs/open.helper.js";
+import open, { type OpenError } from "../../wrappers/modules/fs/open.helper.js";
 
 export type OpenNewWriteOnlyFileError = OpenError;
 

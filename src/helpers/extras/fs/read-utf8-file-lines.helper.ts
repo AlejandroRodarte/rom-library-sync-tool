@@ -1,6 +1,6 @@
 import os from "os";
 import type { PathLike } from "node:fs";
-import readFile, { type ReadFileError } from "../wrappers/modules/fs/read-file.helper.js";
+import readFile, { type ReadFileError } from "../../wrappers/modules/fs/read-file.helper.js";
 
 export type ReadUtf8FileLinesError = ReadFileError;
 

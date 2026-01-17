@@ -1,5 +1,5 @@
 import type { PathLike } from "node:fs";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
 import dirExistsAndIsReadable, {
   type DirExistsAndIsReadableError,
 } from "./dir-exists-and-is-readable.helper.js";

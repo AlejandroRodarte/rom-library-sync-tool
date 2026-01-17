@@ -1,4 +1,4 @@
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
 import fileExistsAndIsReadable, {
   type FileExistsAndIsReadableError,
 } from "./file-exists-and-is-readable.helper.js";

@@ -8,16 +8,6 @@ import steamDeckSftpClient, {
 } from "../build/steam-deck-sftp-client.helper.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
-import fileExists from "../file-io/file-exists.helper.js";
-import openNewWriteOnlyFile, {
-  type OpenNewWriteOnlyFileError,
-} from "../file-io/open-new-write-only-file.helper.js";
-import fileExistsAndReadUtf8Lines from "../file-io/file-exists-and-read-utf8-lines.helper.js";
-import fileIsEmpty from "../file-io/file-is-empty.helper.js";
-import deleteFile from "../file-io/delete-file.helper.js";
-import anyFileExists, {
-  type AnyFileExistsError,
-} from "../file-io/any-file-exists.helper.js";
 import type { AllDirsExistMethodError } from "../../classes/sftp-client.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
 import type SteamDeckLCDAlejandro from "../../classes/devices/steam-deck-lcd-alejandro.class.js";
@@ -27,8 +17,18 @@ import type {
   GetConsoleRomsFailedFilePathError,
   GetConsoleRomsSyncDirPath,
 } from "../../classes/devices/steam-deck-lcd-alejandro.class.js";
-import type { FileExistsAndIsReadableError } from "../file-io/file-exists-and-is-readable.helper.js";
 import writeFile from "../wrappers/modules/fs/write-file.helper.js";
+import fileExists from "../extras/fs/file-exists.helper.js";
+import openNewWriteOnlyFile, {
+  type OpenNewWriteOnlyFileError,
+} from "../extras/fs/open-new-write-only-file.helper.js";
+import fileExistsAndReadUtf8Lines from "../extras/fs/file-exists-and-read-utf8-lines.helper.js";
+import fileIsEmpty from "../extras/fs/file-is-empty.helper.js";
+import deleteFile from "../extras/fs/delete-file.helper.js";
+import anyFileExists, {
+  type AnyFileExistsError,
+} from "../extras/fs/any-file-exists.helper.js";
+import type { FileExistsAndIsReadableError } from "../extras/fs/file-exists-and-is-readable.helper.js";
 
 const build = {
   steamDeckSftpClient,
@@ -36,7 +36,7 @@ const build = {
   diffLineFromDiffAction,
 };
 
-const fileIO = {
+const fsExtras = {
   fileExists,
   openNewWriteOnlyFile,
   fileExistsAndReadUtf8Lines,
@@ -61,9 +61,8 @@ export type SyncSteamDeckError =
 const syncSteamDeckLCDAlejandro = async (
   steamDeck: SteamDeckLCDAlejandro,
 ): Promise<SyncSteamDeckError | undefined> => {
-  const [anyFailedFileExists, anyFileExistsError] = await fileIO.anyFileExists(
-    steamDeck.allFailedFilePaths,
-  );
+  const [anyFailedFileExists, anyFileExistsError] =
+    await fsExtras.anyFileExists(steamDeck.allFailedFilePaths);
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
     return new FsFileExistsError(
@@ -96,12 +95,12 @@ const syncSteamDeckLCDAlejandro = async (
     if (romsDirPathError) return romsDirPathError;
 
     const [failedFileHandle, failedFileOpenError] =
-      await fileIO.openNewWriteOnlyFile(romsFailedFilePath);
+      await fsExtras.openNewWriteOnlyFile(romsFailedFilePath);
 
     if (failedFileOpenError) return failedFileOpenError;
 
     const [diffLines, diffFileError] =
-      await fileIO.fileExistsAndReadUtf8Lines(romsDiffFilePath);
+      await fsExtras.fileExistsAndReadUtf8Lines(romsDiffFilePath);
     let failedDiffLines = "";
 
     if (diffFileError) return diffFileError;
@@ -124,7 +123,7 @@ const syncSteamDeckLCDAlejandro = async (
       diffActions.push(diffAction);
     }
 
-    const failedFileWriteError = await fileIO.writeFile(
+    const failedFileWriteError = await fsExtras.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -187,7 +186,7 @@ const syncSteamDeckLCDAlejandro = async (
       failedDiffLines += `${diffLine}\n`;
     }
 
-    const secondFailedFileWriteError = await fileIO.writeFile(
+    const secondFailedFileWriteError = await fsExtras.writeFile(
       failedFileHandle,
       failedDiffLines,
       "utf8",
@@ -200,7 +199,7 @@ const syncSteamDeckLCDAlejandro = async (
     await failedFileHandle.close();
 
     const [failedFileIsEmpty, failedFileAccessError] =
-      await fileIO.fileIsEmpty(romsFailedFilePath);
+      await fsExtras.fileIsEmpty(romsFailedFilePath);
 
     if (failedFileAccessError) {
       logger.warn(
@@ -210,7 +209,7 @@ const syncSteamDeckLCDAlejandro = async (
     }
 
     if (failedFileIsEmpty) {
-      const failedFileDeleteError = await fileIO.deleteFile(
+      const failedFileDeleteError = await fsExtras.deleteFile(
         romsFailedFilePath,
         true,
       );

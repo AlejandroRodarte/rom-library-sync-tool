@@ -5,7 +5,7 @@ import openNewWriteOnlyFile, {
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
-import type Console from "../../classes/console.class.js";
+import type Console from "../../../classes/console.class.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
 export type WriteConsoleListFileError =

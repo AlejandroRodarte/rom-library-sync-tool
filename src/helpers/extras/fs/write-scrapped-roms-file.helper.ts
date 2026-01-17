@@ -4,7 +4,7 @@ import writeToFileOrDelete, {
 import deleteAndOpenWriteOnlyFile, {
   type DeleteAndOpenWriteOnlyFileError,
 } from "./delete-and-open-new-write-only-file.helper.js";
-import type { Consoles } from "../../types/consoles.type.js";
+import type { Consoles } from "../../../types/consoles.type.js";
 
 export type WriteScrappedRomsFileError =
   | DeleteAndOpenWriteOnlyFileError

@@ -25,14 +25,12 @@ import deleteFileSymlink from "./delete-file-symlink.helper.js";
 import allDirsExistAndAreReadable from "./all-dirs-exist-and-are-readable.helper.js";
 import allFilesExistAndAreReadable from "./all-files-exist-and-are-readable.helper.js";
 import getFileSymlinksFromDeviceFileIOLsEntries from "./get-file-symlinks-from-device-file-io-ls-entries.helper.js";
-import open from "../wrappers/modules/fs/open.helper.js";
 
-const fileIO = {
+const fsExtras = {
   access,
   fileExistsAndIsReadable,
   deleteFile,
   readUtf8FileLines,
-  open,
   openNewWriteOnlyFile,
   writeConsoleDiffFile,
   writeToFileOrDelete,
@@ -58,4 +56,4 @@ const fileIO = {
   getFileSymlinksFromDeviceFileIOLsEntries,
 };
 
-export default fileIO;
+export default fsExtras;

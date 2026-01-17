@@ -1,12 +1,20 @@
 import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
 import databasePaths from "../../objects/database-paths.object.js";
-import type { AllDirsExistAndAreReadableError } from "../file-io/all-dirs-exist-and-are-readable.helper.js";
-import type { AllFilesExistAndAreReadableError } from "../file-io/all-files-exist-and-are-readable.helper.js";
-import fileIO from "../file-io/index.js";
+import allDirsExistAndAreReadable, {
+  type AllDirsExistAndAreReadableError,
+} from "../extras/fs/all-dirs-exist-and-are-readable.helper.js";
+import allFilesExistAndAreReadable, {
+  type AllFilesExistAndAreReadableError,
+} from "../extras/fs/all-files-exist-and-are-readable.helper.js";
 
 export type ValidateDatabasePathsError =
   | AllDirsExistAndAreReadableError
   | AllFilesExistAndAreReadableError;
+
+const fsExtras = {
+  allDirsExistAndAreReadable,
+  allFilesExistAndAreReadable,
+};
 
 const validateDatabasePaths = async (): Promise<
   ValidateDatabasePathsError | undefined
@@ -14,7 +22,7 @@ const validateDatabasePaths = async (): Promise<
   const dirs = databasePaths.allDirs;
 
   const [allDbDirsExist, allDbDirsExistError] =
-    await fileIO.allDirsExistAndAreReadable(dirs);
+    await fsExtras.allDirsExistAndAreReadable(dirs);
 
   if (allDbDirsExistError) return allDbDirsExistError;
   if (!allDbDirsExist)
@@ -25,7 +33,7 @@ const validateDatabasePaths = async (): Promise<
   const files = databasePaths.allFiles;
 
   const [allDbFilesExist, allDbFilesExistError] =
-    await fileIO.allFilesExistAndAreReadable(files);
+    await fsExtras.allFilesExistAndAreReadable(files);
 
   if (allDbFilesExistError) return allDbFilesExistError;
   if (!allDbFilesExist)

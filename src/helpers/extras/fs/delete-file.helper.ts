@@ -1,8 +1,8 @@
 import type { PathLike } from "node:fs";
-import UnknownError from "../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import UnknownError from "../../../classes/errors/unknown-error.class.js";
+import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
 import fileExists, { type FileExistsError } from "./file-exists.helper.js";
-import unlink, { type UnlinkError } from "../wrappers/modules/fs/unlink.helper.js";
+import unlink, { type UnlinkError } from "../../wrappers/modules/fs/unlink.helper.js";
 
 export type DeleteFileError = UnknownError | FileExistsError | UnlinkError;
 
