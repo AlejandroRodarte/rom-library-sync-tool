@@ -45,6 +45,10 @@ class DeviceFileIOLsError extends CustomError {
     return this._reason;
   }
 
+  get specificCode(): SpecificErrorCode {
+    return this._specificCode;
+  }
+
   public toUniversalError(): UniversalError {
     return new UniversalError(
       this.type,
