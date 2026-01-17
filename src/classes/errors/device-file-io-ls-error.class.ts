@@ -2,7 +2,7 @@ import CustomError from "./custom-error.abstract.class.js";
 import UniversalError from "./universal-error.class.js";
 
 // why would DeviceFileIO.ls() fail?
-// 1. because a component in the path is not valid
+// 1. because the path is not valid
 // 2. because the path is valid, but does not exist
 // 3. because the path is valid and exists, but is not a directory
 // 4. because we are unauthorized to access it
