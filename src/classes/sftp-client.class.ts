@@ -1,6 +1,4 @@
 import Client from "ssh2-sftp-client";
-import type { AddFileError } from "../helpers/sftp/add-file.helper.js";
-import type { DeleteFileError } from "../helpers/sftp/delete-file.helper.js";
 import SftpConnectionError from "./errors/sftp-connection-error.class.js";
 import SftpDisconnectionError from "./errors/sftp-disconnection-error.class.js";
 import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
@@ -14,15 +12,21 @@ import disconnect, {
 import list, {
   type ListError,
 } from "../helpers/wrappers/modules/ssh2-sftp-client/list.helper.js";
+import access, {
+  type AccessError,
+} from "../helpers/extras/sftp/access.helper.js";
 import fileExists, {
   type FileExistsError,
-} from "../helpers/sftp/file-exists.helper.js";
+} from "../helpers/extras/sftp/file-exists.helper.js";
 import dirExists, {
   type DirExistsError,
-} from "../helpers/sftp/dir-exists.helper.js";
-import deleteFile from "../helpers/sftp/delete-file.helper.js";
-import addFile from "../helpers/sftp/add-file.helper.js";
-import access, { type AccessError } from "../helpers/sftp/access.helper.js";
+} from "../helpers/extras/sftp/dir-exists.helper.js";
+import deleteFile, {
+  type DeleteFileError,
+} from "../helpers/extras/sftp/delete-file.helper.js";
+import addFile, {
+  type AddFileError,
+} from "../helpers/extras/sftp/add-file.helper.js";
 
 export type ConnectMethodError = ConnectError;
 export type DisconnectMethodError = DisconnectError;
@@ -33,6 +37,14 @@ export type DirExistsMethodError = DirExistsError;
 export type AllDirsExistMethodError = DirExistsMethodError;
 export type ListMethodError = ListError;
 export type ExistsMethodError = AccessError;
+
+const sftpExtras = {
+  access,
+  fileExists,
+  dirExists,
+  addFile,
+  deleteFile,
+};
 
 class SftpClient {
   private _credentials: SftpCredentials;
@@ -85,21 +97,21 @@ class SftpClient {
     path: string,
     mode?: number,
   ): Promise<ExistsMethodError | undefined> {
-    const accessError = await access(this._client, type, path, mode);
+    const accessError = await sftpExtras.access(this._client, type, path, mode);
     if (accessError) return accessError;
   }
 
   public async fileExists(
     filePath: string,
   ): Promise<FileExistsMethodError | undefined> {
-    const existsError = await fileExists(this._client, filePath);
+    const existsError = await sftpExtras.fileExists(this._client, filePath);
     if (existsError) return existsError;
   }
 
   public async dirExists(
     dirPath: string,
   ): Promise<DirExistsMethodError | undefined> {
-    const existsError = await dirExists(this._client, dirPath);
+    const existsError = await sftpExtras.dirExists(this._client, dirPath);
     if (existsError) return existsError;
   }
 
@@ -127,7 +139,7 @@ class SftpClient {
     remoteFilePath: string,
     strategy: "REPLACE" | "KEEP",
   ): Promise<AddFileMethodError | undefined> {
-    const addError = await addFile(
+    const addError = await sftpExtras.addFile(
       this._client,
       localFilePath,
       remoteFilePath,
@@ -140,7 +152,7 @@ class SftpClient {
     remoteFilePath: string,
     fileMustExist = false,
   ): Promise<DeleteFileMethodError | undefined> {
-    const deleteError = await deleteFile(
+    const deleteError = await sftpExtras.deleteFile(
       this._client,
       remoteFilePath,
       fileMustExist,

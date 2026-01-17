@@ -1,18 +1,18 @@
 import Client from "ssh2-sftp-client";
 
-import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import SftpNotFoundError from "../../../classes/errors/sftp-not-found-error.class.js";
 import put, {
   type PutError,
-} from "../wrappers/modules/ssh2-sftp-client/put.helper.js";
+} from "../../wrappers/modules/ssh2-sftp-client/put.helper.js";
 import sftpDelete, {
   type DeleteError,
-} from "../wrappers/modules/ssh2-sftp-client/delete.helper.js";
+} from "../../wrappers/modules/ssh2-sftp-client/delete.helper.js";
 import sftpFileExists, {
   type FileExistsError as SftpFileExistsError,
 } from "./file-exists.helper.js";
 import fsFileExists, {
   type FileExistsError as FsFileExistsError,
-} from "../extras/fs/file-exists.helper.js";
+} from "../../extras/fs/file-exists.helper.js";
 
 const fsExtras = {
   fileExists: fsFileExists,

@@ -1,16 +1,16 @@
 import Client from "ssh2-sftp-client";
 import exists, {
   type ExistsError,
-} from "../wrappers/modules/ssh2-sftp-client/exists.helper.js";
-import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
-import SftpWrongTypeError from "../../classes/errors/sftp-wrong-type-error.class.js";
+} from "../../wrappers/modules/ssh2-sftp-client/exists.helper.js";
+import SftpNotFoundError from "../../../classes/errors/sftp-not-found-error.class.js";
+import SftpWrongTypeError from "../../../classes/errors/sftp-wrong-type-error.class.js";
 import stat, {
   type StatError,
-} from "../wrappers/modules/ssh2-sftp-client/stat.helper.js";
-import type { FileRightsFromDecimalError } from "../build/file-rights-from-decimal-mode.helper.js";
-import type { RightsFromIntegerError } from "../build/rights-from-mode.helper.js";
-import fileRightsFromDecimalMode from "../build/file-rights-from-decimal-mode.helper.js";
-import rightsFromMode from "../build/rights-from-mode.helper.js";
+} from "../../wrappers/modules/ssh2-sftp-client/stat.helper.js";
+import type { FileRightsFromDecimalError } from "../../build/file-rights-from-decimal-mode.helper.js";
+import type { RightsFromIntegerError } from "../../build/rights-from-mode.helper.js";
+import fileRightsFromDecimalMode from "../../build/file-rights-from-decimal-mode.helper.js";
+import rightsFromMode from "../../build/rights-from-mode.helper.js";
 
 const build = {
   fileRightsFromDecimalMode,
