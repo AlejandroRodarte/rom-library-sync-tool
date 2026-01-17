@@ -19,7 +19,13 @@ class Fs implements DeviceFileIO {
     });
 
     if (readDirError)
-      return [undefined, new DeviceFileIOLsError(readDirError.reasons)];
+      return [
+        undefined,
+        new DeviceFileIOLsError(
+          `There was a problem reading contents of device dir path at ${dirPath}`,
+          readDirError.toUniversalError(),
+        ),
+      ];
 
     const lsEntries: DeviceFileIOLsEntry[] = dirEntries.map((d) => {
       const name = d.name.toString();
@@ -52,13 +58,19 @@ class Fs implements DeviceFileIO {
     if (rights) {
       const [rightsMode, parsingError] = build.modeFromRights(rights);
       if (parsingError)
-        return new DeviceFileIOExistsError(parsingError.reasons);
+        return new DeviceFileIOExistsError(
+          `A parsing error occured whileparsing rights ${rights}.`,
+          parsingError.toUniversalError(),
+        );
       mode = rightsMode;
     }
 
-    const accessPathError = await access(type, path, mode);
-    if (accessPathError)
-      return new DeviceFileIOExistsError(accessPathError.reasons);
+    const accessError = await access(type, path, mode);
+    if (accessError)
+      return new DeviceFileIOExistsError(
+        `There was a problem checking if device path ${path} is of type ${type} and with ${rights} permissions.`,
+        accessError.toUniversalError(),
+      );
   };
 }
 

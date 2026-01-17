@@ -72,21 +72,11 @@ const syncSteamDeckLCDAlejandro = async (
 
   const [steamDeckSftpClient, sftpClientError] =
     await build.steamDeckSftpClient();
-  if (sftpClientError) {
-    sftpClientError.addReason(
-      `An error happened while connecting to the Steam Deck via SFTP.`,
-    );
-    return sftpClientError;
-  }
+  if (sftpClientError) return sftpClientError;
 
   const [allRemoteDirsExist, allRemoteDirsExistError] =
     await steamDeckSftpClient.allDirsExist(steamDeck.allSyncDirPaths);
-  if (allRemoteDirsExistError) {
-    allRemoteDirsExistError.addReason(
-      `An error happened while veryfing all remote directories.`,
-    );
-    return allRemoteDirsExistError;
-  }
+  if (allRemoteDirsExistError) return allRemoteDirsExistError;
   if (!allRemoteDirsExist)
     return new SftpNotFoundError(
       `Not all of the following directories exist:\n${steamDeck.allSyncDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,

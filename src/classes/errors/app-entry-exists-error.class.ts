@@ -1,4 +1,5 @@
 import CustomError from "./custom-error.abstract.class.js";
+import UniversalError from "./universal-error.class.js";
 
 class AppEntryExistsError extends CustomError {
   readonly type = "AppEntryExistsError";
@@ -6,34 +7,29 @@ class AppEntryExistsError extends CustomError {
   readonly code = "APP_ENTRY_EXISTS_ERROR";
   readonly message = "There is already an entry in the Map for the given key.";
 
-  private _reasons: string[];
+  private _reason: string;
+  private _linkedError: UniversalError | undefined;
 
-  constructor(...reasons: string[]) {
+  constructor(reason: string, linkedError?: UniversalError) {
     super();
-    this._reasons = reasons;
+    this._reason = reason;
+    if (linkedError) this._linkedError = linkedError;
   }
 
-  get reasons(): string[] {
-    return this._reasons;
+  get reason(): string {
+    return this._reason;
   }
 
-  public addReason(reason: string): void {
-    this._reasons.push(reason);
+  public toUniversalError(): UniversalError {
+    return new UniversalError(
+      this.type,
+      [this.message, this._reason],
+      this._linkedError,
+    );
   }
 
   public toString(): string {
-    let content = "";
-
-    content += `!!!!! Error !!!!!\n`;
-    content += `Type: ${this.type}\n`;
-    content += `Status code: ${this.status}\n`;
-    content += `Code: ${this.code}.\n`;
-    content += `Message: ${this.message}\n`;
-
-    content += `Reasons:\n`;
-    for (const reason of this._reasons) content += `${reason}\n`;
-
-    return content;
+    return this.toUniversalError().toString();
   }
 }
 

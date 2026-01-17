@@ -1,4 +1,5 @@
 import CustomError from "./custom-error.abstract.class.js";
+import UniversalError from "./universal-error.class.js";
 
 class SftpWrongTypeError extends CustomError {
   readonly type = "SftpWrongTypeError";
@@ -6,35 +7,29 @@ class SftpWrongTypeError extends CustomError {
   readonly code = "SFTP_WRONG_TYPE_ERROR";
   readonly message =
     "The object found in the remote filesystem is of the wrong type.";
+  private _reason: string;
+  private _linkedError: UniversalError | undefined;
 
-  private _reasons: string[];
-
-  constructor(...reasons: string[]) {
+  constructor(reason: string, linkedError?: UniversalError) {
     super();
-    this._reasons = reasons;
+    this._reason = reason;
+    if (linkedError) this._linkedError = linkedError;
   }
 
-  get reasons(): string[] {
-    return this._reasons;
+  get reason(): string {
+    return this._reason;
   }
 
-  public addReason(reason: string): void {
-    this._reasons.push(reason);
+  public toUniversalError(): UniversalError {
+    return new UniversalError(
+      this.type,
+      [this.message, this._reason],
+      this._linkedError,
+    );
   }
 
   public toString(): string {
-    let content = "";
-
-    content += `!!!!! Error !!!!!\n`;
-    content += `Type: ${this.type}\n`;
-    content += `Status code: ${this.status}\n`;
-    content += `Code: ${this.code}.\n`;
-    content += `Message: ${this.message}\n`;
-
-    content += `Reasons:\n`;
-    for (const reason of this._reasons) content += `${reason}\n`;
-
-    return content;
+    return this.toUniversalError().toString();
   }
 }
 

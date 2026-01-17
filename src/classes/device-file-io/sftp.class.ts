@@ -21,7 +21,13 @@ class Sftp implements DeviceFileIO {
     const [dirEntries, readDirError] = await this._client.list(dirPath);
 
     if (readDirError)
-      return [undefined, new DeviceFileIOLsError(readDirError.reasons)];
+      return [
+        undefined,
+        new DeviceFileIOLsError(
+          `There was a problem reading contents of device dir path at ${dirPath}`,
+          readDirError.toUniversalError(),
+        ),
+      ];
 
     const lsEntries: DeviceFileIOLsEntry[] = dirEntries.map((d) => ({
       name: d.name,
@@ -49,12 +55,20 @@ class Sftp implements DeviceFileIO {
 
     if (rights) {
       const [rightsMode, modeError] = build.modeFromRights(rights);
-      if (modeError) return new DeviceFileIOExistsError(modeError.reasons);
+      if (modeError)
+        return new DeviceFileIOExistsError(
+          `A parsing error occured whileparsing rights ${rights}.`,
+          modeError.toUniversalError(),
+        );
       mode = rightsMode;
     }
 
     const existsError = await this._client.exists(type, path, mode);
-    if (existsError) return new DeviceFileIOExistsError(existsError.reasons);
+    if (existsError)
+      return new DeviceFileIOExistsError(
+        `There was a problem checking if device path ${path} is of type ${type} and with ${rights} permissions.`,
+        existsError.toUniversalError(),
+      );
   };
 }
 

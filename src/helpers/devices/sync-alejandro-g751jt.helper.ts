@@ -75,12 +75,7 @@ const syncAlejandroG751JT = async (
 
   const [allLocalDirsExist, allDirsExistError] =
     await fileIO.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
-  if (allDirsExistError) {
-    allDirsExistError.addReason(
-      `Something went wrong while validating all local device directories.`,
-    );
-    return allDirsExistError;
-  }
+  if (allDirsExistError) return allDirsExistError;
   if (!allLocalDirsExist)
     return new FsNotFoundError(
       `Not all of the following directories exist and are read/write:\n${local.allSyncDirPaths.join("\n")}. Please verify they do before syncing this device.`,
