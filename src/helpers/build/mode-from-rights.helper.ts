@@ -1,9 +1,11 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import typeGuards from "../typescript/guards/index.js";
 
+export type ModeFromRightsError = AppValidationError;
+
 const modeFromRights = (
   rights: string,
-): [number, undefined] | [undefined, AppValidationError] => {
+): [number, undefined] | [undefined, ModeFromRightsError] => {
   if (!rights) return [0, undefined];
 
   const rightsList = rights.split("");
