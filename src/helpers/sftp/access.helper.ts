@@ -7,9 +7,15 @@ import SftpWrongTypeError from "../../classes/errors/sftp-wrong-type-error.class
 import stat, {
   type StatError,
 } from "../wrappers/modules/ssh2-sftp-client/stat.helper.js";
-import build from "../build/index.js";
 import type { FileRightsFromDecimalError } from "../build/file-rights-from-decimal-mode.helper.js";
 import type { RightsFromIntegerError } from "../build/rights-from-mode.helper.js";
+import fileRightsFromDecimalMode from "../build/file-rights-from-decimal-mode.helper.js";
+import rightsFromMode from "../build/rights-from-mode.helper.js";
+
+const build = {
+  fileRightsFromDecimalMode,
+  rightsFromMode,
+};
 
 export type AccessError =
   | ExistsError
