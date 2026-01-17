@@ -1,24 +1,6 @@
+import type { DeviceFileIOExistsMethodSpecificErrorCode } from "../../types/interfaces/device-file-io/device-file-io-exists-method-specific-error-code.type.js";
 import CustomError from "./custom-error.abstract.class.js";
 import UniversalError from "./universal-error.class.js";
-
-// why would DeviceFileIO.exists() fail?
-// 1. because the path is not valid
-// 2. because the path is valid, but does not exist
-// 3. because the path exists, but is not of the correct type (file|dir|link)
-// 4. because we are unauthorized to access the path
-// 5. because there was a problem parsing the `rights` parameter
-// 6. because there was a connection issue
-export const SPECIFIC_ERROR_CODES = [
-  "BAD_PATH_ERROR",
-  "PATH_DOES_NOT_EXIST_ERROR",
-  "BAD_FILE_TYPE_ERROR",
-  "UNAUTHORIZED_ERROR",
-  "RIGHTS_VALIDATION_ERROR",
-  "CONNECTION_ERROR",
-  "UNKNOWN_ERROR",
-];
-
-export type SpecificErrorCode = (typeof SPECIFIC_ERROR_CODES)[number];
 
 class DeviceFileIOExistsError extends CustomError {
   readonly type = "DeviceFileIOExistsError";
@@ -30,11 +12,11 @@ class DeviceFileIOExistsError extends CustomError {
   private _reason: string;
   private _linkedError: UniversalError | undefined;
 
-  private _specificCode: SpecificErrorCode;
+  private _specificCode: DeviceFileIOExistsMethodSpecificErrorCode;
 
   constructor(
     reason: string,
-    specificCode: SpecificErrorCode,
+    specificCode: DeviceFileIOExistsMethodSpecificErrorCode,
     linkedError?: UniversalError,
   ) {
     super();
@@ -47,7 +29,7 @@ class DeviceFileIOExistsError extends CustomError {
     return this._reason;
   }
 
-  get specificCode(): SpecificErrorCode {
+  get specificCode(): DeviceFileIOExistsMethodSpecificErrorCode {
     return this._specificCode;
   }
 
