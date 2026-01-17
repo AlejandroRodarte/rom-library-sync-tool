@@ -5,6 +5,8 @@ import DeviceFileIOLsError from "../errors/device-file-io-ls-error.class.js";
 import type SftpClient from "../sftp-client.class.js";
 import DeviceFileIOExistsError from "../errors/device-file-io-exists-error.class.js";
 import build from "../../helpers/build/index.js";
+import deviceFileIOSftpLsMethodSpecificErrorCodeDictionary from "../../dictionaries/interfaces/device-file-io/implementors/sftp/device-file-io-sftp-ls-method-specific-error-code-dictionary.dictionary.js";
+import deviceFileIOSftpExistsMethodSpecificErrorCodeDictionary from "../../dictionaries/interfaces/device-file-io/implementors/sftp/device-file-io-sftp-exists-method-specific-error-code-dictionary.dictionary.js";
 
 class Sftp implements DeviceFileIO {
   private _client: SftpClient;
@@ -25,6 +27,9 @@ class Sftp implements DeviceFileIO {
         undefined,
         new DeviceFileIOLsError(
           `There was a problem reading contents of device dir path at ${dirPath}`,
+          deviceFileIOSftpLsMethodSpecificErrorCodeDictionary[
+            readDirError.code
+          ],
           readDirError.toUniversalError(),
         ),
       ];
@@ -58,6 +63,9 @@ class Sftp implements DeviceFileIO {
       if (modeError)
         return new DeviceFileIOExistsError(
           `A parsing error occured whileparsing rights ${rights}.`,
+          deviceFileIOSftpExistsMethodSpecificErrorCodeDictionary[
+            modeError.code
+          ],
           modeError.toUniversalError(),
         );
       mode = rightsMode;
@@ -67,6 +75,9 @@ class Sftp implements DeviceFileIO {
     if (existsError)
       return new DeviceFileIOExistsError(
         `There was a problem checking if device path ${path} is of type ${type} and with ${rights} permissions.`,
+        deviceFileIOSftpExistsMethodSpecificErrorCodeDictionary[
+          existsError.code
+        ],
         existsError.toUniversalError(),
       );
   };
