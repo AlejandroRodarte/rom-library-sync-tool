@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { FileIOLsEntry } from "../../interfaces/file-io-ls-entry.interface.js";
-import type { FileIO, FileIOExistsMethodError, FileIOLsMethodError } from "../../interfaces/file-io.interface.js";
+import type { FileIO, FileIOAddMethodError, FileIODeleteMethodError, FileIOExistsMethodError, FileIOLsMethodError } from "../../interfaces/file-io.interface.js";
 import readdir from "../../helpers/wrappers/modules/fs/readdir.helper.js";
 import build from "../../helpers/build/index.js";
 import access from "../../helpers/extras/fs/access.helper.js";
@@ -50,6 +50,11 @@ class Fs implements FileIO {
     const accessError = await access(type, path, mode);
     if (accessError) return accessError;
   };
+
+  add: (type: "file" | "dir", srcPath: string, dstPath: string) => Promise<FileIOAddMethodError | undefined> = async (type, srcPath, dstPath) => {
+    return undefined;
+  }
+  delete: (type: "file" | "dir", path: string) => Promise<FileIODeleteMethodError | undefined> = async (type, path) => { return undefined; }
 }
 
 export default Fs;
