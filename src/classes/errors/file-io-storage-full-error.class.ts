@@ -3,7 +3,7 @@ import UniversalError from "./universal-error.class.js";
 
 class FileIOStorageFullError extends CustomError {
   readonly type = "FileIOStorageFullError";
-  readonly status = 207;
+  readonly status = 210;
   readonly code = "FILE_IO_STORAGE_FULL";
   readonly message =
     "The file I/O operation is not possible because the disk is full.";
