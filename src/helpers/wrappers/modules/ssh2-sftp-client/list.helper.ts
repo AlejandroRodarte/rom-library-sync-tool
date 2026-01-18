@@ -2,8 +2,8 @@ import Client from "ssh2-sftp-client";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 import FileIOConnectionError from "../../../../classes/errors/file-io-connection-error.class.js";
-import FileIOBadCredentials from "../../../../classes/errors/file-io-bad-credentials.class.js";
-import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path.class.js";
+import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-credentials-error.class.js";
+import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
@@ -11,7 +11,7 @@ import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-er
 export type ListError =
   | UnknownError
   | FileIOConnectionError
-  | FileIOBadCredentials
+  | FileIOBadCredentialsError
   | FileIOBadPathError
   | FileIOUnauthorizedError
   | FileIOBadTypeError
@@ -48,7 +48,7 @@ const list = async (
       case "ERR_BAD_AUTH":
         return [
           undefined,
-          new FileIOBadCredentials(
+          new FileIOBadCredentialsError(
             `Client suffers from bad/faulty authentication and credentials.`,
           ),
         ];
@@ -60,7 +60,9 @@ const list = async (
       case "ENOENT":
         return [
           undefined,
-          new FileIONotFoundError(`Remote path ${remoteDirPath} does not exist.`),
+          new FileIONotFoundError(
+            `Remote path ${remoteDirPath} does not exist.`,
+          ),
         ];
       case "EACCES":
       case "EPERM":

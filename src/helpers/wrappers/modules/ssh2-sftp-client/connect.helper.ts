@@ -1,12 +1,12 @@
 import Client from "ssh2-sftp-client";
 import typeGuards from "../../../typescript/guards/index.js";
 import FileIOConnectionError from "../../../../classes/errors/file-io-connection-error.class.js";
-import FileIOBadCredentials from "../../../../classes/errors/file-io-bad-credentials.class.js";
+import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-credentials-error.class.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 
 export type ConnectError =
   | FileIOConnectionError
-  | FileIOBadCredentials
+  | FileIOBadCredentialsError
   | UnknownError;
 
 const connect = async (
@@ -27,7 +27,7 @@ const connect = async (
       case "ERR_NOT_CONNECTED":
         return new FileIOConnectionError(`Client is not connected.`);
       case "ERR_BAD_AUTH":
-        return new FileIOBadCredentials(
+        return new FileIOBadCredentialsError(
           `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
         );
       default:

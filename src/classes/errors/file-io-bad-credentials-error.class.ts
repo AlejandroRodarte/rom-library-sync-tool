@@ -1,7 +1,7 @@
 import CustomError from "./custom-error.abstract.class.js";
 import UniversalError from "./universal-error.class.js";
 
-class FileIOBadCredentials extends CustomError {
+class FileIOBadCredentialsError extends CustomError {
   readonly type = "FileIOBadCredentials";
   readonly status = 200;
   readonly code = "FILE_IO_BAD_CREDENTIALS_ERROR";
@@ -33,4 +33,4 @@ class FileIOBadCredentials extends CustomError {
   }
 }
 
-export default FileIOBadCredentials;
+export default FileIOBadCredentialsError;

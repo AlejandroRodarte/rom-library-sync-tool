@@ -2,15 +2,15 @@ import Client from "ssh2-sftp-client";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 import FileIOConnectionError from "../../../../classes/errors/file-io-connection-error.class.js";
-import FileIOBadCredentials from "../../../../classes/errors/file-io-bad-credentials.class.js";
-import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path.class.js";
+import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-credentials-error.class.js";
+import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 
 export type DeleteError =
   | UnknownError
   | FileIOConnectionError
-  | FileIOBadCredentials
+  | FileIOBadCredentialsError
   | FileIOBadPathError
   | FileIOUnauthorizedError
   | FileIOBadTypeError;
@@ -35,7 +35,7 @@ const sftpDelete = async (
           `Your client is not connected. Remote file path ${remoteFilePath} can not be accessed.`,
         );
       case "ERR_BAD_AUTH":
-        return new FileIOBadCredentials(
+        return new FileIOBadCredentialsError(
           `Credentials for this client failed authentication. Remote file path ${remoteFilePath} can not be accessed.`,
         );
       case "ERR_BAD_PATH":

@@ -1,7 +1,7 @@
 import type { FileIO } from "../../interfaces/file-io.interface.js";
 import type { PathAccessItem } from "../../interfaces/path-access-item.interface.js";
 import type CustomError from "../errors/custom-error.abstract.class.js";
-import FileIOBadPathError from "../errors/file-io-bad-path.class.js";
+import FileIOBadPathError from "../errors/file-io-bad-path-error.class.js";
 import FileIOBadTypeError from "../errors/file-io-bad-type-error.class.js";
 import FileIONotFoundError from "../errors/file-io-not-found-error.class.js";
 
