@@ -26,7 +26,7 @@ export type FileIOExistsMethodError = CommonErrors;
 export type FileIOAddMethodError =
   | CommonErrors
   | FileIOExistsError
-  | FileIOCircularReferenceError
+  | FileIOCircularReferenceError;
 
 export type FileIODeleteMethodError = CommonErrors;
 
