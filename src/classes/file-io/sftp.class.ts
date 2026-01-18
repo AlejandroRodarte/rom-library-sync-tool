@@ -2,10 +2,10 @@ import path from "node:path";
 import type { FileIOLsEntry } from "../../interfaces/file-io-ls-entry.interface.js";
 import type {
   FileIO,
-  FileIOAddMethodError,
-  FileIODeleteMethodError,
-  FileIOExistsMethodError,
-  FileIOLsMethodError,
+  AddMethodError,
+  DeleteMethodError,
+  ExistsMethodError,
+  LsMethodError,
 } from "../../interfaces/file-io.interface.js";
 import type SftpClient from "../sftp-client.class.js";
 import build from "../../helpers/build/index.js";
@@ -19,35 +19,30 @@ class Sftp implements FileIO {
 
   ls: (
     dirPath: string,
-  ) => Promise<
-    [FileIOLsEntry[], undefined] | [undefined, FileIOLsMethodError]
-  > = async (dirPath: string) => {
-    const [dirEntries, readDirError] = await this._client.list(dirPath);
+  ) => Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]> =
+    async (dirPath: string) => {
+      const [dirEntries, readDirError] = await this._client.list(dirPath);
 
-    if (readDirError) return [undefined, readDirError];
+      if (readDirError) return [undefined, readDirError];
 
-    const lsEntries: FileIOLsEntry[] = dirEntries.map((d) => ({
-      name: d.name,
-      path: path.join(dirPath, d.name),
-      is: {
-        file: d.type === "l",
-        dir: d.type === "d",
-        link: d.type === "-",
-      },
-    }));
+      const lsEntries: FileIOLsEntry[] = dirEntries.map((d) => ({
+        name: d.name,
+        path: path.join(dirPath, d.name),
+        is: {
+          file: d.type === "l",
+          dir: d.type === "d",
+          link: d.type === "-",
+        },
+      }));
 
-    return [lsEntries, undefined];
-  };
+      return [lsEntries, undefined];
+    };
 
   exists: (
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<FileIOExistsMethodError | undefined> = async (
-    type,
-    path,
-    rights,
-  ) => {
+  ) => Promise<ExistsMethodError | undefined> = async (type, path, rights) => {
     let mode = 0;
 
     if (rights) {
@@ -64,17 +59,13 @@ class Sftp implements FileIO {
     type: "file" | "dir",
     srcPath: string,
     dstPath: string,
-  ) => Promise<FileIOAddMethodError | undefined> = async (
-    type,
-    srcPath,
-    dstPath,
-  ) => {
+  ) => Promise<AddMethodError | undefined> = async (type, srcPath, dstPath) => {
     return undefined;
   };
   delete: (
     type: "file" | "dir",
     path: string,
-  ) => Promise<FileIODeleteMethodError | undefined> = async (type, path) => {
+  ) => Promise<DeleteMethodError | undefined> = async (type, path) => {
     return undefined;
   };
 }

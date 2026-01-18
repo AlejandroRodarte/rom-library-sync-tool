@@ -20,35 +20,35 @@ type CommonErrors =
   | FileIOBadCredentialsError
   | AppValidationError;
 
-export type FileIOLsMethodError = CommonErrors;
-export type FileIOExistsMethodError = CommonErrors;
+export type LsMethodError = CommonErrors;
+export type ExistsMethodError = CommonErrors;
 
-export type FileIOAddMethodError =
+export type AddMethodError =
   | CommonErrors
   | FileIOExistsError
   | FileIOCircularReferenceError;
 
-export type FileIODeleteMethodError = CommonErrors;
+export type DeleteMethodError = CommonErrors;
 
 export interface FileIO {
   ls: (
     dirPath: string,
-  ) => Promise<[FileIOLsEntry[], undefined] | [undefined, FileIOLsMethodError]>;
+  ) => Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]>;
 
   exists: (
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<FileIOExistsMethodError | undefined>;
+  ) => Promise<ExistsMethodError | undefined>;
 
   add: (
     type: "file" | "dir",
     srcPath: string,
     dstPath: string,
-  ) => Promise<FileIOAddMethodError | undefined>;
+  ) => Promise<AddMethodError | undefined>;
 
   delete: (
     type: "file" | "dir",
     path: string,
-  ) => Promise<FileIODeleteMethodError | undefined>;
+  ) => Promise<DeleteMethodError | undefined>;
 }
