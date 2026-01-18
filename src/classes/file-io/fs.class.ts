@@ -1,15 +1,14 @@
 import path from "node:path";
 import type { FileIOLsEntry } from "../../interfaces/file-io-ls-entry.interface.js";
-import type { FileIO } from "../../interfaces/file-io.interface.js";
+import type { FileIO, FileIOExistsMethodError, FileIOLsMethodError } from "../../interfaces/file-io.interface.js";
 import readdir from "../../helpers/wrappers/modules/fs/readdir.helper.js";
 import build from "../../helpers/build/index.js";
 import access from "../../helpers/extras/fs/access.helper.js";
-import type CustomError from "../errors/custom-error.abstract.class.js";
 
 class Fs implements FileIO {
   ls: (
     dirPath: string,
-  ) => Promise<[FileIOLsEntry[], undefined] | [undefined, CustomError]> =
+  ) => Promise<[FileIOLsEntry[], undefined] | [undefined, FileIOLsMethodError]> =
     async (dirPath: string) => {
       const [dirEntries, readDirError] = await readdir(dirPath, {
         withFileTypes: true,
@@ -39,7 +38,7 @@ class Fs implements FileIO {
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<CustomError | undefined> = async (type, path, rights) => {
+  ) => Promise<FileIOExistsMethodError | undefined> = async (type, path, rights) => {
     let mode = 0;
 
     if (rights) {
