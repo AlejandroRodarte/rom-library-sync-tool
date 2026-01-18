@@ -3,7 +3,7 @@ import UniversalError from "./universal-error.class.js";
 
 class AppNotFoundError extends CustomError {
   readonly type = "AppNotFoundError";
-  readonly status = 100;
+  readonly status = 102;
   readonly code = "APP_NOT_FOUND_ERROR";
   readonly message = "The object was not found in app memory.";
 

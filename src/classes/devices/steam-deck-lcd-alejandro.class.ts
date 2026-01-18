@@ -6,7 +6,7 @@ import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import Console from "../console.class.js";
-import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
+import AppExistsError from "../errors/app-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
@@ -24,10 +24,10 @@ import SftpClient from "../sftp-client.class.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
 import type { SteamDeckLCDAlejandroPaths } from "../../interfaces/devices/steam-deck-lcd-alejandro/steam-deck-lcd-alejandro-paths.interface.js";
 import type { SteamDeckLCDAlejandroConsoleSkipFlags } from "../../interfaces/devices/steam-deck-lcd-alejandro/steam-deck-lcd-alejandro-consoles-skip-flags.interface.js";
-import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
+import type { FileIO } from "../../interfaces/file-io.interface.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
-import Sftp from "../device-file-io/sftp.class.js";
-import Fs from "../device-file-io/fs.class.js";
+import Sftp from "../file-io/sftp.class.js";
+import Fs from "../file-io/fs.class.js";
 import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
 import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
@@ -36,7 +36,7 @@ import getFileSymlinksFromDeviceFileIOLsEntries from "../../helpers/extras/fs/ge
 import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
 
-export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
+export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
@@ -67,7 +67,7 @@ class SteamDeckLCDAlejandro implements Device, Debug {
   private _mediaNames: MediaName[];
   private _contentTargetNames: ContentTargetName[];
 
-  private _deviceFileIO: DeviceFileIO;
+  private _fileIO: FileIO;
 
   constructor(
     envData: Environment["device"]["data"][typeof STEAM_DECK_LCD_ALEJANDRO],
@@ -116,10 +116,10 @@ class SteamDeckLCDAlejandro implements Device, Debug {
 
     switch (envData.fileIO.strategy) {
       case "fs":
-        this._deviceFileIO = new Fs();
+        this._fileIO = new Fs();
         break;
       case "sftp":
-        this._deviceFileIO = new Sftp(
+        this._fileIO = new Sftp(
           new SftpClient(
             STEAM_DECK_LCD_ALEJANDRO,
             envData.fileIO.data.sftp.credentials,
@@ -432,7 +432,7 @@ class SteamDeckLCDAlejandro implements Device, Debug {
 
     const consoleExists = this._consoles.has(consoleName);
     if (consoleExists)
-      return new AppEntryExistsError(
+      return new AppExistsError(
         `There is already an entry for console ${consoleName}.`,
       );
 

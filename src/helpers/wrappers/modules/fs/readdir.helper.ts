@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
+import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 
 export type ReaddirError =
   | UnknownError
-  | FsNotFoundError
-  | FsUnauthorizedError
-  | FsWrongTypeError;
+  | FileIONotFoundError
+  | FileIOUnauthorizedError
+  | FileIOBadTypeError;
 
 const readdir = async (
   ...args: Parameters<typeof fs.readdir>
@@ -35,20 +35,20 @@ const readdir = async (
       case "ENOENT":
         return [
           undefined,
-          new FsNotFoundError(`Directory path ${path} was not found.`),
+          new FileIONotFoundError(`Directory path ${path} was not found.`),
         ];
       case "EACCES":
       case "EPERM":
         return [
           undefined,
-          new FsUnauthorizedError(
+          new FileIOUnauthorizedError(
             `This process is not authorized to read directory contents at ${path}.`,
           ),
         ];
       case "ENOTDIR":
         return [
           undefined,
-          new FsWrongTypeError(
+          new FileIOBadTypeError(
             `Path ${path} points to a file, NOT a directory.`,
           ),
         ];

@@ -1,11 +1,11 @@
-import AppEntryExistsError from "./errors/app-entry-exists-error.class.js";
+import AppExistsError from "./errors/app-exists-error.class.js";
 import Title from "./title.class.js";
 import type { ConsoleName } from "../types/console-name.type.js";
 import type { Titles } from "../types/titles.type.js";
 import type { RomSet } from "../types/rom-set.type.js";
 import type { Rom } from "../interfaces/rom.interface.js";
 
-export type AddTitleMethodError = AppEntryExistsError;
+export type AddTitleMethodError = AppExistsError;
 
 class Console {
   private _name: ConsoleName;
@@ -63,7 +63,7 @@ class Console {
     const titleExists = this._titles.has(titleName);
 
     if (titleExists)
-      return new AppEntryExistsError(
+      return new AppExistsError(
         `Entry for title ${titleName} already exists.`,
       );
 

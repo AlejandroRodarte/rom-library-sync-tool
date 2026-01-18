@@ -3,7 +3,7 @@ import UniversalError from "./universal-error.class.js";
 
 class AppValidationError extends CustomError {
   readonly type = "AppValidationError";
-  readonly status = 101;
+  readonly status = 103;
   readonly code = "APP_VALIDATION_ERROR";
   readonly message = "The object in question failed validation criteria.";
 

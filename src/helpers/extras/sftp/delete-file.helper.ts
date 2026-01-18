@@ -1,9 +1,9 @@
 import Client from "ssh2-sftp-client";
-import SftpNotFoundError from "../../../classes/errors/sftp-not-found-error.class.js";
 import sftpDelete, {
   type DeleteError,
 } from "../../wrappers/modules/ssh2-sftp-client/delete.helper.js";
 import fileExists, { type FileExistsError } from "./file-exists.helper.js";
+import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 
 export type DeleteFileError = FileExistsError | DeleteError;
 
@@ -17,7 +17,7 @@ const deleteFile = async (
   if (
     !fileMustExist &&
     remoteFileExistsError &&
-    remoteFileExistsError instanceof SftpNotFoundError
+    remoteFileExistsError instanceof FileIONotFoundError
   )
     return undefined;
 

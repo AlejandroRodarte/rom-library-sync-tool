@@ -1,4 +1,4 @@
-import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
+import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import fileExistsAndIsReadable, {
   type FileExistsAndIsReadableError,
 } from "./file-exists-and-is-readable.helper.js";
@@ -16,7 +16,7 @@ const allFilesExistAndAreReadable = async (
     const existsError = await fileExistsAndIsReadable(filePath);
 
     if (existsError) {
-      if (existsError instanceof FsNotFoundError) {
+      if (existsError instanceof FileIONotFoundError) {
         allFilesExist = false;
         break;
       } else return [undefined, existsError];

@@ -15,12 +15,12 @@ import isConsolesList from "./is-consoles-list.helper.js";
 import isModeName from "./is-mode-name.helper.js";
 import isRight from "./is-right.helper.js";
 import isRightList from "./is-right-list.helper.js";
-import isDeviceFileIOStrategy from "./is-device-file-io-strategy.helper.js";
-import isDeviceFileIOFsCrudStrategy from "./is-device-file-io-fs-crud-strategy.helper.js";
 import isContentTargetName from "./is-content-target-name.helper.js";
 import isContentTargetList from "./is-content-target-list.helper.js";
 import isContentTargetsListItem from "./is-content-targets-list-item.helper.js";
 import isContentTargetsList from "./is-content-targets-list.helper.js";
+import isFileIOStrategy from "./is-file-io-strategy.helper.js";
+import isFileIOFsCrudStrategy from "./is-file-io-fs-crud-strategy.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -40,8 +40,8 @@ const typeGuards = {
   isModeName,
   isRight,
   isRightList,
-  isDeviceFileIOStrategy,
-  isDeviceFileIOFsCrudStrategy,
+  isFileIOStrategy,
+  isFileIOFsCrudStrategy,
   isContentTargetName,
   isContentTargetList,
   isContentTargetsListItem,

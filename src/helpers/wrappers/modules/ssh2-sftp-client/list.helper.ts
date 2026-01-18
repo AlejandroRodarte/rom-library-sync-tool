@@ -1,21 +1,21 @@
 import Client from "ssh2-sftp-client";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
-import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credentials.class.js";
-import SftpBadPathError from "../../../../classes/errors/sftp-bad-path.class.js";
-import SftpUnauthorizedError from "../../../../classes/errors/sftp-unauthorized-error.class.js";
-import SftpWrongTypeError from "../../../../classes/errors/sftp-wrong-type-error.class.js";
-import SftpNotFoundError from "../../../../classes/errors/sftp-not-found-error.class.js";
+import FileIOConnectionError from "../../../../classes/errors/file-io-connection-error.class.js";
+import FileIOBadCredentials from "../../../../classes/errors/file-io-bad-credentials.class.js";
+import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path.class.js";
+import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
 
 export type ListError =
   | UnknownError
-  | SftpConnectionError
-  | SftpBadCredentialsError
-  | SftpBadPathError
-  | SftpUnauthorizedError
-  | SftpWrongTypeError
-  | SftpNotFoundError;
+  | FileIOConnectionError
+  | FileIOBadCredentials
+  | FileIOBadPathError
+  | FileIOUnauthorizedError
+  | FileIOBadTypeError
+  | FileIONotFoundError;
 
 const list = async (
   client: Client,
@@ -41,39 +41,39 @@ const list = async (
       case "ERR_NOT_CONNECTED":
         return [
           undefined,
-          new SftpConnectionError(
+          new FileIOConnectionError(
             `Client is not connected. Unable to reach remote path ${remoteDirPath}.`,
           ),
         ];
       case "ERR_BAD_AUTH":
         return [
           undefined,
-          new SftpBadCredentialsError(
+          new FileIOBadCredentials(
             `Client suffers from bad/faulty authentication and credentials.`,
           ),
         ];
       case "ERR_BAD_PATH":
         return [
           undefined,
-          new SftpBadPathError(`Remote path ${remoteDirPath} is faulty.`),
+          new FileIOBadPathError(`Remote path ${remoteDirPath} is faulty.`),
         ];
       case "ENOENT":
         return [
           undefined,
-          new SftpNotFoundError(`Remote path ${remoteDirPath} does not exist.`),
+          new FileIONotFoundError(`Remote path ${remoteDirPath} does not exist.`),
         ];
       case "EACCES":
       case "EPERM":
         return [
           undefined,
-          new SftpUnauthorizedError(
+          new FileIOUnauthorizedError(
             `Remote path ${remoteDirPath} exists, but this process lacks the privileges to access it.`,
           ),
         ];
       case "ENOTDIR":
         return [
           undefined,
-          new SftpWrongTypeError(
+          new FileIOBadTypeError(
             `Remote path ${remoteDirPath} points to a file, NOT a directory.`,
           ),
         ];

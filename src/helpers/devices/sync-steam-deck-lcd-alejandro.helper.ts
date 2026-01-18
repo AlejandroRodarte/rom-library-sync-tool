@@ -1,7 +1,6 @@
 import path from "path";
 
-import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
-import SftpNotFoundError from "../../classes/errors/sftp-not-found-error.class.js";
+import FileIOExistsError from "../../classes/errors/file-io-exists-error.class.js";
 import logger from "../../objects/logger.object.js";
 import steamDeckSftpClient, {
   type SteamDeckSftpClientError,
@@ -29,6 +28,7 @@ import anyFileExists, {
   type AnyFileExistsError,
 } from "../extras/fs/any-file-exists.helper.js";
 import type { FileExistsAndIsReadableError } from "../extras/fs/file-exists-and-is-readable.helper.js";
+import FileIONotFoundError from "../../classes/errors/file-io-not-found-error.class.js";
 
 const build = {
   steamDeckSftpClient,
@@ -48,10 +48,10 @@ const fsExtras = {
 
 export type SyncSteamDeckError =
   | AnyFileExistsError
-  | FsFileExistsError
+  | FileIOExistsError
   | SteamDeckSftpClientError
   | AllDirsExistMethodError
-  | SftpNotFoundError
+  | FileIONotFoundError
   | GetConsoleRomsFailedFilePathError
   | GetConsoleRomsDiffFilePath
   | GetConsoleRomsSyncDirPath
@@ -65,7 +65,7 @@ const syncSteamDeckLCDAlejandro = async (
     await fsExtras.anyFileExists(steamDeck.allFailedFilePaths);
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
-    return new FsFileExistsError(
+    return new FileIOExistsError(
       `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
     );
 
@@ -77,7 +77,7 @@ const syncSteamDeckLCDAlejandro = async (
     await steamDeckSftpClient.allDirsExist(steamDeck.allSyncDirPaths);
   if (allRemoteDirsExistError) return allRemoteDirsExistError;
   if (!allRemoteDirsExist)
-    return new SftpNotFoundError(
+    return new FileIONotFoundError(
       `Not all of the following directories exist:\n${steamDeck.allSyncDirPaths.join("\n")}\nPlease ensure they exist before syncing this device.`,
     );
 

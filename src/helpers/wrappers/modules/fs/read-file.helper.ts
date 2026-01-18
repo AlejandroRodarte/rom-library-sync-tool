@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
+import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 
 export type ReadFileError =
   | UnknownError
-  | FsNotFoundError
-  | FsUnauthorizedError
-  | FsWrongTypeError;
+  | FileIONotFoundError
+  | FileIOUnauthorizedError
+  | FileIOBadTypeError;
 
 const readFile = async (
   ...args: Parameters<typeof fs.readFile>
@@ -35,20 +35,20 @@ const readFile = async (
       case "ENOENT":
         return [
           undefined,
-          new FsNotFoundError(`Was not able to find file at ${filePath}.`),
+          new FileIONotFoundError(`Was not able to find file at ${filePath}.`),
         ];
       case "EACCES":
       case "EPERM":
         return [
           undefined,
-          new FsUnauthorizedError(
+          new FileIOUnauthorizedError(
             `This process lacks permissions to read file at ${filePath}.`,
           ),
         ];
       case "EISDIR":
         return [
           undefined,
-          new FsWrongTypeError(`Path ${filePath} is a directory, NOT a file.`),
+          new FileIOBadTypeError(`Path ${filePath} is a directory, NOT a file.`),
         ];
       default:
         return [

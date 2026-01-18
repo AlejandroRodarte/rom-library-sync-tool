@@ -1,7 +1,7 @@
 import path from "path";
 
-import FsFileExistsError from "../../classes/errors/fs-file-exists-error.class.js";
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import FileIOExistsError from "../../classes/errors/file-io-exists-error.class.js";
+import FileIONotFoundError from "../../classes/errors/file-io-not-found-error.class.js";
 import logger from "../../objects/logger.object.js";
 import diffActionFromDiffLine from "../build/diff-action-from-diff-line.helper.js";
 import diffLineFromDiffAction from "../build/diff-line-from-diff-action.helper.js";
@@ -52,9 +52,9 @@ const fsExtras = {
 
 export type SyncAlejandroG751JTError =
   | AnyFileExistsError
-  | FsFileExistsError
+  | FileIOExistsError
   | AllDirsExistAndAreReadableAndWritableError
-  | FsNotFoundError
+  | FileIONotFoundError
   | GetConsoleRomsFailedFilePathError
   | GetConsoleRomsDiffFilePath
   | GetConsoleRomsSyncDirPath
@@ -68,7 +68,7 @@ const syncAlejandroG751JT = async (
     await fsExtras.anyFileExists(local.allFailedFilePaths);
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
-    return new FsFileExistsError(
+    return new FileIOExistsError(
       `Work on those .failed.txt files before attempting to sync the Steam Deck.`,
     );
 
@@ -76,7 +76,7 @@ const syncAlejandroG751JT = async (
     await fsExtras.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
   if (allDirsExistError) return allDirsExistError;
   if (!allLocalDirsExist)
-    return new FsNotFoundError(
+    return new FileIONotFoundError(
       `Not all of the following directories exist and are read/write:\n${local.allSyncDirPaths.join("\n")}. Please verify they do before syncing this device.`,
     );
 

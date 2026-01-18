@@ -1,4 +1,4 @@
-import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
+import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import symlink, { type SymlinkError } from "../../wrappers/modules/fs/symlink.helper.js";
 import unlink, { type UnlinkError } from "../../wrappers/modules/fs/unlink.helper.js";
 import fileExists, { type FileExistsError } from "./file-exists.helper.js";
@@ -22,7 +22,7 @@ const createFileSymlink = async (
 
   const symlinkExistsError = await symlinkExists(symlinkPath);
   if (symlinkExistsError) {
-    if (symlinkExistsError instanceof FsNotFoundError) {
+    if (symlinkExistsError instanceof FileIONotFoundError) {
       const createSymlinkError = await symlink(filePath, symlinkPath, "file");
       if (createSymlinkError) return createSymlinkError;
       else return undefined;

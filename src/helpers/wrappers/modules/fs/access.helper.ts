@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import typeGuards from "../../../typescript/guards/index.js";
 
-export type AccessError = UnknownError | FsNotFoundError | FsUnauthorizedError;
+export type AccessError = UnknownError | FileIONotFoundError | FileIOUnauthorizedError;
 
 const access = async (
   ...args: Parameters<typeof fs.access>
@@ -20,10 +20,10 @@ const access = async (
 
     switch (e.code) {
       case "ENOENT":
-        return new FsNotFoundError(`Nothing found at path ${path}.`);
+        return new FileIONotFoundError(`Nothing found at path ${path}.`);
       case "EACCES":
       case "EPERM":
-        return new FsUnauthorizedError(
+        return new FileIOUnauthorizedError(
           `Can not access path ${path} because this process in unauthorized to do so. Mode: ${mode}.`,
         );
       default:

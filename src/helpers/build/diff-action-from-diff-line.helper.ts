@@ -1,12 +1,12 @@
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
+import AppBadTypeError from "../../classes/errors/app-bad-type-error.class.js";
 import type { DiffAction } from "../../types/diff-action.type.js";
 
 export type DiffActionFromDiffLineError =
   | AppValidationError
   | AppNotFoundError
-  | AppWrongTypeError;
+  | AppBadTypeError;
 
 const diffActionFromDiffLine = (
   diffLine: string,
@@ -47,7 +47,7 @@ const diffActionFromDiffLine = (
     default:
       return [
         undefined,
-        new AppWrongTypeError(
+        new AppBadTypeError(
           `Action name ${actionName} is unsupported. Only "add-file" and "remove-file" actions are supported.`,
         ),
       ];

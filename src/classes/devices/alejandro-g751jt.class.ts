@@ -6,7 +6,7 @@ import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import Console from "../console.class.js";
-import AppEntryExistsError from "../errors/app-entry-exists-error.class.js";
+import AppExistsError from "../errors/app-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
@@ -18,13 +18,13 @@ import databasePaths from "../../objects/database-paths.object.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
-import type { DeviceFileIO } from "../../interfaces/device-file-io.interface.js";
+import type { FileIO } from "../../interfaces/file-io.interface.js";
 import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { AlejandroG751JTConsolesSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-consoles-skip-flags.interface.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
-import Fs from "../device-file-io/fs.class.js";
-import Sftp from "../device-file-io/sftp.class.js";
+import Fs from "../file-io/fs.class.js";
+import Sftp from "../file-io/sftp.class.js";
 import SftpClient from "../sftp-client.class.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
@@ -37,7 +37,7 @@ import getFileSymlinksFromDeviceFileIOLsEntries from "../../helpers/extras/fs/ge
 import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
 
-export type AddConsoleMethodError = AppNotFoundError | AppEntryExistsError;
+export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
@@ -66,7 +66,7 @@ class AlejandroG751JT implements Device, Debug {
   >;
 
   private _mediaNames: MediaName[];
-  private _deviceFileIO: DeviceFileIO;
+  private _fileIO: FileIO;
 
   private _shouldProcessContentTargets: ContentTargetContent<boolean> = {
     roms: false,
@@ -121,10 +121,10 @@ class AlejandroG751JT implements Device, Debug {
 
     switch (envData.fileIO.strategy) {
       case "fs":
-        this._deviceFileIO = new Fs();
+        this._fileIO = new Fs();
         break;
       case "sftp":
-        this._deviceFileIO = new Sftp(
+        this._fileIO = new Sftp(
           new SftpClient(
             ALEJANDRO_G751JT,
             envData.fileIO.data.sftp.credentials,
@@ -318,7 +318,7 @@ class AlejandroG751JT implements Device, Debug {
           `About to attempt to fetch entries from device dirpath ${romsDirPath}`,
         );
 
-        const [lsEntries, lsError] = await this._deviceFileIO.ls(romsDirPath);
+        const [lsEntries, lsError] = await this._fileIO.ls(romsDirPath);
         if (lsError) {
           logger.error(`${lsError.toString()}. Skipping.`);
           continue;
@@ -538,7 +538,7 @@ class AlejandroG751JT implements Device, Debug {
 
     const consoleExists = this._consoles.has(consoleName);
     if (consoleExists)
-      return new AppEntryExistsError(
+      return new AppExistsError(
         `There is already an entry for console ${consoleName}.`,
       );
 

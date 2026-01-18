@@ -1,12 +1,10 @@
-import type { ErrorTypeName } from "../../types/error-type-name.type.js";
-
 class UniversalError {
-  private _type: ErrorTypeName;
+  private _type: string;
   private _messages: string[];
   private _linkedError: UniversalError | undefined;
 
   constructor(
-    type: ErrorTypeName,
+    type: string,
     messages: string[],
     linkedError?: UniversalError,
   ) {

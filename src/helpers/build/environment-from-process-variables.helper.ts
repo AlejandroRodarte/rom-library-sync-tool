@@ -15,8 +15,8 @@ import intersectStringArraySimple from "./intersect-string-array-simple.helper.j
 import mediaNamesFromMediasList from "./media-names-from-medias-list.helper.js";
 import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
 import contentTargetNamesFromContentTargetsList from "./content-target-names-from-content-targets-list.helper.js";
-import DEVICE_FILE_IO_STRATEGIES from "../../constants/device-file-io-strategies.constant.js";
-import DEVICE_FILE_IO_FS_CRUD_STRATEGIES from "../../constants/device-file-io-fs-crud-strategies.constant.js";
+import FILE_IO_STRATEGIES from "../../constants/file-io-strategies.constant.js";
+import FILE_IO_FS_CRUD_STRATEGIES from "../../constants/file-io-fs-crud-strategies.constant.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { MediaName } from "../../types/media-name.type.js";
@@ -183,9 +183,9 @@ const environmentFromProcessVariables = (): Environment => {
    */
   const alejandroG751JTFileIOStrategy =
     process.env.ALEJANDRO_G751JT_FILE_IO_STRATEGY || "fs";
-  if (!typeGuards.isDeviceFileIOStrategy(alejandroG751JTFileIOStrategy))
+  if (!typeGuards.isFileIOStrategy(alejandroG751JTFileIOStrategy))
     throw new AppValidationError(
-      `${alejandroG751JTFileIOStrategy} is not a valid File IO strategy. Please inject ALEJANDRO_G751JT_FILE_IO_STRATEGY with one of the following File IO strategies: ${DEVICE_FILE_IO_STRATEGIES.join(", ")}.`,
+      `${alejandroG751JTFileIOStrategy} is not a valid File IO strategy. Please inject ALEJANDRO_G751JT_FILE_IO_STRATEGY with one of the following File IO strategies: ${FILE_IO_STRATEGIES.join(", ")}.`,
     );
 
   /*
@@ -193,13 +193,9 @@ const environmentFromProcessVariables = (): Environment => {
    */
   const alejandroG751JTFileIoFsCrudStrategy =
     process.env.ALEJANDRO_G751JT_FILE_IO_FS_CRUD_STRATEGY || "symlink";
-  if (
-    !typeGuards.isDeviceFileIOFsCrudStrategy(
-      alejandroG751JTFileIoFsCrudStrategy,
-    )
-  )
+  if (!typeGuards.isFileIOFsCrudStrategy(alejandroG751JTFileIoFsCrudStrategy))
     throw new AppValidationError(
-      `${alejandroG751JTFileIoFsCrudStrategy} is not a valid FileIO.Fs strategy. Please inject ALEJANDRO_G751JT_FILE_IO_FS_CRUD_STRATEGY with one of the following FileIO.Fs strategies: ${DEVICE_FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
+      `${alejandroG751JTFileIoFsCrudStrategy} is not a valid FileIO.Fs strategy. Please inject ALEJANDRO_G751JT_FILE_IO_FS_CRUD_STRATEGY with one of the following FileIO.Fs strategies: ${FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
     );
 
   /*
@@ -417,9 +413,9 @@ const environmentFromProcessVariables = (): Environment => {
    */
   const steamDeckLCDAlejandroFileIOStrategy =
     process.env.STEAM_DECK_LCD_ALEJANDRO_FILE_IO_STRATEGY || "sftp";
-  if (!typeGuards.isDeviceFileIOStrategy(steamDeckLCDAlejandroFileIOStrategy))
+  if (!typeGuards.isFileIOStrategy(steamDeckLCDAlejandroFileIOStrategy))
     throw new AppValidationError(
-      `${steamDeckLCDAlejandroFileIOStrategy} is not a valid File IO strategy. Please inject STEAM_DECK_LCD_ALEJANDRO_FILE_IO_STRATEGY with one of the following File IO strategies: ${DEVICE_FILE_IO_STRATEGIES.join(", ")}.`,
+      `${steamDeckLCDAlejandroFileIOStrategy} is not a valid File IO strategy. Please inject STEAM_DECK_LCD_ALEJANDRO_FILE_IO_STRATEGY with one of the following File IO strategies: ${FILE_IO_STRATEGIES.join(", ")}.`,
     );
 
   /*
@@ -428,12 +424,12 @@ const environmentFromProcessVariables = (): Environment => {
   const steamDeckLCDAlejandroFileIoFsCrudStrategy =
     process.env.STEAM_DECK_LCD_ALEJANDRO_FILE_IO_FS_CRUD_STRATEGY || "copy";
   if (
-    !typeGuards.isDeviceFileIOFsCrudStrategy(
+    !typeGuards.isFileIOFsCrudStrategy(
       steamDeckLCDAlejandroFileIoFsCrudStrategy,
     )
   )
     throw new AppValidationError(
-      `${steamDeckLCDAlejandroFileIoFsCrudStrategy} is not a valid FileIO.Fs strategy. Please inject STEAM_DECK_LCD_ALEJANDRO_FILE_IO_FS_CRUD_STRATEGY with one of the following FileIO.Fs strategies: ${DEVICE_FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
+      `${steamDeckLCDAlejandroFileIoFsCrudStrategy} is not a valid FileIO.Fs strategy. Please inject STEAM_DECK_LCD_ALEJANDRO_FILE_IO_FS_CRUD_STRATEGY with one of the following FileIO.Fs strategies: ${FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
     );
 
   /*

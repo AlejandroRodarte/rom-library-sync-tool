@@ -1,5 +1,5 @@
 import path from "path";
-import type { DeviceFileIOLsEntry } from "../../../interfaces/device-file-io-ls-entry.interface.js";
+import type { FileIOLsEntry } from "../../../interfaces/file-io-ls-entry.interface.js";
 import realpath, { type RealpathError } from "../../wrappers/modules/fs/realpath.helper.js";
 import stat, { type StatError } from "../../wrappers/modules/fs/stat.helper.js";
 import type { ReaddirError } from "../../wrappers/modules/fs/readdir.helper.js";
@@ -10,9 +10,9 @@ export type GetFileSymlinksFromDeviceFileIOLsEntries =
   | StatError;
 
 const getFileSymlinksFromDeviceFileIOLsEntries = async (
-  list: DeviceFileIOLsEntry[],
+  list: FileIOLsEntry[],
 ): Promise<
-  | [DeviceFileIOLsEntry[], undefined]
+  | [FileIOLsEntry[], undefined]
   | [undefined, GetFileSymlinksFromDeviceFileIOLsEntries]
 > => {
   const symlinks = list.filter((e) => e.is.link);

@@ -1,4 +1,4 @@
-import AppWrongTypeError from "../../classes/errors/app-wrong-type-error.class.js";
+import AppBadTypeError from "../../classes/errors/app-bad-type-error.class.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Device } from "../../interfaces/device.interface.js";
 import environment from "../../objects/environment.object.js";
@@ -19,7 +19,7 @@ const list = async (devices: (Device & Debug)[]) => {
   logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
   if (!allowedModes.includes(mode))
-    throw new AppWrongTypeError(
+    throw new AppBadTypeError(
       `Mode ${mode} is NOT supported for the list task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
 

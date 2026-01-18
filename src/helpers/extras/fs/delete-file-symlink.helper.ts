@@ -1,4 +1,4 @@
-import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
+import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import type UnknownError from "../../../classes/errors/unknown-error.class.js";
 import unlink, { type UnlinkError } from "../../wrappers/modules/fs/unlink.helper.js";
 import symlinkExists from "./symlink-exists.helper.js";
@@ -14,7 +14,7 @@ const deleteFileSymlink = async (
   if (
     !symlinkMustExist &&
     symlinkExistsError &&
-    symlinkExistsError instanceof FsNotFoundError
+    symlinkExistsError instanceof FileIONotFoundError
   )
     return undefined;
 

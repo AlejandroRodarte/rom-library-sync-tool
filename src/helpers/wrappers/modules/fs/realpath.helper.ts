@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsCircularReferenceError from "../../../../classes/errors/fs-circular-reference-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOCircularReferenceError from "../../../../classes/errors/file-io-circular-reference-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 
 export type RealpathError =
   | UnknownError
-  | FsNotFoundError
-  | FsUnauthorizedError
-  | FsCircularReferenceError;
+  | FileIONotFoundError
+  | FileIOUnauthorizedError
+  | FileIOCircularReferenceError;
 
 const realpath = async (
   ...args: Parameters<typeof fs.realpath>
@@ -35,7 +35,7 @@ const realpath = async (
       case "ENOENT":
         return [
           undefined,
-          new FsNotFoundError(
+          new FileIONotFoundError(
             `Path ${path} does not exist. Original error message.`,
           ),
         ];
@@ -43,14 +43,14 @@ const realpath = async (
       case "EPERM":
         return [
           undefined,
-          new FsUnauthorizedError(
+          new FileIOUnauthorizedError(
             `This process is not authorized to get the real path of link at ${path}.`,
           ),
         ];
       case "ELOOP":
         return [
           undefined,
-          new FsCircularReferenceError(
+          new FileIOCircularReferenceError(
             `Link at ${path} is a circular symbolic link. Delete it.`,
           ),
         ];

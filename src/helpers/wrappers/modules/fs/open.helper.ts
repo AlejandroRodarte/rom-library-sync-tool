@@ -1,17 +1,17 @@
 import fs from "node:fs/promises";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
-import FsFileExistsError from "../../../../classes/errors/fs-file-exists-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
+import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIOExistsError from "../../../../classes/errors/file-io-exists-error.class.js";
 
 export type OpenError =
   | UnknownError
-  | FsNotFoundError
-  | FsUnauthorizedError
-  | FsWrongTypeError
-  | FsFileExistsError;
+  | FileIONotFoundError
+  | FileIOUnauthorizedError
+  | FileIOBadTypeError
+  | FileIOExistsError;
 
 const open = async (
   ...args: Parameters<typeof fs.open>
@@ -36,7 +36,7 @@ const open = async (
       case "ENOENT":
         return [
           undefined,
-          new FsNotFoundError(
+          new FileIONotFoundError(
             `File to open was not found at file path ${filePath}.`,
           ),
         ];
@@ -44,21 +44,21 @@ const open = async (
       case "EPERM":
         return [
           undefined,
-          new FsUnauthorizedError(
+          new FileIOUnauthorizedError(
             `Was able to find file at ${filePath}, but this process lacks the permissions to open it.`,
           ),
         ];
       case "EISDIR":
         return [
           undefined,
-          new FsWrongTypeError(
+          new FileIOBadTypeError(
             `Path ${filePath} points to a directory, NOT to a file.`,
           ),
         ];
       case "EEXIST":
         return [
           undefined,
-          new FsFileExistsError(
+          new FileIOExistsError(
             `Path ${filePath} already exists in the filesystem.`,
           ),
         ];

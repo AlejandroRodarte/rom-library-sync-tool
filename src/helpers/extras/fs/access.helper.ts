@@ -1,11 +1,11 @@
 import type { PathLike } from "node:fs";
-import FsWrongTypeError from "../../../classes/errors/fs-wrong-type-error.class.js";
+import FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-error.class.js";
 import rawAccess, {
   type AccessError,
 } from "../../wrappers/modules/fs/access.helper.js";
 import stat, { type StatError } from "../../wrappers/modules/fs/stat.helper.js";
 
-export type AccessPathError = AccessError | StatError | FsWrongTypeError;
+export type AccessPathError = AccessError | StatError | FileIOBadTypeError;
 
 const access = async (
   type: "file" | "dir" | "link",
@@ -21,17 +21,17 @@ const access = async (
   switch (type) {
     case "file":
       if (!pathStats.isFile())
-        return new FsWrongTypeError(`Path ${path} exists, but is NOT a file.`);
+        return new FileIOBadTypeError(`Path ${path} exists, but is NOT a file.`);
       break;
     case "dir":
       if (!pathStats.isDirectory())
-        return new FsWrongTypeError(
+        return new FileIOBadTypeError(
           `Path ${path} exists, but is NOT a directory.`,
         );
       break;
     case "link":
       if (!pathStats.isSymbolicLink())
-        return new FsWrongTypeError(
+        return new FileIOBadTypeError(
           `Path ${path} exists, but is NOT a symbolic link.`,
         );
       break;

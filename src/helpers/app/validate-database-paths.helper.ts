@@ -1,4 +1,4 @@
-import FsNotFoundError from "../../classes/errors/fs-not-found-error.class.js";
+import FileIONotFoundError from "../../classes/errors/file-io-not-found-error.class.js";
 import databasePaths from "../../objects/database-paths.object.js";
 import allDirsExistAndAreReadable, {
   type AllDirsExistAndAreReadableError,
@@ -26,7 +26,7 @@ const validateDatabasePaths = async (): Promise<
 
   if (allDbDirsExistError) return allDbDirsExistError;
   if (!allDbDirsExist)
-    return new FsNotFoundError(
+    return new FileIONotFoundError(
       `Not all of the following directories exist and are readable.\n${dirs.join("\n")}\nPlease make sure all of them exist before running this script.`,
     );
 
@@ -37,7 +37,7 @@ const validateDatabasePaths = async (): Promise<
 
   if (allDbFilesExistError) return allDbFilesExistError;
   if (!allDbFilesExist)
-    return new FsNotFoundError(
+    return new FileIONotFoundError(
       `Not all of the following files exist and are readable.\n${files.join("\n")}\nPlease make sure all of them exist before running this script.`,
     );
 };

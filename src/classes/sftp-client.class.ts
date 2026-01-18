@@ -1,7 +1,6 @@
 import Client from "ssh2-sftp-client";
-import SftpConnectionError from "./errors/sftp-connection-error.class.js";
-import SftpDisconnectionError from "./errors/sftp-disconnection-error.class.js";
-import SftpNotFoundError from "./errors/sftp-not-found-error.class.js";
+import FileIOConnectionError from "./errors/file-io-connection-error.class.js";
+import FileIODisconnectionError from "./errors/file-io-disconnection-error.class.js";
 import type { SftpCredentials } from "../interfaces/sftp-credentials.interface.js";
 import connect, {
   type ConnectError,
@@ -27,6 +26,7 @@ import deleteFile, {
 import addFile, {
   type AddFileError,
 } from "../helpers/extras/sftp/add-file.helper.js";
+import FileIONotFoundError from "./errors/file-io-not-found-error.class.js";
 
 export type ConnectMethodError = ConnectError;
 export type DisconnectMethodError = DisconnectError;
@@ -62,7 +62,7 @@ class SftpClient {
 
   public async connect(): Promise<ConnectMethodError | undefined> {
     if (this._connected)
-      return new SftpConnectionError(
+      return new FileIOConnectionError(
         "This client is already connected to a remote device.",
       );
 
@@ -74,7 +74,7 @@ class SftpClient {
 
   public async disconnect(): Promise<DisconnectMethodError | undefined> {
     if (!this._connected)
-      return new SftpDisconnectionError(
+      return new FileIODisconnectionError(
         "This client is not connected to a remote device.",
       );
 
@@ -124,7 +124,7 @@ class SftpClient {
       const existsError = await this.dirExists(dirPath);
 
       if (existsError) {
-        if (existsError instanceof SftpNotFoundError) {
+        if (existsError instanceof FileIONotFoundError) {
           allDirsExist = false;
           break;
         } else return [undefined, existsError];

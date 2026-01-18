@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import typeGuards from "../../../typescript/guards/index.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
-import FsNotFoundError from "../../../../classes/errors/fs-not-found-error.class.js";
-import FsUnauthorizedError from "../../../../classes/errors/fs-unauthorized-error.class.js";
-import FsWrongTypeError from "../../../../classes/errors/fs-wrong-type-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
+import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 
 export type UnlinkError =
   | UnknownError
-  | FsNotFoundError
-  | FsUnauthorizedError
-  | FsWrongTypeError;
+  | FileIONotFoundError
+  | FileIOUnauthorizedError
+  | FileIOBadTypeError;
 
 const unlink = async (
   ...args: Parameters<typeof fs.unlink>
@@ -26,14 +26,14 @@ const unlink = async (
 
     switch (e.code) {
       case "ENOENT":
-        return new FsNotFoundError(`No symlink was found at path ${path}.`);
+        return new FileIONotFoundError(`No symlink was found at path ${path}.`);
       case "EACCES":
       case "EPERM":
-        return new FsUnauthorizedError(
+        return new FileIOUnauthorizedError(
           `This process is not authorized to delete symlink at ${path}.`,
         );
       case "EISDIR":
-        return new FsWrongTypeError(
+        return new FileIOBadTypeError(
           `fs.unlink() only works with files, NOT directories. ${path} is a directory.`,
         );
       default:

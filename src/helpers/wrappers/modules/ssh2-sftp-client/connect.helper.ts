@@ -1,12 +1,12 @@
 import Client from "ssh2-sftp-client";
 import typeGuards from "../../../typescript/guards/index.js";
-import SftpConnectionError from "../../../../classes/errors/sftp-connection-error.class.js";
-import SftpBadCredentialsError from "../../../../classes/errors/sftp-bad-credentials.class.js";
+import FileIOConnectionError from "../../../../classes/errors/file-io-connection-error.class.js";
+import FileIOBadCredentials from "../../../../classes/errors/file-io-bad-credentials.class.js";
 import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 
 export type ConnectError =
-  | SftpConnectionError
-  | SftpBadCredentialsError
+  | FileIOConnectionError
+  | FileIOBadCredentials
   | UnknownError;
 
 const connect = async (
@@ -19,15 +19,15 @@ const connect = async (
     await client.connect(...args);
   } catch (e: unknown) {
     if (!typeGuards.isSftpError(e))
-      return new SftpConnectionError(
+      return new FileIOConnectionError(
         `An unknown error happened while connecting via SFTP. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
       );
 
     switch (e.code) {
       case "ERR_NOT_CONNECTED":
-        return new SftpConnectionError(`Client is not connected.`);
+        return new FileIOConnectionError(`Client is not connected.`);
       case "ERR_BAD_AUTH":
-        return new SftpBadCredentialsError(
+        return new FileIOBadCredentials(
           `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
         );
       default:

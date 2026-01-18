@@ -1,5 +1,5 @@
 import type { PathLike } from "node:fs";
-import FsNotFoundError from "../../../classes/errors/fs-not-found-error.class.js";
+import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import dirExistsAndIsReadable, {
   type DirExistsAndIsReadableError,
 } from "./dir-exists-and-is-readable.helper.js";
@@ -18,7 +18,7 @@ const allDirsExistAndAreReadable = async (
 
     if (!existsError) continue;
 
-    if (existsError instanceof FsNotFoundError) {
+    if (existsError instanceof FileIONotFoundError) {
       allExist = false;
       break;
     } else return [undefined, existsError];
