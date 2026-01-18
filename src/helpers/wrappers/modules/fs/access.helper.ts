@@ -4,7 +4,10 @@ import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-er
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import typeGuards from "../../../typescript/guards/index.js";
 
-export type AccessError = UnknownError | FileIONotFoundError | FileIOUnauthorizedError;
+export type AccessError =
+  | UnknownError
+  | FileIONotFoundError
+  | FileIOUnauthorizedError;
 
 const access = async (
   ...args: Parameters<typeof fs.access>

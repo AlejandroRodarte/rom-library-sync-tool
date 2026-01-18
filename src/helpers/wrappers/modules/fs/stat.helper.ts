@@ -4,7 +4,10 @@ import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 
-export type StatError = UnknownError | FileIONotFoundError | FileIOUnauthorizedError;
+export type StatError =
+  | UnknownError
+  | FileIONotFoundError
+  | FileIOUnauthorizedError;
 
 const stat = async (
   ...args: Parameters<typeof fs.stat>

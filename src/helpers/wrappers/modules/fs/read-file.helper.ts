@@ -48,7 +48,9 @@ const readFile = async (
       case "EISDIR":
         return [
           undefined,
-          new FileIOBadTypeError(`Path ${filePath} is a directory, NOT a file.`),
+          new FileIOBadTypeError(
+            `Path ${filePath} is a directory, NOT a file.`,
+          ),
         ];
       default:
         return [

@@ -17,7 +17,9 @@ const fileExists = async (
 
   if (existsError) return existsError;
   if (info === false)
-    return new FileIONotFoundError(`Filepath ${remoteFilePath} does not exist.`);
+    return new FileIONotFoundError(
+      `Filepath ${remoteFilePath} does not exist.`,
+    );
 
   switch (info) {
     case "d":
