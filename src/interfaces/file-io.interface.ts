@@ -12,7 +12,6 @@ import type { FileIOLsEntry } from "./file-io-ls-entry.interface.js";
 
 type CommonErrors =
   | UnknownError
-  | FileIONotFoundError
   | FileIOBadTypeError
   | FileIOBadPathError
   | FileIOUnauthorizedError
@@ -20,7 +19,7 @@ type CommonErrors =
   | FileIOBadCredentialsError
   | AppValidationError;
 
-export type LsMethodError = CommonErrors;
+export type LsMethodError = CommonErrors | FileIONotFoundError;
 export type ExistsMethodError = CommonErrors;
 
 export type AddMethodError =
@@ -39,7 +38,7 @@ export interface FileIO {
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<ExistsMethodError | undefined>;
+  ) => Promise<[boolean, undefined] | [undefined, ExistsMethodError]>;
 
   add: (
     type: "file" | "dir",

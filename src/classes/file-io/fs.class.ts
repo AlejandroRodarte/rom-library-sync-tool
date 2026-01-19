@@ -44,17 +44,27 @@ class Fs implements FileIO {
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<ExistsMethodError | undefined> = async (type, path, rights) => {
+  ) => Promise<[boolean, undefined] | [undefined, ExistsMethodError]> = async (
+    type,
+    path,
+    rights,
+  ) => {
     let mode = 0;
 
     if (rights) {
       const [rightsMode, parsingError] = build.modeFromRights(rights);
-      if (parsingError) return parsingError;
+      if (parsingError) return [undefined, parsingError];
       mode = rightsMode;
     }
 
     const accessError = await access(type, path, mode);
-    if (accessError) return accessError;
+
+    if (accessError) {
+      if (accessError instanceof FileIONotFoundError) return [false, undefined];
+      else return [undefined, accessError];
+    }
+
+    return [true, undefined];
   };
 
   add: (

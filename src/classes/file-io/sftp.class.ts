@@ -9,6 +9,7 @@ import type {
 } from "../../interfaces/file-io.interface.js";
 import type SftpClient from "../sftp-client.class.js";
 import build from "../../helpers/build/index.js";
+import FileIONotFoundError from "../errors/file-io-not-found-error.class.js";
 
 class Sftp implements FileIO {
   private _client: SftpClient;
@@ -42,17 +43,27 @@ class Sftp implements FileIO {
     type: "file" | "dir" | "link",
     path: string,
     rights?: "r" | "w" | "rw",
-  ) => Promise<ExistsMethodError | undefined> = async (type, path, rights) => {
+  ) => Promise<[boolean, undefined] | [undefined, ExistsMethodError]> = async (
+    type,
+    path,
+    rights,
+  ) => {
     let mode = 0;
 
     if (rights) {
       const [rightsMode, modeError] = build.modeFromRights(rights);
-      if (modeError) return modeError;
+      if (modeError) return [undefined, modeError];
       mode = rightsMode;
     }
 
     const existsError = await this._client.exists(type, path, mode);
-    if (existsError) return existsError;
+
+    if (existsError) {
+      if (existsError instanceof FileIONotFoundError) return [false, undefined];
+      else return [undefined, existsError];
+    }
+
+    return [true, undefined];
   };
 
   add: (
