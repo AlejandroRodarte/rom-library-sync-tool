@@ -116,7 +116,7 @@ class SteamDeckLCDAlejandro implements Device, Debug {
 
     switch (envData.fileIO.strategy) {
       case "fs":
-        this._fileIO = new Fs();
+        this._fileIO = new Fs(envData.fileIO.data.fs.crud.strategy);
         break;
       case "sftp":
         this._fileIO = new Sftp(

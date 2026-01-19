@@ -4,12 +4,14 @@ import UnknownError from "../../../../classes/errors/unknown-error.class.js";
 import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIOLockedError from "../../../../classes/errors/file-io-locked-error.class.js";
 
 export type UnlinkError =
   | UnknownError
   | FileIONotFoundError
   | FileIOUnauthorizedError
-  | FileIOBadTypeError;
+  | FileIOBadTypeError
+  | FileIOLockedError;
 
 const unlink = async (
   ...args: Parameters<typeof fs.unlink>
@@ -35,6 +37,10 @@ const unlink = async (
       case "EISDIR":
         return new FileIOBadTypeError(
           `fs.unlink() only works with files, NOT directories. ${path} is a directory.`,
+        );
+      case "EBUSY":
+        return new FileIOLockedError(
+          `Content at path ${path} may be locked by another process.`,
         );
       default:
         return new UnknownError(

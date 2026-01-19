@@ -1,30 +1,41 @@
-import type { PathLike } from "node:fs";
-import UnknownError from "../../../classes/errors/unknown-error.class.js";
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
-import fileExists, { type FileExistsError } from "./file-exists.helper.js";
 import unlink, {
   type UnlinkError,
 } from "../../wrappers/modules/fs/unlink.helper.js";
+import type { ExistsFalseErrors } from "./exists.helper.js";
+import fileExists, { type FileExistsError } from "./file-exists.helper.js";
 
-export type DeleteFileError = UnknownError | FileExistsError | UnlinkError;
+export type DeleteFileError = FileExistsError | ExistsFalseErrors | UnlinkError;
+
+export interface DeleteFileOpts {
+  mustExist?: boolean;
+}
 
 const deleteFile = async (
-  filePath: PathLike,
-  fileMustExist: boolean = false,
+  filePath: string,
+  opts?: DeleteFileOpts,
 ): Promise<DeleteFileError | undefined> => {
-  const fileExistsError = await fileExists(filePath);
+  const deleteFileOpts: Required<DeleteFileOpts> = { mustExist: false };
 
-  if (
-    !fileMustExist &&
-    fileExistsError &&
-    fileExistsError instanceof FileIONotFoundError
-  )
+  if (opts)
+    if (typeof opts.mustExist !== "undefined")
+      deleteFileOpts.mustExist = opts.mustExist;
+
+  const [filePathExistsResult, existsError] = await fileExists(filePath);
+  if (existsError) return existsError;
+
+  if (!filePathExistsResult.exists && deleteFileOpts.mustExist)
+    return filePathExistsResult.error;
+
+  if (!filePathExistsResult.exists && !deleteFileOpts.mustExist)
     return undefined;
 
-  if (fileExistsError) return fileExistsError;
-
   const unlinkError = await unlink(filePath);
-  if (unlinkError) return unlinkError;
+
+  if (unlinkError) {
+    if (unlinkError instanceof FileIONotFoundError) return undefined;
+    else return unlinkError;
+  }
 };
 
 export default deleteFile;

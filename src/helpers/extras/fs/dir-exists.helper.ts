@@ -1,14 +1,19 @@
-import fs from "node:fs/promises";
-import type { PathLike } from "node:fs";
-import access, { type AccessPathError } from "./access.helper.js";
+import exists, {
+  type ExistsError,
+  type ExistsResult,
+} from "./exists.helper.js";
 
-export type DirExistsError = AccessPathError;
+export type DirExistsResult = ExistsResult;
+export type DirExistsError = ExistsError;
 
 const dirExists = async (
-  dirPath: PathLike,
-): Promise<DirExistsError | undefined> => {
-  const dirAccessError = await access("dir", dirPath, fs.constants.F_OK);
-  if (dirAccessError) return dirAccessError;
+  dirPath: string,
+  rights?: "r" | "w" | "rw",
+): Promise<[DirExistsResult, undefined] | [undefined, DirExistsError]> => {
+  const [dirExists, existsError] = await exists("dir", dirPath, rights);
+
+  if (existsError) return [undefined, existsError];
+  return [dirExists, undefined];
 };
 
 export default dirExists;

@@ -11,6 +11,7 @@ import fileRightsFromDecimalMode from "../../build/file-rights-from-decimal-mode
 import rightsFromMode from "../../build/rights-from-mode.helper.js";
 import FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-error.class.js";
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
+import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorized-error.class.js";
 
 const build = {
   fileRightsFromDecimalMode,
@@ -23,7 +24,8 @@ export type AccessError =
   | FileIOBadTypeError
   | StatError
   | FileRightsFromDecimalError
-  | RightsFromIntegerError;
+  | RightsFromIntegerError
+  | FileIOUnauthorizedError;
 
 const access = async (
   client: Client,
@@ -71,7 +73,7 @@ const access = async (
   if (desiredRightsError) return desiredRightsError;
 
   if (!remotePathRights.user.includes(desiredRights))
-    return new FileIONotFoundError(
+    return new FileIOUnauthorizedError(
       `While remote path ${path} was found and is indeed a ${type}, it only has ${remotePathRights.user} permissions. We need it to have ${desiredRights} permissions.`,
     );
 };

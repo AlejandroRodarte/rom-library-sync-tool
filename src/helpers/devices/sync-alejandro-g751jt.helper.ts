@@ -15,22 +15,18 @@ import type {
 } from "../../classes/devices/alejandro-g751jt.class.js";
 import writeFile from "../wrappers/modules/fs/write-file.helper.js";
 import fileExists from "../extras/fs/file-exists.helper.js";
-import allDirsExistAndAreReadableAndWritable, {
-  type AllDirsExistAndAreReadableAndWritableError,
-} from "../extras/fs/all-dirs-exist-and-are-readable-and-writable.helper.js";
 import openNewWriteOnlyFile, {
   type OpenNewWriteOnlyFileError,
 } from "../extras/fs/open-new-write-only-file.helper.js";
-import fileExistsAndReadUtf8Lines, {
-  type FileExistsAndReadUtf8Lines,
-} from "../extras/fs/file-exists-and-read-utf8-lines.helper.js";
-import createFileSymlink from "../extras/fs/create-file-symlink.helper.js";
-import deleteFileSymlink from "../extras/fs/delete-file-symlink.helper.js";
+import createSymlink from "../extras/fs/create-symlink.helper.js";
+import deleteSymlink from "../extras/fs/delete-symlink.helper.js";
 import fileIsEmpty from "../extras/fs/file-is-empty.helper.js";
 import deleteFile from "../extras/fs/delete-file.helper.js";
 import anyFileExists, {
   type AnyFileExistsError,
 } from "../extras/fs/any-file-exists.helper.js";
+import readUTF8Lines, { type ReadUTF8LinesError } from "../extras/fs/read-utf8-lines.helper.js";
+import type { AllDirsExistError } from "../extras/fs/all-dirs-exist.helper.js";
 
 const build = {
   diffActionFromDiffLine,
@@ -39,11 +35,10 @@ const build = {
 
 const fsExtras = {
   fileExists,
-  allDirsExistAndAreReadableAndWritable,
   openNewWriteOnlyFile,
-  fileExistsAndReadUtf8Lines,
-  createFileSymlink,
-  deleteFileSymlink,
+  readUTF8Lines,
+  createSymlink,
+  deleteSymlink,
   writeFile,
   fileIsEmpty,
   deleteFile,
@@ -53,19 +48,19 @@ const fsExtras = {
 export type SyncAlejandroG751JTError =
   | AnyFileExistsError
   | FileIOExistsError
-  | AllDirsExistAndAreReadableAndWritableError
+  | AllDirsExistError
   | FileIONotFoundError
   | GetConsoleRomsFailedFilePathError
   | GetConsoleRomsDiffFilePath
   | GetConsoleRomsSyncDirPath
   | OpenNewWriteOnlyFileError
-  | FileExistsAndReadUtf8Lines;
+  | ReadUTF8LinesError;
 
 const syncAlejandroG751JT = async (
-  local: AlejandroG751JT,
+  alejandroG751JT: AlejandroG751JT,
 ): Promise<SyncAlejandroG751JTError | undefined> => {
   const [anyFailedFileExists, anyFileExistsError] =
-    await fsExtras.anyFileExists(local.allFailedFilePaths);
+    await fsExtras.anyFileExists(alejandroG751JT.allFailedFilePaths.map((p) => ({ type: "file", path: p, rights: "rw" })));
   if (anyFileExistsError) return anyFileExistsError;
   if (!anyFailedFileExists)
     return new FileIOExistsError(
@@ -73,24 +68,24 @@ const syncAlejandroG751JT = async (
     );
 
   const [allLocalDirsExist, allDirsExistError] =
-    await fsExtras.allDirsExistAndAreReadableAndWritable(local.allSyncDirPaths);
+    await fsExtras.allDirsExist(alejandroG751JT.allSyncDirPaths.map((p) => ({ type: "dir", path: p, rights: "rw" })));
   if (allDirsExistError) return allDirsExistError;
   if (!allLocalDirsExist)
     return new FileIONotFoundError(
-      `Not all of the following directories exist and are read/write:\n${local.allSyncDirPaths.join("\n")}. Please verify they do before syncing this device.`,
+      `Not all of the following directories exist and are read/write:\n${alejandroG751JT.allSyncDirPaths.join("\n")}. Please verify they do before syncing this device.`,
     );
 
-  for (const [consoleName, konsole] of local.syncableConsoles) {
+  for (const [consoleName, konsole] of alejandroG751JT.syncableConsoles) {
     const [romsFailedFilePath, failedFilePathError] =
-      local.getConsoleRomsFailedFilePath(consoleName);
+      alejandroG751JT.getConsoleRomsFailedFilePath(consoleName);
     if (failedFilePathError) return failedFilePathError;
 
     const [romsDiffFilePath, diffFilePathError] =
-      local.getConsoleRomsDiffFilePath(consoleName);
+      alejandroG751JT.getConsoleRomsDiffFilePath(consoleName);
     if (diffFilePathError) return diffFilePathError;
 
     const [localRomsDirPath, romsDirPathError] =
-      local.getConsoleRomsSyncDirPath(consoleName);
+      alejandroG751JT.getConsoleRomsSyncDirPath(consoleName);
     if (romsDirPathError) return romsDirPathError;
 
     const [failedFileHandle, failedFileOpenError] =

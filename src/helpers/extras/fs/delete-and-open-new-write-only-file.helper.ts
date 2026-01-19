@@ -1,4 +1,3 @@
-import type { PathLike } from "node:fs";
 import type { FileHandle } from "node:fs/promises";
 import openNewWriteOnlyFile, {
   type OpenNewWriteOnlyFileError,
@@ -10,11 +9,11 @@ export type DeleteAndOpenWriteOnlyFileError =
   | OpenNewWriteOnlyFileError;
 
 const deleteAndOpenWriteOnlyFile = async (
-  filePath: PathLike,
+  filePath: string,
 ): Promise<
   [FileHandle, undefined] | [undefined, DeleteAndOpenWriteOnlyFileError]
 > => {
-  const deleteError = await deleteFile(filePath, false);
+  const deleteError = await deleteFile(filePath, { mustExist: false });
   if (deleteError) return [undefined, deleteError];
 
   const [fileHandle, openError] = await openNewWriteOnlyFile(filePath);

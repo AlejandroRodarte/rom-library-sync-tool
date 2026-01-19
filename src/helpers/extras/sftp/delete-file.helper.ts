@@ -1,30 +1,43 @@
 import Client from "ssh2-sftp-client";
+import fileExists, { type FileExistsError } from "./file-exists.helper.js";
 import sftpDelete, {
   type DeleteError,
 } from "../../wrappers/modules/ssh2-sftp-client/delete.helper.js";
-import fileExists, { type FileExistsError } from "./file-exists.helper.js";
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
+import type { ExistsFalseErrors } from "./exists.helper.js";
 
-export type DeleteFileError = FileExistsError | DeleteError;
+export interface DeleteFileOpts {
+  mustExist?: boolean;
+}
+
+export type DeleteFileError = FileExistsError | ExistsFalseErrors | DeleteError;
 
 const deleteFile = async (
   client: Client,
-  remoteFilePath: string,
-  fileMustExist: boolean,
+  filePath: string,
+  opts?: DeleteFileOpts,
 ): Promise<DeleteFileError | undefined> => {
-  const remoteFileExistsError = await fileExists(client, remoteFilePath);
+  const deleteFileOpts: Required<DeleteFileOpts> = { mustExist: false };
 
-  if (
-    !fileMustExist &&
-    remoteFileExistsError &&
-    remoteFileExistsError instanceof FileIONotFoundError
-  )
-    return undefined;
+  const [fileExistsResult, existsError] = await fileExists(client, filePath);
 
-  if (remoteFileExistsError) return remoteFileExistsError;
+  if (existsError) return existsError;
 
-  const deleteError = await sftpDelete(client, remoteFilePath, !fileMustExist);
-  if (deleteError) return deleteError;
+  if (!fileExistsResult.exists && deleteFileOpts.mustExist)
+    return fileExistsResult.error;
+
+  if (!fileExistsResult.exists && !deleteFileOpts.mustExist) return undefined;
+
+  const deleteError = await sftpDelete(
+    client,
+    filePath,
+    !deleteFileOpts.mustExist,
+  );
+
+  if (deleteError) {
+    if (deleteError instanceof FileIONotFoundError) return undefined;
+    else return deleteError;
+  }
 };
 
 export default deleteFile;

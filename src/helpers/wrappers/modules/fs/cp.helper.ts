@@ -6,6 +6,8 @@ import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthor
 import FileIOExistsError from "../../../../classes/errors/file-io-exists-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
 import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
+import FileIOStorageFullError from "../../../../classes/errors/file-io-storage-full-error.class.js";
+import FileIOLockedError from "../../../../classes/errors/file-io-locked-error.class.js";
 
 export type CpError =
   | UnknownError
@@ -13,7 +15,9 @@ export type CpError =
   | FileIOExistsError
   | FileIOUnauthorizedError
   | FileIOBadPathError
-  | FileIOBadTypeError;
+  | FileIOBadTypeError
+  | FileIOStorageFullError
+  | FileIOLockedError;
 
 const cp = async (
   ...args: Parameters<typeof fs.cp>
@@ -41,6 +45,14 @@ const cp = async (
       case "EEXIST":
         return new FileIOExistsError(
           `Destination directory ${dstDir} already exists. Will not copy.`,
+        );
+      case "ENOSPC":
+        return new FileIOStorageFullError(
+          `Destination disk is full. Can not copy over to ${dstDir}.`,
+        );
+      case "EBUSY":
+        return new FileIOLockedError(
+          `Source directory at ${srcDir} is (or any of its children) currently locked by another process. Can not copy over to ${dstDir}.`,
         );
       case "ENOTDIR":
       case "ERR_FS_CP_NON_DIR_TO_DIR":

@@ -1,28 +1,50 @@
-import type { PathLike } from "fs";
-import type { FileExistsError } from "./file-exists.helper.js";
-import fileExists from "./file-exists.helper.js";
-import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
+import type { PathAccessItem } from "../../../interfaces/path-access-item.interface.js";
+import type { AnyExistsError } from "./any-exists.helper.js";
+import anyExists from "./any-exists.helper.js";
 
-export type AnyFileExistsError = FileExistsError;
+export type FileAccessItem = Omit<PathAccessItem, "type">;
+
+export interface AnyFileExistsTrueResult {
+  anyExists: true;
+  fileAccessItem: FileAccessItem;
+}
+
+export interface AnyFileExistsFalseResult {
+  anyExists: false;
+  fileAccessItem: undefined;
+}
+
+export type AnyFileExistsResult =
+  | AnyFileExistsTrueResult
+  | AnyFileExistsFalseResult;
+
+export type AnyFileExistsError = AnyExistsError;
 
 const anyFileExists = async (
-  filePaths: PathLike[],
-): Promise<[boolean, undefined] | [undefined, AnyFileExistsError]> => {
-  let fileFound = false;
+  fileAccessItems: FileAccessItem[],
+): Promise<
+  [AnyFileExistsResult, undefined] | [undefined, AnyFileExistsError]
+> => {
+  const pathAccessItems: PathAccessItem[] = fileAccessItems.map((i) => ({
+    type: "file",
+    ...i,
+  }));
 
-  for (const filePath of filePaths) {
-    const existsError = await fileExists(filePath);
+  const [anyExistsResult, anyExistsError] = await anyExists(pathAccessItems);
 
-    if (!existsError) {
-      fileFound = true;
-      break;
-    }
+  if (anyExistsError) return [undefined, anyExistsError];
 
-    if (existsError instanceof FileIONotFoundError) continue;
-    else return [undefined, existsError];
+  if (anyExistsResult.anyExists) {
+    const fileAccessItem: FileAccessItem = {
+      path: anyExistsResult.pathAccessItem.path,
+    };
+    if (anyExistsResult.pathAccessItem.rights)
+      fileAccessItem.rights = anyExistsResult.pathAccessItem.rights;
+
+    return [{ anyExists: true, fileAccessItem }, undefined];
   }
 
-  return [fileFound, undefined];
+  return [{ anyExists: false, fileAccessItem: undefined }, undefined];
 };
 
 export default anyFileExists;

@@ -74,12 +74,14 @@ class AlejandroG751JT implements Device, Debug {
     "es-de-gamelists": false,
   };
 
-  constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT]) {
+  constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT], fileIO: FileIO) {
     const uniqueConsoleNames = [...new Set(envData.console.names)];
     this._consoleNames = uniqueConsoleNames;
 
     const uniqueMediaNames = [...new Set(envData.media.names)];
     this._mediaNames = uniqueMediaNames;
+
+    this._fileIO = fileIO;
 
     const uniqueContentTargetNames = [
       ...new Set(envData["content-targets"].names),
@@ -118,20 +120,6 @@ class AlejandroG751JT implements Device, Debug {
     this._paths = this._initAlejandroG751JTPaths(
       envData["content-targets"].paths,
     );
-
-    switch (envData.fileIO.strategy) {
-      case "fs":
-        this._fileIO = new Fs();
-        break;
-      case "sftp":
-        this._fileIO = new Sftp(
-          new SftpClient(
-            ALEJANDRO_G751JT,
-            envData.fileIO.data.sftp.credentials,
-          ),
-        );
-        break;
-    }
   }
 
   name: () => DeviceName = () => {

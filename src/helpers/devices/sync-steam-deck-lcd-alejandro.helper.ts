@@ -21,7 +21,7 @@ import fileExists from "../extras/fs/file-exists.helper.js";
 import openNewWriteOnlyFile, {
   type OpenNewWriteOnlyFileError,
 } from "../extras/fs/open-new-write-only-file.helper.js";
-import fileExistsAndReadUtf8Lines from "../extras/fs/file-exists-and-read-utf8-lines.helper.js";
+import readUTF8Lines from "../extras/fs/read-utf8-lines.helper.js";
 import fileIsEmpty from "../extras/fs/file-is-empty.helper.js";
 import deleteFile from "../extras/fs/delete-file.helper.js";
 import anyFileExists, {
@@ -39,7 +39,7 @@ const build = {
 const fsExtras = {
   fileExists,
   openNewWriteOnlyFile,
-  fileExistsAndReadUtf8Lines,
+  fileExistsAndReadUtf8Lines: readUTF8Lines,
   writeFile,
   fileIsEmpty,
   deleteFile,

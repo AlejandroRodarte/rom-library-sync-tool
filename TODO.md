@@ -1,3 +1,14 @@
+## Error Handling
+- [ ] Replace error union types with classes
+    - [ ] Each class should wrap an `error` field holding the actual union type.
+    - [ ] It should have a `code` string field denoting what was the cause of the failure.
+    - Example, for `fsExtras.copyFile()`, we currently have a `CopyFileError` error union type
+    - The idea would be to make `CopyFileError` a class
+    - It should have a field called `underlyingError` that is of the current union type we have (`RawCopyFileError | FileExistsError | UnlinkError | ExistsFalseErrors`).
+    - It should also have a `code` string providing more context on what happened.
+    - For example, if the `unlink` helper function fails, a fitting code would be `DELETE_DST_FILE_ERROR`, denoting there was a failure while attempting to delete the destination file when copying (and overwriting).
+    - Therefore, instead of just returning the `unlinkError`, we should return something like `return new CopyFileError("DELETE_DST_FILE_ERROR", unlinkError)`.
+
 ## Priority
 
 - [ ] Implement `list` mode for all devices.

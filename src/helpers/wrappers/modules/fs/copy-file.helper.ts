@@ -15,7 +15,8 @@ export type CopyFileError =
   | FileIOBadTypeError
   | FileIOExistsError
   | FileIOStorageFullError
-  | FileIOLockedError;
+  | FileIOLockedError
+  | FileIOStorageFullError;
 
 const copyFile = async (
   ...args: Parameters<typeof fs.copyFile>

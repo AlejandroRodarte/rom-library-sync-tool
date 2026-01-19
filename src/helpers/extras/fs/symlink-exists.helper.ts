@@ -1,13 +1,25 @@
-import type { PathLike } from "node:fs";
-import access, { type AccessPathError } from "./access.helper.js";
+import exists, {
+  type ExistsError,
+  type ExistsResult,
+} from "./exists.helper.js";
 
-export type SymlinkExistsError = AccessPathError;
+export type SymlinkExistsResult = ExistsResult;
+export type SymlinkExistsError = ExistsError;
 
 const symlinkExists = async (
-  linkPath: PathLike,
-): Promise<SymlinkExistsError | undefined> => {
-  const accessError = await access("link", linkPath);
-  return accessError;
+  symlinkPath: string,
+  rights?: "r" | "w" | "rw",
+): Promise<
+  [SymlinkExistsResult, undefined] | [undefined, SymlinkExistsError]
+> => {
+  const [symlinkExists, existsError] = await exists(
+    "link",
+    symlinkPath,
+    rights,
+  );
+
+  if (existsError) return [undefined, existsError];
+  return [symlinkExists, undefined];
 };
 
 export default symlinkExists;
