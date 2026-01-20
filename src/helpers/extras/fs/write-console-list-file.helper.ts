@@ -20,7 +20,9 @@ const writeConsoleListFile = async (
 ): Promise<WriteConsoleListFileError | undefined> => {
   const listFilePath = path.join(listsDirPath, `${name}.txt`);
 
-  const listFileDeleteError = await deleteFile(listFilePath, false);
+  const listFileDeleteError = await deleteFile(listFilePath, {
+    mustExist: false,
+  });
   if (listFileDeleteError) return listFileDeleteError;
 
   const [listFileHandle, listFileOpenError] =

@@ -23,7 +23,7 @@ const access = async (
 
     switch (e.code) {
       case "ENOENT":
-        return new FileIONotFoundError(`Nothing found at path ${path}.`);
+        return new FileIONotFoundError(`Path ${path} does not exist.`);
       case "EACCES":
       case "EPERM":
         return new FileIOUnauthorizedError(

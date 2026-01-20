@@ -1,4 +1,3 @@
-import type { PathLike } from "node:fs";
 import type { FileHandle } from "node:fs/promises";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
@@ -8,7 +7,7 @@ export type WriteDeleteFileLineToDiffFileError = WriteToFileOrDeleteError;
 
 const writeDeleteFileLineToDiffFile = async (
   filename: string,
-  diffFilePath: PathLike,
+  diffFilePath: string,
   diffFileHandle: FileHandle,
 ): Promise<WriteDeleteFileLineToDiffFileError | undefined> => {
   const diffFileWriteError = await writeToFileOrDelete(

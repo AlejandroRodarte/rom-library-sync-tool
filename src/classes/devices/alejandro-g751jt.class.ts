@@ -10,7 +10,6 @@ import AppExistsError from "../errors/app-exists-error.class.js";
 import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
-import build from "../../helpers/build/index.js";
 import logger from "../../objects/logger.object.js";
 import unselect from "../../helpers/unselect/index.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
@@ -23,31 +22,38 @@ import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g7
 import type { AlejandroG751JTConsolesSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-consoles-skip-flags.interface.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
-import Fs from "../file-io/fs.class.js";
-import Sftp from "../file-io/sftp.class.js";
-import SftpClient from "../sftp-client.class.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
 import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
 import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
-import allDirsExistAndAreReadable from "../../helpers/extras/fs/all-dirs-exist-and-are-readable.helper.js";
-import getFileSymlinksFromDeviceFileIOLsEntries from "../../helpers/extras/fs/get-file-symlinks-from-device-file-io-ls-entries.helper.js";
 import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
+import FileIOExtras, {
+  type DirAccessItem as FileIODirAccessItem,
+} from "../file-io/file-io-extras.class.js";
+import dirExists from "../../helpers/extras/fs/dir-exists.helper.js";
+import titlesFromRomsDirPath from "../../helpers/build/titles-from-roms-dir-path.helper.js";
+import allDirsExist, {
+  type DirAccessItem as FsDirAccessItem,
+} from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
 
+const build = {
+  titlesFromRomsDirPath,
+};
+
 const fsExtras = {
+  dirExists,
+  allDirsExist,
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
   writeToFileOrDelete,
-  allDirsExistAndAreReadable,
-  getFileSymlinksFromDeviceFileIOLsEntries,
   deleteAndOpenWriteOnlyFile,
   writeConsoleDiffFile,
 };
@@ -66,7 +72,8 @@ class AlejandroG751JT implements Device, Debug {
   >;
 
   private _mediaNames: MediaName[];
-  private _fileIO: FileIO;
+
+  private _fileIOExtras: FileIOExtras;
 
   private _shouldProcessContentTargets: ContentTargetContent<boolean> = {
     roms: false,
@@ -74,14 +81,25 @@ class AlejandroG751JT implements Device, Debug {
     "es-de-gamelists": false,
   };
 
-  constructor(envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT], fileIO: FileIO) {
+  constructor(
+    envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT],
+    fileIO: FileIO,
+  ) {
+    logger.trace(`Start of AlejandroG751JT's constructor.`);
+
     const uniqueConsoleNames = [...new Set(envData.console.names)];
     this._consoleNames = uniqueConsoleNames;
+
+    logger.debug(`Console names: ${this._consoleNames.join(", ")}.`);
 
     const uniqueMediaNames = [...new Set(envData.media.names)];
     this._mediaNames = uniqueMediaNames;
 
-    this._fileIO = fileIO;
+    logger.debug(`Media names: ${this._mediaNames.join(", ")}.`);
+
+    this._fileIOExtras = new FileIOExtras(fileIO);
+
+    logger.trace("File IO Extras wrapper ready to go.");
 
     const uniqueContentTargetNames = [
       ...new Set(envData["content-targets"].names),
@@ -89,6 +107,10 @@ class AlejandroG751JT implements Device, Debug {
 
     for (const contentTargetName of uniqueContentTargetNames)
       this._shouldProcessContentTargets[contentTargetName] = true;
+
+    logger.debug(
+      `Content targets to process: ${uniqueContentTargetNames.join(", ")}.`,
+    );
 
     this._consoleSkipFlags = Object.fromEntries(
       this._consoleNames.map((c) => [
@@ -113,12 +135,21 @@ class AlejandroG751JT implements Device, Debug {
       ]),
     ) as Partial<ConsoleContent<AlejandroG751JTConsolesSkipFlags>>;
 
+    logger.trace("Console skip flags all set to false.");
+
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
       this._addConsole(consoleName, new Console(consoleName));
 
+    logger.trace("Empty consoles initialized.");
+
     this._paths = this._initAlejandroG751JTPaths(
       envData["content-targets"].paths,
+    );
+
+    logger.trace("All device-specific paths set.");
+    logger.info(
+      `Constructor for device ${this._name} finished without issues.`,
     );
   }
 
@@ -131,33 +162,76 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
+    logger.trace(`Beginning of device.populate() for device AlejandroG751JT.`);
+
     for (const [consoleName, konsole] of this._consoles) {
+      logger.trace(`Attempting to populate console ${consoleName}.`);
+
+      const consoleDatabaseRomDirPath =
+        databasePaths.getConsoleDatabaseRomDirPath(consoleName);
+
+      logger.debug(
+        `DB ROM directory for console ${consoleName}: ${consoleDatabaseRomDirPath}.`,
+      );
+
+      logger.trace(
+        `About to check if dirpath at ${consoleDatabaseRomDirPath} exists and has read permissions.`,
+      );
+
+      const [dbPathExistsResult, dbPathExistsError] = await fsExtras.dirExists(
+        consoleDatabaseRomDirPath,
+        "r",
+      );
+
+      if (dbPathExistsError) {
+        logger.warn(
+          `${dbPathExistsError.toString()}. Skipping console ${consoleName} globally.`,
+        );
+        this._skipConsoleGlobal(consoleName);
+        continue;
+      }
+
+      if (!dbPathExistsResult.exists) {
+        logger.warn(
+          `${dbPathExistsResult.error.toString()}. Skipping console ${consoleName} globally.`,
+        );
+        this._skipConsoleGlobal(consoleName);
+      }
+
+      logger.info(
+        `Console ROM database path at ${consoleDatabaseRomDirPath} exists and is ready for reading.`,
+      );
+
+      logger.trace(
+        `Beginning to build titles from what the console ROM database offers.`,
+      );
+
       const [titles, buildTitlesError] = await build.titlesFromRomsDirPath(
-        databasePaths.getConsoleDatabaseRomDirPath(consoleName),
+        consoleDatabaseRomDirPath,
       );
 
       if (buildTitlesError) {
         logger.warn(
           `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
         );
-
-        if (this._consoleSkipFlags[consoleName]) {
-          this._consoleSkipFlags[consoleName].global = true;
-          this._consoleSkipFlags[consoleName].filter = true;
-          this._consoleSkipFlags[consoleName].sync.global = true;
-        }
-
+        this._skipConsoleGlobal(consoleName);
         continue;
       }
 
       for (const [titleName, title] of titles)
         konsole.addTitle(titleName, title);
+
+      logger.info(
+        `Successfully crafter Title objects for console ${consoleName}. Its associated Console instance is ready to be filtered.`,
+      );
     }
+
+    logger.trace(`End of device.populate() call for device ${this._name}.`);
   };
 
   filter: () => void = () => {
     for (const [, konsole] of this.filterableConsoles)
-      konsole.unselectTitles(unselect.bySteamDeckDevice);
+      konsole.unselectTitles(unselect.byLocalDevice);
   };
 
   update: () => void = () => {
@@ -184,196 +258,174 @@ class AlejandroG751JT implements Device, Debug {
       if (writeError) logger.error(writeError.toString());
     },
     lists: async () => {
-      logger.trace(`device.write.lists() starts for console ${this._name}.`);
+      logger.trace(`device.write.lists() starts for device ${this._name}.`);
 
-      logger.trace(
-        `Building list of directories to validate before actually writing list files for device ${this._name}.`,
-      );
-
-      const projectDirPathsToValidate: string[] = [
-        this._paths.dirs.project.base,
-        this._paths.dirs.project.lists.base,
-        this._paths.dirs.project.lists["content-targets"].roms,
-        this._paths.dirs.project.lists["content-targets"].media.base,
-      ];
-
-      const contentTargetDirPathsToValidate: string[] = [
-        this._paths.dirs["content-targets"].roms.base,
-        this._paths.dirs["content-targets"].media.base,
-        this._paths.dirs["content-targets"]["es-de-gamelists"].base,
-      ];
-
-      for (const consoleName of this._consoleNames) {
-        const contentTargetRomDirPath =
-          this._paths.dirs["content-targets"].roms.consoles[consoleName];
-        if (contentTargetRomDirPath)
-          contentTargetDirPathsToValidate.push(contentTargetRomDirPath);
-
-        const contentTargetEsDeGamelistsDirPath =
-          this._paths.dirs["content-targets"]["es-de-gamelists"].consoles[
-            consoleName
-          ];
-        if (contentTargetEsDeGamelistsDirPath)
-          contentTargetDirPathsToValidate.push(
-            contentTargetEsDeGamelistsDirPath,
-          );
-
-        for (const mediaName of this._mediaNames) {
-          const projectMediaDirPath =
-            this._paths.dirs.project.lists["content-targets"].media.names[
-              mediaName
-            ];
-          if (projectMediaDirPath)
-            projectDirPathsToValidate.push(projectMediaDirPath);
-        }
-
-        const contentTargetMediaDirPath =
-          this._paths.dirs["content-targets"].media.consoles[consoleName];
-
-        if (contentTargetMediaDirPath) {
-          contentTargetDirPathsToValidate.push(contentTargetMediaDirPath.base);
-
-          for (const mediaName of this._mediaNames) {
-            const contentTargetMediaNameDirPath =
-              contentTargetMediaDirPath.names[mediaName];
-            if (contentTargetMediaNameDirPath)
-              contentTargetDirPathsToValidate.push(
-                contentTargetMediaNameDirPath,
-              );
-          }
-        }
-      }
-
-      logger.debug(
-        `Project directories to validate: `,
-        ...projectDirPathsToValidate,
-      );
-
-      logger.debug(
-        `Content target directories to validate: `,
-        ...contentTargetDirPathsToValidate,
-      );
-
-      const [allDirsAreValid, allDirsAreValidError] =
-        await fsExtras.allDirsExistAndAreReadable(projectDirPathsToValidate);
-
-      if (allDirsAreValidError) {
-        logger.error(
-          `${allDirsAreValidError.toString()}. Will NOT write list files for device ${this._name}.`,
+      if (this._shouldProcessContentTargets.roms) {
+        logger.info(
+          `ROMs content target selected for device ${this._name}. Fetching project and device directories to validate before doing anything else...`,
         );
-        return;
-      }
-      if (!allDirsAreValid) {
-        logger.error(
-          `Not all of the following directories exist and are read-write: ${projectDirPathsToValidate.join(", ")}. Please make sure all of them are valid before attempting to write the list files for device ${this._name}.`,
+
+        const dirs = this._getListsDirPathsToValidateForRomsContentTarget();
+
+        logger.debug(`Project directories to validate:`, ...dirs.project);
+
+        const projectDirAccessItems: FsDirAccessItem[] = dirs.project.map(
+          (p) => ({ path: p, rights: "rw" }),
         );
-        return;
-      }
 
-      logger.info(
-        `All list-relevant directories for device ${this._name} are valid. Continuing.`,
-      );
+        const [allProjectDirsExistResult, allProjectDirsExistError] =
+          await fsExtras.allDirsExist(projectDirAccessItems);
 
-      for (const consoleName of this._consoleNames) {
-        logger.trace(`starting to write list file for console ${consoleName}`);
-
-        const romsDirPath =
-          this._paths.dirs["content-targets"].roms.consoles[consoleName];
-        if (!romsDirPath) {
+        if (allProjectDirsExistError) {
           logger.warn(
-            `There is no ROM sync dirpath for console ${consoleName}. Skipping.`,
+            `${allProjectDirsExistError.toString()}. Will not list anything until all project directory paths are ready.`,
           );
-          continue;
+          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
+          return;
         }
 
-        logger.debug(
-          `ROMs sync dirpath for console ${consoleName}: ${romsDirPath}`,
-        );
-
-        const listFilePath =
-          this._paths.files.project.lists.roms.consoles[consoleName];
-        if (!listFilePath) {
+        if (!allProjectDirsExistResult.allExist) {
           logger.warn(
-            `There is no ROM list filepath for console ${consoleName}. Skipping.`,
+            `${allProjectDirsExistResult.error.toString()}. Will not list anything until all project directory paths are ready.`,
           );
-          continue;
-        }
-
-        logger.debug(
-          `ROM list filepath for console ${consoleName}: ${listFilePath}`,
-        );
-        logger.trace(
-          `About to attempt to fetch entries from device dirpath ${romsDirPath}`,
-        );
-
-        const [lsEntries, lsError] = await this._fileIO.ls(romsDirPath);
-        if (lsError) {
-          logger.error(`${lsError.toString()}. Skipping.`);
-          continue;
+          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
+          return;
         }
 
         logger.info(
-          `Successfully fetched entries from device dirpath ${romsDirPath}`,
-        );
-        logger.trace(
-          `About to attempt to filter out entries found at ${romsDirPath} so only symlinks to files remain.`,
+          `All ROM lists directories for device ${this._name} are valid. Continuing with the device directories.`,
         );
 
-        const [fileSymlinkEntries, readDirError] =
-          await fsExtras.getFileSymlinksFromDeviceFileIOLsEntries(lsEntries);
-
-        if (readDirError) {
-          logger.error(`${readDirError.toString()}. Skipping.`);
-          continue;
-        }
-
-        logger.info(
-          `Successfully obtained file symlinks found at ${romsDirPath}.`,
+        const deviceDirAccessItems: FileIODirAccessItem[] = dirs.device.map(
+          (p) => ({ path: p, rights: "r" }),
         );
 
-        const filenames = fileSymlinkEntries.map((e) => e.name);
+        logger.debug(`Device directories to validate:`, ...dirs.device);
 
-        logger.trace(
-          `Deleting ${listFilePath} to create a new one and get its file handle.`,
-        );
+        const [allDeviceDirsExistResult, allDeviceDirsExistError] =
+          await this._fileIOExtras.allDirsExist(deviceDirAccessItems);
 
-        const [listFileHandle, listFileError] =
-          await fsExtras.deleteAndOpenWriteOnlyFile(listFilePath);
-
-        if (listFileError) {
-          logger.error(`${listFileError.toString()}. Skipping.`);
-          continue;
-        }
-
-        logger.trace(
-          `Successfully created a new file at ${listFilePath}. About to attempt to write contents into it.`,
-        );
-
-        const writeError = await writeToFileOrDelete(
-          listFilePath,
-          listFileHandle,
-          `${filenames.join("\n")}\n`,
-          "utf8",
-        );
-
-        if (writeError) {
-          logger.error(
-            `${writeError.toString()}. Skipping and closing file handle`,
+        if (allDeviceDirsExistError) {
+          logger.warn(
+            `${allDeviceDirsExistError.toString()}. Will not list anything until all project directory paths are ready.`,
           );
-          await listFileHandle.close();
-          continue;
+          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
+          return;
         }
 
-        logger.trace(
-          `Finished writing to file ${listFilePath}. Closing file handle.`,
-        );
-
-        await listFileHandle.close();
+        if (!allDeviceDirsExistResult.allExist) {
+          logger.warn(
+            `${allDeviceDirsExistResult.error.toString()}. Will not list anything until all project directory paths are ready.`,
+          );
+          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
+          return;
+        }
 
         logger.info(
-          `Successfully generated ROMs list file at ${listFilePath} with contents from ROMs dir at ${romsDirPath}`,
+          `Device directories for ${this._name} are valid. Proceeding to fetch lists.`,
         );
       }
+
+      // for (const consoleName of this._consoleNames) {
+      //   logger.trace(`starting to write list file for console ${consoleName}`);
+      //
+      //   const romsDirPath =
+      //     this._paths.dirs["content-targets"].roms.consoles[consoleName];
+      //   if (!romsDirPath) {
+      //     logger.warn(
+      //       `There is no ROM sync dirpath for console ${consoleName}. Skipping.`,
+      //     );
+      //     continue;
+      //   }
+      //
+      //   logger.debug(
+      //     `ROMs sync dirpath for console ${consoleName}: ${romsDirPath}`,
+      //   );
+      //
+      //   const listFilePath =
+      //     this._paths.files.project.lists.roms.consoles[consoleName];
+      //   if (!listFilePath) {
+      //     logger.warn(
+      //       `There is no ROM list filepath for console ${consoleName}. Skipping.`,
+      //     );
+      //     continue;
+      //   }
+      //
+      //   logger.debug(
+      //     `ROM list filepath for console ${consoleName}: ${listFilePath}`,
+      //   );
+      //   logger.trace(
+      //     `About to attempt to fetch entries from device dirpath ${romsDirPath}`,
+      //   );
+      //
+      //   const [lsEntries, lsError] = await this._fileIO.ls(romsDirPath);
+      //   if (lsError) {
+      //     logger.error(`${lsError.toString()}. Skipping.`);
+      //     continue;
+      //   }
+      //
+      //   logger.info(
+      //     `Successfully fetched entries from device dirpath ${romsDirPath}`,
+      //   );
+      //   logger.trace(
+      //     `About to attempt to filter out entries found at ${romsDirPath} so only symlinks to files remain.`,
+      //   );
+      //
+      //   const [fileSymlinkEntries, readDirError] =
+      //     await fsExtras.getFileSymlinksFromDeviceFileIOLsEntries(lsEntries);
+      //
+      //   if (readDirError) {
+      //     logger.error(`${readDirError.toString()}. Skipping.`);
+      //     continue;
+      //   }
+      //
+      //   logger.info(
+      //     `Successfully obtained file symlinks found at ${romsDirPath}.`,
+      //   );
+      //
+      //   const filenames = fileSymlinkEntries.map((e) => e.name);
+      //
+      //   logger.trace(
+      //     `Deleting ${listFilePath} to create a new one and get its file handle.`,
+      //   );
+      //
+      //   const [listFileHandle, listFileError] =
+      //     await fsExtras.deleteAndOpenWriteOnlyFile(listFilePath);
+      //
+      //   if (listFileError) {
+      //     logger.error(`${listFileError.toString()}. Skipping.`);
+      //     continue;
+      //   }
+      //
+      //   logger.trace(
+      //     `Successfully created a new file at ${listFilePath}. About to attempt to write contents into it.`,
+      //   );
+      //
+      //   const writeError = await writeToFileOrDelete(
+      //     listFilePath,
+      //     listFileHandle,
+      //     `${filenames.join("\n")}\n`,
+      //     "utf8",
+      //   );
+      //
+      //   if (writeError) {
+      //     logger.error(
+      //       `${writeError.toString()}. Skipping and closing file handle`,
+      //     );
+      //     await listFileHandle.close();
+      //     continue;
+      //   }
+      //
+      //   logger.trace(
+      //     `Finished writing to file ${listFilePath}. Closing file handle.`,
+      //   );
+      //
+      //   await listFileHandle.close();
+      //
+      //   logger.info(
+      //     `Successfully generated ROMs list file at ${listFilePath} with contents from ROMs dir at ${romsDirPath}`,
+      //   );
+      // }
 
       logger.trace(`device.write.lists() ends for console ${this._name}.`);
     },
@@ -414,18 +466,7 @@ class AlejandroG751JT implements Device, Debug {
     },
   };
 
-  sync: () => Promise<void> = async () => {
-    // 1. there are .failed.txt filenames for this device
-    // 2. not all device sync dir paths exist
-    // 3. failed to open new .failed.txt file to write on
-    // 4. failed to open .diff.txt file
-    const syncError = await devices.syncAlejandroG751JT(this);
-
-    if (syncError)
-      logger.warn(
-        `${syncError.toString()}\nWe were unable to sync this console.`,
-      );
-  };
+  sync: () => Promise<void> = async () => {};
 
   debug: () => string = () => {
     let content = "Local { ";
@@ -531,6 +572,80 @@ class AlejandroG751JT implements Device, Debug {
       );
 
     this._consoles.set(consoleName, konsole);
+  }
+
+  private _skipConsoleGlobal(consoleName: ConsoleName) {
+    if (this._consoleSkipFlags[consoleName]) {
+      this._consoleSkipFlags[consoleName].global = true;
+      this._consoleSkipFlags[consoleName].filter = true;
+      this._consoleSkipFlags[consoleName].sync.global = true;
+      this._consoleSkipFlags[consoleName].sync["content-targets"].roms = true;
+      this._consoleSkipFlags[consoleName].sync["content-targets"].media.global =
+        true;
+      this._consoleSkipFlags[consoleName].sync["content-targets"][
+        "es-de-gamelists"
+      ] = true;
+    }
+  }
+
+  private _getListsDirPathsToValidateForRomsContentTarget(): {
+    project: string[];
+    device: string[];
+  } {
+    const projectDirs: string[] = [
+      this._paths.dirs.project.lists["content-targets"].roms,
+    ];
+
+    const deviceDirs: string[] = [
+      this._paths.dirs["content-targets"].roms.base,
+    ];
+
+    for (const consoleName of this._consoleNames) {
+      const deviceConsoleRomsDirPath =
+        this._paths.dirs["content-targets"].roms.consoles[consoleName];
+      if (deviceConsoleRomsDirPath) deviceDirs.push(deviceConsoleRomsDirPath);
+    }
+
+    return { project: projectDirs, device: deviceDirs };
+  }
+
+  private _getListsDirPathsToValidateForMediaContentTarget(): {
+    project: string[];
+    device: string[];
+  } {
+    const projectDirs: string[] = [
+      this._paths.dirs.project.lists["content-targets"].media.base,
+    ];
+
+    const deviceDirs: string[] = [
+      this._paths.dirs["content-targets"].media.base,
+    ];
+
+    for (const consoleName of this._consoleNames) {
+      for (const mediaName of this._mediaNames) {
+        const projectMediaNameDirPath =
+          this._paths.dirs.project.lists["content-targets"].media.names[
+            mediaName
+          ];
+        if (projectMediaNameDirPath) projectDirs.push(projectMediaNameDirPath);
+      }
+
+      const deviceConsoleMediaDirPath =
+        this._paths.dirs["content-targets"].media.consoles[consoleName];
+
+      if (deviceConsoleMediaDirPath) {
+        deviceDirs.push(deviceConsoleMediaDirPath.base);
+
+        for (const mediaName of this._mediaNames) {
+          const deviceConsoleMediaNameDirPath =
+            deviceConsoleMediaDirPath.names[mediaName];
+          if (deviceConsoleMediaNameDirPath)
+            deviceDirs.push(deviceConsoleMediaNameDirPath);
+        }
+      }
+    }
+
+    return { project: projectDirs, device: deviceDirs };
   }
 
   private _initAlejandroG751JTPaths(
