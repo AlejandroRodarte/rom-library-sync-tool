@@ -11,7 +11,7 @@ const writeLines = async (
   lines: string[],
   encoding: BufferEncoding = "utf8",
 ): Promise<WriteLinesError | undefined> => {
-  const content = lines.join(os.EOL);
+  const content = `${lines.join(os.EOL)}${os.EOL}`;
   const writeFileError = await writeFile(fileHandle, content, { encoding });
   if (writeFileError) return writeFileError;
 };
