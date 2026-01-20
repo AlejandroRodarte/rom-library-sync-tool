@@ -3,11 +3,7 @@ class UniversalError {
   private _messages: string[];
   private _linkedError: UniversalError | undefined;
 
-  constructor(
-    type: string,
-    messages: string[],
-    linkedError?: UniversalError,
-  ) {
+  constructor(type: string, messages: string[], linkedError?: UniversalError) {
     this._type = type;
     this._messages = messages;
     if (linkedError) this._linkedError = linkedError;
@@ -30,7 +26,7 @@ class UniversalError {
       content += `${tabs}${linkedError._type} { `;
       content += `messages: ${linkedError._messages.join(", ")} }\n`;
 
-      tabs += "\n";
+      tabs += "\t";
 
       linkedError = linkedError._linkedError;
     }
