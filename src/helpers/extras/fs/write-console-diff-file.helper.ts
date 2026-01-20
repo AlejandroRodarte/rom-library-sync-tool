@@ -1,8 +1,8 @@
 import filenameIndexesToAddAndDelete from "../../build/filename-indexes-to-add-and-delete.helper.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
-import openNewWriteOnlyFile, {
-  type OpenNewWriteOnlyFileError,
-} from "./open-new-write-only-file.helper.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "./open-file-for-writing.helper.js";
 import writeAddFileLineToDiffFile, {
   type WriteAddFileLineToDiffFileError,
 } from "./write-add-file-line-to-diff-file.helper.js";
@@ -23,7 +23,7 @@ export type WriteConsoleDiffFileError =
   | FileExistsError
   | DeleteFileError
   | ReadUTF8LinesError
-  | OpenNewWriteOnlyFileError
+  | OpenFileForWritingError
   | WriteAddFileLineToDiffFileError
   | WriteDeleteFileLineToDiffFileError;
 
@@ -53,7 +53,7 @@ const writeConsoleDiffFile = async (
     .map((rom) => rom.filename)
     .toArray();
 
-  const [diffFileHandle, diffFileOpenError] = await openNewWriteOnlyFile(
+  const [diffFileHandle, diffFileOpenError] = await openFileForWriting(
     filePaths.diff,
   );
   if (diffFileOpenError) return diffFileOpenError;

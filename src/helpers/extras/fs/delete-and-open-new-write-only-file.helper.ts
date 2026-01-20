@@ -1,12 +1,12 @@
 import type { FileHandle } from "node:fs/promises";
-import openNewWriteOnlyFile, {
-  type OpenNewWriteOnlyFileError,
-} from "./open-new-write-only-file.helper.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "./open-file-for-writing.helper.js";
 import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
 export type DeleteAndOpenWriteOnlyFileError =
   | DeleteFileError
-  | OpenNewWriteOnlyFileError;
+  | OpenFileForWritingError;
 
 const deleteAndOpenWriteOnlyFile = async (
   filePath: string,
@@ -16,7 +16,7 @@ const deleteAndOpenWriteOnlyFile = async (
   const deleteError = await deleteFile(filePath, { mustExist: false });
   if (deleteError) return [undefined, deleteError];
 
-  const [fileHandle, openError] = await openNewWriteOnlyFile(filePath);
+  const [fileHandle, openError] = await openFileForWriting(filePath);
   if (openError) return [undefined, openError];
 
   return [fileHandle, undefined];

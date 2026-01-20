@@ -1,7 +1,7 @@
 import path from "node:path";
-import openNewWriteOnlyFile, {
-  type OpenNewWriteOnlyFileError,
-} from "./open-new-write-only-file.helper.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "./open-file-for-writing.helper.js";
 import writeToFileOrDelete, {
   type WriteToFileOrDeleteError,
 } from "./write-to-file-or-delete.helper.js";
@@ -10,7 +10,7 @@ import deleteFile, { type DeleteFileError } from "./delete-file.helper.js";
 
 export type WriteConsoleListFileError =
   | DeleteFileError
-  | OpenNewWriteOnlyFileError
+  | OpenFileForWritingError
   | WriteToFileOrDeleteError;
 
 const writeConsoleListFile = async (
@@ -26,7 +26,7 @@ const writeConsoleListFile = async (
   if (listFileDeleteError) return listFileDeleteError;
 
   const [listFileHandle, listFileOpenError] =
-    await openNewWriteOnlyFile(listFilePath);
+    await openFileForWriting(listFilePath);
   if (listFileOpenError) return listFileOpenError;
 
   const newFilenames = konsole.selectedRoms
