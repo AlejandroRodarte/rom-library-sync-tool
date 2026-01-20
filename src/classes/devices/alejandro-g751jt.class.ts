@@ -39,6 +39,8 @@ import allDirsExist, {
 } from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 import openFileForWriting from "../../helpers/extras/fs/open-file-for-writing.helper.js";
 import writeLines from "../../helpers/extras/fs/write-lines.helper.js";
+import getRomsListsProjectDirs from "../../helpers/classes/devices/alejandro-g751jt/get-roms-lists-project-dirs.helper.js";
+import getRomsListsDeviceDirs from "../../helpers/classes/devices/alejandro-g751jt/get-roms-lists-device-dirs.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -266,11 +268,10 @@ class AlejandroG751JT implements Device, Debug {
           `ROMs content target selected for device ${this._name}. Fetching project and device directories to validate before doing anything else...`,
         );
 
-        const dirs = this._getListsDirPathsToValidateForRomsContentTarget();
+        const projectDirs = getRomsListsProjectDirs(this._paths);
+        logger.debug(`Project directories to validate:`, ...projectDirs);
 
-        logger.debug(`Project directories to validate:`, ...dirs.project);
-
-        const projectDirAccessItems: FsDirAccessItem[] = dirs.project.map(
+        const projectDirAccessItems: FsDirAccessItem[] = projectDirs.map(
           (p) => ({ path: p, rights: "rw" }),
         );
 
@@ -297,11 +298,15 @@ class AlejandroG751JT implements Device, Debug {
           `All ROM lists directories for device ${this._name} are valid. Continuing with the device directories.`,
         );
 
-        const deviceDirAccessItems: FileIODirAccessItem[] = dirs.device.map(
+        const deviceDirs = getRomsListsDeviceDirs(
+          this._paths,
+          this._consoleNames,
+        );
+        logger.debug(`Device directories to validate:`, ...deviceDirs);
+
+        const deviceDirAccessItems: FileIODirAccessItem[] = deviceDirs.map(
           (p) => ({ path: p, rights: "r" }),
         );
-
-        logger.debug(`Device directories to validate:`, ...dirs.device);
 
         const [allDeviceDirsExistResult, allDeviceDirsExistError] =
           await this._fileIOExtras.allDirsExist(deviceDirAccessItems);
@@ -572,66 +577,6 @@ class AlejandroG751JT implements Device, Debug {
         "es-de-gamelists"
       ] = true;
     }
-  }
-
-  private _getListsDirPathsToValidateForRomsContentTarget(): {
-    project: string[];
-    device: string[];
-  } {
-    const projectDirs: string[] = [
-      this._paths.dirs.project.lists["content-targets"].roms,
-    ];
-
-    const deviceDirs: string[] = [
-      this._paths.dirs["content-targets"].roms.base,
-    ];
-
-    for (const consoleName of this._consoleNames) {
-      const deviceConsoleRomsDirPath =
-        this._paths.dirs["content-targets"].roms.consoles[consoleName];
-      if (deviceConsoleRomsDirPath) deviceDirs.push(deviceConsoleRomsDirPath);
-    }
-
-    return { project: projectDirs, device: deviceDirs };
-  }
-
-  private _getListsDirPathsToValidateForMediaContentTarget(): {
-    project: string[];
-    device: string[];
-  } {
-    const projectDirs: string[] = [
-      this._paths.dirs.project.lists["content-targets"].media.base,
-    ];
-
-    const deviceDirs: string[] = [
-      this._paths.dirs["content-targets"].media.base,
-    ];
-
-    for (const consoleName of this._consoleNames) {
-      for (const mediaName of this._mediaNames) {
-        const projectMediaNameDirPath =
-          this._paths.dirs.project.lists["content-targets"].media.names[
-            mediaName
-          ];
-        if (projectMediaNameDirPath) projectDirs.push(projectMediaNameDirPath);
-      }
-
-      const deviceConsoleMediaDirPath =
-        this._paths.dirs["content-targets"].media.consoles[consoleName];
-
-      if (deviceConsoleMediaDirPath) {
-        deviceDirs.push(deviceConsoleMediaDirPath.base);
-
-        for (const mediaName of this._mediaNames) {
-          const deviceConsoleMediaNameDirPath =
-            deviceConsoleMediaDirPath.names[mediaName];
-          if (deviceConsoleMediaNameDirPath)
-            deviceDirs.push(deviceConsoleMediaNameDirPath);
-        }
-      }
-    }
-
-    return { project: projectDirs, device: deviceDirs };
   }
 
   private _initAlejandroG751JTPaths(
