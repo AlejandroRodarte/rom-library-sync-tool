@@ -1,0 +1,19 @@
+import type { FileHandle } from "node:fs/promises";
+import os from "node:os";
+import writeFile, {
+  type WriteFileError,
+} from "../../wrappers/modules/fs/write-file.helper.js";
+
+export type WriteLinesError = WriteFileError;
+
+const writeLines = async (
+  fileHandle: string | FileHandle,
+  lines: string[],
+  encoding: BufferEncoding = "utf8",
+): Promise<WriteLinesError | undefined> => {
+  const content = lines.join(os.EOL);
+  const writeFileError = await writeFile(fileHandle, content, { encoding });
+  if (writeFileError) return writeFileError;
+};
+
+export default writeLines;
