@@ -1,6 +1,6 @@
 import FileIOExtras, {
   type AllDirsExistMethodError,
-  type AllDirsExistMethodResult,
+  type AllDirsExistMethodFalseResult,
   type DirAccessItem as FileIODirAccessItem,
 } from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
@@ -9,7 +9,7 @@ import getRomsListsDeviceDirs from "./get-roms-lists-device-dirs.helper.js";
 
 export type ValidateRomsListsDeviceDirsError =
   | AllDirsExistMethodError
-  | AllDirsExistMethodResult["error"];
+  | AllDirsExistMethodFalseResult["error"];
 
 const validateRomsListsDeviceDirs = async (
   paths: AlejandroG751JTPaths["dirs"]["content-targets"]["roms"],
