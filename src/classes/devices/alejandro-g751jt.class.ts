@@ -29,18 +29,11 @@ import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-f
 import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
 import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
-import FileIOExtras, {
-  type DirAccessItem as FileIODirAccessItem,
-} from "../file-io/file-io-extras.class.js";
+import FileIOExtras from "../file-io/file-io-extras.class.js";
 import dirExists from "../../helpers/extras/fs/dir-exists.helper.js";
 import titlesFromRomsDirPath from "../../helpers/build/titles-from-roms-dir-path.helper.js";
-import allDirsExist, {
-  type DirAccessItem as FsDirAccessItem,
-} from "../../helpers/extras/fs/all-dirs-exist.helper.js";
-import openFileForWriting from "../../helpers/extras/fs/open-file-for-writing.helper.js";
-import writeLines from "../../helpers/extras/fs/write-lines.helper.js";
-import getRomsListsProjectDirs from "../../helpers/classes/devices/alejandro-g751jt/get-roms-lists-project-dirs.helper.js";
-import getRomsListsDeviceDirs from "../../helpers/classes/devices/alejandro-g751jt/get-roms-lists-device-dirs.helper.js";
+import allDirsExist from "../../helpers/extras/fs/all-dirs-exist.helper.js";
+import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write-roms-lists.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -264,158 +257,12 @@ class AlejandroG751JT implements Device, Debug {
       logger.trace(`device.write.lists() starts for device ${this._name}.`);
 
       if (this._shouldProcessContentTargets.roms) {
-        logger.info(
-          `ROMs content target selected for device ${this._name}. Fetching project and device directories to validate before doing anything else...`,
-        );
-
-        const projectDirs = getRomsListsProjectDirs(this._paths);
-        logger.debug(`Project directories to validate:`, ...projectDirs);
-
-        const projectDirAccessItems: FsDirAccessItem[] = projectDirs.map(
-          (p) => ({ path: p, rights: "rw" }),
-        );
-
-        const [allProjectDirsExistResult, allProjectDirsExistError] =
-          await fsExtras.allDirsExist(projectDirAccessItems);
-
-        if (allProjectDirsExistError) {
-          logger.warn(
-            `${allProjectDirsExistError.toString()}. Will not list anything until all project directory paths are ready.`,
-          );
-          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
-          return;
-        }
-
-        if (!allProjectDirsExistResult.allExist) {
-          logger.warn(
-            `${allProjectDirsExistResult.error.toString()}. Will not list anything until all project directory paths are ready.`,
-          );
-          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
-          return;
-        }
-
-        logger.info(
-          `All ROM lists directories for device ${this._name} are valid. Continuing with the device directories.`,
-        );
-
-        const deviceDirs = getRomsListsDeviceDirs(
+        await writeRomsLists(
+          this._name,
           this._paths,
           this._consoleNames,
+          this._fileIOExtras,
         );
-        logger.debug(`Device directories to validate:`, ...deviceDirs);
-
-        const deviceDirAccessItems: FileIODirAccessItem[] = deviceDirs.map(
-          (p) => ({ path: p, rights: "r" }),
-        );
-
-        const [allDeviceDirsExistResult, allDeviceDirsExistError] =
-          await this._fileIOExtras.allDirsExist(deviceDirAccessItems);
-
-        if (allDeviceDirsExistError) {
-          logger.warn(
-            `${allDeviceDirsExistError.toString()}. Will not list anything until all project directory paths are ready.`,
-          );
-          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
-          return;
-        }
-
-        if (!allDeviceDirsExistResult.allExist) {
-          logger.warn(
-            `${allDeviceDirsExistResult.error.toString()}. Will not list anything until all project directory paths are ready.`,
-          );
-          // TODO: require device.write.lists() to return something that informs that the `list` operation completely failed.
-          return;
-        }
-
-        logger.info(
-          `Device directories for ${this._name} are valid. Proceeding to fetch lists.`,
-        );
-
-        for (const consoleName of this._consoleNames) {
-          logger.trace(
-            `Beginning to write ROM list file for console ${consoleName}.`,
-          );
-
-          const deviceConsoleRomsDirPath =
-            this._paths.dirs["content-targets"].roms.consoles[consoleName];
-
-          if (!deviceConsoleRomsDirPath) {
-            logger.fatal(
-              `There is no ROM directory path for console ${consoleName} for device ${this._name}, even though we just checked it moments ago. Skipping this console.`,
-            );
-            continue;
-          }
-
-          logger.debug(
-            `(${this._name}): ROM directory path for console ${consoleName} = ${deviceConsoleRomsDirPath}`,
-          );
-
-          logger.trace(
-            `(${this._name}) (${consoleName}): About to attempt to fetch entries from directory at ${deviceConsoleRomsDirPath}`,
-          );
-
-          const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
-            deviceConsoleRomsDirPath,
-          );
-
-          if (lsError) {
-            logger.error(`${lsError.toString()}`, "Skipping this console.");
-            continue;
-          }
-
-          logger.info(
-            `(${this._name}) (${consoleName}) Successfully fetched entries from directory ${deviceConsoleRomsDirPath}`,
-          );
-
-          const filenames = lsEntries
-            .map((e) => e.name)
-            .filter((n) => n !== "systeminfo.txt" && n !== "metadata.txt");
-
-          const deviceConsoleRomListFilePath =
-            this._paths.files.project.lists.roms.consoles[consoleName];
-
-          if (!deviceConsoleRomListFilePath) {
-            logger.fatal(
-              `(${this._name}) (${consoleName}): We failed to get ROM list filepath ${deviceConsoleRomListFilePath}, even though we just checked it moments ago. Skipping this console.`,
-            );
-            continue;
-          }
-
-          logger.info(
-            `(${this._name}) (${consoleName}): Opening (and overwriting, if needed) list filepath at ${deviceConsoleRomListFilePath}`,
-          );
-
-          const [listFileHandle, listFileError] = await openFileForWriting(
-            deviceConsoleRomListFilePath,
-            { overwrite: true },
-          );
-
-          if (listFileError) {
-            logger.error(
-              `(${this._name}) (${consoleName}): ${listFileError.toString()}`,
-              "Skipping this console.",
-            );
-            continue;
-          }
-
-          logger.trace(
-            `(${this._name}) (${consoleName}): About to write list lines to file at ${deviceConsoleRomListFilePath}`,
-          );
-
-          const writeLinesError = await writeLines(listFileHandle, filenames);
-
-          if (writeLinesError) {
-            await listFileHandle.close();
-            logger.error(
-              `(${this._name}) (${consoleName}): ${writeLinesError.toString()}`,
-              "Skipping this console.",
-            );
-          }
-
-          logger.info(
-            `(${this._name}) (${consoleName}): Succesfully wrote list lines to file at ${deviceConsoleRomListFilePath}.`,
-          );
-        }
       }
 
       logger.trace(`device.write.lists() ends for console ${this._name}.`);
