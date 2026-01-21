@@ -81,21 +81,13 @@ class AlejandroG751JT implements Device, Debug {
     envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT],
     fileIO: FileIO,
   ) {
-    logger.trace(`Start of AlejandroG751JT's constructor.`);
-
     const uniqueConsoleNames = [...new Set(envData.console.names)];
     this._consoleNames = uniqueConsoleNames;
-
-    logger.debug(`Console names: ${this._consoleNames.join(", ")}.`);
 
     const uniqueMediaNames = [...new Set(envData.media.names)];
     this._mediaNames = uniqueMediaNames;
 
-    logger.debug(`Media names: ${this._mediaNames.join(", ")}.`);
-
     this._fileIOExtras = new FileIOExtras(fileIO);
-
-    logger.trace("File IO Extras wrapper ready to go.");
 
     const uniqueContentTargetNames = [
       ...new Set(envData["content-targets"].names),
@@ -103,10 +95,6 @@ class AlejandroG751JT implements Device, Debug {
 
     for (const contentTargetName of uniqueContentTargetNames)
       this._shouldProcessContentTargets[contentTargetName] = true;
-
-    logger.debug(
-      `Content targets to process: ${uniqueContentTargetNames.join(", ")}.`,
-    );
 
     this._skipFlags = {
       "content-targets": {
@@ -138,22 +126,15 @@ class AlejandroG751JT implements Device, Debug {
       ) as Partial<ConsoleContent<AlejandroG751JTConsolesSkipFlags>>,
     };
 
-    logger.trace("Console skip flags all set to false.");
-
     this._consoles = new Map<ConsoleName, Console>();
     for (const consoleName of this._consoleNames)
       this._addConsole(consoleName, new Console(consoleName));
-
-    logger.trace("Empty consoles initialized.");
 
     this._paths = this._initAlejandroG751JTPaths(
       envData["content-targets"].paths,
     );
 
-    logger.trace("All device-specific paths set.");
-    logger.info(
-      `Constructor for device ${this._name} finished without issues.`,
-    );
+    logger.debug(this.debug());
   }
 
   name: () => DeviceName = () => {
@@ -165,21 +146,9 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
-    logger.trace(`Beginning of device.populate() for device AlejandroG751JT.`);
-
     for (const [consoleName, konsole] of this._consoles) {
-      logger.trace(`Attempting to populate console ${consoleName}.`);
-
       const consoleDatabaseRomDirPath =
         databasePaths.getConsoleDatabaseRomDirPath(consoleName);
-
-      logger.debug(
-        `DB ROM directory for console ${consoleName}: ${consoleDatabaseRomDirPath}.`,
-      );
-
-      logger.trace(
-        `About to check if dirpath at ${consoleDatabaseRomDirPath} exists and has read permissions.`,
-      );
 
       const [dbPathExistsResult, dbPathExistsError] = await fsExtras.dirExists(
         consoleDatabaseRomDirPath,
@@ -187,49 +156,27 @@ class AlejandroG751JT implements Device, Debug {
       );
 
       if (dbPathExistsError) {
-        logger.warn(
-          `${dbPathExistsError.toString()}. Skipping console ${consoleName} globally.`,
-        );
         this._skipConsoleGlobal(consoleName);
         continue;
       }
 
       if (!dbPathExistsResult.exists) {
-        logger.warn(
-          `${dbPathExistsResult.error.toString()}. Skipping console ${consoleName} globally.`,
-        );
         this._skipConsoleGlobal(consoleName);
+        continue;
       }
-
-      logger.info(
-        `Console ROM database path at ${consoleDatabaseRomDirPath} exists and is ready for reading.`,
-      );
-
-      logger.trace(
-        `Beginning to build titles from what the console ROM database offers.`,
-      );
 
       const [titles, buildTitlesError] = await build.titlesFromRomsDirPath(
         consoleDatabaseRomDirPath,
       );
 
       if (buildTitlesError) {
-        logger.warn(
-          `Error while reading database ROM directory for console ${consoleName}.\n${buildTitlesError.toString()}\nWill skip this console. This means that NOTHING after this step will get processed.`,
-        );
         this._skipConsoleGlobal(consoleName);
         continue;
       }
 
       for (const [titleName, title] of titles)
         konsole.addTitle(titleName, title);
-
-      logger.info(
-        `Successfully crafter Title objects for console ${consoleName}. Its associated Console instance is ready to be filtered.`,
-      );
     }
-
-    logger.trace(`End of device.populate() call for device ${this._name}.`);
   };
 
   filter: () => void = () => {
@@ -271,10 +218,6 @@ class AlejandroG751JT implements Device, Debug {
         );
 
         if (writeError) {
-          logger.error(
-            `${writeError.toString()}. Will skip ROMs content target as a whole.`,
-          );
-
           this._skipFlags["content-targets"].roms = true;
           return;
         }
@@ -282,24 +225,14 @@ class AlejandroG751JT implements Device, Debug {
         for (const consoleName of consolesToSkip)
           this._skipConsoleRoms(consoleName);
       }
-
-      logger.trace(`device.write.lists() ends for console ${this._name}.`);
     },
     diffs: async () => {
       for (const [consoleName, konsole] of this.filterableConsoles) {
-        if (!this._paths.files.project.lists.roms.consoles[consoleName]) {
-          logger.warn(
-            `There is no ROM list filepath for console ${consoleName}. Skipping.`,
-          );
+        if (!this._paths.files.project.lists.roms.consoles[consoleName])
           continue;
-        }
 
-        if (!this._paths.files.project.diffs.roms.consoles[consoleName]) {
-          logger.warn(
-            `There is no ROM diff filepath for console ${consoleName}. Skipping.`,
-          );
+        if (!this._paths.files.project.diffs.roms.consoles[consoleName])
           continue;
-        }
 
         // 1. couldn't delete previous diff file (if it existed)
         // 2. couldn't read list file
@@ -309,12 +242,6 @@ class AlejandroG751JT implements Device, Debug {
           list: this._paths.files.project.lists.roms.consoles[consoleName],
           diff: this._paths.files.project.diffs.roms.consoles[consoleName],
         });
-
-        if (diffError) {
-          logger.warn(
-            `${diffError.toString()}\nSince we were not able to generate the diff file, we will skip this console when sync-ing.`,
-          );
-        }
       }
     },
   };
@@ -322,7 +249,7 @@ class AlejandroG751JT implements Device, Debug {
   sync: () => Promise<void> = async () => {};
 
   debug: () => string = () => {
-    let content = "Local { ";
+    let content = "AlejandroG751JT { ";
 
     content += `name: ${this._name}, `;
     content += `content-targets: ${CONTENT_TARGET_NAMES.filter((c) => this._shouldProcessContentTargets[c] === true).join(", ")}, `;

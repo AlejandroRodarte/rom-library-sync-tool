@@ -20,8 +20,6 @@ const main = async () => {
   let alejandroG751JT: AlejandroG751JT | undefined;
 
   if (environment.device.names.includes("alejandro-g751jt")) {
-    logger.trace("Creating and adding new alejandro-g751jt device");
-
     const env = environment.device.data["alejandro-g751jt"];
 
     let fileIO: FileIO;
@@ -41,24 +39,17 @@ const main = async () => {
 
     alejandroG751JT = new AlejandroG751JT(env, fileIO);
     devices.push(alejandroG751JT);
-
-    logger.debug(alejandroG751JT.debug());
   }
 
   logger.debug(`amount of devices to process: ${devices.length}`);
 
-  logger.trace("switch (mode) statement starts");
   switch (mode) {
     case "list":
-      logger.trace(`entering the "list" case`);
       await modes.list(devices);
       break;
     default:
       logger.warn(`Mode ${mode} not implemented yet`);
   }
-  logger.trace("switch (mode) statement ends");
-
-  logger.trace("main() function ends");
 };
 
 main();
