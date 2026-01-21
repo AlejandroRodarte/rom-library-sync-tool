@@ -3,15 +3,14 @@ import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
 
 const getMediaListsDeviceDirs = (
-  paths: AlejandroG751JTPaths,
+  paths: AlejandroG751JTPaths["dirs"]["content-targets"],
   consoleNames: ConsoleName[],
   mediaNames: MediaName[],
 ): string[] => {
-  const dirs: string[] = [paths.dirs["content-targets"].media.base];
+  const dirs: string[] = [paths.media.base];
 
   for (const consoleName of consoleNames) {
-    const consoleMediaDir =
-      paths.dirs["content-targets"].media.consoles[consoleName];
+    const consoleMediaDir = paths.media.consoles[consoleName];
 
     if (consoleMediaDir) {
       dirs.push(consoleMediaDir.base);

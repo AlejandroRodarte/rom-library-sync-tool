@@ -2,17 +2,19 @@ import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { DeviceName } from "../../../../types/device-name.type.js";
 import validateRomsListsDirs from "./validate-roms-lists-dirs.helper.js";
 import writeConsoleRomsList from "./write-console-roms-list.helper.js";
 
 const writeRomsLists = async (
-  name: DeviceName,
   paths: AlejandroG751JTPaths,
   consoleNames: ConsoleName[],
   fileIOExtras: FileIOExtras,
 ) => {
-  await validateRomsListsDirs(name, paths, consoleNames, fileIOExtras);
+  await validateRomsListsDirs(
+    paths.dirs,
+    consoleNames,
+    fileIOExtras.allDirsExist,
+  );
 
   for (const consoleName of consoleNames) {
     const deviceDir = paths.dirs["content-targets"].roms.consoles[consoleName];
