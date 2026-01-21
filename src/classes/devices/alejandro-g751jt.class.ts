@@ -29,12 +29,16 @@ import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-f
 import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
 import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
-import FileIOExtras from "../file-io/file-io-extras.class.js";
+import FileIOExtras, {
+  type DirAccessItem,
+} from "../file-io/file-io-extras.class.js";
 import dirExists from "../../helpers/extras/fs/dir-exists.helper.js";
 import titlesFromRomsDirPath from "../../helpers/build/titles-from-roms-dir-path.helper.js";
 import allDirsExist from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write-roms-lists.helper.js";
 import type { AlejandroG751JTSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-skip-flags.interface.js";
+import getMediaListsProjectDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-project-dirs.helper.js";
+import getMediaListsDeviceDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-device-dirs.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -218,12 +222,67 @@ class AlejandroG751JT implements Device, Debug {
         );
 
         if (writeError) {
-          this._skipFlags["content-targets"].roms = true;
+          this._skipRomsContentTarget();
           return;
         }
 
         for (const consoleName of consolesToSkip)
           this._skipConsoleRoms(consoleName);
+      }
+
+      if (this._shouldProcessContentTargets.media) {
+        const projectDirs = getMediaListsProjectDirs(
+          this._paths.dirs.project.lists["content-targets"].media,
+          this._mediaNames,
+        );
+
+        const projectDirAccessItems: DirAccessItem[] = projectDirs.map((p) => ({
+          type: "dir",
+          path: p,
+          rights: "rw",
+        }));
+
+        const [allProjectDirsExistResult, allProjectDirsExistError] =
+          await allDirsExist(projectDirAccessItems);
+
+        if (allProjectDirsExistError) {
+          logger.warn(allProjectDirsExistError.toString());
+          this._skipMediaContentTarget();
+          return;
+        }
+
+        if (!allProjectDirsExistResult.allExist) {
+          logger.warn(allProjectDirsExistResult.error.toString());
+          this._skipMediaContentTarget();
+          return;
+        }
+
+        const deviceDirs = getMediaListsDeviceDirs(
+          this._paths.dirs["content-targets"].media,
+          this._consoleNames,
+          this._mediaNames,
+        );
+
+        const deviceDirAccessItems: DirAccessItem[] = deviceDirs.map((p) => ({
+          type: "dir",
+          path: p,
+          rights: "r",
+        }));
+
+        const [allDeviceDirsExistResult, allDeviceDirsExistError] =
+          await this._fileIOExtras.allDirsExist(deviceDirAccessItems);
+
+        if (allDeviceDirsExistError) {
+          logger.warn(allDeviceDirsExistError.toString());
+          this._skipMediaContentTarget();
+          return;
+        }
+
+        if (!allDeviceDirsExistResult.allExist) {
+          logger.warn(allDeviceDirsExistResult.error.toString());
+          this._skipMediaContentTarget();
+          return;
+        }
       }
     },
     diffs: async () => {
@@ -365,6 +424,16 @@ class AlejandroG751JT implements Device, Debug {
   private _skipConsoleRoms(consoleName: ConsoleName) {
     if (this._skipFlags.consoles[consoleName])
       this._skipFlags.consoles[consoleName].sync["content-targets"].roms = true;
+  }
+
+  private _skipRomsContentTarget() {
+    this._skipFlags["content-targets"].roms = true;
+    this._shouldProcessContentTargets.roms = true;
+  }
+
+  private _skipMediaContentTarget() {
+    this._skipFlags["content-targets"].media = true;
+    this._shouldProcessContentTargets.roms = true;
   }
 
   private _initAlejandroG751JTPaths(
