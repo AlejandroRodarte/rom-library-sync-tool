@@ -2,13 +2,13 @@ import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejan
 import type { MediaName } from "../../../../types/media-name.type.js";
 
 const getMediaListsProjectDirs = (
-  paths: AlejandroG751JTPaths["dirs"]["project"]["lists"],
+  paths: AlejandroG751JTPaths["dirs"]["project"]["lists"]["content-targets"]["media"],
   mediaNames: MediaName[],
 ) => {
-  const dirs: string[] = [paths["content-targets"].media.base];
+  const dirs: string[] = [paths.base];
 
   for (const mediaName of mediaNames) {
-    const mediaNameDir = paths["content-targets"].media.names[mediaName];
+    const mediaNameDir = paths.names[mediaName];
     if (mediaNameDir) dirs.push(mediaNameDir);
   }
 

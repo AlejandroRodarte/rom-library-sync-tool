@@ -2,13 +2,13 @@ import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejan
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 
 const getRomsListsDeviceDirs = (
-  paths: AlejandroG751JTPaths["dirs"]["content-targets"],
+  paths: AlejandroG751JTPaths["dirs"]["content-targets"]["roms"],
   consoleNames: ConsoleName[],
 ): string[] => {
-  const dirs: string[] = [paths.roms.base];
+  const dirs: string[] = [paths.base];
 
   for (const consoleName of consoleNames) {
-    const consoleRomsDir = paths.roms.consoles[consoleName];
+    const consoleRomsDir = paths.consoles[consoleName];
     if (consoleRomsDir) dirs.push(consoleRomsDir);
   }
 

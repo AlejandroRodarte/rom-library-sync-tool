@@ -258,7 +258,6 @@ class AlejandroG751JT implements Device, Debug {
 
       if (this._shouldProcessContentTargets.roms) {
         await writeRomsLists(
-          this._name,
           this._paths,
           this._consoleNames,
           this._fileIOExtras,
