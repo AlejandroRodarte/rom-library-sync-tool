@@ -39,6 +39,10 @@ import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write
 import type { AlejandroG751JTSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-skip-flags.interface.js";
 import getMediaListsProjectDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-project-dirs.helper.js";
 import getMediaListsDeviceDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-device-dirs.helper.js";
+import type { ContentTargetName } from "../../types/content-target-name.type.js";
+import type { AlejandroG751JTShouldProcessContentTargetFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-should-process-content-targets-flags.interface.js";
+import openFileForWriting from "../../helpers/extras/fs/open-file-for-writing.helper.js";
+import writeLines from "../../helpers/extras/fs/write-lines.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -75,10 +79,8 @@ class AlejandroG751JT implements Device, Debug {
 
   private _fileIOExtras: FileIOExtras;
 
-  private _shouldProcessContentTargets: ContentTargetContent<boolean> = {
-    roms: false,
-    media: false,
-    "es-de-gamelists": false,
+  private _shouldProcessContentTargets: {
+    [C in ContentTargetName]: AlejandroG751JTShouldProcessContentTargetFlags[C];
   };
 
   constructor(
@@ -97,13 +99,26 @@ class AlejandroG751JT implements Device, Debug {
       ...new Set(envData["content-targets"].names),
     ];
 
-    for (const contentTargetName of uniqueContentTargetNames)
-      this._shouldProcessContentTargets[contentTargetName] = true;
+    this._shouldProcessContentTargets = {
+      roms: uniqueContentTargetNames.includes("roms"),
+      media: {
+        global: uniqueContentTargetNames.includes("media"),
+        names: Object.fromEntries(
+          this._mediaNames.map((m) => [m, true]),
+        ) as Partial<MediaContent<boolean>>,
+      },
+      "es-de-gamelists": uniqueContentTargetNames.includes("es-de-gamelists"),
+    };
 
     this._skipFlags = {
       "content-targets": {
         roms: false,
-        media: false,
+        media: {
+          global: false,
+          names: Object.fromEntries(
+            this._mediaNames.map((m) => [m, false]),
+          ) as Partial<MediaContent<boolean>>,
+        },
         "es-de-gamelists": false,
       },
       consoles: Object.fromEntries(
@@ -214,7 +229,10 @@ class AlejandroG751JT implements Device, Debug {
     lists: async () => {
       logger.trace(`device.write.lists() starts for device ${this._name}.`);
 
-      if (this._shouldProcessContentTargets.roms) {
+      if (
+        this._shouldProcessContentTargets.roms &&
+        !this._skipFlags["content-targets"].roms
+      ) {
         const [consolesToSkip, writeError] = await writeRomsLists(
           this._paths,
           this._consoleNames,
@@ -230,7 +248,10 @@ class AlejandroG751JT implements Device, Debug {
           this._skipConsoleRoms(consoleName);
       }
 
-      if (this._shouldProcessContentTargets.media) {
+      if (
+        this._shouldProcessContentTargets.media.global &&
+        !this._skipFlags["content-targets"].media.global
+      ) {
         const projectDirs = getMediaListsProjectDirs(
           this._paths.dirs.project.lists["content-targets"].media,
           this._mediaNames,
@@ -282,6 +303,100 @@ class AlejandroG751JT implements Device, Debug {
           logger.warn(allDeviceDirsExistResult.error.toString());
           this._skipMediaContentTarget();
           return;
+        }
+
+        for (const mediaName of this._mediaNames) {
+          const shouldProcessFlag =
+            this._shouldProcessContentTargets.media.names[mediaName];
+
+          if (typeof shouldProcessFlag === "undefined") {
+            this._skipMediaNameContentTarget(mediaName);
+            continue;
+          }
+
+          const skipFlag =
+            this._skipFlags["content-targets"].media.names[mediaName];
+
+          if (typeof skipFlag === "undefined") {
+            this._skipMediaNameContentTarget(mediaName);
+            continue;
+          }
+
+          const projectMediaNameDirs =
+            this._paths.files.project.lists.media[mediaName];
+
+          if (!projectMediaNameDirs) {
+            this._skipMediaNameContentTarget(mediaName);
+            continue;
+          }
+
+          if (shouldProcessFlag && !skipFlag) {
+            for (const consoleName of this._consoleNames) {
+              const deviceConsoleMediaDirs =
+                this._paths.dirs["content-targets"].media.consoles[consoleName];
+
+              if (!deviceConsoleMediaDirs) {
+                this._skipConsoleMedia(consoleName);
+                continue;
+              }
+
+              const deviceConsoleMediaNameDir =
+                deviceConsoleMediaDirs.names[mediaName];
+
+              if (!deviceConsoleMediaNameDir) {
+                this._skipConsoleMediaName(consoleName, mediaName);
+                continue;
+              }
+
+              const projectConsoleMediaNameFile =
+                projectMediaNameDirs[consoleName];
+
+              if (!projectConsoleMediaNameFile) {
+                this._skipConsoleMediaName(consoleName, mediaName);
+                continue;
+              }
+
+              logger.debug(
+                deviceConsoleMediaNameDir,
+                projectConsoleMediaNameFile,
+              );
+
+              const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
+                deviceConsoleMediaNameDir,
+              );
+
+              if (lsError) {
+                this._skipConsoleMediaName(consoleName, mediaName);
+                continue;
+              }
+
+              const filenames = lsEntries.map((e) => e.name);
+
+              const [listFileHandle, listFileError] = await openFileForWriting(
+                projectConsoleMediaNameFile,
+                { overwrite: true },
+              );
+
+              if (listFileError) {
+                this._skipConsoleMediaName(consoleName, mediaName);
+                continue;
+              }
+
+              const writeLinesError = await writeLines(
+                listFileHandle,
+                filenames,
+                "utf8",
+              );
+
+              if (writeLinesError) {
+                await listFileHandle.close();
+                this._skipConsoleMediaName(consoleName, mediaName);
+                continue;
+              }
+
+              await listFileHandle.close();
+            }
+          }
         }
       }
     },
@@ -426,14 +541,46 @@ class AlejandroG751JT implements Device, Debug {
       this._skipFlags.consoles[consoleName].sync["content-targets"].roms = true;
   }
 
+  private _skipConsoleMedia(consoleName: ConsoleName) {
+    if (this._skipFlags.consoles[consoleName])
+      this._skipFlags.consoles[consoleName].sync[
+        "content-targets"
+      ].media.global = true;
+  }
+
+  private _skipConsoleMediaName(
+    consoleName: ConsoleName,
+    mediaName: MediaName,
+  ) {
+    if (this._skipFlags.consoles[consoleName]) {
+      if (
+        typeof this._skipFlags.consoles[consoleName].sync["content-targets"]
+          .media.names[mediaName] === "boolean"
+      )
+        this._skipFlags.consoles[consoleName].sync[
+          "content-targets"
+        ].media.names[mediaName] = false;
+    }
+  }
+
   private _skipRomsContentTarget() {
     this._skipFlags["content-targets"].roms = true;
-    this._shouldProcessContentTargets.roms = true;
+    this._shouldProcessContentTargets.roms = false;
   }
 
   private _skipMediaContentTarget() {
-    this._skipFlags["content-targets"].media = true;
-    this._shouldProcessContentTargets.roms = true;
+    this._skipFlags["content-targets"].media.global = true;
+    this._shouldProcessContentTargets.media.global = false;
+  }
+
+  private _skipMediaNameContentTarget(mediaName: MediaName) {
+    if (
+      typeof this._skipFlags["content-targets"].media.names[mediaName] ===
+      "boolean"
+    ) {
+      this._skipFlags["content-targets"].media.names[mediaName] = true;
+      this._shouldProcessContentTargets.media.names[mediaName] = false;
+    }
   }
 
   private _initAlejandroG751JTPaths(
