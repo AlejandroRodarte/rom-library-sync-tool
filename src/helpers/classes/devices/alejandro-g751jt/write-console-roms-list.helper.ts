@@ -41,6 +41,8 @@ const writeConsoleRomsList = async (
     await listFileHandle.close();
     return writeLinesError;
   }
+
+  await listFileHandle.close();
 };
 
 export default writeConsoleRomsList;
