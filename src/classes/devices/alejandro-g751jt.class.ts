@@ -355,8 +355,11 @@ class AlejandroG751JT implements Device, Debug {
   }
 
   private _skipConsoleGlobal(consoleName: ConsoleName) {
-    if (this._skipFlags.consoles[consoleName])
+    if (this._skipFlags.consoles[consoleName]) {
       this._skipFlags.consoles[consoleName].global = true;
+      this._skipFlags.consoles[consoleName].filter = true;
+      this._skipFlags.consoles[consoleName].sync.global = true;
+    }
   }
 
   private _skipConsoleRoms(consoleName: ConsoleName) {
