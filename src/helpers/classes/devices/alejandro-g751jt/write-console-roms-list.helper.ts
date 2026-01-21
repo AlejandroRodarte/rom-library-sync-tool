@@ -5,12 +5,12 @@ import writeLines from "../../../extras/fs/write-lines.helper.js";
 
 const writeConsoleRomsList = async (
   paths: {
-    device: string;
-    project: string;
+    deviceDir: string;
+    projectFile: string;
   },
   ls: FileIO["ls"],
 ) => {
-  const [lsEntries, lsError] = await ls(paths.device);
+  const [lsEntries, lsError] = await ls(paths.deviceDir);
 
   if (lsError) {
     logger.error(`${lsError.toString()}`, "Skipping this console.");
@@ -22,7 +22,7 @@ const writeConsoleRomsList = async (
     .filter((n) => n !== "systeminfo.txt" && n !== "metadata.txt");
 
   const [listFileHandle, listFileError] = await openFileForWriting(
-    paths.project,
+    paths.projectFile,
     { overwrite: true },
   );
 
