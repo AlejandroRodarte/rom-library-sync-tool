@@ -257,11 +257,21 @@ class AlejandroG751JT implements Device, Debug {
       logger.trace(`device.write.lists() starts for device ${this._name}.`);
 
       if (this._shouldProcessContentTargets.roms) {
-        await writeRomsLists(
+        const [consolesToSkip, writeError] = await writeRomsLists(
           this._paths,
           this._consoleNames,
           this._fileIOExtras,
         );
+
+        if (writeError) {
+          logger.error(
+            `${writeError.toString()}. Will skip ROMs content target as a whole.`,
+          );
+          return;
+        }
+
+        for (const consoleName of consolesToSkip)
+          this._skipConsoleRoms(consoleName);
       }
 
       logger.trace(`device.write.lists() ends for console ${this._name}.`);
@@ -412,17 +422,13 @@ class AlejandroG751JT implements Device, Debug {
   }
 
   private _skipConsoleGlobal(consoleName: ConsoleName) {
-    if (this._consoleSkipFlags[consoleName]) {
+    if (this._consoleSkipFlags[consoleName])
       this._consoleSkipFlags[consoleName].global = true;
-      this._consoleSkipFlags[consoleName].filter = true;
-      this._consoleSkipFlags[consoleName].sync.global = true;
+  }
+
+  private _skipConsoleRoms(consoleName: ConsoleName) {
+    if (this._consoleSkipFlags[consoleName])
       this._consoleSkipFlags[consoleName].sync["content-targets"].roms = true;
-      this._consoleSkipFlags[consoleName].sync["content-targets"].media.global =
-        true;
-      this._consoleSkipFlags[consoleName].sync["content-targets"][
-        "es-de-gamelists"
-      ] = true;
-    }
   }
 
   private _initAlejandroG751JTPaths(
