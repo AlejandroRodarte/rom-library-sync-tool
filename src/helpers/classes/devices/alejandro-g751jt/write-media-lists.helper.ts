@@ -1,6 +1,8 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import { type DirAccessItem as FileIODirAccessItem } from "../../../../classes/file-io/file-io-extras.class.js";
+import type { AlejandroG751JTMediaListsPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-paths.interface.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import type { WriteConsoleMediaNameListOperation } from "../../../../interfaces/write-console-media-name-list-operation.interface.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
@@ -22,42 +24,32 @@ const writeMediaLists = async (
   allMediaNames: MediaName[],
   fileIOExtras: FileIOExtras,
 ) => {
-  const items: {
+  const mediaPaths: AlejandroG751JTMediaListsPaths = {
     project: {
-      dirs: string[];
-    };
+      dirs: [],
+    },
     device: {
       base: {
-        dirs: string[];
-      };
-    };
-    ops: {
-      device: {
-        dir: string;
-      };
-      project: {
-        file: string;
-      };
-      names: {
-        console: ConsoleName;
-        media: MediaName;
-      };
-    }[];
-  } = { project: { dirs: [] }, device: { base: { dirs: [] } }, ops: [] };
+        dirs: [],
+      },
+    },
+  };
 
-  items.project.dirs.push(
+  const ops: WriteConsoleMediaNameListOperation[] = [];
+
+  mediaPaths.project.dirs.push(
     paths.dirs.project.base,
     paths.dirs.project.lists.base,
     paths.dirs.project.lists["content-targets"].media.base,
   );
 
-  items.device.base.dirs.push(paths.dirs["content-targets"].media.base);
+  mediaPaths.device.base.dirs.push(paths.dirs["content-targets"].media.base);
 
   for (const mediaName of allMediaNames) {
     const projectMediaNameDir =
       paths.dirs.project.lists["content-targets"].media.names[mediaName];
     if (!projectMediaNameDir) continue;
-    items.project.dirs.push(projectMediaNameDir);
+    mediaPaths.project.dirs.push(projectMediaNameDir);
   }
 
   for (const [, consoleData] of Object.entries(consolesData)) {
@@ -70,7 +62,7 @@ const writeMediaLists = async (
     if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths) continue;
 
     if (!deviceConsoleMediaDirPaths) continue;
-    items.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
+    mediaPaths.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
 
     for (const mediaName of consoleData["content-targets"].media.names) {
       const deviceConsoleMediaNameDir =
@@ -81,15 +73,17 @@ const writeMediaLists = async (
         projectConsoleMediaFilePaths[mediaName];
       if (!projectConsoleMediaNameFile) continue;
 
-      items.ops.push({
-        device: { dir: deviceConsoleMediaNameDir },
-        project: { file: projectConsoleMediaNameFile },
+      ops.push({
+        paths: {
+          device: { dir: deviceConsoleMediaNameDir },
+          project: { file: projectConsoleMediaNameFile },
+        },
         names: { console: consoleData.name, media: mediaName },
       });
     }
   }
 
-  const projectDirAccessItems: FsDirAccessItem[] = items.project.dirs.map(
+  const projectDirAccessItems: FsDirAccessItem[] = mediaPaths.project.dirs.map(
     (p) => ({
       type: "dir",
       path: p,
@@ -105,8 +99,8 @@ const writeMediaLists = async (
     return allProjectDirsExistResult.error;
 
   const deviceDirAccessItems: FileIODirAccessItem[] = [
-    ...items.device.base.dirs,
-    ...items.ops.map((o) => o.device.dir),
+    ...mediaPaths.device.base.dirs,
+    ...ops.map((o) => o.paths.device.dir),
   ].map((p) => ({
     type: "dir",
     path: p,
@@ -120,8 +114,10 @@ const writeMediaLists = async (
   if (!allDeviceDirsExistResult.allExist)
     return allProjectDirsExistResult.error;
 
-  for (const op of items.ops) {
-    const [lsEntries, lsError] = await fileIOExtras.fileIO.ls(op.device.dir);
+  for (const op of ops) {
+    const [lsEntries, lsError] = await fileIOExtras.fileIO.ls(
+      op.paths.device.dir,
+    );
 
     if (lsError) {
       // skipConsoleMediaName(op.names.console, op.names.media);
@@ -131,7 +127,7 @@ const writeMediaLists = async (
     const filenames = lsEntries.map((e) => e.name);
 
     const [listFileHandle, listFileError] = await openFileForWriting(
-      op.project.file,
+      op.paths.project.file,
       { overwrite: true },
     );
 
