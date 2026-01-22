@@ -252,19 +252,90 @@ class AlejandroG751JT implements Device, Debug {
         this._shouldProcessContentTargets.media.global &&
         !this._skipFlags["content-targets"].media.global
       ) {
-        const projectDirs = getMediaListsProjectDirs(
-          this._paths.dirs.project.lists["content-targets"].media,
-          this._mediaNames,
+        const items: {
+          project: {
+            dirs: string[];
+          };
+          device: {
+            base: {
+              dirs: string[];
+            };
+          };
+          ops: {
+            device: {
+              dir: string;
+            };
+            project: {
+              file: string;
+            };
+            names: {
+              console: ConsoleName;
+              media: MediaName;
+            };
+          }[];
+        } = { project: { dirs: [] }, device: { base: { dirs: [] } }, ops: [] };
+
+        items.project.dirs.push(
+          this._paths.dirs.project.base,
+          this._paths.dirs.project.lists.base,
+          this._paths.dirs.project.lists["content-targets"].media.base,
         );
 
-        const projectDirAccessItems: DirAccessItem[] = projectDirs.map((p) => ({
-          type: "dir",
-          path: p,
-          rights: "rw",
-        }));
+        items.device.base.dirs.push(
+          this._paths.dirs["content-targets"].media.base,
+        );
+
+        for (const mediaName of this._mediaNames) {
+          const projectMediaNameDir =
+            this._paths.dirs.project.lists["content-targets"].media.names[
+              mediaName
+            ];
+          if (!projectMediaNameDir) continue;
+          items.project.dirs.push(projectMediaNameDir);
+        }
+
+        for (const consoleName of this._consoleNames) {
+          const deviceConsoleMediaDirPaths =
+            this._paths.dirs["content-targets"].media.consoles[consoleName];
+
+          if (!deviceConsoleMediaDirPaths) continue;
+          items.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
+
+          for (const mediaName of this._mediaNames) {
+            const deviceConsoleMediaDirPaths =
+              this._paths.dirs["content-targets"].media.consoles[consoleName];
+            const projectMediaNameFilePaths =
+              this._paths.files.project.lists.media[mediaName];
+
+            if (!projectMediaNameFilePaths || !deviceConsoleMediaDirPaths)
+              continue;
+
+            const deviceConsoleMediaNameDir =
+              deviceConsoleMediaDirPaths.names[mediaName];
+            if (!deviceConsoleMediaNameDir) continue;
+
+            const projectConsoleMediaNameFile =
+              projectMediaNameFilePaths[consoleName];
+            if (!projectConsoleMediaNameFile) continue;
+
+            items.ops.push({
+              device: { dir: deviceConsoleMediaNameDir },
+              project: { file: projectConsoleMediaNameFile },
+              names: { console: consoleName, media: mediaName },
+            });
+          }
+        }
+
+        const projectDirAccessItems: DirAccessItem[] = items.project.dirs.map(
+          (p) => ({
+            type: "dir",
+            path: p,
+            rights: "rw",
+          }),
+        );
 
         const [allProjectDirsExistResult, allProjectDirsExistError] =
-          await allDirsExist(projectDirAccessItems);
+          await fsExtras.allDirsExist(projectDirAccessItems);
 
         if (allProjectDirsExistError) {
           logger.warn(allProjectDirsExistError.toString());
@@ -278,13 +349,10 @@ class AlejandroG751JT implements Device, Debug {
           return;
         }
 
-        const deviceDirs = getMediaListsDeviceDirs(
-          this._paths.dirs["content-targets"].media,
-          this._consoleNames,
-          this._mediaNames,
-        );
-
-        const deviceDirAccessItems: DirAccessItem[] = deviceDirs.map((p) => ({
+        const deviceDirAccessItems: DirAccessItem[] = [
+          ...items.device.base.dirs,
+          ...items.ops.map((o) => o.device.dir),
+        ].map((p) => ({
           type: "dir",
           path: p,
           rights: "r",
@@ -305,98 +373,41 @@ class AlejandroG751JT implements Device, Debug {
           return;
         }
 
-        for (const mediaName of this._mediaNames) {
-          const shouldProcessFlag =
-            this._shouldProcessContentTargets.media.names[mediaName];
+        for (const op of items.ops) {
+          const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
+            op.device.dir,
+          );
 
-          if (typeof shouldProcessFlag === "undefined") {
-            this._skipMediaNameContentTarget(mediaName);
+          if (lsError) {
+            this._skipConsoleMediaName(op.names.console, op.names.media);
             continue;
           }
 
-          const skipFlag =
-            this._skipFlags["content-targets"].media.names[mediaName];
+          const filenames = lsEntries.map((e) => e.name);
 
-          if (typeof skipFlag === "undefined") {
-            this._skipMediaNameContentTarget(mediaName);
+          const [listFileHandle, listFileError] = await openFileForWriting(
+            op.project.file,
+            { overwrite: true },
+          );
+
+          if (listFileError) {
+            this._skipConsoleMediaName(op.names.console, op.names.media);
             continue;
           }
 
-          const projectMediaNameDirs =
-            this._paths.files.project.lists.media[mediaName];
+          const writeLinesError = await writeLines(
+            listFileHandle,
+            filenames,
+            "utf8",
+          );
 
-          if (!projectMediaNameDirs) {
-            this._skipMediaNameContentTarget(mediaName);
+          if (writeLinesError) {
+            await listFileHandle.close();
+            this._skipConsoleMediaName(op.names.console, op.names.media);
             continue;
           }
 
-          if (shouldProcessFlag && !skipFlag) {
-            for (const consoleName of this._consoleNames) {
-              const deviceConsoleMediaDirs =
-                this._paths.dirs["content-targets"].media.consoles[consoleName];
-
-              if (!deviceConsoleMediaDirs) {
-                this._skipConsoleMedia(consoleName);
-                continue;
-              }
-
-              const deviceConsoleMediaNameDir =
-                deviceConsoleMediaDirs.names[mediaName];
-
-              if (!deviceConsoleMediaNameDir) {
-                this._skipConsoleMediaName(consoleName, mediaName);
-                continue;
-              }
-
-              const projectConsoleMediaNameFile =
-                projectMediaNameDirs[consoleName];
-
-              if (!projectConsoleMediaNameFile) {
-                this._skipConsoleMediaName(consoleName, mediaName);
-                continue;
-              }
-
-              logger.debug(
-                deviceConsoleMediaNameDir,
-                projectConsoleMediaNameFile,
-              );
-
-              const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
-                deviceConsoleMediaNameDir,
-              );
-
-              if (lsError) {
-                this._skipConsoleMediaName(consoleName, mediaName);
-                continue;
-              }
-
-              const filenames = lsEntries.map((e) => e.name);
-
-              const [listFileHandle, listFileError] = await openFileForWriting(
-                projectConsoleMediaNameFile,
-                { overwrite: true },
-              );
-
-              if (listFileError) {
-                this._skipConsoleMediaName(consoleName, mediaName);
-                continue;
-              }
-
-              const writeLinesError = await writeLines(
-                listFileHandle,
-                filenames,
-                "utf8",
-              );
-
-              if (writeLinesError) {
-                await listFileHandle.close();
-                this._skipConsoleMediaName(consoleName, mediaName);
-                continue;
-              }
-
-              await listFileHandle.close();
-            }
-          }
+          await listFileHandle.close();
         }
       }
     },
