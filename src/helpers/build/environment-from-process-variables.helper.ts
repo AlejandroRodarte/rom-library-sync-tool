@@ -3,7 +3,6 @@ import AppValidationError from "../../classes/errors/app-validation-error.class.
 import ALL_LOG_LEVELS from "../../constants/all-log-levels.constant.js";
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import DEVICE_NAMES from "../../constants/device-names.constant.js";
-import MEDIA_NAMES from "../../constants/media-names.constant.js";
 import MODE_NAMES from "../../constants/mode-names.constant.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
 import typeGuards from "../typescript/guards/index.js";
@@ -12,14 +11,14 @@ import isStringIpv4Address from "../validation/is-string-ipv4-address.helper.js"
 import consoleNamesFromConsolesList from "./console-names-from-consoles-list.helper.js";
 import deviceNamesFromDevicesList from "./device-names-from-devices-list.helper.js";
 import intersectStringArraySimple from "./intersect-string-array-simple.helper.js";
-import mediaNamesFromMediasList from "./media-names-from-medias-list.helper.js";
 import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
 import contentTargetNamesFromContentTargetsList from "./content-target-names-from-content-targets-list.helper.js";
 import FILE_IO_STRATEGIES from "../../constants/file-io-strategies.constant.js";
 import FILE_IO_FS_CRUD_STRATEGIES from "../../constants/file-io-fs-crud-strategies.constant.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
-import type { MediaName } from "../../types/media-name.type.js";
+import setConsolesDataMediaNamesFromStringPairs from "../mutate/set-consoles-data-media-names-from-string-pairs.helper.js";
+import type { ConsolesData } from "../../types/consoles-data.type.js";
 
 const environmentFromProcessVariables = (): Environment => {
   /*
@@ -250,6 +249,13 @@ const environmentFromProcessVariables = (): Environment => {
     alejandroG751JTListConsolesList,
   );
 
+  const alejandroG751JTListConsolesData: ConsolesData = {};
+  for (const consoleName of alejandroG751JTListConsoleNames)
+    alejandroG751JTListConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
+
   /*
    * ALEJANDRO_G751JT_DIFF_CONSOLES_LIST
    */
@@ -267,6 +273,13 @@ const environmentFromProcessVariables = (): Environment => {
   const alejandroG751JTDiffConsoleNames = consoleNamesFromConsolesList(
     alejandroG751JTDiffConsolesList,
   );
+
+  const alejandroG751JTDiffConsolesData: ConsolesData = {};
+  for (const consoleName of alejandroG751JTDiffConsoleNames)
+    alejandroG751JTDiffConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
 
   /*
    * ALEJANDRO_G751JT_SYNC_CONSOLES_LIST
@@ -286,59 +299,57 @@ const environmentFromProcessVariables = (): Environment => {
     alejandroG751JTSyncConsolesList,
   );
 
-  /*
-   * ALEJANDRO_G751JT_LIST_MEDIAS_LIST
-   */
-  const rawAlejandroG751JTListMediasList =
-    process.env.ALEJANDRO_G751JT_LIST_MEDIAS_LIST || "none";
-  const alejandroG751JTListMediasList = [
-    ...new Set(
-      rawAlejandroG751JTListMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(alejandroG751JTListMediasList))
-    throw new AppValidationError(
-      `${alejandroG751JTListMediasList} is an invalid list of medias. Please provide ALEJANDRO_G751JT_LIST_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
-    );
-  const alejandroG751JTListMediaNames = mediaNamesFromMediasList(
-    alejandroG751JTListMediasList,
-  );
+  const alejandroG751JTSyncConsolesData: ConsolesData = {};
+  for (const consoleName of alejandroG751JTSyncConsoleNames)
+    alejandroG751JTSyncConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
 
   /*
-   * ALEJANDRO_G751JT_DIFF_MEDIAS_LIST
+   * ALEJANDRO_G751JT_LIST_CONSOLES_MEDIAS_LISTS
    */
-  const rawAlejandroG751JTDiffMediasList =
-    process.env.ALEJANDRO_G751JT_DIFF_MEDIAS_LIST || "none";
-  const alejandroG751JTDiffMediasList = [
-    ...new Set(
-      rawAlejandroG751JTDiffMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(alejandroG751JTDiffMediasList))
-    throw new AppValidationError(
-      `${alejandroG751JTDiffMediasList} is an invalid list of medias. Please provide ALEJANDRO_G751JT_DIFF_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
+  const rawAlejandroG751JTListConsolesMediasLists =
+    process.env.ALEJANDRO_G751JT_LIST_CONSOLES_MEDIAS_LISTS || "none";
+  const alejandroG751JTListConsoleMediaPairs =
+    rawAlejandroG751JTListConsolesMediasLists.split(",").map((s) => s.trim());
+  const alejandroG751JTListConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      alejandroG751JTListConsolesData,
+      alejandroG751JTListConsoleMediaPairs,
     );
-  const alejandroG751JTDiffMediaNames = mediaNamesFromMediasList(
-    alejandroG751JTDiffMediasList,
-  );
+  if (alejandroG751JTListConsoleMediaPairsValidationError)
+    throw alejandroG751JTListConsoleMediaPairsValidationError;
 
   /*
-   * ALEJANDRO_G751JT_SYNC_MEDIAS_LIST
+   * ALEJANDRO_G751JT_DIFF_CONSOLES_MEDIAS_LISTS
    */
-  const rawAlejandroG751JTSyncMediasList =
-    process.env.ALEJANDRO_G751JT_SYNC_MEDIAS_LIST || "none";
-  const alejandroG751JTSyncMediasList = [
-    ...new Set(
-      rawAlejandroG751JTSyncMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(alejandroG751JTSyncMediasList))
-    throw new AppValidationError(
-      `${alejandroG751JTSyncMediasList} is an invalid list of medias. Please provide ALEJANDRO_G751JT_SYNC_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
+  const rawAlejandroG751JTDiffConsolesMediasLists =
+    process.env.ALEJANDRO_G751JT_DIFF_CONSOLES_MEDIAS_LISTS || "none";
+  const alejandroG751JTDiffConsoleMediaPairs =
+    rawAlejandroG751JTDiffConsolesMediasLists.split(",").map((s) => s.trim());
+  const alejandroG751JTDiffConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      alejandroG751JTDiffConsolesData,
+      alejandroG751JTDiffConsoleMediaPairs,
     );
-  const alejandroG751JTSyncMediaNames = mediaNamesFromMediasList(
-    alejandroG751JTSyncMediasList,
-  );
+  if (alejandroG751JTDiffConsoleMediaPairsValidationError)
+    throw alejandroG751JTDiffConsoleMediaPairsValidationError;
+
+  /*
+   * ALEJANDRO_G751JT_SYNC_CONSOLES_MEDIAS_LISTS
+   */
+  const rawAlejandroG751JTSyncConsolesMediasLists =
+    process.env.ALEJANDRO_G751JT_SYNC_CONSOLES_MEDIAS_LISTS || "none";
+  const alejandroG751JTSyncConsoleMediaPairs =
+    rawAlejandroG751JTSyncConsolesMediasLists.split(",").map((s) => s.trim());
+  const alejandroG751JTSyncConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      alejandroG751JTSyncConsolesData,
+      alejandroG751JTSyncConsoleMediaPairs,
+    );
+  if (alejandroG751JTSyncConsoleMediaPairsValidationError)
+    throw alejandroG751JTSyncConsoleMediaPairsValidationError;
 
   /*****
    * Device: steam-deck-lcd-alejandro
@@ -488,6 +499,13 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckLCDAlejandroListConsolesList,
   );
 
+  const steamDeckLCDAlejandroListConsolesData: ConsolesData = {};
+  for (const consoleName of steamDeckLCDAlejandroListConsoleNames)
+    steamDeckLCDAlejandroListConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
+
   /*
    * STEAM_DECK_LCD_ALEJANDRO_DIFF_CONSOLES_LIST
    */
@@ -505,6 +523,13 @@ const environmentFromProcessVariables = (): Environment => {
   const steamDeckLCDAlejandroDiffConsoleNames = consoleNamesFromConsolesList(
     steamDeckLCDAlejandroDiffConsolesList,
   );
+
+  const steamDeckLCDAlejandroDiffConsolesData: ConsolesData = {};
+  for (const consoleName of steamDeckLCDAlejandroDiffConsoleNames)
+    steamDeckLCDAlejandroDiffConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
 
   /*
    * STEAM_DECK_LCD_ALEJANDRO_SYNC_CONSOLES_LIST
@@ -524,59 +549,63 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckLCDAlejandroSyncConsolesList,
   );
 
-  /*
-   * STEAM_DECK_LCD_ALEJANDRO_LIST_MEDIAS_LIST
-   */
-  const rawSteamDeckLCDAlejandroListMediasList =
-    process.env.STEAM_DECK_LCD_ALEJANDRO_LIST_MEDIAS_LIST || "none";
-  const steamDeckLCDAlejandroListMediasList = [
-    ...new Set(
-      rawSteamDeckLCDAlejandroListMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(steamDeckLCDAlejandroListMediasList))
-    throw new AppValidationError(
-      `${steamDeckLCDAlejandroListMediasList} is an invalid list of medias. Please provide STEAM_DECK_LCD_ALEJANDRO_LIST_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
-    );
-  const steamDeckLCDAlejandroListMediaNames = mediaNamesFromMediasList(
-    steamDeckLCDAlejandroListMediasList,
-  );
+  const steamDeckLCDAlejandroSyncConsolesData: ConsolesData = {};
+  for (const consoleName of steamDeckLCDAlejandroSyncConsoleNames)
+    steamDeckLCDAlejandroSyncConsolesData[consoleName] = {
+      name: consoleName,
+      "content-targets": { media: { names: [] } },
+    };
 
   /*
-   * STEAM_DECK_LCD_ALEJANDRO_DIFF_MEDIAS_LIST
+   * STEAM_DECK_LCD_ALEJANDRO_LIST_CONSOLES_MEDIAS_LISTS
    */
-  const rawSteamDeckLCDAlejandroDiffMediasList =
-    process.env.STEAM_DECK_LCD_ALEJANDRO_DIFF_MEDIAS_LIST || "none";
-  const steamDeckLCDAlejandroDiffMediasList = [
-    ...new Set(
-      rawSteamDeckLCDAlejandroDiffMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(steamDeckLCDAlejandroDiffMediasList))
-    throw new AppValidationError(
-      `${steamDeckLCDAlejandroDiffMediasList} is an invalid list of medias. Please provide STEAM_DECK_LCD_ALEJANDRO_DIFF_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
+  const rawSteamDeckLCDAlejandroListConsolesMediasLists =
+    process.env.STEAM_DECK_LCD_ALEJANDRO_LIST_CONSOLES_MEDIAS_LISTS || "none";
+  const steamDeckLCDAlejandroListConsoleMediaPairs =
+    rawSteamDeckLCDAlejandroListConsolesMediasLists
+      .split(",")
+      .map((s) => s.trim());
+  const steamDeckLCDAlejandroListConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      steamDeckLCDAlejandroListConsolesData,
+      steamDeckLCDAlejandroListConsoleMediaPairs,
     );
-  const steamDeckLCDAlejandroDiffMediaNames = mediaNamesFromMediasList(
-    steamDeckLCDAlejandroDiffMediasList,
-  );
+  if (steamDeckLCDAlejandroListConsoleMediaPairsValidationError)
+    throw steamDeckLCDAlejandroListConsoleMediaPairsValidationError;
 
   /*
-   * STEAM_DECK_LCD_ALEJANDRO_SYNC_MEDIAS_LIST
+   * STEAM_DECK_LCD_ALEJANDRO_DIFF_CONSOLES_MEDIAS_LISTS
    */
-  const rawSteamDeckLCDAlejandroSyncMediasList =
-    process.env.STEAM_DECK_LCD_ALEJANDRO_SYNC_MEDIAS_LIST || "none";
-  const steamDeckLCDAlejandroSyncMediasList = [
-    ...new Set(
-      rawSteamDeckLCDAlejandroSyncMediasList.split(",").map((s) => s.trim()),
-    ),
-  ];
-  if (!typeGuards.isMediasList(steamDeckLCDAlejandroSyncMediasList))
-    throw new AppValidationError(
-      `${steamDeckLCDAlejandroSyncMediasList} is an invalid list of medias. Please provide STEAM_DECK_LCD_ALEJANDRO_SYNC_MEDIAS_LIST a comma-separated list of valid medias: ${MEDIA_NAMES.join(", ")}. For convenience, use either "none" or "all" to select none or all medias respectively.`,
+  const rawSteamDeckLCDAlejandroDiffConsolesMediasLists =
+    process.env.STEAM_DECK_LCD_ALEJANDRO_DIFF_CONSOLES_MEDIAS_LISTS || "none";
+  const steamDeckLCDAlejandroDiffConsoleMediaPairs =
+    rawSteamDeckLCDAlejandroDiffConsolesMediasLists
+      .split(",")
+      .map((s) => s.trim());
+  const steamDeckLCDAlejandroDiffConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      steamDeckLCDAlejandroDiffConsolesData,
+      steamDeckLCDAlejandroDiffConsoleMediaPairs,
     );
-  const steamDeckLCDAlejandroSyncMediaNames = mediaNamesFromMediasList(
-    steamDeckLCDAlejandroSyncMediasList,
-  );
+  if (steamDeckLCDAlejandroDiffConsoleMediaPairsValidationError)
+    throw steamDeckLCDAlejandroDiffConsoleMediaPairsValidationError;
+
+  /*
+   * STEAM_DECK_LCD_ALEJANDRO_SYNC_CONSOLES_MEDIAS_LISTS
+   */
+  const rawSteamDeckLCDAlejandroSyncConsolesMediasLists =
+    process.env.STEAM_DECK_LCD_ALEJANDRO_SYNC_CONSOLES_MEDIAS_LISTS || "none";
+  const steamDeckLCDAlejandroSyncConsoleMediaPairs =
+    rawSteamDeckLCDAlejandroSyncConsolesMediasLists
+      .split(",")
+      .map((s) => s.trim());
+  const steamDeckLCDAlejandroSyncConsoleMediaPairsValidationError =
+    setConsolesDataMediaNamesFromStringPairs(
+      steamDeckLCDAlejandroSyncConsolesData,
+      steamDeckLCDAlejandroSyncConsoleMediaPairs,
+    );
+  if (steamDeckLCDAlejandroSyncConsoleMediaPairsValidationError)
+    throw steamDeckLCDAlejandroSyncConsoleMediaPairsValidationError;
 
   /*
    * Computed Environment Variables
@@ -625,33 +654,25 @@ const environmentFromProcessVariables = (): Environment => {
   }
 
   /*
-   * Filtered device's console and media names depending on mode
+   * Filtered device's console names, depending on mode
    */
   let alejandroG751JTConsoleNames: ConsoleName[];
-  let alejandroG751JTMediaNames: MediaName[];
   let steamDeckLCDAlejandroConsoleNames: ConsoleName[];
-  let steamDeckLCDAlejandroMediaNames: MediaName[];
 
   switch (mode) {
     case "diff": {
       alejandroG751JTConsoleNames = alejandroG751JTDiffConsoleNames;
-      alejandroG751JTMediaNames = alejandroG751JTDiffMediaNames;
       steamDeckLCDAlejandroConsoleNames = steamDeckLCDAlejandroDiffConsoleNames;
-      steamDeckLCDAlejandroMediaNames = steamDeckLCDAlejandroDiffMediaNames;
       break;
     }
     case "list": {
       alejandroG751JTConsoleNames = alejandroG751JTListConsoleNames;
-      alejandroG751JTMediaNames = alejandroG751JTListMediaNames;
       steamDeckLCDAlejandroConsoleNames = steamDeckLCDAlejandroListConsoleNames;
-      steamDeckLCDAlejandroMediaNames = steamDeckLCDAlejandroListMediaNames;
       break;
     }
     case "sync": {
       alejandroG751JTConsoleNames = alejandroG751JTSyncConsoleNames;
-      alejandroG751JTMediaNames = alejandroG751JTSyncMediaNames;
       steamDeckLCDAlejandroConsoleNames = steamDeckLCDAlejandroSyncConsoleNames;
-      steamDeckLCDAlejandroMediaNames = steamDeckLCDAlejandroSyncMediaNames;
       break;
     }
     case "diff-sync": {
@@ -659,17 +680,9 @@ const environmentFromProcessVariables = (): Environment => {
         alejandroG751JTDiffConsoleNames,
         alejandroG751JTSyncConsoleNames,
       );
-      alejandroG751JTMediaNames = intersectStringArraySimple(
-        alejandroG751JTDiffMediaNames,
-        alejandroG751JTSyncMediaNames,
-      );
       steamDeckLCDAlejandroConsoleNames = intersectStringArraySimple(
         steamDeckLCDAlejandroDiffConsoleNames,
         steamDeckLCDAlejandroSyncConsoleNames,
-      );
-      steamDeckLCDAlejandroMediaNames = intersectStringArraySimple(
-        steamDeckLCDAlejandroDiffMediaNames,
-        steamDeckLCDAlejandroSyncMediaNames,
       );
       break;
     }
@@ -678,17 +691,9 @@ const environmentFromProcessVariables = (): Environment => {
         alejandroG751JTSyncConsoleNames,
         alejandroG751JTListConsoleNames,
       );
-      alejandroG751JTMediaNames = intersectStringArraySimple(
-        alejandroG751JTSyncMediaNames,
-        alejandroG751JTListMediaNames,
-      );
       steamDeckLCDAlejandroConsoleNames = intersectStringArraySimple(
         steamDeckLCDAlejandroSyncConsoleNames,
         steamDeckLCDAlejandroListConsoleNames,
-      );
-      steamDeckLCDAlejandroMediaNames = intersectStringArraySimple(
-        steamDeckLCDAlejandroSyncMediaNames,
-        steamDeckLCDAlejandroListMediaNames,
       );
       break;
     }
@@ -701,13 +706,6 @@ const environmentFromProcessVariables = (): Environment => {
           alejandroG751JTListConsoleNames,
         ),
       );
-      alejandroG751JTMediaNames = intersectStringArraySimple(
-        alejandroG751JTDiffMediaNames,
-        intersectStringArraySimple(
-          alejandroG751JTSyncMediaNames,
-          alejandroG751JTListMediaNames,
-        ),
-      );
       steamDeckLCDAlejandroConsoleNames = intersectStringArraySimple(
         steamDeckLCDAlejandroDiffConsoleNames,
         intersectStringArraySimple(
@@ -715,14 +713,256 @@ const environmentFromProcessVariables = (): Environment => {
           steamDeckLCDAlejandroListConsoleNames,
         ),
       );
-      steamDeckLCDAlejandroMediaNames = intersectStringArraySimple(
-        steamDeckLCDAlejandroDiffMediaNames,
-        intersectStringArraySimple(
-          steamDeckLCDAlejandroSyncMediaNames,
-          steamDeckLCDAlejandroListMediaNames,
-        ),
-      );
       break;
+    }
+  }
+
+  /*
+   * Intersected consoles data, depending on mode
+   */
+  const alejandroG751JTConsolesData: ConsolesData = {};
+  for (const consoleName of alejandroG751JTConsoleNames) {
+    switch (mode) {
+      case "diff": {
+        if (!alejandroG751JTDiffConsolesData[consoleName]) continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                alejandroG751JTDiffConsolesData[consoleName]["content-targets"]
+                  .media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "list": {
+        if (!alejandroG751JTListConsolesData[consoleName]) continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                alejandroG751JTListConsolesData[consoleName]["content-targets"]
+                  .media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "sync": {
+        if (!alejandroG751JTSyncConsolesData[consoleName]) continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                alejandroG751JTSyncConsolesData[consoleName]["content-targets"]
+                  .media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "diff-sync": {
+        if (
+          !alejandroG751JTDiffConsolesData[consoleName] ||
+          !alejandroG751JTSyncConsolesData[consoleName]
+        )
+          continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                alejandroG751JTDiffConsolesData[consoleName]["content-targets"]
+                  .media.names,
+                alejandroG751JTSyncConsolesData[consoleName]["content-targets"]
+                  .media.names,
+              ),
+            },
+          },
+        };
+        break;
+      }
+      case "sync-list": {
+        if (
+          !alejandroG751JTSyncConsolesData[consoleName] ||
+          !alejandroG751JTListConsolesData[consoleName]
+        )
+          continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                alejandroG751JTSyncConsolesData[consoleName]["content-targets"]
+                  .media.names,
+                alejandroG751JTListConsolesData[consoleName]["content-targets"]
+                  .media.names,
+              ),
+            },
+          },
+        };
+        break;
+      }
+      case "diff-sync-list":
+      case "list-diff-sync-list": {
+        if (
+          !alejandroG751JTListConsolesData[consoleName] ||
+          !alejandroG751JTDiffConsolesData[consoleName] ||
+          !alejandroG751JTSyncConsolesData[consoleName]
+        )
+          continue;
+        alejandroG751JTConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                alejandroG751JTListConsolesData[consoleName]["content-targets"]
+                  .media.names,
+                intersectStringArraySimple(
+                  alejandroG751JTDiffConsolesData[consoleName][
+                    "content-targets"
+                  ].media.names,
+                  alejandroG751JTSyncConsolesData[consoleName][
+                    "content-targets"
+                  ].media.names,
+                ),
+              ),
+            },
+          },
+        };
+        break;
+      }
+    }
+  }
+
+  const steamDeckLCDAlejandroConsolesData: ConsolesData = {};
+  for (const consoleName of steamDeckLCDAlejandroConsoleNames) {
+    switch (mode) {
+      case "diff": {
+        if (!steamDeckLCDAlejandroDiffConsolesData[consoleName]) continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                steamDeckLCDAlejandroDiffConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "list": {
+        if (!steamDeckLCDAlejandroListConsolesData[consoleName]) continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                steamDeckLCDAlejandroListConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "sync": {
+        if (!steamDeckLCDAlejandroSyncConsolesData[consoleName]) continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names:
+                steamDeckLCDAlejandroSyncConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+            },
+          },
+        };
+        break;
+      }
+      case "diff-sync": {
+        if (
+          !steamDeckLCDAlejandroDiffConsolesData[consoleName] ||
+          !steamDeckLCDAlejandroSyncConsolesData[consoleName]
+        )
+          continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                steamDeckLCDAlejandroDiffConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+                steamDeckLCDAlejandroSyncConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+              ),
+            },
+          },
+        };
+        break;
+      }
+      case "sync-list": {
+        if (
+          !steamDeckLCDAlejandroSyncConsolesData[consoleName] ||
+          !steamDeckLCDAlejandroListConsolesData[consoleName]
+        )
+          continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                steamDeckLCDAlejandroSyncConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+                steamDeckLCDAlejandroListConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+              ),
+            },
+          },
+        };
+        break;
+      }
+      case "diff-sync-list":
+      case "list-diff-sync-list": {
+        if (
+          !steamDeckLCDAlejandroListConsolesData[consoleName] ||
+          !steamDeckLCDAlejandroDiffConsolesData[consoleName] ||
+          !steamDeckLCDAlejandroSyncConsolesData[consoleName]
+        )
+          continue;
+        steamDeckLCDAlejandroConsolesData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: intersectStringArraySimple(
+                steamDeckLCDAlejandroListConsolesData[consoleName][
+                  "content-targets"
+                ].media.names,
+                intersectStringArraySimple(
+                  steamDeckLCDAlejandroDiffConsolesData[consoleName][
+                    "content-targets"
+                  ].media.names,
+                  steamDeckLCDAlejandroSyncConsolesData[consoleName][
+                    "content-targets"
+                  ].media.names,
+                ),
+              ),
+            },
+          },
+        };
+        break;
+      }
     }
   }
 
@@ -747,12 +987,7 @@ const environmentFromProcessVariables = (): Environment => {
       names: deviceNames,
       data: {
         "alejandro-g751jt": {
-          console: {
-            names: alejandroG751JTConsoleNames,
-          },
-          media: {
-            names: alejandroG751JTMediaNames,
-          },
+          consoles: alejandroG751JTConsolesData,
           "content-targets": {
             names: alejandroG751JTContentTargetNames,
             paths: {
@@ -782,12 +1017,7 @@ const environmentFromProcessVariables = (): Environment => {
           },
         },
         "steam-deck-lcd-alejandro": {
-          console: {
-            names: steamDeckLCDAlejandroConsoleNames,
-          },
-          media: {
-            names: steamDeckLCDAlejandroMediaNames,
-          },
+          consoles: steamDeckLCDAlejandroConsolesData,
           "content-targets": {
             names: steamDeckLCDAlejandroContentTargetNames,
             paths: {

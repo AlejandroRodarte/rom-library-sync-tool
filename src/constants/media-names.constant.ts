@@ -4,6 +4,7 @@ const MEDIA_NAMES = [
   "covers",
   "manuals",
   "marquees",
+  "miximages",
   "physicalmedia",
   "screenshots",
   "titlescreens",

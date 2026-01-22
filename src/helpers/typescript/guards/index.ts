@@ -21,6 +21,7 @@ import isContentTargetsListItem from "./is-content-targets-list-item.helper.js";
 import isContentTargetsList from "./is-content-targets-list.helper.js";
 import isFileIOStrategy from "./is-file-io-strategy.helper.js";
 import isFileIOFsCrudStrategy from "./is-file-io-fs-crud-strategy.helper.js";
+import isConsolesListItemOrRest from "./is-consoles-list-item-or-rest.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -46,6 +47,7 @@ const typeGuards = {
   isContentTargetList,
   isContentTargetsListItem,
   isContentTargetsList,
+  isConsolesListItemOrRest,
 };
 
 export default typeGuards;

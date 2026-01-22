@@ -22,7 +22,6 @@ import type { AlejandroG751JTConsolesSkipFlags } from "../../interfaces/devices/
 import type { MediaName } from "../../types/media-name.type.js";
 import type { MediaContent } from "../../types/media-content.type.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
-import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
 import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
@@ -37,12 +36,11 @@ import titlesFromRomsDirPath from "../../helpers/build/titles-from-roms-dir-path
 import allDirsExist from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write-roms-lists.helper.js";
 import type { AlejandroG751JTSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-skip-flags.interface.js";
-import getMediaListsProjectDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-project-dirs.helper.js";
-import getMediaListsDeviceDirs from "../../helpers/classes/devices/alejandro-g751jt/get-media-lists-device-dirs.helper.js";
 import type { ContentTargetName } from "../../types/content-target-name.type.js";
 import type { AlejandroG751JTShouldProcessContentTargetFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-should-process-content-targets-flags.interface.js";
 import openFileForWriting from "../../helpers/extras/fs/open-file-for-writing.helper.js";
 import writeLines from "../../helpers/extras/fs/write-lines.helper.js";
+import type { ConsolesData } from "../../types/consoles-data.type.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -71,12 +69,12 @@ class AlejandroG751JT implements Device, Debug {
   private _paths: AlejandroG751JTPaths;
 
   private _consoles: Consoles;
+  private _consolesData: ConsolesData;
   private _consoleNames: ConsoleName[];
 
+  private _allMediaNames: MediaName[];
+
   private _skipFlags: AlejandroG751JTSkipFlags;
-
-  private _mediaNames: MediaName[];
-
   private _fileIOExtras: FileIOExtras;
 
   private _shouldProcessContentTargets: {
@@ -87,11 +85,10 @@ class AlejandroG751JT implements Device, Debug {
     envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT],
     fileIO: FileIO,
   ) {
-    const uniqueConsoleNames = [...new Set(envData.console.names)];
-    this._consoleNames = uniqueConsoleNames;
-
-    const uniqueMediaNames = [...new Set(envData.media.names)];
-    this._mediaNames = uniqueMediaNames;
+    this._consolesData = envData.consoles;
+    this._consoleNames = Object.entries(this._consolesData).map(
+      ([, c]) => c.name,
+    );
 
     this._fileIOExtras = new FileIOExtras(fileIO);
 
@@ -99,12 +96,20 @@ class AlejandroG751JT implements Device, Debug {
       ...new Set(envData["content-targets"].names),
     ];
 
+    const allMediaNames = new Set<MediaName>();
+    for (const [, consoleData] of Object.entries(this._consolesData)) {
+      for (const mediaName of consoleData["content-targets"].media.names)
+        if (!allMediaNames.has(mediaName)) allMediaNames.add(mediaName);
+    }
+
+    this._allMediaNames = [...allMediaNames];
+
     this._shouldProcessContentTargets = {
       roms: uniqueContentTargetNames.includes("roms"),
       media: {
         global: uniqueContentTargetNames.includes("media"),
         names: Object.fromEntries(
-          this._mediaNames.map((m) => [m, true]),
+          this._allMediaNames.map((m) => [m, true]),
         ) as Partial<MediaContent<boolean>>,
       },
       "es-de-gamelists": uniqueContentTargetNames.includes("es-de-gamelists"),
@@ -116,14 +121,14 @@ class AlejandroG751JT implements Device, Debug {
         media: {
           global: false,
           names: Object.fromEntries(
-            this._mediaNames.map((m) => [m, false]),
+            this._allMediaNames.map((m) => [m, false]),
           ) as Partial<MediaContent<boolean>>,
         },
         "es-de-gamelists": false,
       },
       consoles: Object.fromEntries(
-        this._consoleNames.map((c) => [
-          c,
+        Object.entries(this._consolesData).map(([, c]) => [
+          c.name,
           {
             global: false,
             filter: false,
@@ -134,7 +139,7 @@ class AlejandroG751JT implements Device, Debug {
                 media: {
                   global: false,
                   names: Object.fromEntries(
-                    this._mediaNames.map((m) => [m, false]),
+                    c["content-targets"].media.names.map((m) => [m, false]),
                   ) as Partial<MediaContent<boolean>>,
                 },
                 "es-de-gamelists": false,
@@ -285,7 +290,7 @@ class AlejandroG751JT implements Device, Debug {
           this._paths.dirs["content-targets"].media.base,
         );
 
-        for (const mediaName of this._mediaNames) {
+        for (const mediaName of this._allMediaNames) {
           const projectMediaNameDir =
             this._paths.dirs.project.lists["content-targets"].media.names[
               mediaName
@@ -294,34 +299,34 @@ class AlejandroG751JT implements Device, Debug {
           items.project.dirs.push(projectMediaNameDir);
         }
 
-        for (const consoleName of this._consoleNames) {
+        for (const [, consoleData] of Object.entries(this._consolesData)) {
           const deviceConsoleMediaDirPaths =
-            this._paths.dirs["content-targets"].media.consoles[consoleName];
+            this._paths.dirs["content-targets"].media.consoles[
+              consoleData.name
+            ];
+
+          const projectConsoleMediaFilePaths =
+            this._paths.files.project.lists.media.consoles[consoleData.name];
+
+          if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths)
+            continue;
 
           if (!deviceConsoleMediaDirPaths) continue;
           items.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
 
-          for (const mediaName of this._mediaNames) {
-            const deviceConsoleMediaDirPaths =
-              this._paths.dirs["content-targets"].media.consoles[consoleName];
-            const projectMediaNameFilePaths =
-              this._paths.files.project.lists.media[mediaName];
-
-            if (!projectMediaNameFilePaths || !deviceConsoleMediaDirPaths)
-              continue;
-
+          for (const mediaName of consoleData["content-targets"].media.names) {
             const deviceConsoleMediaNameDir =
               deviceConsoleMediaDirPaths.names[mediaName];
             if (!deviceConsoleMediaNameDir) continue;
 
             const projectConsoleMediaNameFile =
-              projectMediaNameFilePaths[consoleName];
+              projectConsoleMediaFilePaths[mediaName];
             if (!projectConsoleMediaNameFile) continue;
 
             items.ops.push({
               device: { dir: deviceConsoleMediaNameDir },
               project: { file: projectConsoleMediaNameFile },
-              names: { console: consoleName, media: mediaName },
+              names: { console: consoleData.name, media: mediaName },
             });
           }
         }
@@ -372,6 +377,11 @@ class AlejandroG751JT implements Device, Debug {
           this._skipMediaContentTarget();
           return;
         }
+
+        logger.debug(...items.project.dirs);
+        logger.debug(...items.device.base.dirs);
+        logger.debug(...items.ops.map((o) => o.device.dir));
+        logger.debug(...items.ops.map((o) => o.project.file));
 
         for (const op of items.ops) {
           const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
@@ -439,7 +449,11 @@ class AlejandroG751JT implements Device, Debug {
     content += `name: ${this._name}, `;
     content += `content-targets: ${CONTENT_TARGET_NAMES.filter((c) => this._shouldProcessContentTargets[c] === true).join(", ")}, `;
     content += `console-names: ${this._consoleNames.join(",")}, `;
-    content += `media-names: ${this._mediaNames.join(", ")} `;
+    content += `all-media-names: ${this._allMediaNames.join(", ")}, `;
+
+    for (const [, consoleData] of Object.entries(this._consolesData))
+      content += `${consoleData.name}-media-names: ${consoleData["content-targets"].media.names.join(", ")} `;
+
     content += "}";
 
     return content;
@@ -627,7 +641,7 @@ class AlejandroG751JT implements Device, Debug {
               media: {
                 base: mediaListsDirPath,
                 names: Object.fromEntries(
-                  this._mediaNames.map((m) => [
+                  this._allMediaNames.map((m) => [
                     m,
                     path.join(mediaListsDirPath, m),
                   ]),
@@ -642,7 +656,7 @@ class AlejandroG751JT implements Device, Debug {
               media: {
                 base: mediaDiffsDirPath,
                 names: Object.fromEntries(
-                  this._mediaNames.map((m) => [
+                  this._allMediaNames.map((m) => [
                     m,
                     path.join(mediaDiffsDirPath, m),
                   ]),
@@ -657,7 +671,7 @@ class AlejandroG751JT implements Device, Debug {
               media: {
                 base: mediaFailedDirPath,
                 names: Object.fromEntries(
-                  this._mediaNames.map((m) => [
+                  this._allMediaNames.map((m) => [
                     m,
                     path.join(mediaFailedDirPath, m),
                   ]),
@@ -679,14 +693,14 @@ class AlejandroG751JT implements Device, Debug {
           media: {
             base: contentTargetPaths.media,
             consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [
-                c,
+              Object.entries(this._consolesData).map(([, c]) => [
+                c.name,
                 {
-                  base: path.join(contentTargetPaths.media, c),
+                  base: path.join(contentTargetPaths.media, c.name),
                   names: Object.fromEntries(
-                    this._mediaNames.map((m) => [
+                    c["content-targets"].media.names.map((m) => [
                       m,
-                      path.join(contentTargetPaths.media, c, m),
+                      path.join(contentTargetPaths.media, c.name, m),
                     ]),
                   ) as Partial<MediaPaths>,
                 },
@@ -721,17 +735,19 @@ class AlejandroG751JT implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
-            media: Object.fromEntries(
-              this._mediaNames.map((m) => [
-                m,
-                Object.fromEntries(
-                  this._consoleNames.map((c) => [
-                    c,
-                    path.join(mediaListsDirPath, m, `${c}.list.txt`),
-                  ]),
-                ) as Partial<ConsolePaths>,
-              ]),
-            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
+            media: {
+              consoles: Object.fromEntries(
+                Object.entries(this._consolesData).map(([, c]) => [
+                  c.name,
+                  Object.fromEntries(
+                    c["content-targets"].media.names.map((m) => [
+                      m,
+                      path.join(mediaListsDirPath, m, `${c.name}.list.txt`),
+                    ]),
+                  ) as Partial<MediaPaths>,
+                ]),
+              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
+            },
           },
           diffs: {
             roms: {
@@ -742,17 +758,19 @@ class AlejandroG751JT implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
-            media: Object.fromEntries(
-              this._mediaNames.map((m) => [
-                m,
-                Object.fromEntries(
-                  this._consoleNames.map((c) => [
-                    c,
-                    path.join(mediaDiffsDirPath, m, `${c}.diff.txt`),
-                  ]),
-                ) as Partial<ConsolePaths>,
-              ]),
-            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
+            media: {
+              consoles: Object.fromEntries(
+                Object.entries(this._consolesData).map(([, c]) => [
+                  c.name,
+                  Object.fromEntries(
+                    c["content-targets"].media.names.map((m) => [
+                      m,
+                      path.join(mediaDiffsDirPath, m, `${c.name}.diff.txt`),
+                    ]),
+                  ) as Partial<MediaPaths>,
+                ]),
+              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
+            },
           },
           failed: {
             roms: {
@@ -763,17 +781,19 @@ class AlejandroG751JT implements Device, Debug {
                 ]),
               ) as Partial<ConsolePaths>,
             },
-            media: Object.fromEntries(
-              this._mediaNames.map((m) => [
-                m,
-                Object.fromEntries(
-                  this._consoleNames.map((c) => [
-                    c,
-                    path.join(mediaFailedDirPath, m, `${c}.failed.txt`),
-                  ]),
-                ) as Partial<ConsolePaths>,
-              ]),
-            ) as Partial<MediaContent<Partial<ConsolePaths>>>,
+            media: {
+              consoles: Object.fromEntries(
+                Object.entries(this._consolesData).map(([, c]) => [
+                  c.name,
+                  Object.fromEntries(
+                    c["content-targets"].media.names.map((m) => [
+                      m,
+                      path.join(mediaFailedDirPath, m, `${c.name}.failed.txt`),
+                    ]),
+                  ) as Partial<MediaPaths>,
+                ]),
+              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
+            },
           },
         },
         "content-targets": {
