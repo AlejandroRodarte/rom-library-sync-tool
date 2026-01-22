@@ -41,6 +41,7 @@ import type { AlejandroG751JTShouldProcessContentTargetFlags } from "../../inter
 import openFileForWriting from "../../helpers/extras/fs/open-file-for-writing.helper.js";
 import writeLines from "../../helpers/extras/fs/write-lines.helper.js";
 import type { ConsolesData } from "../../types/consoles-data.type.js";
+import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/write-media-lists.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -257,168 +258,12 @@ class AlejandroG751JT implements Device, Debug {
         this._shouldProcessContentTargets.media.global &&
         !this._skipFlags["content-targets"].media.global
       ) {
-        const items: {
-          project: {
-            dirs: string[];
-          };
-          device: {
-            base: {
-              dirs: string[];
-            };
-          };
-          ops: {
-            device: {
-              dir: string;
-            };
-            project: {
-              file: string;
-            };
-            names: {
-              console: ConsoleName;
-              media: MediaName;
-            };
-          }[];
-        } = { project: { dirs: [] }, device: { base: { dirs: [] } }, ops: [] };
-
-        items.project.dirs.push(
-          this._paths.dirs.project.base,
-          this._paths.dirs.project.lists.base,
-          this._paths.dirs.project.lists["content-targets"].media.base,
+        await writeMediaLists(
+          this._paths,
+          this._consolesData,
+          this._allMediaNames,
+          this._fileIOExtras,
         );
-
-        items.device.base.dirs.push(
-          this._paths.dirs["content-targets"].media.base,
-        );
-
-        for (const mediaName of this._allMediaNames) {
-          const projectMediaNameDir =
-            this._paths.dirs.project.lists["content-targets"].media.names[
-              mediaName
-            ];
-          if (!projectMediaNameDir) continue;
-          items.project.dirs.push(projectMediaNameDir);
-        }
-
-        for (const [, consoleData] of Object.entries(this._consolesData)) {
-          const deviceConsoleMediaDirPaths =
-            this._paths.dirs["content-targets"].media.consoles[
-              consoleData.name
-            ];
-
-          const projectConsoleMediaFilePaths =
-            this._paths.files.project.lists.media.consoles[consoleData.name];
-
-          if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths)
-            continue;
-
-          if (!deviceConsoleMediaDirPaths) continue;
-          items.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
-
-          for (const mediaName of consoleData["content-targets"].media.names) {
-            const deviceConsoleMediaNameDir =
-              deviceConsoleMediaDirPaths.names[mediaName];
-            if (!deviceConsoleMediaNameDir) continue;
-
-            const projectConsoleMediaNameFile =
-              projectConsoleMediaFilePaths[mediaName];
-            if (!projectConsoleMediaNameFile) continue;
-
-            items.ops.push({
-              device: { dir: deviceConsoleMediaNameDir },
-              project: { file: projectConsoleMediaNameFile },
-              names: { console: consoleData.name, media: mediaName },
-            });
-          }
-        }
-
-        const projectDirAccessItems: DirAccessItem[] = items.project.dirs.map(
-          (p) => ({
-            type: "dir",
-            path: p,
-            rights: "rw",
-          }),
-        );
-
-        const [allProjectDirsExistResult, allProjectDirsExistError] =
-          await fsExtras.allDirsExist(projectDirAccessItems);
-
-        if (allProjectDirsExistError) {
-          logger.warn(allProjectDirsExistError.toString());
-          this._skipMediaContentTarget();
-          return;
-        }
-
-        if (!allProjectDirsExistResult.allExist) {
-          logger.warn(allProjectDirsExistResult.error.toString());
-          this._skipMediaContentTarget();
-          return;
-        }
-
-        const deviceDirAccessItems: DirAccessItem[] = [
-          ...items.device.base.dirs,
-          ...items.ops.map((o) => o.device.dir),
-        ].map((p) => ({
-          type: "dir",
-          path: p,
-          rights: "r",
-        }));
-
-        const [allDeviceDirsExistResult, allDeviceDirsExistError] =
-          await this._fileIOExtras.allDirsExist(deviceDirAccessItems);
-
-        if (allDeviceDirsExistError) {
-          logger.warn(allDeviceDirsExistError.toString());
-          this._skipMediaContentTarget();
-          return;
-        }
-
-        if (!allDeviceDirsExistResult.allExist) {
-          logger.warn(allDeviceDirsExistResult.error.toString());
-          this._skipMediaContentTarget();
-          return;
-        }
-
-        logger.debug(...items.project.dirs);
-        logger.debug(...items.device.base.dirs);
-        logger.debug(...items.ops.map((o) => o.device.dir));
-        logger.debug(...items.ops.map((o) => o.project.file));
-
-        for (const op of items.ops) {
-          const [lsEntries, lsError] = await this._fileIOExtras.fileIO.ls(
-            op.device.dir,
-          );
-
-          if (lsError) {
-            this._skipConsoleMediaName(op.names.console, op.names.media);
-            continue;
-          }
-
-          const filenames = lsEntries.map((e) => e.name);
-
-          const [listFileHandle, listFileError] = await openFileForWriting(
-            op.project.file,
-            { overwrite: true },
-          );
-
-          if (listFileError) {
-            this._skipConsoleMediaName(op.names.console, op.names.media);
-            continue;
-          }
-
-          const writeLinesError = await writeLines(
-            listFileHandle,
-            filenames,
-            "utf8",
-          );
-
-          if (writeLinesError) {
-            await listFileHandle.close();
-            this._skipConsoleMediaName(op.names.console, op.names.media);
-            continue;
-          }
-
-          await listFileHandle.close();
-        }
       }
     },
     diffs: async () => {
