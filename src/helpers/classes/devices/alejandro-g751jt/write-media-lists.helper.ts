@@ -1,8 +1,9 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import { type DirAccessItem as FileIODirAccessItem } from "../../../../classes/file-io/file-io-extras.class.js";
-import type { AlejandroG751JTMediaListsPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-paths.interface.js";
+import type { AlejandroG751JTMediaListsDirPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-dir-paths.interface.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteConsoleMediaNameListOperation } from "../../../../interfaces/write-console-media-name-list-operation.interface.js";
+import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
@@ -11,6 +12,7 @@ import allDirsExist, {
 } from "../../../extras/fs/all-dirs-exist.helper.js";
 import openFileForWriting from "../../../extras/fs/open-file-for-writing.helper.js";
 import writeLines from "../../../extras/fs/write-lines.helper.js";
+import buildMediaListsDirPaths from "./build-media-lists-dir-paths.helper.js";
 
 const fsExtras = {
   allDirsExist,
@@ -24,33 +26,13 @@ const writeMediaLists = async (
   allMediaNames: MediaName[],
   fileIOExtras: FileIOExtras,
 ) => {
-  const mediaPaths: AlejandroG751JTMediaListsPaths = {
-    project: {
-      dirs: [],
-    },
-    device: {
-      base: {
-        dirs: [],
-      },
-    },
-  };
-
-  const ops: WriteConsoleMediaNameListOperation[] = [];
-
-  mediaPaths.project.dirs.push(
-    paths.dirs.project.base,
-    paths.dirs.project.lists.base,
-    paths.dirs.project.lists["content-targets"].media.base,
+  const mediaDirPaths = buildMediaListsDirPaths(
+    paths.dirs,
+    Object.entries(consolesData).map(([, c]) => c.name),
+    allMediaNames,
   );
 
-  mediaPaths.device.base.dirs.push(paths.dirs["content-targets"].media.base);
-
-  for (const mediaName of allMediaNames) {
-    const projectMediaNameDir =
-      paths.dirs.project.lists["content-targets"].media.names[mediaName];
-    if (!projectMediaNameDir) continue;
-    mediaPaths.project.dirs.push(projectMediaNameDir);
-  }
+  const ops: WriteConsoleMediaNameListOperation[] = [];
 
   for (const [, consoleData] of Object.entries(consolesData)) {
     const deviceConsoleMediaDirPaths =
@@ -60,9 +42,6 @@ const writeMediaLists = async (
       paths.files.project.lists.media.consoles[consoleData.name];
 
     if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths) continue;
-
-    if (!deviceConsoleMediaDirPaths) continue;
-    mediaPaths.device.base.dirs.push(deviceConsoleMediaDirPaths.base);
 
     for (const mediaName of consoleData["content-targets"].media.names) {
       const deviceConsoleMediaNameDir =
@@ -83,7 +62,7 @@ const writeMediaLists = async (
     }
   }
 
-  const projectDirAccessItems: FsDirAccessItem[] = mediaPaths.project.dirs.map(
+  const projectDirAccessItems: FsDirAccessItem[] = mediaDirPaths.project.map(
     (p) => ({
       type: "dir",
       path: p,
@@ -99,7 +78,7 @@ const writeMediaLists = async (
     return allProjectDirsExistResult.error;
 
   const deviceDirAccessItems: FileIODirAccessItem[] = [
-    ...mediaPaths.device.base.dirs,
+    ...mediaDirPaths.device.base,
     ...ops.map((o) => o.paths.device.dir),
   ].map((p) => ({
     type: "dir",
@@ -113,6 +92,9 @@ const writeMediaLists = async (
   if (allDeviceDirsExistError) return allProjectDirsExistError;
   if (!allDeviceDirsExistResult.allExist)
     return allProjectDirsExistResult.error;
+
+  logger.debug(...mediaDirPaths.project);
+  logger.debug(...mediaDirPaths.device.base);
 
   for (const op of ops) {
     const [lsEntries, lsError] = await fileIOExtras.fileIO.ls(
