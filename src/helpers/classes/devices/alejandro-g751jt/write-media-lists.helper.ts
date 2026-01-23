@@ -13,6 +13,7 @@ import writeLines from "../../../extras/fs/write-lines.helper.js";
 import buildMediaListsDirPaths from "./build-media-lists-dir-paths.helper.js";
 import buildWriteConsoleMediaNameListOperations from "./build-write-console-media-name-list-operations.helper.js";
 import validateMediaListsDirs from "./validate-media-lists-dirs.helper.js";
+import writeConsoleMediaNameLists from "./write-console-media-name-lists.helper.js";
 
 const fsExtras = {
   allDirsExist,
@@ -43,38 +44,7 @@ const writeMediaLists = async (
   logger.debug(...mediaDirPaths.project);
   logger.debug(...mediaDirPaths.device.base);
 
-  for (const op of ops) {
-    const [lsEntries, lsError] = await fileIOExtras.fileIO.ls(
-      op.paths.device.dir,
-    );
-
-    if (lsError) {
-      // skipConsoleMediaName(op.names.console, op.names.media);
-      continue;
-    }
-
-    const filenames = lsEntries.map((e) => e.name);
-
-    const [listFileHandle, listFileError] = await openFileForWriting(
-      op.paths.project.file,
-      { overwrite: true },
-    );
-
-    if (listFileError) {
-      // skipConsoleMediaName(op.names.console, op.names.media);
-      continue;
-    }
-
-    const writeLinesError = await writeLines(listFileHandle, filenames, "utf8");
-
-    if (writeLinesError) {
-      await listFileHandle.close();
-      // skipConsoleMediaName(op.names.console, op.names.media);
-      continue;
-    }
-
-    await listFileHandle.close();
-  }
+  await writeConsoleMediaNameLists(ops, fileIOExtras.fileIO.ls);
 };
 
 export default writeMediaLists;
