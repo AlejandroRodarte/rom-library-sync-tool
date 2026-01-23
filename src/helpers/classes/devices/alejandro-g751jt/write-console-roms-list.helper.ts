@@ -2,7 +2,6 @@ import type {
   FileIO,
   LsMethodError,
 } from "../../../../interfaces/file-io.interface.js";
-import logger from "../../../../objects/logger.object.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../extras/fs/open-file-for-writing.helper.js";

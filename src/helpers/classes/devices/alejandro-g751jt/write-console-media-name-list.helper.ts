@@ -1,23 +1,31 @@
-import type { FileIO } from "../../../../interfaces/file-io.interface.js";
+import type {
+  FileIO,
+  LsMethodError,
+} from "../../../../interfaces/file-io.interface.js";
 import type { WriteConsoleMediaNameListOperation } from "../../../../interfaces/write-console-media-name-list-operation.interface.js";
-import openFileForWriting from "../../../extras/fs/open-file-for-writing.helper.js";
-import writeLines from "../../../extras/fs/write-lines.helper.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "../../../extras/fs/open-file-for-writing.helper.js";
+import writeLines, {
+  type WriteLinesError,
+} from "../../../extras/fs/write-lines.helper.js";
 
 const fsExtras = {
   openFileForWriting,
   writeLines,
 };
 
+export type WriteConsoleMediaNameListError =
+  | LsMethodError
+  | OpenFileForWritingError
+  | WriteLinesError;
+
 const writeConsoleMediaNameList = async (
   op: WriteConsoleMediaNameListOperation,
   ls: FileIO["ls"],
-) => {
+): Promise<WriteConsoleMediaNameListError | undefined> => {
   const [lsEntries, lsError] = await ls(op.paths.device.dir);
-
-  if (lsError) {
-    // skipConsoleMediaName(op.names.console, op.names.media);
-    return;
-  }
+  if (lsError) return lsError;
 
   const filenames = lsEntries.map((e) => e.name);
 
@@ -25,11 +33,7 @@ const writeConsoleMediaNameList = async (
     op.paths.project.file,
     { overwrite: true },
   );
-
-  if (listFileError) {
-    // skipConsoleMediaName(op.names.console, op.names.media);
-    return;
-  }
+  if (listFileError) return listFileError;
 
   const writeLinesError = await fsExtras.writeLines(
     listFileHandle,
@@ -39,8 +43,7 @@ const writeConsoleMediaNameList = async (
 
   if (writeLinesError) {
     await listFileHandle.close();
-    // skipConsoleMediaName(op.names.console, op.names.media);
-    return;
+    return writeLinesError;
   }
 
   await listFileHandle.close();

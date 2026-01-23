@@ -1,28 +1,31 @@
-import allDirsExist, {
-  type DirAccessItem as FsDirAccessItem,
-} from "../../../extras/fs/all-dirs-exist.helper.js";
-import FileIOExtras, {
-  type DirAccessItem as FileIODirAccessItem,
-} from "../../../../classes/file-io/file-io-extras.class.js";
+import FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTMediaListsDirPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-dir-paths.interface.js";
-import validateMediaListsProjectDirs from "./validate-media-lists-project-dirs.helper.js";
-import validateMediaListsDeviceDirs from "./validate-media-lists-device-dirs.helper.js";
+import validateMediaListsProjectDirs, {
+  type ValidateMediaListsProjectDirsError,
+} from "./validate-media-lists-project-dirs.helper.js";
+import validateMediaListsDeviceDirs, {
+  type ValidateMediaListsDeviceDirsError,
+} from "./validate-media-lists-device-dirs.helper.js";
 
-const fsExtras = {
-  allDirsExist,
-};
+export type ValidateMediaListsDirsError =
+  | ValidateMediaListsProjectDirsError
+  | ValidateMediaListsDeviceDirsError;
 
 const validateMediaListsDirs = async (
   mediaDirPaths: AlejandroG751JTMediaListsDirPaths,
   mediaNamesDirPaths: string[],
   allDirsExist: FileIOExtras["allDirsExist"],
-) => {
-  await validateMediaListsProjectDirs(mediaDirPaths.project);
+): Promise<ValidateMediaListsDirsError | undefined> => {
+  const projectDirsValidationError = await validateMediaListsProjectDirs(
+    mediaDirPaths.project,
+  );
+  if (projectDirsValidationError) return projectDirsValidationError;
 
-  await validateMediaListsDeviceDirs(
+  const deviceDirsValidationError = await validateMediaListsDeviceDirs(
     [...mediaDirPaths.device.base, ...mediaNamesDirPaths],
     allDirsExist,
   );
+  if (deviceDirsValidationError) return deviceDirsValidationError;
 };
 
 export default validateMediaListsDirs;
