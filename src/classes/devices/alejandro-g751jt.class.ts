@@ -284,12 +284,39 @@ class AlejandroG751JT implements Device, Debug {
 
   get syncableConsoles(): Consoles {
     return new Map(
-      [...this._consoles.entries()].filter(
+      [...this.filterableConsoles.entries()].filter(
+        ([consoleName]) => !this._skipFlags.consoles[consoleName]!.sync.global,
+      ),
+    );
+  }
+
+  get romSyncableConsoles(): Consoles {
+    return new Map(
+      [...this.syncableConsoles.entries()].filter(
         ([consoleName]) =>
-          this._skipFlags.consoles[consoleName] &&
-          !this._skipFlags.consoles[consoleName].global &&
-          !this._skipFlags.consoles[consoleName].filter &&
-          !this._skipFlags.consoles[consoleName].sync,
+          !this._skipFlags.consoles[consoleName]!.sync["content-targets"].roms,
+      ),
+    );
+  }
+
+  get mediaSyncableConsoles(): Consoles {
+    return new Map(
+      [...this.syncableConsoles.entries()].filter(
+        ([consoleName]) =>
+          !this._skipFlags.consoles[consoleName]!.sync["content-targets"].media
+            .global,
+      ),
+    );
+  }
+
+  public getMediaNameSyncableConsoles(mediaName: MediaName): Consoles {
+    return new Map(
+      [...this.mediaSyncableConsoles.entries()].filter(
+        ([consoleName]) =>
+          typeof this._skipFlags.consoles[consoleName]!.sync["content-targets"]
+            .media.names[mediaName] === "boolean" &&
+          !this._skipFlags.consoles[consoleName]!.sync["content-targets"].media
+            .names[mediaName],
       ),
     );
   }
