@@ -39,6 +39,7 @@ import type { AlejandroG751JTShouldProcessContentTargetFlags } from "../../inter
 import type { ConsolesData } from "../../types/consoles-data.type.js";
 import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/write-media-lists.helper.js";
 import populateConsoles from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles.helper.js";
+import filterConsoles from "../../helpers/classes/devices/alejandro-g751jt/filter-consoles.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -174,8 +175,7 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   filter: () => void = () => {
-    for (const [, konsole] of this.filterableConsoles)
-      konsole.unselectTitles(unselect.byLocalDevice);
+    filterConsoles(this.filterableConsoles);
   };
 
   update: () => void = () => {
