@@ -4,28 +4,23 @@ import type { Titles } from "../../types/titles.type.js";
 import type { Rom } from "../../interfaces/rom.interface.js";
 import type { Dirent } from "node:fs";
 import logger from "../../objects/logger.object.js";
+import buildTitleNameFromDirEntry from "../classes/devices/alejandro-g751jt/build-title-name-from-dir-entry.helper.js";
 
 const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
   const titles = new Map<string, Title>();
 
   for (const entry of entries) {
-    const filename = entry.name.toString();
-
     if (entry.isSymbolicLink()) {
       logger.error(
-        `Entry with filename ${filename} is a symlink, which is not a valid ROM file type. Skipping entry.`,
+        `Entry ${entry.name} is a symlink, which is not a valid ROM file type. Skipping entry.`,
       );
       continue;
     }
 
-    const [rawTitleName] = filename.split("(");
+    const [titleName, validationError] = buildTitleNameFromDirEntry(entry);
+    if (validationError) continue;
 
-    if (!rawTitleName) {
-      console.error(`No title found for ROM ${filename}.`);
-      continue;
-    }
-
-    const titleName = rawTitleName.trim();
+    const filename = entry.name.toString();
     const { labels, languages } = labelsAndLanguagesFromFilename(filename);
     const title = titles.get(titleName);
     const newRom: Rom = {
