@@ -38,6 +38,7 @@ import type { ContentTargetName } from "../../types/content-target-name.type.js"
 import type { AlejandroG751JTShouldProcessContentTargetFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-should-process-content-targets-flags.interface.js";
 import type { ConsolesData } from "../../types/consoles-data.type.js";
 import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/write-media-lists.helper.js";
+import populateConsoles from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -167,37 +168,9 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
-    for (const [consoleName, konsole] of this._consoles) {
-      const consoleDatabaseRomDirPath =
-        databasePaths.getConsoleRomsDatabaseDirPath(consoleName);
-
-      const [dbPathExistsResult, dbPathExistsError] = await fsExtras.dirExists(
-        consoleDatabaseRomDirPath,
-        "r",
-      );
-
-      if (dbPathExistsError) {
-        this._skipConsoleGlobal(consoleName);
-        continue;
-      }
-
-      if (!dbPathExistsResult.exists) {
-        this._skipConsoleGlobal(consoleName);
-        continue;
-      }
-
-      const [titles, buildTitlesError] = await build.titlesFromRomsDirPath(
-        consoleDatabaseRomDirPath,
-      );
-
-      if (buildTitlesError) {
-        this._skipConsoleGlobal(consoleName);
-        continue;
-      }
-
-      for (const [titleName, title] of titles)
-        konsole.addTitle(titleName, title);
-    }
+    const consolesToSkip = await populateConsoles(this._consoles);
+    for (const consoleName of consolesToSkip)
+      this._skipConsoleGlobal(consoleName);
   };
 
   filter: () => void = () => {
