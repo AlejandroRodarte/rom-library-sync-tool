@@ -229,8 +229,6 @@ class AlejandroG751JT implements Device, Debug {
       if (writeError) logger.error(writeError.toString());
     },
     lists: async () => {
-      logger.trace(`device.write.lists() starts for device ${this._name}.`);
-
       if (
         this._shouldProcessContentTargets.roms &&
         !this._skipFlags["content-targets"].roms

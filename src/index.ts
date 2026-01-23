@@ -10,8 +10,6 @@ import Sftp from "./classes/file-io/sftp.class.js";
 import SftpClient from "./classes/sftp-client.class.js";
 
 const main = async () => {
-  logger.trace("main() function starts");
-
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}`);
 

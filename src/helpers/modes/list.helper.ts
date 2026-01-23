@@ -13,8 +13,6 @@ const allowedModes: ModeName[] = [
 ];
 
 const list = async (devices: (Device & Debug)[]) => {
-  logger.trace("modes.list() function starts");
-
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
@@ -24,11 +22,8 @@ const list = async (devices: (Device & Debug)[]) => {
     );
 
   for (const device of devices) {
-    logger.trace(`Calling device.write.lists() for device ${device.name()}`);
     await device.write.lists();
   }
-
-  logger.trace("modes.list() function ends");
 };
 
 export default list;
