@@ -1,7 +1,8 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
+import buildRomsListsDirPaths from "./build-roms-lists-dir-paths.helper.js";
+import buildWriteConsoleRomsListOperations from "./build-write-console-roms-list-operations.helper.js";
 import validateRomsListsDirs, {
   type ValidateRomsListsDirsError,
 } from "./validate-roms-lists-dirs.helper.js";
@@ -14,57 +15,29 @@ const writeRomsLists = async (
   consoleNames: ConsoleName[],
   fileIOExtras: FileIOExtras,
 ): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsListsError]> => {
+  const romsDirPaths = buildRomsListsDirPaths(paths.dirs);
+  const ops = buildWriteConsoleRomsListOperations(paths, consoleNames);
+
   const dirsValidationError = await validateRomsListsDirs(
-    paths.dirs,
-    consoleNames,
+    {
+      project: romsDirPaths.project,
+      device: [
+        ...romsDirPaths.device.base,
+        ...ops.map((o) => o.paths.device.dir),
+      ],
+    },
     fileIOExtras.allDirsExist,
   );
 
   if (dirsValidationError) return [undefined, dirsValidationError];
 
-  const skipConsoles: ConsoleName[] = [];
-
-  for (const consoleName of consoleNames) {
-    const deviceDir = paths.dirs["content-targets"].roms.consoles[consoleName];
-
-    if (!deviceDir) {
-      logger.warn(
-        `Device dirpath for console ${consoleName} not found. Skipping this console when processing ROMs.`,
-      );
-
-      skipConsoles.push(consoleName);
-      continue;
-    }
-
-    const projectFile = paths.files.project.lists.roms.consoles[consoleName];
-
-    if (!projectFile) {
-      logger.fatal(
-        `Project filepath for console ${consoleName} not found. Skipping this console when processing ROMs.`,
-      );
-
-      skipConsoles.push(consoleName);
-      continue;
-    }
-
-    const writeListError = await writeConsoleRomsList(
-      {
-        deviceDir,
-        projectFile,
-      },
-      fileIOExtras.fileIO.ls,
-    );
-
-    if (writeListError) {
-      logger.warn(
-        `Failed to write ROM list file for console ${consoleName}. Skipping this console when processing ROMs.`,
-      );
-
-      skipConsoles.push(consoleName);
-    }
+  const consolesToSkip: ConsoleName[] = [];
+  for (const op of ops) {
+    const writeError = await writeConsoleRomsList(op, fileIOExtras.fileIO.ls);
+    if (writeError) consolesToSkip.push(op.names.console);
   }
 
-  return [skipConsoles, undefined];
+  return [consolesToSkip, undefined];
 };
 
 export default writeRomsLists;

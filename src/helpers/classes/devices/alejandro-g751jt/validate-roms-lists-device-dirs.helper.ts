@@ -3,21 +3,16 @@ import FileIOExtras, {
   type AllDirsExistMethodFalseResult,
   type DirAccessItem as FileIODirAccessItem,
 } from "../../../../classes/file-io/file-io-extras.class.js";
-import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
-import getRomsListsDeviceDirs from "./get-roms-lists-device-dirs.helper.js";
 
 export type ValidateRomsListsDeviceDirsError =
   | AllDirsExistMethodError
   | AllDirsExistMethodFalseResult["error"];
 
 const validateRomsListsDeviceDirs = async (
-  paths: AlejandroG751JTPaths["dirs"]["content-targets"]["roms"],
-  consoleNames: ConsoleName[],
+  paths: string[],
   allDirsExist: FileIOExtras["allDirsExist"],
 ): Promise<ValidateRomsListsDeviceDirsError | undefined> => {
-  const deviceDirs = getRomsListsDeviceDirs(paths, consoleNames);
-  const deviceDirAccessItems: FileIODirAccessItem[] = deviceDirs.map((p) => ({
+  const deviceDirAccessItems: FileIODirAccessItem[] = paths.map((p) => ({
     path: p,
     rights: "r",
   }));

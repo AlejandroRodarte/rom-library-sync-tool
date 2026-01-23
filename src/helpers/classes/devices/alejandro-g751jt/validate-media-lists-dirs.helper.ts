@@ -1,5 +1,4 @@
 import FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
-import type { AlejandroG751JTMediaListsDirPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-dir-paths.interface.js";
 import validateMediaListsProjectDirs, {
   type ValidateMediaListsProjectDirsError,
 } from "./validate-media-lists-project-dirs.helper.js";
@@ -12,17 +11,19 @@ export type ValidateMediaListsDirsError =
   | ValidateMediaListsDeviceDirsError;
 
 const validateMediaListsDirs = async (
-  mediaDirPaths: AlejandroG751JTMediaListsDirPaths,
-  mediaNamesDirPaths: string[],
+  paths: {
+    project: string[];
+    device: string[];
+  },
   allDirsExist: FileIOExtras["allDirsExist"],
 ): Promise<ValidateMediaListsDirsError | undefined> => {
   const projectDirsValidationError = await validateMediaListsProjectDirs(
-    mediaDirPaths.project,
+    paths.project,
   );
   if (projectDirsValidationError) return projectDirsValidationError;
 
   const deviceDirsValidationError = await validateMediaListsDeviceDirs(
-    [...mediaDirPaths.device.base, ...mediaNamesDirPaths],
+    paths.device,
     allDirsExist,
   );
   if (deviceDirsValidationError) return deviceDirsValidationError;

@@ -30,8 +30,13 @@ const writeMediaLists = async (
   const ops = buildWriteConsoleMediaNameListOperations(paths, consolesData);
 
   const validationError = await validateMediaListsDirs(
-    mediaDirPaths, // project dirs and base device dirs
-    ops.map((o) => o.paths.device.dir), // remaining device dirs
+    {
+      project: mediaDirPaths.project,
+      device: [
+        ...mediaDirPaths.device.base,
+        ...ops.map((o) => o.paths.device.dir),
+      ],
+    },
     fileIOExtras.allDirsExist,
   );
 

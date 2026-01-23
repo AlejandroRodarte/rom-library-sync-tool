@@ -20,11 +20,11 @@ const buildWriteConsoleMediaNameListOperations = (
     for (const mediaName of consoleData["content-targets"].media.names) {
       const deviceConsoleMediaNameDir =
         deviceConsoleMediaDirPaths.names[mediaName];
-      if (!deviceConsoleMediaNameDir) continue;
 
       const projectConsoleMediaNameFile =
         projectConsoleMediaFilePaths[mediaName];
-      if (!projectConsoleMediaNameFile) continue;
+
+      if (!deviceConsoleMediaNameDir || !projectConsoleMediaNameFile) continue;
 
       ops.push({
         paths: {

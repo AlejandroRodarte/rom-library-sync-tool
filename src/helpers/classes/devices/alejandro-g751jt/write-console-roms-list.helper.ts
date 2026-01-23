@@ -2,6 +2,7 @@ import type {
   FileIO,
   LsMethodError,
 } from "../../../../interfaces/file-io.interface.js";
+import type { WriteConsoleRomsListOperation } from "../../../../interfaces/write-console-roms-list-operation.interface.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../extras/fs/open-file-for-writing.helper.js";
@@ -15,13 +16,10 @@ export type WriteConsoleRomsListError =
   | WriteLinesError;
 
 const writeConsoleRomsList = async (
-  paths: {
-    deviceDir: string;
-    projectFile: string;
-  },
+  op: WriteConsoleRomsListOperation,
   ls: FileIO["ls"],
 ): Promise<WriteConsoleRomsListError | undefined> => {
-  const [lsEntries, lsError] = await ls(paths.deviceDir);
+  const [lsEntries, lsError] = await ls(op.paths.device.dir);
   if (lsError) return lsError;
 
   const filenames = lsEntries
@@ -29,7 +27,7 @@ const writeConsoleRomsList = async (
     .filter((n) => n !== "systeminfo.txt" && n !== "metadata.txt");
 
   const [listFileHandle, openListFileError] = await openFileForWriting(
-    paths.projectFile,
+    op.paths.project.file,
     { overwrite: true },
   );
   if (openListFileError) return openListFileError;
