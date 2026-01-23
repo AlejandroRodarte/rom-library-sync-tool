@@ -24,7 +24,6 @@ const diff = async (devices: (Device & Debug)[]) => {
   for (const device of devices) {
     await device.populate();
     device.filter();
-    device.update();
     await device.write.scrapped();
     await device.write.duplicates();
     await device.write.diffs();

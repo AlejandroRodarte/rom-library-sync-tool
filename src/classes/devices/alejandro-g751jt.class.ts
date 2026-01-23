@@ -178,14 +178,6 @@ class AlejandroG751JT implements Device, Debug {
     filterConsoles(this.filterableConsoles);
   };
 
-  update: () => void = () => {
-    for (const [, konsole] of this.filterableConsoles) {
-      konsole.updateSelectedRoms();
-      konsole.updateScrappedTitles();
-      konsole.updateScrappedTitles();
-    }
-  };
-
   write: DeviceWriteMethods = {
     duplicates: async () => {
       const writeError = await fsExtras.writeDuplicateRomsFile(
