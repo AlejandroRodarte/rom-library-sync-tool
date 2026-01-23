@@ -1,29 +1,26 @@
-import titlesFromFilenames from "./titles-from-filenames.helper.js";
 import type { Titles } from "../../types/titles.type.js";
 import readdir, {
   type ReaddirError,
 } from "../wrappers/modules/fs/readdir.helper.js";
-
-const fsExtras = {
-  readdir,
-};
+import titlesFromDirEntries from "./titles-from-dir-entries.helper.js";
 
 export type TitlesFromRomsDirPath = ReaddirError;
 
 const titlesFromRomsDirPath = async (
   romsDirPath: string,
 ): Promise<[Titles, undefined] | [undefined, TitlesFromRomsDirPath]> => {
-  const [entries, readdirError] = await fsExtras.readdir(romsDirPath, {
+  const [entries, readdirError] = await readdir(romsDirPath, {
     withFileTypes: true,
     encoding: "buffer",
   });
 
   if (readdirError) return [undefined, readdirError];
 
-  const filenames = entries
-    .filter((entry) => entry.isFile())
-    .map((e) => e.name.toString());
-  const titles = titlesFromFilenames(filenames);
+  const dirEntries = entries.filter(
+    (entry) => entry.isFile() || entry.isDirectory(),
+  );
+
+  const titles = titlesFromDirEntries(dirEntries);
   return [titles, undefined];
 };
 

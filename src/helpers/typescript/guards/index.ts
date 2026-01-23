@@ -22,6 +22,7 @@ import isContentTargetsList from "./is-content-targets-list.helper.js";
 import isFileIOStrategy from "./is-file-io-strategy.helper.js";
 import isFileIOFsCrudStrategy from "./is-file-io-fs-crud-strategy.helper.js";
 import isConsolesListItemOrRest from "./is-consoles-list-item-or-rest.helper.js";
+import isRomFileType from "./is-rom-file-type.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -48,6 +49,7 @@ const typeGuards = {
   isContentTargetsListItem,
   isContentTargetsList,
   isConsolesListItemOrRest,
+  isRomFileType,
 };
 
 export default typeGuards;

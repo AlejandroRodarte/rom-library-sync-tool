@@ -1,5 +1,5 @@
 import titlesFromRomsDirPath from "./titles-from-roms-dir-path.helper.js";
-import titlesFromFilenames from "./titles-from-filenames.helper.js";
+import titlesFromDirEntries from "./titles-from-dir-entries.helper.js";
 import labelsAndLanguagesFromFilename from "./labels-and-languages-from-filename.helper.js";
 import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
 import environmentFromProcessVariables from "./environment-from-process-variables.helper.js";
@@ -18,7 +18,7 @@ import rightsFromMode from "./rights-from-mode.helper.js";
 
 const build = {
   titlesFromRomsDirPath,
-  titlesFromFilenames,
+  titlesFromFilenames: titlesFromDirEntries,
   labelsAndLanguagesFromFilename,
   specialFlagsFromRoms,
   environmentFromProcessVariables,
