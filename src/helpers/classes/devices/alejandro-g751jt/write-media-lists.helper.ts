@@ -15,18 +15,12 @@ export type WriteMediaListsError = ValidateMediaListsDirsError;
 const writeMediaLists = async (
   paths: AlejandroG751JTPaths,
   consolesData: ConsolesData,
-  allMediaNames: MediaName[],
   fileIOExtras: FileIOExtras,
 ): Promise<
   | [WriteConsoleMediaNameListOperation["names"][], undefined]
   | [undefined, WriteMediaListsError]
 > => {
-  const mediaDirPaths = buildMediaListsDirPaths(
-    paths.dirs,
-    Object.entries(consolesData).map(([, c]) => c.name),
-    allMediaNames,
-  );
-
+  const mediaDirPaths = buildMediaListsDirPaths(paths.dirs);
   const ops = buildWriteConsoleMediaNameListOperations(paths, consolesData);
 
   const validationError = await validateMediaListsDirs(

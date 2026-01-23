@@ -219,7 +219,6 @@ class AlejandroG751JT implements Device, Debug {
           await writeMediaLists(
             this._paths,
             this._consolesData,
-            this._allMediaNames,
             this._fileIOExtras,
           );
 

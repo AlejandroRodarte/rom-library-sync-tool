@@ -1,12 +1,8 @@
 import type { AlejandroG751JTMediaListsDirPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-dir-paths.interface.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { MediaName } from "../../../../types/media-name.type.js";
 
 const buildMediaListsDirPaths = (
   paths: AlejandroG751JTPaths["dirs"],
-  consoleNames: ConsoleName[],
-  mediaNames: MediaName[],
 ): AlejandroG751JTMediaListsDirPaths => {
   const mediaPaths: AlejandroG751JTMediaListsDirPaths = {
     project: [],
@@ -23,20 +19,15 @@ const buildMediaListsDirPaths = (
 
   mediaPaths.device.base.push(paths["content-targets"].media.base);
 
-  for (const mediaName of mediaNames) {
-    const projectMediaNameDir =
-      paths.project.lists["content-targets"].media.names[mediaName];
-    if (!projectMediaNameDir) continue;
-    mediaPaths.project.push(projectMediaNameDir);
-  }
+  for (const [, mediaNameDirPath] of Object.entries(
+    paths.project.lists["content-targets"].media.names,
+  ))
+    mediaPaths.project.push(mediaNameDirPath);
 
-  for (const consoleName of consoleNames) {
-    const deviceConsoleMediaDirPaths =
-      paths["content-targets"].media.consoles[consoleName];
-
-    if (!deviceConsoleMediaDirPaths) continue;
-    mediaPaths.device.base.push(deviceConsoleMediaDirPaths.base);
-  }
+  for (const [, consoleMediaDirPaths] of Object.entries(
+    paths["content-targets"].media.consoles,
+  ))
+    mediaPaths.device.base.push(consoleMediaDirPaths.base);
 
   return mediaPaths;
 };
