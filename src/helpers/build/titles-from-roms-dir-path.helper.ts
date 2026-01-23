@@ -4,11 +4,11 @@ import readdir, {
 } from "../wrappers/modules/fs/readdir.helper.js";
 import titlesFromDirEntries from "./titles-from-dir-entries.helper.js";
 
-export type TitlesFromRomsDirPath = ReaddirError;
+export type TitlesFromRomsDirPathError = ReaddirError;
 
 const titlesFromRomsDirPath = async (
   romsDirPath: string,
-): Promise<[Titles, undefined] | [undefined, TitlesFromRomsDirPath]> => {
+): Promise<[Titles, undefined] | [undefined, TitlesFromRomsDirPathError]> => {
   const [entries, readdirError] = await readdir(romsDirPath, {
     withFileTypes: true,
     encoding: "buffer",
@@ -16,11 +16,7 @@ const titlesFromRomsDirPath = async (
 
   if (readdirError) return [undefined, readdirError];
 
-  const dirEntries = entries.filter(
-    (entry) => entry.isFile() || entry.isDirectory(),
-  );
-
-  const titles = titlesFromDirEntries(dirEntries);
+  const titles = titlesFromDirEntries(entries);
   return [titles, undefined];
 };
 
