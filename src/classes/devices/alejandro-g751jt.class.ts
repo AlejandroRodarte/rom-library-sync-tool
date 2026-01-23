@@ -169,7 +169,7 @@ class AlejandroG751JT implements Device, Debug {
   populate: () => Promise<void> = async () => {
     for (const [consoleName, konsole] of this._consoles) {
       const consoleDatabaseRomDirPath =
-        databasePaths.getConsoleDatabaseRomDirPath(consoleName);
+        databasePaths.getConsoleRomsDatabaseDirPath(consoleName);
 
       const [dbPathExistsResult, dbPathExistsError] = await fsExtras.dirExists(
         consoleDatabaseRomDirPath,

@@ -7,6 +7,7 @@ import MEDIA_NAMES from "../constants/media-names.constant.js";
 import type { ConsoleContent } from "../types/console-content.type.js";
 import type { MediaPaths } from "../types/media-paths.type.js";
 import type { ConsoleName } from "../types/console-name.type.js";
+import type { MediaName } from "../types/media-name.type.js";
 
 class DatabasePaths {
   private _paths: IDatabasePaths;
@@ -15,43 +16,16 @@ class DatabasePaths {
     this._paths = this._initDatabasePaths();
   }
 
-  get allDirs(): string[] {
-    const basePaths = [
-      this._paths.dirs.roms.base,
-      this._paths.dirs.media.base,
-      this._paths.dirs["es-de-gamelists"].base,
-    ];
-
-    const romsPaths: string[] = [];
-    const mediaPaths: string[] = [];
-    const metadataPaths: string[] = [];
-
-    for (const consoleName of CONSOLE_NAMES) {
-      romsPaths.push(this._paths.dirs.roms.consoles[consoleName]);
-      metadataPaths.push(
-        this._paths.dirs["es-de-gamelists"].consoles[consoleName],
-      );
-
-      for (const mediaName of MEDIA_NAMES)
-        mediaPaths.push(
-          this._paths.dirs.media.consoles[consoleName][mediaName],
-        );
-    }
-
-    return [...basePaths, ...mediaPaths, ...metadataPaths];
-  }
-
-  get allFiles(): string[] {
-    const paths: string[] = [];
-
-    for (const consoleName of CONSOLE_NAMES)
-      paths.push(this._paths.files["es-de-gamelists"].consoles[consoleName]);
-
-    return paths;
-  }
-
-  public getConsoleDatabaseRomDirPath(consoleName: ConsoleName): string {
+  public getConsoleRomsDatabaseDirPath(consoleName: ConsoleName): string {
     return this._paths.dirs.roms.consoles[consoleName];
+  }
+
+  public getConsoleMediaNamesDatabaseDirPath(consoleName: ConsoleName, mediaName: MediaName): string {
+    return this._paths.dirs.media.consoles[consoleName][mediaName];
+  }
+
+  public getConsoleEsDeMetadataDatabaseFilePath(consoleName: ConsoleName): string {
+    return this._paths.files["es-de-gamelists"].consoles[consoleName];
   }
 
   private _initDatabasePaths(): IDatabasePaths {
