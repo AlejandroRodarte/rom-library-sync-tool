@@ -1,10 +1,8 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import { type DirAccessItem as FileIODirAccessItem } from "../../../../classes/file-io/file-io-extras.class.js";
-import type { AlejandroG751JTMediaListsDirPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-media-lists-dir-paths.interface.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteConsoleMediaNameListOperation } from "../../../../interfaces/write-console-media-name-list-operation.interface.js";
 import logger from "../../../../objects/logger.object.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
 import allDirsExist, {
@@ -14,6 +12,7 @@ import openFileForWriting from "../../../extras/fs/open-file-for-writing.helper.
 import writeLines from "../../../extras/fs/write-lines.helper.js";
 import buildMediaListsDirPaths from "./build-media-lists-dir-paths.helper.js";
 import buildWriteConsoleMediaNameListOperations from "./build-write-console-media-name-list-operations.helper.js";
+import validateMediaListsDirs from "./validate-media-lists-dirs.helper.js";
 
 const fsExtras = {
   allDirsExist,
@@ -33,39 +32,13 @@ const writeMediaLists = async (
     allMediaNames,
   );
 
-  const ops: WriteConsoleMediaNameListOperation[] =
-    buildWriteConsoleMediaNameListOperations(paths, consolesData);
+  const ops = buildWriteConsoleMediaNameListOperations(paths, consolesData);
 
-  const projectDirAccessItems: FsDirAccessItem[] = mediaDirPaths.project.map(
-    (p) => ({
-      type: "dir",
-      path: p,
-      rights: "rw",
-    }),
+  await validateMediaListsDirs(
+    mediaDirPaths,
+    ops.map((o) => o.paths.device.dir),
+    fileIOExtras.allDirsExist,
   );
-
-  const [allProjectDirsExistResult, allProjectDirsExistError] =
-    await fsExtras.allDirsExist(projectDirAccessItems);
-
-  if (allProjectDirsExistError) return allProjectDirsExistError;
-  if (!allProjectDirsExistResult.allExist)
-    return allProjectDirsExistResult.error;
-
-  const deviceDirAccessItems: FileIODirAccessItem[] = [
-    ...mediaDirPaths.device.base,
-    ...ops.map((o) => o.paths.device.dir),
-  ].map((p) => ({
-    type: "dir",
-    path: p,
-    rights: "r",
-  }));
-
-  const [allDeviceDirsExistResult, allDeviceDirsExistError] =
-    await fileIOExtras.allDirsExist(deviceDirAccessItems);
-
-  if (allDeviceDirsExistError) return allProjectDirsExistError;
-  if (!allDeviceDirsExistResult.allExist)
-    return allProjectDirsExistResult.error;
 
   logger.debug(...mediaDirPaths.project);
   logger.debug(...mediaDirPaths.device.base);
