@@ -1,43 +1,40 @@
-import writeToFileOrDelete, {
-  type WriteToFileOrDeleteError,
-} from "./write-to-file-or-delete.helper.js";
-import deleteAndOpenWriteOnlyFile, {
-  type DeleteAndOpenWriteOnlyFileError,
-} from "./delete-and-open-new-write-only-file.helper.js";
 import type { Consoles } from "../../../types/consoles.type.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "./open-file-for-writing.helper.js";
+import writeLines, { type WriteLinesError } from "./write-lines.helper.js";
 
 export type WriteScrappedRomsFileError =
-  | DeleteAndOpenWriteOnlyFileError
-  | WriteToFileOrDeleteError;
+  | OpenFileForWritingError
+  | WriteLinesError;
 
 const writeScrappedRomsFile = async (
   consoles: Consoles,
   filePath: string,
 ): Promise<WriteScrappedRomsFileError | undefined> => {
-  const [fileHandle, scrappedFileError] =
-    await deleteAndOpenWriteOnlyFile(filePath);
-  if (scrappedFileError) return scrappedFileError;
+  const [fileHandle, fileError] = await openFileForWriting(filePath, {
+    overwrite: true,
+  });
+  if (fileError) return fileError;
 
-  let content = "";
+  let lines: string[] = [];
 
   for (const [consoleName, konsole] of consoles) {
-    content += `%%%%% Scrapped titles found from console ${consoleName} %%%%%\n`;
-
+    lines.push(`%%%%% Scrapped titles found from console ${consoleName} %%%%%`);
     for (const [titleName, title] of konsole.scrappedTitles) {
-      content += `===== Title: ${titleName} =====\n`;
-      for (const [, rom] of title.romSet) content += `ROM: ${rom.file.name}\n`;
+      lines.push(`===== Title: ${titleName} =====`);
+      for (const [, rom] of title.romSet) lines.push(`ROM: ${rom.file.name}`);
     }
   }
 
-  const writeOrDeleteError = await writeToFileOrDelete(
-    filePath,
-    fileHandle,
-    content,
-    "utf8",
-  );
+  const writeLinesError = await writeLines(fileHandle, lines, "utf8");
 
-  if (writeOrDeleteError) return writeOrDeleteError;
-  else fileHandle.close();
+  if (writeLinesError) {
+    await fileHandle.close();
+    return writeLinesError;
+  }
+
+  await fileHandle.close();
 };
 
 export default writeScrappedRomsFile;

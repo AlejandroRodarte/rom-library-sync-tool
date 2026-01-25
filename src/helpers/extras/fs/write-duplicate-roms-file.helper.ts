@@ -1,45 +1,44 @@
-import writeToFileOrDelete, {
-  type WriteToFileOrDeleteError,
-} from "./write-to-file-or-delete.helper.js";
-import deleteAndOpenWriteOnlyFile, {
-  type DeleteAndOpenWriteOnlyFileError,
-} from "./delete-and-open-new-write-only-file.helper.js";
 import type { Consoles } from "../../../types/consoles.type.js";
+import openFileForWriting, {
+  type OpenFileForWritingError,
+} from "./open-file-for-writing.helper.js";
+import writeLines, { type WriteLinesError } from "./write-lines.helper.js";
 
 export type WriteDuplicateRomsFileError =
-  | DeleteAndOpenWriteOnlyFileError
-  | WriteToFileOrDeleteError;
+  | OpenFileForWritingError
+  | WriteLinesError;
 
 const writeDuplicateRomsFile = async (
   consoles: Consoles,
   filePath: string,
 ): Promise<WriteDuplicateRomsFileError | undefined> => {
-  const [fileHandle, fileError] = await deleteAndOpenWriteOnlyFile(filePath);
+  const [fileHandle, fileError] = await openFileForWriting(filePath, {
+    overwrite: true,
+  });
   if (fileError) return fileError;
 
-  let content = "";
+  let lines: string[] = [];
 
   for (const [consoleName, konsole] of consoles) {
-    content += `%%%%% Duplicates found on console ${consoleName} %%%%%\n`;
+    lines.push(`%%%%% Duplicates found on console ${consoleName} %%%%%`);
     for (const [romsSelected, titles] of konsole.duplicateTitles) {
-      content += `***** Titles with ${romsSelected} duplicates *****\n`;
+      lines.push(`***** Titles with ${romsSelected} duplicates *****`);
       for (const [titleName, title] of titles) {
-        content += `===== Title: ${titleName} =====\n`;
+        lines.push(`===== Title: ${titleName} =====`);
         for (const [, rom] of title.selectedRomSet)
-          content += `ROM: ${rom.file.name}\n`;
+          lines.push(`ROM: ${rom.file.name}`);
       }
     }
   }
 
-  const writeOrDeleteError = await writeToFileOrDelete(
-    filePath,
-    fileHandle,
-    content,
-    "utf8",
-  );
+  const writeLinesError = await writeLines(fileHandle, lines, "utf8");
 
-  if (writeOrDeleteError) return writeOrDeleteError;
-  else fileHandle.close();
+  if (writeLinesError) {
+    await fileHandle.close();
+    return writeLinesError;
+  }
+
+  await fileHandle.close();
 };
 
 export default writeDuplicateRomsFile;
