@@ -1,8 +1,16 @@
-import type { RomFileType } from "../types/rom-file-type.type.js";
+import type { RomFsType } from "../types/rom-fs-type.type.js";
 
 export interface Rom {
-  filename: string;
+  base: {
+    name: string;
+  };
+  file: {
+    name: string;
+    type: string;
+  };
+  fs: {
+    type: RomFsType;
+  };
   labels: string[];
   languages: string[];
-  fileType: RomFileType;
 }

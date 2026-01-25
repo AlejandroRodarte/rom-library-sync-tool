@@ -1,0 +1,58 @@
+import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import type { ConsoleName } from "../../../../types/console-name.type.js";
+import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
+import type { ConsolesData } from "../../../../types/consoles-data.type.js";
+import type { MediaName } from "../../../../types/media-name.type.js";
+import buildMediaDiffsDirPaths from "./build-media-diffs-dir-paths.helper.js";
+import buildWriteMediaNameDiffOperations from "./build-write-media-name-diff-operations.helper.js";
+import validateDiffPaths, {
+  type ValidateDiffPathsError,
+} from "./validate-diff-paths.helper.js";
+import writeMediaNameDiff from "./write-media-name-diff.helper.js";
+
+export interface ConsoleMediaName {
+  console: ConsoleName;
+  media: MediaName;
+}
+
+export type WriteMediaDiffsError = ValidateDiffPathsError;
+
+const writeMediaDiffs = async (
+  paths: AlejandroG751JTPaths,
+  consoles: ConsoleRoms,
+  consolesData: ConsolesData,
+): Promise<
+  [ConsoleMediaName[], undefined] | [undefined, WriteMediaDiffsError]
+> => {
+  const mediaDirPaths = buildMediaDiffsDirPaths(paths.dirs);
+  const ops = buildWriteMediaNameDiffOperations(paths, consoles, consolesData);
+
+  const pathValidationError = await validateDiffPaths({
+    project: {
+      list: {
+        dirs: mediaDirPaths.project.lists,
+        files: ops.map((o) => o.paths.project.list.file),
+      },
+      diff: {
+        dirs: mediaDirPaths.project.diffs,
+      },
+    },
+  });
+
+  if (pathValidationError) return [undefined, pathValidationError];
+
+  const consoleMediaNamesToSkip: ConsoleMediaName[] = [];
+
+  for (const op of ops) {
+    const writeError = await writeMediaNameDiff(op);
+    if (writeError)
+      consoleMediaNamesToSkip.push({
+        console: op.console.name,
+        media: op.media.name,
+      });
+  }
+
+  return [consoleMediaNamesToSkip, undefined];
+};
+
+export default writeMediaDiffs;

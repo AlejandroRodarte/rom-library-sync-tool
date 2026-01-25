@@ -10,9 +10,7 @@ import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
 import type { ConsolePaths } from "../../types/console-paths.types.js";
 import logger from "../../objects/logger.object.js";
-import unselect from "../../helpers/unselect/index.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
-import databasePaths from "../../objects/database-paths.object.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
@@ -30,7 +28,6 @@ import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-
 import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
 import dirExists from "../../helpers/extras/fs/dir-exists.helper.js";
-import titlesFromRomsDirPath from "../../helpers/build/titles-from-roms-dir-path.helper.js";
 import allDirsExist from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write-roms-lists.helper.js";
 import type { AlejandroG751JTSkipFlags } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-skip-flags.interface.js";
@@ -40,15 +37,14 @@ import type { ConsolesData } from "../../types/consoles-data.type.js";
 import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/write-media-lists.helper.js";
 import populateConsoles from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles.helper.js";
 import filterConsoles from "../../helpers/classes/devices/alejandro-g751jt/filter-consoles.helper.js";
+import writeRomsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-roms-diffs.helper.js";
+import type { ConsoleRoms } from "../../types/console-roms.type.js";
+import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-media-diffs.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
 export type GetConsoleRomsDiffFilePath = AppNotFoundError;
 export type GetConsoleRomsSyncDirPath = AppNotFoundError;
-
-const build = {
-  titlesFromRomsDirPath,
-};
 
 const fsExtras = {
   dirExists,
@@ -233,21 +229,48 @@ class AlejandroG751JT implements Device, Debug {
       }
     },
     diffs: async () => {
-      for (const [consoleName, konsole] of this.filterableConsoles) {
-        if (!this._paths.files.project.lists.roms.consoles[consoleName])
-          continue;
+      const consoleRoms: ConsoleRoms = {};
 
-        if (!this._paths.files.project.diffs.roms.consoles[consoleName])
-          continue;
+      for (const [, konsole] of this.filterableConsoles)
+        consoleRoms[konsole.name] = {
+          name: konsole.name,
+          roms: {
+            all: konsole.roms,
+            selected: konsole.selectedRoms,
+          },
+        };
 
-        // 1. couldn't delete previous diff file (if it existed)
-        // 2. couldn't read list file
-        // 3. couldn't open a new diff file
-        // 4. couldn't write to the diff file
-        const diffError = await fsExtras.writeConsoleDiffFile(konsole, {
-          list: this._paths.files.project.lists.roms.consoles[consoleName],
-          diff: this._paths.files.project.diffs.roms.consoles[consoleName],
-        });
+      if (
+        this._shouldProcessContentTargets.roms &&
+        !this._skipFlags["content-targets"].roms
+      ) {
+        const [consolesToSkip, validationError] = await writeRomsDiffs(
+          this._paths,
+          consoleRoms,
+        );
+
+        if (validationError) this._skipRomsContentTarget();
+
+        if (consolesToSkip)
+          for (const consoleName of consolesToSkip)
+            this._skipConsoleRoms(consoleName);
+      }
+
+      if (
+        this._shouldProcessContentTargets.media &&
+        !this._skipFlags["content-targets"].media.global
+      ) {
+        const [consoleMediaNamesToSkip, validationError] =
+          await writeMediaDiffs(this._paths, consoleRoms, this._consolesData);
+
+        if (validationError) this._skipMediaContentTarget();
+
+        if (consoleMediaNamesToSkip)
+          for (const consoleMediaName of consoleMediaNamesToSkip)
+            this._skipConsoleMediaName(
+              consoleMediaName.console,
+              consoleMediaName.media,
+            );
       }
     },
   };

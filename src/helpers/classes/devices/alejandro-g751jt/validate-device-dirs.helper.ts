@@ -4,17 +4,18 @@ import FileIOExtras, {
   type DirAccessItem as FileIODirAccessItem,
 } from "../../../../classes/file-io/file-io-extras.class.js";
 
-export type ValidateRomsListsDeviceDirsError =
+export type ValidateDeviceDirsError =
   | AllDirsExistMethodError
   | AllDirsExistMethodFalseResult["error"];
 
-const validateRomsListsDeviceDirs = async (
+const validateDeviceDirs = async (
   paths: string[],
   allDirsExist: FileIOExtras["allDirsExist"],
-): Promise<ValidateRomsListsDeviceDirsError | undefined> => {
+  rights: "r" | "w" | "rw" = "r",
+): Promise<ValidateDeviceDirsError | undefined> => {
   const deviceDirAccessItems: FileIODirAccessItem[] = paths.map((p) => ({
     path: p,
-    rights: "r",
+    rights,
   }));
 
   const [allDeviceDirsExistResult, allDeviceDirsExistError] =
@@ -24,4 +25,4 @@ const validateRomsListsDeviceDirs = async (
   if (!allDeviceDirsExistResult.allExist) return allDeviceDirsExistResult.error;
 };
 
-export default validateRomsListsDeviceDirs;
+export default validateDeviceDirs;

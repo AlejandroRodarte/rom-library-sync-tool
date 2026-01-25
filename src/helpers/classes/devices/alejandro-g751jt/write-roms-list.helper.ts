@@ -2,7 +2,7 @@ import type {
   FileIO,
   LsMethodError,
 } from "../../../../interfaces/file-io.interface.js";
-import type { WriteConsoleRomsListOperation } from "../../../../interfaces/write-console-roms-list-operation.interface.js";
+import type { WriteRomsListOperation } from "../../../../interfaces/write-roms-list-operation.interface.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../extras/fs/open-file-for-writing.helper.js";
@@ -10,15 +10,15 @@ import writeLines, {
   type WriteLinesError,
 } from "../../../extras/fs/write-lines.helper.js";
 
-export type WriteConsoleRomsListError =
+export type WriteRomsListError =
   | LsMethodError
   | OpenFileForWritingError
   | WriteLinesError;
 
-const writeConsoleRomsList = async (
-  op: WriteConsoleRomsListOperation,
+const writeRomsList = async (
+  op: WriteRomsListOperation,
   ls: FileIO["ls"],
-): Promise<WriteConsoleRomsListError | undefined> => {
+): Promise<WriteRomsListError | undefined> => {
   const [lsEntries, lsError] = await ls(op.paths.device.dir);
   if (lsError) return lsError;
 
@@ -42,4 +42,4 @@ const writeConsoleRomsList = async (
   await listFileHandle.close();
 };
 
-export default writeConsoleRomsList;
+export default writeRomsList;

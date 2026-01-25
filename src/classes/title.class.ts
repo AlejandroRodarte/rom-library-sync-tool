@@ -1,5 +1,3 @@
-import { v7 } from "uuid";
-
 import AppNotFoundError from "./errors/app-not-found-error.class.js";
 import specialFlagsFromRoms from "../helpers/build/special-flags-from-roms.helper.js";
 import type { RomSet } from "../types/rom-set.type.js";
@@ -50,7 +48,7 @@ class Title {
   }
 
   public addRom(rom: Rom): void {
-    this._romSet.set(v7(), rom);
+    this._romSet.set(rom.file.name, rom);
   }
 
   public setSelectedRomSet(): void {

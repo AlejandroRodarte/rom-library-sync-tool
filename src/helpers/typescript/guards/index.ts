@@ -22,7 +22,10 @@ import isContentTargetsList from "./is-content-targets-list.helper.js";
 import isFileIOStrategy from "./is-file-io-strategy.helper.js";
 import isFileIOFsCrudStrategy from "./is-file-io-fs-crud-strategy.helper.js";
 import isConsolesListItemOrRest from "./is-consoles-list-item-or-rest.helper.js";
-import isRomFileType from "./is-rom-file-type.helper.js";
+import isRomFsType from "./is-rom-fs-type.helper.js";
+import isMediaFsType from "./is-media-fs-type.helper.js";
+import isRomDiffActionType from "./is-rom-diff-action.type.helper.js";
+import isMediaDiffActionType from "./is-media-diff-action.type.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -49,7 +52,10 @@ const typeGuards = {
   isContentTargetsListItem,
   isContentTargetsList,
   isConsolesListItemOrRest,
-  isRomFileType,
+  isRomFsType,
+  isMediaFsType,
+  isRomDiffActionType,
+  isMediaDiffActionType,
 };
 
 export default typeGuards;

@@ -13,6 +13,8 @@ class Console {
 
   private _scrappedTitles: Titles;
   private _selectedTitles: Map<number, Titles>;
+
+  private _roms: RomSet;
   private _selectedRoms: RomSet;
 
   constructor(name: ConsoleName) {
@@ -21,11 +23,16 @@ class Console {
 
     this._selectedTitles = new Map<number, Titles>();
     this._scrappedTitles = new Map<string, Title>();
+    this._roms = new Map<string, Rom>();
     this._selectedRoms = new Map<string, Rom>();
   }
 
   get name() {
     return this._name;
+  }
+
+  get roms() {
+    return this._roms;
   }
 
   get selectedTitles() {
@@ -63,9 +70,7 @@ class Console {
     const titleExists = this._titles.has(titleName);
 
     if (titleExists)
-      return new AppExistsError(
-        `Entry for title ${titleName} already exists.`,
-      );
+      return new AppExistsError(`Entry for title ${titleName} already exists.`);
 
     this._titles.set(titleName, title);
   }
@@ -75,44 +80,37 @@ class Console {
   }
 
   public updateSelectedTitles(): void {
-    const duplicates = new Map<number, Titles>();
-
     for (const [titleName, title] of this._titles) {
       if (title.selectedRomAmount < 1) continue;
 
-      const duplicateTitles = duplicates.get(title.selectedRomAmount);
+      const duplicateTitles = this._selectedTitles.get(title.selectedRomAmount);
       if (duplicateTitles) duplicateTitles.set(titleName, title);
       else
-        duplicates.set(
+        this._selectedTitles.set(
           title.selectedRomAmount,
           new Map<string, Title>([[titleName, title]]),
         );
     }
-
-    this._selectedTitles = duplicates;
   }
 
   public updateScrappedTitles(): void {
-    const scrapped = new Map<string, Title>();
-
     for (const [titleName, title] of this._titles) {
       if (title.selectedRomAmount !== 0) continue;
-      scrapped.set(titleName, title);
+      this._scrappedTitles.set(titleName, title);
     }
+  }
 
-    this._scrappedTitles = scrapped;
+  public updateRoms(): void {
+    for (const [_, title] of this._titles)
+      title.romSet.entries().forEach(([id, rom]) => this._roms.set(id, rom));
   }
 
   public updateSelectedRoms(): void {
-    const romSet: RomSet = new Map<string, Rom>();
-
     for (const [_, title] of this._titles) {
       title.selectedRomSet
         .entries()
-        .forEach(([id, rom]) => romSet.set(id, rom));
+        .forEach(([id, rom]) => this._selectedRoms.set(id, rom));
     }
-
-    this._selectedRoms = romSet;
   }
 }
 

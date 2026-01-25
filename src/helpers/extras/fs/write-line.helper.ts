@@ -4,16 +4,16 @@ import writeFile, {
   type WriteFileError,
 } from "../../wrappers/modules/fs/write-file.helper.js";
 
-export type WriteLinesError = WriteFileError;
+export type WriteLineError = WriteFileError;
 
-const writeLines = async (
+const writeLine = async (
   file: string | FileHandle,
-  lines: string[],
+  line: string,
   encoding: BufferEncoding = "utf8",
-): Promise<WriteLinesError | undefined> => {
-  const content = `${lines.join(os.EOL)}${os.EOL}`;
+): Promise<WriteLineError | undefined> => {
+  const content = `${line}${os.EOL}`;
   const writeFileError = await writeFile(file, content, { encoding });
   if (writeFileError) return writeFileError;
 };
 
-export default writeLines;
+export default writeLine;

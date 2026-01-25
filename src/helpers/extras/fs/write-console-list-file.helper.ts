@@ -31,7 +31,7 @@ const writeConsoleListFile = async (
 
   const newFilenames = konsole.selectedRoms
     .values()
-    .map((rom) => rom.filename)
+    .map((rom) => rom.file.name)
     .toArray()
     .join("\n");
 

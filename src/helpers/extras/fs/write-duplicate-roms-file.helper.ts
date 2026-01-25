@@ -26,7 +26,7 @@ const writeDuplicateRomsFile = async (
       for (const [titleName, title] of titles) {
         content += `===== Title: ${titleName} =====\n`;
         for (const [, rom] of title.selectedRomSet)
-          content += `ROM: ${rom.filename}\n`;
+          content += `ROM: ${rom.file.name}\n`;
       }
     }
   }

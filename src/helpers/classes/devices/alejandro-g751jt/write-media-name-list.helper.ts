@@ -2,7 +2,7 @@ import type {
   FileIO,
   LsMethodError,
 } from "../../../../interfaces/file-io.interface.js";
-import type { WriteConsoleMediaNameListOperation } from "../../../../interfaces/write-console-media-name-list-operation.interface.js";
+import type { WriteMediaNameListOperation } from "../../../../interfaces/write-media-name-list-operation.interface.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../extras/fs/open-file-for-writing.helper.js";
@@ -15,19 +15,21 @@ const fsExtras = {
   writeLines,
 };
 
-export type WriteConsoleMediaNameListError =
+export type WriteMediaNameListError =
   | LsMethodError
   | OpenFileForWritingError
   | WriteLinesError;
 
-const writeConsoleMediaNameList = async (
-  op: WriteConsoleMediaNameListOperation,
+const writeMediaNameList = async (
+  op: WriteMediaNameListOperation,
   ls: FileIO["ls"],
-): Promise<WriteConsoleMediaNameListError | undefined> => {
+): Promise<WriteMediaNameListError | undefined> => {
   const [lsEntries, lsError] = await ls(op.paths.device.dir);
   if (lsError) return lsError;
 
-  const filenames = lsEntries.map((e) => e.name);
+  const fsTypeandFilenameList = lsEntries
+    .filter((e) => e.is.link)
+    .map((e) => e.name);
 
   const [listFileHandle, listFileError] = await fsExtras.openFileForWriting(
     op.paths.project.file,
@@ -37,7 +39,7 @@ const writeConsoleMediaNameList = async (
 
   const writeLinesError = await fsExtras.writeLines(
     listFileHandle,
-    filenames,
+    fsTypeandFilenameList,
     "utf8",
   );
 
@@ -49,4 +51,4 @@ const writeConsoleMediaNameList = async (
   await listFileHandle.close();
 };
 
-export default writeConsoleMediaNameList;
+export default writeMediaNameList;

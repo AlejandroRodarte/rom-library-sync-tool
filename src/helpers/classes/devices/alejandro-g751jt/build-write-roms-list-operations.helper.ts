@@ -1,12 +1,12 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { WriteConsoleRomsListOperation } from "../../../../interfaces/write-console-roms-list-operation.interface.js";
+import type { WriteRomsListOperation } from "../../../../interfaces/write-roms-list-operation.interface.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 
-const buildWriteConsoleRomsListOperations = (
+const buildWriteRomsListOperations = (
   paths: AlejandroG751JTPaths,
   consoleNames: ConsoleName[],
-): WriteConsoleRomsListOperation[] => {
-  const ops: WriteConsoleRomsListOperation[] = [];
+): WriteRomsListOperation[] => {
+  const ops: WriteRomsListOperation[] = [];
 
   for (const consoleName of consoleNames) {
     const deviceConsoleRomsDir =
@@ -29,4 +29,4 @@ const buildWriteConsoleRomsListOperations = (
   return ops;
 };
 
-export default buildWriteConsoleRomsListOperations;
+export default buildWriteRomsListOperations;

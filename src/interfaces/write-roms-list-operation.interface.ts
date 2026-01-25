@@ -1,6 +1,6 @@
 import type { ConsoleName } from "../types/console-name.type.js";
 
-export interface WriteConsoleRomsListOperation {
+export interface WriteRomsListOperation {
   paths: {
     device: {
       dir: string;

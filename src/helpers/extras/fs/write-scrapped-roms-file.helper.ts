@@ -25,7 +25,7 @@ const writeScrappedRomsFile = async (
 
     for (const [titleName, title] of konsole.scrappedTitles) {
       content += `===== Title: ${titleName} =====\n`;
-      for (const [, rom] of title.romSet) content += `ROM: ${rom.filename}\n`;
+      for (const [, rom] of title.romSet) content += `ROM: ${rom.file.name}\n`;
     }
   }
 

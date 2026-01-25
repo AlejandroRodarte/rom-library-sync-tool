@@ -50,7 +50,7 @@ const writeConsoleDiffFile = async (
 
   const newFilenames = konsole.selectedRoms
     .values()
-    .map((rom) => rom.filename)
+    .map((rom) => rom.file.name)
     .toArray();
 
   const [diffFileHandle, diffFileOpenError] = await openFileForWriting(

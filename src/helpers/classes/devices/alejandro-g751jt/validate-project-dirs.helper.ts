@@ -1,23 +1,24 @@
 import allDirsExist, {
   type AllDirsExistError,
   type AllDirsExistFalseResult,
-  type DirAccessItem as FsDirAccessItem,
+  type DirAccessItem,
 } from "../../../extras/fs/all-dirs-exist.helper.js";
 
 const fsExtras = {
   allDirsExist,
 };
 
-export type ValidateRomsListsProjectDirsError =
+export type ValidateProjectDirsError =
   | AllDirsExistError
   | AllDirsExistFalseResult["error"];
 
-const validateRomsListsProjectDirs = async (
+const validateProjectDirs = async (
   paths: string[],
-): Promise<ValidateRomsListsProjectDirsError | undefined> => {
-  const projectDirAccessItems: FsDirAccessItem[] = paths.map((p) => ({
+  rights: "r" | "w" | "rw" = "rw",
+): Promise<ValidateProjectDirsError | undefined> => {
+  const projectDirAccessItems: DirAccessItem[] = paths.map((p) => ({
     path: p,
-    rights: "rw",
+    rights,
   }));
 
   const [allProjectDirsExistResult, allProjectDirsExistError] =
@@ -29,4 +30,4 @@ const validateRomsListsProjectDirs = async (
     return allProjectDirsExistResult.error;
 };
 
-export default validateRomsListsProjectDirs;
+export default validateProjectDirs;

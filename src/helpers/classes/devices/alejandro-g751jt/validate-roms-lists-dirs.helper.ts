@@ -1,14 +1,14 @@
-import validateRomsListsProjectDirs, {
-  type ValidateRomsListsProjectDirsError,
-} from "./validate-roms-lists-project-dirs.helper.js";
-import validateRomsListsDeviceDirs, {
-  type ValidateRomsListsDeviceDirsError,
-} from "./validate-roms-lists-device-dirs.helper.js";
+import validateProjectDirs, {
+  type ValidateProjectDirsError,
+} from "./validate-project-dirs.helper.js";
+import validateDeviceDirs, {
+  type ValidateDeviceDirsError,
+} from "./validate-device-dirs.helper.js";
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 
 export type ValidateRomsListsDirsError =
-  | ValidateRomsListsProjectDirsError
-  | ValidateRomsListsDeviceDirsError;
+  | ValidateProjectDirsError
+  | ValidateDeviceDirsError;
 
 const validateRomsListsDirs = async (
   paths: {
@@ -17,13 +17,11 @@ const validateRomsListsDirs = async (
   },
   allDirsExist: FileIOExtras["allDirsExist"],
 ): Promise<ValidateRomsListsDirsError | undefined> => {
-  const projectDirsValidationError = await validateRomsListsProjectDirs(
-    paths.project,
-  );
+  const projectDirsValidationError = await validateProjectDirs(paths.project);
 
   if (projectDirsValidationError) return projectDirsValidationError;
 
-  const deviceDirsValidationError = await validateRomsListsDeviceDirs(
+  const deviceDirsValidationError = await validateDeviceDirs(
     paths.device,
     allDirsExist,
   );

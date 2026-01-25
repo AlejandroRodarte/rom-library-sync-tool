@@ -6,6 +6,7 @@ const filterConsoles = (consoles: Consoles): void => {
     konsole.unselectTitles(unselect.byLocalDevice);
 
   for (const [, konsole] of consoles) {
+    konsole.updateRoms();
     konsole.updateSelectedRoms();
     konsole.updateScrappedTitles();
     konsole.updateScrappedTitles();

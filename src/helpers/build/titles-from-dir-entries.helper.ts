@@ -21,14 +21,29 @@ const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
     if (validationError) continue;
 
     const filename = entry.name.toString();
+    const lastDotIndex = filename.lastIndexOf(".");
+
+    if (lastDotIndex === -1) {
+      logger.error(
+        `Filename ${filename} must have a dot that separates the basename from the extension. Skipping entry.`,
+      );
+      continue;
+    }
+
+    const basename = filename.substring(0, lastDotIndex);
+    const extension = filename.substring(lastDotIndex + 1);
+
     const { labels, languages } = labelsAndLanguagesFromFilename(filename);
-    const title = titles.get(titleName);
+
     const newRom: Rom = {
-      filename,
+      base: { name: basename },
+      file: { name: filename, type: extension },
+      fs: { type: entry.isFile() ? "file" : "dir" },
       labels,
       languages,
-      fileType: entry.isFile() ? "file" : "dir",
     };
+
+    const title = titles.get(titleName);
 
     if (title) title.addRom(newRom);
     else {
