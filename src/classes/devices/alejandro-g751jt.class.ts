@@ -257,7 +257,7 @@ class AlejandroG751JT implements Device, Debug {
       }
 
       if (
-        this._shouldProcessContentTargets.media &&
+        this._shouldProcessContentTargets.media.global &&
         !this._skipFlags["content-targets"].media.global
       ) {
         const [consoleMediaNamesToSkip, validationError] =
