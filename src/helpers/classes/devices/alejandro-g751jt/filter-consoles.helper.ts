@@ -9,7 +9,7 @@ const filterConsoles = (consoles: Consoles): void => {
     konsole.updateRoms();
     konsole.updateSelectedRoms();
     konsole.updateScrappedTitles();
-    konsole.updateScrappedTitles();
+    konsole.updateSelectedTitles();
   }
 };
 
