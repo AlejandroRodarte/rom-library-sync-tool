@@ -23,14 +23,15 @@ const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
     const filename = entry.name.toString();
     const lastDotIndex = filename.lastIndexOf(".");
 
-    if (lastDotIndex === -1) {
+    if (entry.isFile() && lastDotIndex === -1) {
       logger.error(
-        `Filename ${filename} must have a dot that separates the basename from the extension. Skipping entry.`,
+        `Entry ${entry.name} is a file, and does not have a dot that separates basename from extension. Skipping entry.`,
       );
       continue;
     }
 
-    const basename = filename.substring(0, lastDotIndex);
+    const basename =
+      lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
     const extension = filename.substring(lastDotIndex + 1);
 
     const { labels, languages } = labelsAndLanguagesFromFilename(filename);
