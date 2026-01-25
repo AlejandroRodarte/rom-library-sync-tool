@@ -273,6 +273,11 @@ class AlejandroG751JT implements Device, Debug {
             );
       }
     },
+    failed: async () => {
+      if (this._shouldProcessContentTargets.roms && !this._skipFlags["content-targets"].roms) {
+        // await syncRoms();
+      }
+    },
   };
 
   sync: () => Promise<void> = async () => {};

@@ -3,4 +3,5 @@ export interface DeviceWriteMethods {
   scrapped: () => Promise<void>;
   lists: () => Promise<void>;
   diffs: () => Promise<void>;
+  failed: () => Promise<void>;
 }

@@ -48,6 +48,8 @@ const main = async () => {
     case "diff":
       await modes.diff(devices);
       break;
+    case "sync":
+      await modes.sync(devices);
     default:
       logger.warn(`Mode ${mode} not implemented yet`);
   }
