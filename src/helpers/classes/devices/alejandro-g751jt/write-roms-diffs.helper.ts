@@ -1,4 +1,6 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
+import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
 import buildRomsDiffsDirPaths from "./build-roms-diffs-dir-paths.helper.js";
@@ -19,7 +21,7 @@ const writeRomsDiffs = async (
   const romsDirPaths = buildRomsDiffsDirPaths(paths.dirs);
   const ops = buildWriteRomsDiffOperations(paths.files.project, consoles);
 
-  const pathsValidationError = await validateDiffPaths({
+  const diffPaths: DiffPaths = {
     project: {
       list: {
         dirs: romsDirPaths.project.lists,
@@ -29,7 +31,11 @@ const writeRomsDiffs = async (
         dirs: romsDirPaths.project.diffs,
       },
     },
-  });
+  };
+
+  logger.debug(JSON.stringify(diffPaths, undefined, 2));
+
+  const pathsValidationError = await validateDiffPaths(diffPaths);
   if (pathsValidationError) return [undefined, pathsValidationError];
 
   const consolesToSkip: ConsoleName[] = [];
