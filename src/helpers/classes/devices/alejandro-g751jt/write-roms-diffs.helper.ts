@@ -3,7 +3,7 @@ import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
 import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
-import buildRomsDiffsDirPaths from "./build-roms-diffs-dir-paths.helper.js";
+import buildRomsDiffsDirPaths from "./build-roms-diff-paths.helper.js";
 import buildWriteRomsDiffOperations from "./build-write-roms-diff-operations.helper.js";
 import validateDiffPaths, {
   type ValidateDiffPathsError,
@@ -18,23 +18,11 @@ const writeRomsDiffs = async (
   paths: AlejandroG751JTPaths,
   diffConsolesData: DiffConsolesData,
 ): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsDiffError]> => {
-  const romsDirPaths = buildRomsDiffsDirPaths(paths.dirs);
+  const diffPaths = buildRomsDiffsDirPaths(paths);
   const ops = buildWriteRomsDiffOperations(
     paths.files.project,
     diffConsolesData,
   );
-
-  const diffPaths: DiffPaths = {
-    project: {
-      list: {
-        dirs: romsDirPaths.project.lists,
-        files: ops.map((o) => o.paths.project.list.file),
-      },
-      diff: {
-        dirs: romsDirPaths.project.diffs,
-      },
-    },
-  };
 
   logger.debug(JSON.stringify(diffPaths, undefined, 2));
 
