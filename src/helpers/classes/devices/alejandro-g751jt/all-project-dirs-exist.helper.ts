@@ -8,14 +8,14 @@ const fsExtras = {
   allDirsExist,
 };
 
-export type ValidateProjectDirsError =
+export type AllProjectDirsExistError =
   | AllDirsExistError
   | AllDirsExistFalseResult["error"];
 
-const validateProjectDirs = async (
+const allProjectDirsExist = async (
   paths: string[],
   rights: "r" | "w" | "rw" = "rw",
-): Promise<ValidateProjectDirsError | undefined> => {
+): Promise<AllProjectDirsExistError | undefined> => {
   const projectDirAccessItems: DirAccessItem[] = paths.map((p) => ({
     path: p,
     rights,
@@ -30,4 +30,4 @@ const validateProjectDirs = async (
     return allProjectDirsExistResult.error;
 };
 
-export default validateProjectDirs;
+export default allProjectDirsExist;

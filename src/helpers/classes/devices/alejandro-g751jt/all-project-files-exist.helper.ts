@@ -8,14 +8,14 @@ const fsExtras = {
   allFilesExist,
 };
 
-export type ValidateProjectFilesError =
+export type AllProjectFilesExistError =
   | AllFilesExistError
   | AllFilesExistFalseResult["error"];
 
-const validateProjectFiles = async (
+const allProjectFilesExist = async (
   paths: string[],
   rights: "r" | "w" | "rw" = "r",
-): Promise<ValidateProjectFilesError | undefined> => {
+): Promise<AllProjectFilesExistError | undefined> => {
   const projectDirAccessItems: FileAccessItem[] = paths.map((p) => ({
     path: p,
     rights,
@@ -30,4 +30,4 @@ const validateProjectFiles = async (
     return allProjectDirsExistResult.error;
 };
 
-export default validateProjectFiles;
+export default allProjectFilesExist;
