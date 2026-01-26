@@ -2,10 +2,10 @@ import type { ContentTargetName } from "../../../types/content-target-name.type.
 import type { FileIOStrategy } from "../../../types/file-io-strategy.type.js";
 import type { FileIOStrategyData } from "../../file-io-strategy-data.interface.js";
 import type { ContentTargetPaths } from "../../../types/content-target-paths.type.js";
-import type { ConsolesData } from "../../../types/consoles-data.type.js";
+import type { ConsoleEnvData } from "../../../types/console-env-data.type.js";
 
 export interface AlejandroG751JTData {
-  consoles: ConsolesData,
+  consoles: ConsoleEnvData;
   "content-targets": {
     names: ContentTargetName[];
     paths: ContentTargetPaths;

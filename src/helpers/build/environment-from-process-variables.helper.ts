@@ -18,7 +18,7 @@ import FILE_IO_FS_CRUD_STRATEGIES from "../../constants/file-io-fs-crud-strategi
 import type { DeviceName } from "../../types/device-name.type.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import setConsolesDataMediaNamesFromStringPairs from "../mutate/set-consoles-data-media-names-from-string-pairs.helper.js";
-import type { ConsolesData } from "../../types/consoles-data.type.js";
+import type { ConsoleEnvData } from "../../types/console-env-data.type.js";
 
 const environmentFromProcessVariables = (): Environment => {
   /*
@@ -249,7 +249,7 @@ const environmentFromProcessVariables = (): Environment => {
     alejandroG751JTListConsolesList,
   );
 
-  const alejandroG751JTListConsolesData: ConsolesData = {};
+  const alejandroG751JTListConsolesData: ConsoleEnvData = {};
   for (const consoleName of alejandroG751JTListConsoleNames)
     alejandroG751JTListConsolesData[consoleName] = {
       name: consoleName,
@@ -274,7 +274,7 @@ const environmentFromProcessVariables = (): Environment => {
     alejandroG751JTDiffConsolesList,
   );
 
-  const alejandroG751JTDiffConsolesData: ConsolesData = {};
+  const alejandroG751JTDiffConsolesData: ConsoleEnvData = {};
   for (const consoleName of alejandroG751JTDiffConsoleNames)
     alejandroG751JTDiffConsolesData[consoleName] = {
       name: consoleName,
@@ -299,7 +299,7 @@ const environmentFromProcessVariables = (): Environment => {
     alejandroG751JTSyncConsolesList,
   );
 
-  const alejandroG751JTSyncConsolesData: ConsolesData = {};
+  const alejandroG751JTSyncConsolesData: ConsoleEnvData = {};
   for (const consoleName of alejandroG751JTSyncConsoleNames)
     alejandroG751JTSyncConsolesData[consoleName] = {
       name: consoleName,
@@ -499,7 +499,7 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckLCDAlejandroListConsolesList,
   );
 
-  const steamDeckLCDAlejandroListConsolesData: ConsolesData = {};
+  const steamDeckLCDAlejandroListConsolesData: ConsoleEnvData = {};
   for (const consoleName of steamDeckLCDAlejandroListConsoleNames)
     steamDeckLCDAlejandroListConsolesData[consoleName] = {
       name: consoleName,
@@ -524,7 +524,7 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckLCDAlejandroDiffConsolesList,
   );
 
-  const steamDeckLCDAlejandroDiffConsolesData: ConsolesData = {};
+  const steamDeckLCDAlejandroDiffConsolesData: ConsoleEnvData = {};
   for (const consoleName of steamDeckLCDAlejandroDiffConsoleNames)
     steamDeckLCDAlejandroDiffConsolesData[consoleName] = {
       name: consoleName,
@@ -549,7 +549,7 @@ const environmentFromProcessVariables = (): Environment => {
     steamDeckLCDAlejandroSyncConsolesList,
   );
 
-  const steamDeckLCDAlejandroSyncConsolesData: ConsolesData = {};
+  const steamDeckLCDAlejandroSyncConsolesData: ConsoleEnvData = {};
   for (const consoleName of steamDeckLCDAlejandroSyncConsoleNames)
     steamDeckLCDAlejandroSyncConsolesData[consoleName] = {
       name: consoleName,
@@ -720,7 +720,7 @@ const environmentFromProcessVariables = (): Environment => {
   /*
    * Intersected consoles data, depending on mode
    */
-  const alejandroG751JTConsolesData: ConsolesData = {};
+  const alejandroG751JTConsolesData: ConsoleEnvData = {};
   for (const consoleName of alejandroG751JTConsoleNames) {
     switch (mode) {
       case "diff": {
@@ -839,7 +839,7 @@ const environmentFromProcessVariables = (): Environment => {
     }
   }
 
-  const steamDeckLCDAlejandroConsolesData: ConsolesData = {};
+  const steamDeckLCDAlejandroConsolesData: ConsoleEnvData = {};
   for (const consoleName of steamDeckLCDAlejandroConsoleNames) {
     switch (mode) {
       case "diff": {

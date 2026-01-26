@@ -2,13 +2,13 @@ import AppValidationError from "../../classes/errors/app-validation-error.class.
 import CONSOLE_NAMES from "../../constants/console-names.constant.js";
 import MEDIA_NAMES from "../../constants/media-names.constant.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
+import type { ConsoleEnvData } from "../../types/console-env-data.type.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
-import type { ConsolesData } from "../../types/consoles-data.type.js";
 import mediaNamesFromMediasList from "../build/media-names-from-medias-list.helper.js";
 import typeGuards from "../typescript/guards/index.js";
 
 const setConsolesDataMediaNamesFromStringPairs = (
-  consolesData: ConsolesData,
+  consolesData: ConsoleEnvData,
   pairs: string[],
 ): AppValidationError | undefined => {
   const consoleNames: ConsoleName[] = Object.entries(consolesData).map(
