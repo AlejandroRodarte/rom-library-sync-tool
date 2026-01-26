@@ -6,7 +6,7 @@ import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
 import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
-import buildMediaDiffsDirPaths from "./build-media-diffs-dir-paths.helper.js";
+import buildMediaDiffPaths from "./build-media-diff-paths.helper.js";
 import buildWriteMediaNameDiffOperations from "./build-write-media-name-diff-operations.helper.js";
 import validateDiffPaths, {
   type ValidateDiffPathsError,
@@ -26,20 +26,8 @@ const writeMediaDiffs = async (
 ): Promise<
   [ConsoleMediaName[], undefined] | [undefined, WriteMediaDiffsError]
 > => {
-  const mediaDirPaths = buildMediaDiffsDirPaths(paths.dirs);
+  const diffPaths = buildMediaDiffPaths(paths);
   const ops = buildWriteMediaNameDiffOperations(paths, diffConsolesData);
-
-  const diffPaths: DiffPaths = {
-    project: {
-      list: {
-        dirs: mediaDirPaths.project.lists,
-        files: ops.map((o) => o.paths.project.list.file),
-      },
-      diff: {
-        dirs: mediaDirPaths.project.diffs,
-      },
-    },
-  };
 
   logger.debug(JSON.stringify(diffPaths, undefined, 2));
 

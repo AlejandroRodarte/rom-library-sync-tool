@@ -32,7 +32,6 @@ import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/writ
 import populateConsoles from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles.helper.js";
 import filterConsoles from "../../helpers/classes/devices/alejandro-g751jt/filter-consoles.helper.js";
 import writeRomsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-roms-diffs.helper.js";
-import type { ConsoleRoms } from "../../types/console-roms.type.js";
 import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-media-diffs.helper.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
