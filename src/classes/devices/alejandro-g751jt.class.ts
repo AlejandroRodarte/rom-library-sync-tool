@@ -153,7 +153,7 @@ class AlejandroG751JT implements Device, Debug {
       if (!this._contentTargetSkipFlags.roms) {
         const [consolesToSkip, validationError] = await writeRomsLists(
           this._paths,
-          this._consoleNames,
+          this._consolesData,
           this._fileIOExtras,
         );
 

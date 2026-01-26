@@ -1,19 +1,26 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteRomsListOperation } from "../../../../interfaces/write-roms-list-operation.interface.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
+import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 
 const buildWriteRomsListOperations = (
   paths: AlejandroG751JTPaths,
-  consoleNames: ConsoleName[],
+  consolesData: ConsolesData,
 ): WriteRomsListOperation[] => {
   const ops: WriteRomsListOperation[] = [];
 
-  for (const consoleName of consoleNames) {
+  for (const [, consoleData] of Object.entries(consolesData)) {
+    if (
+      consoleData.skipFlags.global ||
+      consoleData.skipFlags.list.global ||
+      consoleData.skipFlags.list["content-targets"].roms
+    )
+      continue;
+
     const deviceConsoleRomsDir =
-      paths.dirs["content-targets"].roms.consoles[consoleName];
+      paths.dirs["content-targets"].roms.consoles[consoleData.name];
 
     const projectConsolesRomsFile =
-      paths.files.project.lists.roms.consoles[consoleName];
+      paths.files.project.lists.roms.consoles[consoleData.name];
 
     if (!deviceConsoleRomsDir || !projectConsolesRomsFile) continue;
 

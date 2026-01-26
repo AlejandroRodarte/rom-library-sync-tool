@@ -2,6 +2,7 @@ import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { ListPaths } from "../../../../interfaces/list-paths.interface.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
+import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import buildRomsListsDirPaths from "./build-roms-lists-dir-paths.helper.js";
 import buildWriteRomsListOperations from "./build-write-roms-list-operations.helper.js";
 import validateListPaths, {
@@ -13,11 +14,11 @@ export type WriteRomsListsError = ValidateListPathsError;
 
 const writeRomsLists = async (
   paths: AlejandroG751JTPaths,
-  consoleNames: ConsoleName[],
+  consolesData: ConsolesData,
   fileIOExtras: FileIOExtras,
 ): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsListsError]> => {
   const romsDirPaths = buildRomsListsDirPaths(paths.dirs);
-  const ops = buildWriteRomsListOperations(paths, consoleNames);
+  const ops = buildWriteRomsListOperations(paths, consolesData);
 
   const listPaths: ListPaths = {
     project: {
