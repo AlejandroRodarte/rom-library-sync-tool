@@ -4,6 +4,7 @@ import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
 import type { ConsolesData } from "../../../../types/consoles-data.type.js";
+import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
 import buildMediaDiffsDirPaths from "./build-media-diffs-dir-paths.helper.js";
 import buildWriteMediaNameDiffOperations from "./build-write-media-name-diff-operations.helper.js";
@@ -21,13 +22,12 @@ export type WriteMediaDiffsError = ValidateDiffPathsError;
 
 const writeMediaDiffs = async (
   paths: AlejandroG751JTPaths,
-  consoles: ConsoleRoms,
-  consolesData: ConsolesData,
+  diffConsolesData: DiffConsolesData,
 ): Promise<
   [ConsoleMediaName[], undefined] | [undefined, WriteMediaDiffsError]
 > => {
   const mediaDirPaths = buildMediaDiffsDirPaths(paths.dirs);
-  const ops = buildWriteMediaNameDiffOperations(paths, consoles, consolesData);
+  const ops = buildWriteMediaNameDiffOperations(paths, diffConsolesData);
 
   const diffPaths: DiffPaths = {
     project: {
@@ -41,7 +41,7 @@ const writeMediaDiffs = async (
     },
   };
 
-  logger.debug(JSON.stringify(diffPaths, undefined, 2))
+  logger.debug(JSON.stringify(diffPaths, undefined, 2));
 
   const pathValidationError = await validateDiffPaths(diffPaths);
 

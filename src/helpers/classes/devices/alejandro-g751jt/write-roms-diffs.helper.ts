@@ -2,7 +2,7 @@ import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejan
 import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
 import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
+import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
 import buildRomsDiffsDirPaths from "./build-roms-diffs-dir-paths.helper.js";
 import buildWriteRomsDiffOperations from "./build-write-roms-diff-operations.helper.js";
 import validateDiffPaths, {
@@ -16,10 +16,13 @@ export type WriteRomsDiffsError = ValidateDiffPathsError;
 
 const writeRomsDiffs = async (
   paths: AlejandroG751JTPaths,
-  consoles: ConsoleRoms,
+  diffConsolesData: DiffConsolesData,
 ): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsDiffError]> => {
   const romsDirPaths = buildRomsDiffsDirPaths(paths.dirs);
-  const ops = buildWriteRomsDiffOperations(paths.files.project, consoles);
+  const ops = buildWriteRomsDiffOperations(
+    paths.files.project,
+    diffConsolesData,
+  );
 
   const diffPaths: DiffPaths = {
     project: {

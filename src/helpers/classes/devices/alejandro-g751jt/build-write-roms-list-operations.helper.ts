@@ -29,7 +29,7 @@ const buildWriteRomsListOperations = (
         device: { dir: deviceConsoleRomsDir },
         project: { file: projectConsolesRomsFile },
       },
-      names: { console: consoleName },
+      names: { console: consoleData.name },
     });
   }
 

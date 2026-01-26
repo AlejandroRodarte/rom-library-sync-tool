@@ -36,6 +36,7 @@ import type { ConsoleRoms } from "../../types/console-roms.type.js";
 import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-media-diffs.helper.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
+import type { DiffConsolesData } from "../../types/diff-consoles-data.type.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -160,8 +161,10 @@ class AlejandroG751JT implements Device, Debug {
         if (validationError) this._skipRomsContentTarget();
 
         if (consolesToSkip)
-          for (const consoleName of consolesToSkip)
-            this._skipConsoleRoms(consoleName);
+          for (const consoleName of consolesToSkip) {
+            this._skipListConsoleRoms(consoleName);
+            this._skipDiffConsoleRoms(consoleName);
+          }
       }
 
       if (!this._contentTargetSkipFlags.media) {
@@ -175,47 +178,57 @@ class AlejandroG751JT implements Device, Debug {
         if (validationError) this._skipMediaContentTarget();
 
         if (consoleMediaNamesToSkip)
-          for (const consoleMediaName of consoleMediaNamesToSkip)
-            this._skipConsoleMediaName(
+          for (const consoleMediaName of consoleMediaNamesToSkip) {
+            this._skipListConsoleMediaName(
               consoleMediaName.console,
               consoleMediaName.media,
             );
+            this._skipDiffConsoleMediaName(
+              consoleMediaName.console,
+              consoleMediaName.media,
+            );
+          }
       }
     },
     diffs: async () => {
-      const consoleRoms: ConsoleRoms = {};
+      const diffConsolesData: DiffConsolesData = {};
 
-      for (const [, konsole] of this._consoles)
-        consoleRoms[konsole.name] = {
+      for (const [, konsole] of this._consoles) {
+        const consoleData = this._consolesData[konsole.name];
+        if (!consoleData) continue;
+
+        diffConsolesData[konsole.name] = {
           name: konsole.name,
           roms: {
             all: konsole.roms,
             selected: konsole.selectedRoms,
           },
+          data: consoleData,
         };
+      }
 
       if (!this._contentTargetSkipFlags.roms) {
         const [consolesToSkip, validationError] = await writeRomsDiffs(
           this._paths,
-          consoleRoms,
+          diffConsolesData,
         );
 
         if (validationError) this._skipRomsContentTarget();
 
         if (consolesToSkip)
           for (const consoleName of consolesToSkip)
-            this._skipConsoleRoms(consoleName);
+            this._skipSyncConsoleRoms(consoleName);
       }
 
       if (!this._contentTargetSkipFlags.media) {
         const [consoleMediaNamesToSkip, validationError] =
-          await writeMediaDiffs(this._paths, consoleRoms, this._consolesData);
+          await writeMediaDiffs(this._paths, diffConsolesData);
 
         if (validationError) this._skipMediaContentTarget();
 
         if (consoleMediaNamesToSkip)
           for (const consoleMediaName of consoleMediaNamesToSkip)
-            this._skipConsoleMediaName(
+            this._skipSyncConsoleMediaName(
               consoleMediaName.console,
               consoleMediaName.media,
             );
@@ -272,25 +285,49 @@ class AlejandroG751JT implements Device, Debug {
     }
   }
 
-  private _skipConsoleRoms(consoleName: ConsoleName) {
-    if (this._consolesData[consoleName])
-      this._consolesData[consoleName].skipFlags.sync["content-targets"].roms =
-        true;
+  private _skipListConsoleRoms(consoleName: ConsoleName) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.list["content-targets"].roms = true;
   }
 
-  private _skipConsoleMediaName(
+  private _skipDiffConsoleRoms(consoleName: ConsoleName) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.diff["content-targets"].roms = true;
+  }
+
+  private _skipListConsoleMediaName(
     consoleName: ConsoleName,
     mediaName: MediaName,
   ) {
-    if (this._consolesData[consoleName]) {
-      if (
-        typeof this._consolesData[consoleName].skipFlags.sync["content-targets"]
-          .media.names[mediaName] === "boolean"
-      )
-        this._consolesData[consoleName].skipFlags.sync[
-          "content-targets"
-        ].media.names[mediaName] = false;
-    }
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.list["content-targets"].media.names[mediaName] = true;
+  }
+
+  private _skipDiffConsoleMediaName(
+    consoleName: ConsoleName,
+    mediaName: MediaName,
+  ) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.diff["content-targets"].media.names[mediaName] = true;
+  }
+
+  private _skipSyncConsoleRoms(consoleName: ConsoleName) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.sync["content-targets"].roms = true;
+  }
+
+  private _skipSyncConsoleMediaName(
+    consoleName: ConsoleName,
+    mediaName: MediaName,
+  ) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.sync["content-targets"].media.names[mediaName] = true;
   }
 
   private _skipRomsContentTarget() {
