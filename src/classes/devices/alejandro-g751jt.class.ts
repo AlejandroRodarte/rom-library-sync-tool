@@ -17,7 +17,6 @@ import type { Environment } from "../../interfaces/environment.interface.js";
 import type { FileIO } from "../../interfaces/file-io.interface.js";
 import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { MediaName } from "../../types/media-name.type.js";
-import type { MediaContent } from "../../types/media-content.type.js";
 import type { MediaPaths } from "../../types/media-paths.type.js";
 import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
@@ -36,6 +35,7 @@ import writeRomsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write
 import type { ConsoleRoms } from "../../types/console-roms.type.js";
 import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-media-diffs.helper.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
+import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -74,29 +74,12 @@ class AlejandroG751JT implements Device, Debug {
   ) {
     this._consolesData = {};
 
-    for (const [, c] of Object.entries(envData.consoles)) {
+    for (const [, c] of Object.entries(envData.consoles))
       this._consolesData[c.name] = {
         name: c.name,
         "content-targets": c["content-targets"],
-        skipFlags: {
-          global: false,
-          filter: false,
-          sync: {
-            global: false,
-            "content-targets": {
-              roms: false,
-              media: {
-                global: false,
-                names: Object.fromEntries(
-                  c["content-targets"].media.names.map((m) => [m, false]),
-                ) as Partial<MediaContent<boolean>>,
-              },
-              "es-de-gamelists": false,
-            },
-          },
-        },
+        skipFlags: buildConsolesSkipFlags(c["content-targets"].media.names),
       };
-    }
 
     this._consoleNames = Object.entries(this._consolesData).map(
       ([, c]) => c.name,
@@ -148,20 +131,20 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   filter: () => void = () => {
-    filterConsoles(this.filterableConsoles);
+    filterConsoles(this._consoles);
   };
 
   write: DeviceWriteMethods = {
     duplicates: async () => {
       const writeError = await fsExtras.writeDuplicateRomsFile(
-        this.filterableConsoles,
+        this._consoles,
         this._paths.files.project.logs.duplicates,
       );
       if (writeError) logger.error(writeError.toString());
     },
     scrapped: async () => {
       const writeError = await fsExtras.writeScrappedRomsFile(
-        this.filterableConsoles,
+        this._consoles,
         this._paths.files.project.logs.scrapped,
       );
       if (writeError) logger.error(writeError.toString());
@@ -202,7 +185,7 @@ class AlejandroG751JT implements Device, Debug {
     diffs: async () => {
       const consoleRoms: ConsoleRoms = {};
 
-      for (const [, konsole] of this.filterableConsoles)
+      for (const [, konsole] of this._consoles)
         consoleRoms[konsole.name] = {
           name: konsole.name,
           roms: {
@@ -262,59 +245,6 @@ class AlejandroG751JT implements Device, Debug {
     return content;
   };
 
-  get filterableConsoles(): Consoles {
-    return new Map(
-      [...this._consoles.entries()].filter(
-        ([consoleName]) =>
-          this._consolesData[consoleName] &&
-          !this._consolesData[consoleName].skipFlags.global &&
-          !this._consolesData[consoleName].skipFlags.filter,
-      ),
-    );
-  }
-
-  get syncableConsoles(): Consoles {
-    return new Map(
-      [...this.filterableConsoles.entries()].filter(
-        ([consoleName]) =>
-          !this._consolesData[consoleName]!.skipFlags.sync.global,
-      ),
-    );
-  }
-
-  get romSyncableConsoles(): Consoles {
-    return new Map(
-      [...this.syncableConsoles.entries()].filter(
-        ([consoleName]) =>
-          !this._consolesData[consoleName]!.skipFlags.sync["content-targets"]
-            .roms,
-      ),
-    );
-  }
-
-  get mediaSyncableConsoles(): Consoles {
-    return new Map(
-      [...this.syncableConsoles.entries()].filter(
-        ([consoleName]) =>
-          !this._consolesData[consoleName]!.skipFlags.sync["content-targets"]
-            .media.global,
-      ),
-    );
-  }
-
-  public getMediaNameSyncableConsoles(mediaName: MediaName): Consoles {
-    return new Map(
-      [...this.mediaSyncableConsoles.entries()].filter(
-        ([consoleName]) =>
-          typeof this._consolesData[consoleName]!.skipFlags.sync[
-            "content-targets"
-          ].media.names[mediaName] === "boolean" &&
-          !this._consolesData[consoleName]!.skipFlags.sync["content-targets"]
-            .media.names[mediaName],
-      ),
-    );
-  }
-
   private _addConsole(
     consoleName: ConsoleName,
     konsole: Console,
@@ -336,7 +266,8 @@ class AlejandroG751JT implements Device, Debug {
   private _skipConsoleGlobal(consoleName: ConsoleName) {
     if (this._consolesData[consoleName]) {
       this._consolesData[consoleName].skipFlags.global = true;
-      this._consolesData[consoleName].skipFlags.filter = true;
+      this._consolesData[consoleName].skipFlags.list.global = true;
+      this._consolesData[consoleName].skipFlags.diff.global = true;
       this._consolesData[consoleName].skipFlags.sync.global = true;
     }
   }
