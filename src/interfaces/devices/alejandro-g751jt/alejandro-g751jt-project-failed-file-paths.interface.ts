@@ -7,4 +7,7 @@ export interface AlejandroG751JTProjectFailedFilePaths {
     consoles: Partial<ConsolePaths>; // devices/alejandro-g751jt/failed/roms/<console>.failed.txt
   };
   media: { consoles: Partial<ConsoleContent<Partial<MediaPaths>>> }; // devices/alejandro-g751jt/failed/media/<media-name>/<console>.failed.txt
+  "es-de-gamelists": {
+    consoles: Partial<ConsolePaths>; // devices/alejandro-g751jt/failed/es-de-gamelists/<console>.failed.txt
+  };
 }

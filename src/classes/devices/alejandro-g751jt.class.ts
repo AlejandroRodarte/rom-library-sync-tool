@@ -347,14 +347,26 @@ class AlejandroG751JT implements Device, Debug {
     const listsDirPath = path.join(baseDirPath, "lists");
     const romsListsDirPath = path.join(listsDirPath, "roms");
     const mediaListsDirPath = path.join(listsDirPath, "media");
+    const esDeGamelistsListsDirPath = path.join(
+      listsDirPath,
+      "es-de-gamelists",
+    );
 
     const diffsDirPath = path.join(baseDirPath, "diffs");
     const romsDiffsDirPath = path.join(diffsDirPath, "roms");
     const mediaDiffsDirPath = path.join(diffsDirPath, "media");
+    const esDeGamelistsDiffsDirPath = path.join(
+      diffsDirPath,
+      "es-de-gamelists",
+    );
 
     const failedDirPath = path.join(baseDirPath, "failed");
     const romsFailedDirPath = path.join(failedDirPath, "roms");
     const mediaFailedDirPath = path.join(failedDirPath, "media");
+    const esDeGamelistsFailedDirPath = path.join(
+      diffsDirPath,
+      "es-de-gamelists",
+    );
 
     const paths: AlejandroG751JTPaths = {
       dirs: {
@@ -376,6 +388,7 @@ class AlejandroG751JT implements Device, Debug {
                   ]),
                 ) as Partial<MediaPaths>,
               },
+              "es-de-gamelists": esDeGamelistsListsDirPath,
             },
           },
           diffs: {
@@ -391,6 +404,7 @@ class AlejandroG751JT implements Device, Debug {
                   ]),
                 ) as Partial<MediaPaths>,
               },
+              "es-de-gamelists": esDeGamelistsDiffsDirPath,
             },
           },
           failed: {
@@ -406,6 +420,7 @@ class AlejandroG751JT implements Device, Debug {
                   ]),
                 ) as Partial<MediaPaths>,
               },
+              "es-de-gamelists": esDeGamelistsFailedDirPath,
             },
           },
         },
@@ -477,6 +492,14 @@ class AlejandroG751JT implements Device, Debug {
                 ]),
               ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
             },
+            "es-de-gamelists": {
+              consoles: Object.fromEntries(
+                this._consoleNames.map((c) => [
+                  c,
+                  path.join(romsListsDirPath, `${c}.list.xml`),
+                ]),
+              ) as Partial<ConsolePaths>,
+            },
           },
           diffs: {
             roms: {
@@ -500,6 +523,14 @@ class AlejandroG751JT implements Device, Debug {
                 ]),
               ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
             },
+            "es-de-gamelists": {
+              consoles: Object.fromEntries(
+                this._consoleNames.map((c) => [
+                  c,
+                  path.join(romsListsDirPath, `${c}.diff.xml`),
+                ]),
+              ) as Partial<ConsolePaths>,
+            },
           },
           failed: {
             roms: {
@@ -522,6 +553,14 @@ class AlejandroG751JT implements Device, Debug {
                   ) as Partial<MediaPaths>,
                 ]),
               ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
+            },
+            "es-de-gamelists": {
+              consoles: Object.fromEntries(
+                this._consoleNames.map((c) => [
+                  c,
+                  path.join(romsListsDirPath, `${c}.failed.txt`),
+                ]),
+              ) as Partial<ConsolePaths>,
             },
           },
         },

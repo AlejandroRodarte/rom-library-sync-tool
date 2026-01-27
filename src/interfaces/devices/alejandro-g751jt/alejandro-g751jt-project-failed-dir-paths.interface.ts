@@ -6,4 +6,5 @@ export interface AlejandroG751JTProjectFailedDirPaths {
     base: string; // devices/alejandro-g751jt/failed/media/
     names: Partial<MediaPaths>; // devices/alejandro-g751jt/failed/media/<media-name>/
   };
+  "es-de-gamelists": string; // devices/alejandro-g751jt/failed/es-de-gamelists/
 }

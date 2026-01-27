@@ -18,28 +18,19 @@ export interface AlejandroG751JTPaths {
       lists: {
         base: string; // devices/alejandro-g751jt/lists/
         "content-targets": {
-          [T in Exclude<
-            ContentTargetName,
-            "es-de-gamelists"
-          >]: AlejandroG751JTProjectListsDirPaths[T];
+          [T in ContentTargetName]: AlejandroG751JTProjectListsDirPaths[T];
         };
       };
       diffs: {
         base: string; // devices/alejandro-g751jt/diffs/
         "content-targets": {
-          [T in Exclude<
-            ContentTargetName,
-            "es-de-gamelists"
-          >]: AlejandroG751JTProjectDiffsDirPaths[T];
+          [T in ContentTargetName]: AlejandroG751JTProjectDiffsDirPaths[T];
         };
       };
       failed: {
         base: string; // devices/alejandro-g751jt/failed/
         "content-targets": {
-          [T in Exclude<
-            ContentTargetName,
-            "es-de-gamelists"
-          >]: AlejandroG751JTProjectFailedDirPaths[T];
+          [T in ContentTargetName]: AlejandroG751JTProjectFailedDirPaths[T];
         };
       };
     };
@@ -54,22 +45,13 @@ export interface AlejandroG751JTPaths {
         scrapped: string; // devices/alejandro-g751jt/logs/scrapped.log.txt
       };
       lists: {
-        [T in Exclude<
-          ContentTargetName,
-          "es-de-gamelists"
-        >]: AlejandroG751JTProjectListsFilePaths[T];
+        [T in ContentTargetName]: AlejandroG751JTProjectListsFilePaths[T];
       };
       diffs: {
-        [T in Exclude<
-          ContentTargetName,
-          "es-de-gamelists"
-        >]: AlejandroG751JTProjectDiffsFilePaths[T];
+        [T in ContentTargetName]: AlejandroG751JTProjectDiffsFilePaths[T];
       };
       failed: {
-        [T in Exclude<
-          ContentTargetName,
-          "es-de-gamelists"
-        >]: AlejandroG751JTProjectFailedFilePaths[T];
+        [T in ContentTargetName]: AlejandroG751JTProjectFailedFilePaths[T];
       };
     };
     "content-targets": {

@@ -7,4 +7,7 @@ export interface AlejandroG751JTProjectDiffsFilePaths {
     consoles: Partial<ConsolePaths>; // devices/alejandro-g751jt/diffs/roms/<console>.diff.txt
   };
   media: { consoles: Partial<ConsoleContent<Partial<MediaPaths>>> }; // devices/alejandro-g751jt/diffs/media/<media-name>/<console>.diff.txt
+  "es-de-gamelists": {
+    consoles: Partial<ConsolePaths>; // devices/alejandro-g751jt/diffs/es-de-gamelists/<console>.diff.xml
+  };
 }
