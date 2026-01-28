@@ -37,6 +37,11 @@ import type { ContentTargetContent } from "../../types/content-target-content.ty
 import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
 import type { DiffConsolesData } from "../../types/diff-consoles-data.type.js";
 import writeEsDeGamelistsLists from "../../helpers/classes/devices/alejandro-g751jt/write-es-de-gamelists-lists.helper.js";
+import type { Medias } from "../../types/medias.type.js";
+import type { BasenameMediaEntries } from "../../types/basename-media-entries.type.js";
+import type { MediaEntry } from "../../types/media-entry.type.js";
+import type { ConsolesMedias } from "../../types/consoles-medias.type.js";
+import populateConsolesMedias from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles-medias.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -63,6 +68,7 @@ class AlejandroG751JT implements Device, Debug {
   private _consoles: Consoles;
   private _consolesData: ConsolesData;
   private _consoleNames: ConsoleName[];
+  private _consolesMedias: ConsolesMedias = new Map<ConsoleName, Medias>();
 
   private _allMediaNames: MediaName[];
 
@@ -93,9 +99,16 @@ class AlejandroG751JT implements Device, Debug {
     ];
 
     const allMediaNames = new Set<MediaName>();
+
     for (const [, consoleData] of Object.entries(this._consolesData)) {
-      for (const mediaName of consoleData["content-targets"].media.names)
+      const consoleMedias = new Map<MediaName, BasenameMediaEntries>();
+
+      for (const mediaName of consoleData["content-targets"].media.names) {
         if (!allMediaNames.has(mediaName)) allMediaNames.add(mediaName);
+        consoleMedias.set(mediaName, new Map<string, MediaEntry[]>());
+      }
+
+      this._consolesMedias.set(consoleData.name, consoleMedias);
     }
 
     this._allMediaNames = [...allMediaNames];
@@ -129,6 +142,15 @@ class AlejandroG751JT implements Device, Debug {
     const consolesToSkip = await populateConsoles(this._consoles);
     for (const consoleName of consolesToSkip)
       this._skipConsoleGlobal(consoleName);
+
+    const consoleMediaNamesToSkip = await populateConsolesMedias(
+      this._consolesMedias,
+    );
+    for (const consoleMediaName of consoleMediaNamesToSkip)
+      this._skipConsoleMediaGlobal(
+        consoleMediaName.console,
+        consoleMediaName.media,
+      );
   };
 
   filter: () => void = () => {
@@ -302,6 +324,23 @@ class AlejandroG751JT implements Device, Debug {
       this._consolesData[consoleName].skipFlags.list.global = true;
       this._consolesData[consoleName].skipFlags.diff.global = true;
       this._consolesData[consoleName].skipFlags.sync.global = true;
+    }
+  }
+
+  private _skipConsoleMediaGlobal(
+    consoleName: ConsoleName,
+    mediaName: MediaName,
+  ) {
+    if (this._consolesData[consoleName]) {
+      this._consolesData[consoleName].skipFlags.list[
+        "content-targets"
+      ].media.names[mediaName] = true;
+      this._consolesData[consoleName].skipFlags.diff[
+        "content-targets"
+      ].media.names[mediaName] = true;
+      this._consolesData[consoleName].skipFlags.sync[
+        "content-targets"
+      ].media.names[mediaName] = true;
     }
   }
 
