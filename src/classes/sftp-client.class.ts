@@ -31,6 +31,12 @@ import deleteFile, {
 import deleteDir, {
   type DeleteDirError,
 } from "../helpers/extras/sftp/delete-dir.gelper.js";
+import downloadFileToFs, {
+  type DownloadFileToFsError,
+} from "../helpers/extras/sftp/download-file-to-fs.helper.js";
+import downloadDirToFs, {
+  type DownloadDirToFsError,
+} from "../helpers/extras/sftp/download-dir-to-fs.helper.js";
 
 const sftpExtras = {
   access,
@@ -40,6 +46,8 @@ const sftpExtras = {
   copyDirFromFs,
   deleteFile,
   deleteDir,
+  downloadFileToFs,
+  downloadDirToFs,
 };
 
 type ConnectMethodError = ConnectError;
@@ -61,6 +69,14 @@ export type AddDirFromFsMethodError =
   | TryConnectMethodError;
 export type DeleteDirMethodError = DeleteDirError | TryConnectMethodError;
 
+export type DownloadFileToFsMethodError =
+  | DownloadFileToFsError
+  | TryConnectMethodError;
+
+export type DownloadDirToFsMethodError =
+  | DownloadDirToFsError
+  | TryConnectMethodError;
+
 export interface AddFileFromFsMethodOpts {
   overwrite?: boolean;
 }
@@ -77,6 +93,14 @@ export interface AddDirFromFsMethodOpts {
 export interface DeleteDirMethodOpts {
   mustExist?: boolean;
   recursive?: boolean;
+}
+
+export interface DownloadFileToFsMethodOpts {
+  overwrite?: boolean;
+}
+
+export interface DownloadDirToFsMethodOpts {
+  overwrite?: boolean;
 }
 
 class SftpClient {
@@ -215,6 +239,40 @@ class SftpClient {
       opts,
     );
     if (deleteDirError) return deleteDirError;
+  }
+
+  public async downloadFileToFs(
+    srcFilePath: string,
+    dstFilePath: string,
+    opts?: DownloadFileToFsMethodOpts,
+  ): Promise<DownloadFileToFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const downloadFileError = await sftpExtras.downloadFileToFs(
+      this._client,
+      srcFilePath,
+      dstFilePath,
+      opts,
+    );
+    if (downloadFileError) return downloadFileError;
+  }
+
+  public async downloadDirToFs(
+    srcDirPath: string,
+    dstDirPath: string,
+    opts?: DownloadDirToFsMethodOpts,
+  ): Promise<DownloadDirToFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const downloadDirError = await sftpExtras.downloadDirToFs(
+      this._client,
+      srcDirPath,
+      dstDirPath,
+      opts,
+    );
+    if (downloadDirError) return downloadDirError;
   }
 
   private async _connect(): Promise<ConnectMethodError | undefined> {

@@ -12,6 +12,7 @@ import type {
   AddFilePayloadOpts,
   AddDirPayloadOpts,
   ExistsMethodResult,
+  GetMethodError,
 } from "../../interfaces/file-io.interface.js";
 import type { FileIOFsCrudStrategy } from "../../types/file-io-fs-crud-strategy.type.js";
 import exists from "../../helpers/extras/fs/exists.helper.js";
@@ -44,6 +45,29 @@ class Fs implements FileIO {
     async (dirPath: string) => {
       return await fsExtras.ls(dirPath);
     };
+
+  get: (
+    type: "file" | "dir",
+    paths: { src: string; dst: string },
+  ) => Promise<GetMethodError | undefined> = async (type, paths) => {
+    switch (type) {
+      case "file": {
+        const copyFileError = await copyFile(paths.src, paths.dst, {
+          overwrite: true,
+        });
+        if (copyFileError) return copyFileError;
+        break;
+      }
+      case "dir": {
+        const copyDirError = await copyDir(paths.src, paths.dst, {
+          overwrite: true,
+          recursive: true,
+        });
+        if (copyDirError) return copyDirError;
+        break;
+      }
+    }
+  };
 
   exists: (
     type: "file" | "dir" | "link",

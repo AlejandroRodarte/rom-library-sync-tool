@@ -36,6 +36,7 @@ import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/writ
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
 import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
 import type { DiffConsolesData } from "../../types/diff-consoles-data.type.js";
+import writeEsDeGamelistsLists from "../../helpers/classes/devices/alejandro-g751jt/write-es-de-gamelists-lists.helper.js";
 
 export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
 export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
@@ -188,6 +189,26 @@ class AlejandroG751JT implements Device, Debug {
             );
           }
       }
+
+      if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+        const [consolesToSkip, pathsValidationError] =
+          await writeEsDeGamelistsLists(
+            this._paths,
+            this._consolesData,
+            this._fileIOExtras,
+          );
+
+        if (pathsValidationError) {
+          logger.warn(pathsValidationError.toString());
+          this._skipEsDeGamelistsContentTarget();
+        }
+
+        if (consolesToSkip)
+          for (const consoleName of consolesToSkip) {
+            this._skipListConsoleEsDeGamelists(consoleName);
+            this._skipDiffConsoleEsDeGamelists(consoleName);
+          }
+      }
     },
     diffs: async () => {
       const diffConsolesData: DiffConsolesData = {};
@@ -314,6 +335,18 @@ class AlejandroG751JT implements Device, Debug {
     consoleData.skipFlags.diff["content-targets"].media.names[mediaName] = true;
   }
 
+  private _skipListConsoleEsDeGamelists(consoleName: ConsoleName) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.list["content-targets"]["es-de-gamelists"] = true;
+  }
+
+  private _skipDiffConsoleEsDeGamelists(consoleName: ConsoleName) {
+    const consoleData = this._consolesData[consoleName];
+    if (!consoleData) return;
+    consoleData.skipFlags.diff["content-targets"]["es-de-gamelists"] = true;
+  }
+
   private _skipSyncConsoleRoms(consoleName: ConsoleName) {
     const consoleData = this._consolesData[consoleName];
     if (!consoleData) return;
@@ -335,6 +368,10 @@ class AlejandroG751JT implements Device, Debug {
 
   private _skipMediaContentTarget() {
     this._contentTargetSkipFlags.media = true;
+  }
+
+  private _skipEsDeGamelistsContentTarget() {
+    this._contentTargetSkipFlags["es-de-gamelists"] = true;
   }
 
   private _initAlejandroG751JTPaths(
@@ -364,7 +401,7 @@ class AlejandroG751JT implements Device, Debug {
     const romsFailedDirPath = path.join(failedDirPath, "roms");
     const mediaFailedDirPath = path.join(failedDirPath, "media");
     const esDeGamelistsFailedDirPath = path.join(
-      diffsDirPath,
+      failedDirPath,
       "es-de-gamelists",
     );
 
@@ -496,7 +533,7 @@ class AlejandroG751JT implements Device, Debug {
               consoles: Object.fromEntries(
                 this._consoleNames.map((c) => [
                   c,
-                  path.join(romsListsDirPath, `${c}.list.xml`),
+                  path.join(esDeGamelistsListsDirPath, `${c}.list.xml`),
                 ]),
               ) as Partial<ConsolePaths>,
             },
@@ -527,7 +564,7 @@ class AlejandroG751JT implements Device, Debug {
               consoles: Object.fromEntries(
                 this._consoleNames.map((c) => [
                   c,
-                  path.join(romsListsDirPath, `${c}.diff.xml`),
+                  path.join(esDeGamelistsDiffsDirPath, `${c}.diff.xml`),
                 ]),
               ) as Partial<ConsolePaths>,
             },
@@ -558,7 +595,7 @@ class AlejandroG751JT implements Device, Debug {
               consoles: Object.fromEntries(
                 this._consoleNames.map((c) => [
                   c,
-                  path.join(romsListsDirPath, `${c}.failed.txt`),
+                  path.join(esDeGamelistsFailedDirPath, `${c}.failed.txt`),
                 ]),
               ) as Partial<ConsolePaths>,
             },

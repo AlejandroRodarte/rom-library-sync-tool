@@ -6,6 +6,7 @@ import type {
 import type { PathAccessItem } from "../../interfaces/path-access-item.interface.js";
 
 export type DirAccessItem = Omit<PathAccessItem, "type">;
+export type FileAccessItem = DirAccessItem;
 
 export interface AllExistMethodFalseResult {
   allExist: false;
@@ -16,6 +17,12 @@ export interface AllExistMethodFalseResult {
 export interface AllDirsExistMethodFalseResult {
   allExist: false;
   dirAccessItem: DirAccessItem;
+  error: AllExistMethodFalseResult["error"];
+}
+
+export interface AllFilesExistMethodFalseResult {
+  allExist: false;
+  fileAccessItem: FileAccessItem;
   error: AllExistMethodFalseResult["error"];
 }
 
@@ -31,6 +38,12 @@ export interface AllDirsExistMethodTrueResult {
   error: undefined;
 }
 
+export interface AllFilesExistMethodTrueResult {
+  allExist: true;
+  fileAccessItem: undefined;
+  error: undefined;
+}
+
 export type AllExistMethodResult =
   | AllExistMethodTrueResult
   | AllExistMethodFalseResult;
@@ -39,8 +52,13 @@ export type AllDirsExistMethodResult =
   | AllDirsExistMethodFalseResult
   | AllDirsExistMethodTrueResult;
 
+export type AllFilesExistMethodResult =
+  | AllFilesExistMethodFalseResult
+  | AllFilesExistMethodTrueResult;
+
 export type AllExistMethodError = ExistsMethodError;
 export type AllDirsExistMethodError = AllExistMethodError;
+export type AllFilesExistMethodError = AllExistMethodError;
 
 class FileIOExtras {
   private _fileIO: FileIO;
@@ -109,6 +127,41 @@ class FileIOExtras {
 
     return [
       { allExist: true, dirAccessItem: undefined, error: undefined },
+      undefined,
+    ];
+  };
+
+  allFilesExist: (
+    fileAccessItems: FileAccessItem[],
+  ) => Promise<
+    | [AllFilesExistMethodResult, undefined]
+    | [undefined, AllFilesExistMethodError]
+  > = async (fileAccessItems) => {
+    const pathAccessItems: PathAccessItem[] = fileAccessItems.map((i) => ({
+      type: "file",
+      ...i,
+    }));
+
+    const [allExistResult, allExistError] =
+      await this.allExist(pathAccessItems);
+
+    if (allExistError) return [undefined, allExistError];
+
+    if (!allExistResult.allExist) {
+      const fileAccessItem: FileAccessItem = {
+        path: allExistResult.pathAccessItem.path,
+      };
+      if (allExistResult.pathAccessItem.rights)
+        fileAccessItem.rights = allExistResult.pathAccessItem.rights;
+
+      return [
+        { allExist: false, fileAccessItem, error: allExistResult.error },
+        undefined,
+      ];
+    }
+
+    return [
+      { allExist: true, fileAccessItem: undefined, error: undefined },
       undefined,
     ];
   };

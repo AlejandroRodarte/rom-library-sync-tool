@@ -19,10 +19,7 @@ const writeRomsLists = async (
   const listPaths = buildRomsListPaths(paths);
   const ops = buildWriteRomsListOperations(paths, consolesData);
 
-  const dirsValidationError = await validateListPaths(
-    listPaths,
-    fileIOExtras.allDirsExist,
-  );
+  const dirsValidationError = await validateListPaths(listPaths, fileIOExtras);
 
   if (dirsValidationError) return [undefined, dirsValidationError];
 

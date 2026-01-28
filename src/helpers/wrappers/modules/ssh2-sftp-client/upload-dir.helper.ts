@@ -6,12 +6,14 @@ import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-cr
 import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIOExistsError from "../../../../classes/errors/file-io-exists-error.class.js";
 
 export type UploadDirError =
   | UnknownError
   | FileIOConnectionError
   | FileIOBadCredentialsError
   | FileIOBadPathError
+  | FileIOExistsError
   | FileIOUnauthorizedError
   | FileIOBadTypeError;
 
@@ -50,6 +52,10 @@ const uploadDir = async (
       case "ENOTDIR":
         return new FileIOBadTypeError(
           `Source path ${srcDir} is NOT a directory.`,
+        );
+      case "EEXIST":
+        return new FileIOExistsError(
+          `Destination dir path ${dstDir} already exists. Will NOT replace it.`,
         );
       default:
         return new UnknownError(

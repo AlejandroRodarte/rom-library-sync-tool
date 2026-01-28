@@ -22,10 +22,7 @@ const writeMediaLists = async (
   const listPaths = buildMediaListPaths(paths);
   const ops = buildWriteMediaNameListOperations(paths, consolesData);
 
-  const validationError = await validateListPaths(
-    listPaths,
-    fileIOExtras.allDirsExist,
-  );
+  const validationError = await validateListPaths(listPaths, fileIOExtras);
 
   if (validationError) return [undefined, validationError];
 

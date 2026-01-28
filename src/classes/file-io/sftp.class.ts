@@ -12,6 +12,8 @@ import type {
   AddDirPayloadOpts,
   DeleteFilePayloadOpts,
   DeleteDirPayloadOpts,
+  GetMethodError,
+  GetMethodOpts,
 } from "../../interfaces/file-io.interface.js";
 import type SftpClient from "../sftp-client.class.js";
 
@@ -32,6 +34,33 @@ class Sftp implements FileIO {
     async (dirPath: string) => {
       return await this._client.ls(dirPath);
     };
+
+  get: (
+    type: "file" | "dir",
+    paths: { src: string; dst: string },
+    opts?: GetMethodOpts,
+  ) => Promise<GetMethodError | undefined> = async (type, paths, opts) => {
+    switch (type) {
+      case "file": {
+        const downloadFileError = await this._client.downloadFileToFs(
+          paths.src,
+          paths.dst,
+          opts,
+        );
+        if (downloadFileError) return downloadFileError;
+        break;
+      }
+      case "dir": {
+        const downloadDirError = await this._client.downloadDirToFs(
+          paths.src,
+          paths.dst,
+          opts,
+        );
+        if (downloadDirError) return downloadDirError;
+        break;
+      }
+    }
+  };
 
   exists: (
     type: "file" | "dir" | "link",

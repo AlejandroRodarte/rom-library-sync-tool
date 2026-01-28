@@ -19,6 +19,9 @@ const deleteFile = async (
 ): Promise<DeleteFileError | undefined> => {
   const deleteFileOpts: Required<DeleteFileOpts> = { mustExist: false };
 
+  if (opts)
+    if (typeof opts.mustExist === "boolean") deleteFileOpts.mustExist = opts.mustExist;
+
   const [fileExistsResult, existsError] = await fileExists(client, filePath);
 
   if (existsError) return existsError;

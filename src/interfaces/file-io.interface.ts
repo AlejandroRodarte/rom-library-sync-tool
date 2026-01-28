@@ -44,6 +44,17 @@ export type LsMethodError =
   | FileIOBadPathError
   | FileIOUnauthorizedError;
 
+export type GetMethodError =
+  | CommonErrors
+  | FileIONotFoundError
+  | FileIOBadTypeError
+  | FileIOBadPathError
+  | FileIOUnauthorizedError
+  | FileIOLockedError
+  | FileIOExistsError
+  | FileIOStorageFullError
+  | FileIONotEmptyError;
+
 export type ExistsMethodError = CommonErrors;
 
 export type AddMethodError =
@@ -66,6 +77,10 @@ export type DeleteMethodError =
   | FileIOUnauthorizedError
   | FileIOLockedError
   | FileIONotEmptyError;
+
+export interface GetMethodOpts {
+  overwrite?: boolean;
+}
 
 export interface AddFilePayloadOpts {
   overwrite?: boolean;
@@ -118,6 +133,15 @@ export interface FileIO {
   ls: (
     dirPath: string,
   ) => Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]>;
+
+  get: (
+    type: "file" | "dir",
+    paths: {
+      src: string;
+      dst: string;
+    },
+    opts?: GetMethodOpts,
+  ) => Promise<GetMethodError | undefined>;
 
   exists: (
     type: "file" | "dir" | "link",

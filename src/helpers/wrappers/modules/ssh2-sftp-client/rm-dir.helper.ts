@@ -6,10 +6,12 @@ import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-cr
 import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
 
 export type RmDirError =
   | UnknownError
   | FileIOConnectionError
+  | FileIONotFoundError
   | FileIOBadCredentialsError
   | FileIOBadPathError
   | FileIOUnauthorizedError
@@ -44,6 +46,10 @@ const rmDir = async (
       case "EPERM":
         return new FileIOUnauthorizedError(
           `This process is NOT authorized to delete dirpath ${path}.`,
+        );
+      case "ENOENT":
+        return new FileIONotFoundError(
+          `Remote dir path ${path} does not exist.`,
         );
       case "ENOTDIR":
         return new FileIOBadTypeError(

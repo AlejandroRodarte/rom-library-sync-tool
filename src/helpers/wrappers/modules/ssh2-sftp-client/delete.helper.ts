@@ -6,9 +6,11 @@ import FileIOBadCredentialsError from "../../../../classes/errors/file-io-bad-cr
 import FileIOBadPathError from "../../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOUnauthorizedError from "../../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadTypeError from "../../../../classes/errors/file-io-bad-type-error.class.js";
+import FileIONotFoundError from "../../../../classes/errors/file-io-not-found-error.class.js";
 
 export type DeleteError =
   | UnknownError
+  | FileIONotFoundError
   | FileIOConnectionError
   | FileIOBadCredentialsError
   | FileIOBadPathError
@@ -41,6 +43,10 @@ const sftpDelete = async (
       case "ERR_BAD_PATH":
         return new FileIOBadPathError(
           `Remote file path ${remoteFilePath} is faulty.`,
+        );
+      case "ENOENT":
+        return new FileIONotFoundError(
+          `Remote file path ${remoteFilePath} does not exist.`,
         );
       case "EACCES":
       case "EPERM":
