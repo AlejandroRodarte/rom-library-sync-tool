@@ -35,9 +35,12 @@ const buildWriteMediaNameDiffOperations = (
       const projectConsoleMediaNameDiffFilePath =
         projectConsoleMediaDiffFilePaths[mediaName];
 
+      const basenameMediaEntries = diffConsoleData.medias.get(mediaName);
+
       if (
         !projectConsoleMediaNameListFilePath ||
-        !projectConsoleMediaNameDiffFilePath
+        !projectConsoleMediaNameDiffFilePath ||
+        !basenameMediaEntries
       )
         continue;
 
@@ -61,6 +64,9 @@ const buildWriteMediaNameDiffOperations = (
         },
         media: {
           name: mediaName,
+          basename: {
+            entries: basenameMediaEntries,
+          },
         },
       });
     }

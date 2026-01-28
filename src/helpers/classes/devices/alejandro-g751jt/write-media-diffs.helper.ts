@@ -1,9 +1,6 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
 import logger from "../../../../objects/logger.object.js";
 import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { ConsoleRoms } from "../../../../types/console-roms.type.js";
-import type { ConsolesData } from "../../../../types/consoles-data.type.js";
 import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
 import type { MediaName } from "../../../../types/media-name.type.js";
 import buildMediaDiffPaths from "./build-media-diff-paths.helper.js";

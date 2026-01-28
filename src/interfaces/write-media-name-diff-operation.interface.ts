@@ -1,3 +1,4 @@
+import type { BasenameMediaEntries } from "../types/basename-media-entries.type.js";
 import type { ConsoleName } from "../types/console-name.type.js";
 import type { MediaName } from "../types/media-name.type.js";
 import type { RomSet } from "../types/rom-set.type.js";
@@ -22,5 +23,8 @@ export interface WriteMediaNameDiffOperation {
   };
   media: {
     name: MediaName;
+    basename: {
+      entries: BasenameMediaEntries;
+    };
   };
 }

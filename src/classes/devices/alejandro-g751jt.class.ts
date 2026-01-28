@@ -237,7 +237,9 @@ class AlejandroG751JT implements Device, Debug {
 
       for (const [, konsole] of this._consoles) {
         const consoleData = this._consolesData[konsole.name];
-        if (!consoleData) continue;
+        const consoleMedias = this._consolesMedias.get(konsole.name);
+
+        if (!consoleData || !consoleMedias) continue;
 
         diffConsolesData[konsole.name] = {
           name: konsole.name,
@@ -246,6 +248,7 @@ class AlejandroG751JT implements Device, Debug {
             selected: konsole.selectedRoms,
           },
           data: consoleData,
+          medias: consoleMedias,
         };
       }
 
