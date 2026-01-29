@@ -115,7 +115,7 @@ class ConsoleMetadata {
   }
 
   public canDiffRoms(): boolean {
-    return this.canDiff() && this._skipFlags.diff["content-targets"].roms;
+    return this.canDiff() && !this._skipFlags.diff["content-targets"].roms;
   }
 
   public canDiffMediaName(mediaName: MediaName): boolean {
