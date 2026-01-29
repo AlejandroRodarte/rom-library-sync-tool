@@ -91,20 +91,6 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   write: DeviceWriteMethods = {
-    duplicates: async () => {
-      const writeError = await fsExtras.writeDuplicateRomsFile(
-        this._consoles,
-        this._paths.files.project.logs.duplicates,
-      );
-      if (writeError) logger.error(writeError.toString());
-    },
-    scrapped: async () => {
-      const writeError = await fsExtras.writeScrappedRomsFile(
-        this._consoles,
-        this._paths.files.project.logs.scrapped,
-      );
-      if (writeError) logger.error(writeError.toString());
-    },
     lists: async () => {
       if (!this._contentTargetSkipFlags.roms) {
         const pathsValidationError = await writeRomsLists(
@@ -140,6 +126,18 @@ class AlejandroG751JT implements Device, Debug {
           this._consoles,
         );
         if (pathsValidationError) this._skipRomsContentTarget();
+
+        const writeDuplicatesError = await fsExtras.writeDuplicateRomsFile(
+          this._consoles,
+          this._paths.files.project.logs.duplicates,
+        );
+        if (writeDuplicatesError) logger.error(writeDuplicatesError.toString());
+
+        const writeScrappedError = await fsExtras.writeScrappedRomsFile(
+          this._consoles,
+          this._paths.files.project.logs.scrapped,
+        );
+        if (writeScrappedError) logger.error(writeScrappedError.toString());
       }
 
       if (!this._contentTargetSkipFlags.media) {
