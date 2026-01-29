@@ -4,21 +4,20 @@ import UNRELEASED_LABEL_SEGMENT_LIST from "../../constants/unreleased-label-segm
 
 const byCountry = (title: Title, countryPriorityList: string[]): void => {
   if (!title.canUnselect()) return;
-  const specialFlags = title.getSpecialFlags("selected-roms");
+  const specialFlags = title.getSpecialFlags("selected");
 
   const unselectNonCountryRoms = (country: string): void => {
-    const nonCountryRomIds = title.selectedRomSet
-      .entries()
+    const nonCountryRomIds = title.selectedRoms.entries
       .filter(([_, rom]) => !rom.labels.includes(country))
       .map(([id]) => id)
       .toArray();
 
-    title.unselectByIds(nonCountryRomIds);
+    title.unselectMany(nonCountryRomIds);
   };
 
   for (const country of countryPriorityList) {
-    const countryRoms = title.selectedRomSet
-      .values()
+    const countryRoms = title.selectedRoms.entries
+      .map(([, rom]) => rom)
       .filter((rom) => rom.labels.includes(country))
       .toArray();
     const countryRomsFound = countryRoms.length > 0;

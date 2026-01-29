@@ -21,11 +21,11 @@ const writeDuplicateRomsFile = async (
 
   for (const [consoleName, konsole] of consoles) {
     lines.push(`%%%%% Duplicates found on console ${consoleName} %%%%%`);
-    for (const [romsSelected, titles] of konsole.duplicateTitles) {
+    for (const [romsSelected, titles] of konsole.games.duplicateTitles) {
       lines.push(`***** Titles with ${romsSelected} duplicates *****`);
       for (const [titleName, title] of titles) {
         lines.push(`===== Title: ${titleName} =====`);
-        for (const [, rom] of title.selectedRomSet)
+        for (const [, rom] of title.selectedRoms.entries)
           lines.push(`ROM: ${rom.file.name}`);
       }
     }

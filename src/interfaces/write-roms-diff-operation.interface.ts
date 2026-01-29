@@ -1,5 +1,5 @@
+import type Roms from "../classes/roms.class.js";
 import type { ConsoleName } from "../types/console-name.type.js";
-import type { RomSet } from "../types/rom-set.type.js";
 
 export interface WriteRomsDiffOperation {
   paths: {
@@ -15,8 +15,8 @@ export interface WriteRomsDiffOperation {
   console: {
     name: ConsoleName;
     roms: {
-      all: RomSet;
-      selected: RomSet;
+      all: Roms;
+      selected: Roms;
     };
   };
 }

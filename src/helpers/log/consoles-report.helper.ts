@@ -7,8 +7,8 @@ const consolesReport = (consoles: Consoles): void => {
   const romsSelectedTotals = new Map<number, number>();
 
   for (const [_, konsole] of consoles) {
-    romsSelectedTotals.set(0, konsole.scrappedTitles.size);
-    for (const [romsSelected, titles] of konsole.selectedTitles) {
+    romsSelectedTotals.set(0, konsole.games.scrappedTitles.size);
+    for (const [romsSelected, titles] of konsole.games.selectedTitles) {
       const total = romsSelectedTotals.get(romsSelected);
       if (typeof total !== "undefined")
         romsSelectedTotals.set(romsSelected, total + titles.size);

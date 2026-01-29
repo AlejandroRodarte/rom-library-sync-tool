@@ -1,7 +1,6 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { ConsolesData } from "../../../../types/consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 import buildRomsListPaths from "./build-roms-list-paths.helper.js";
 import buildWriteRomsListOperations from "./build-write-roms-list-operations.helper.js";
 import validateListPaths, {
@@ -13,23 +12,25 @@ export type WriteRomsListsError = ValidateListPathsError;
 
 const writeRomsLists = async (
   paths: AlejandroG751JTPaths,
-  consolesData: ConsolesData,
+  consoles: Consoles,
   fileIOExtras: FileIOExtras,
-): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsListsError]> => {
+): Promise<WriteRomsListsError | undefined> => {
   const listPaths = buildRomsListPaths(paths);
-  const ops = buildWriteRomsListOperations(paths, consolesData);
+  const ops = buildWriteRomsListOperations(paths, consoles);
 
   const dirsValidationError = await validateListPaths(listPaths, fileIOExtras);
 
-  if (dirsValidationError) return [undefined, dirsValidationError];
+  if (dirsValidationError) return dirsValidationError;
 
-  const consolesToSkip: ConsoleName[] = [];
   for (const op of ops) {
     const writeError = await writeRomsList(op, fileIOExtras.fileIO.ls);
-    if (writeError) consolesToSkip.push(op.names.console);
-  }
+    if (!writeError) continue;
 
-  return [consolesToSkip, undefined];
+    const konsole = consoles.get(op.names.console);
+    if (!konsole) continue;
+
+    konsole.metadata.skipGlobalRoms();
+  }
 };
 
 export default writeRomsLists;

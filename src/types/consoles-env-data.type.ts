@@ -1,6 +1,6 @@
 import type { ConsoleData } from "../interfaces/console-data.interface.js";
 import type { ConsoleContent } from "./console-content.type.js";
 
-export type ConsoleEnvData = Partial<
+export type ConsolesEnvData = Partial<
   ConsoleContent<Omit<ConsoleData, "skipFlags">>
 >;

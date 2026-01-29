@@ -7,7 +7,7 @@ import byVersionSystem from "./by-version-systems.helper.js";
 const byVersionsPriorityList = (title: Title): void => {
   if (!title.canUnselect()) return;
 
-  const specialFlags = title.getSpecialFlags("selected-roms");
+  const specialFlags = title.getSpecialFlags("selected");
   const versionSystemsPriorityList: VersionSystem[] = [];
   if (specialFlags.allRomsAreUnreleased)
     versionSystemsPriorityList.push(

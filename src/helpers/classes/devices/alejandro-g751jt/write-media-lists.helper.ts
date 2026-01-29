@@ -1,7 +1,6 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { WriteMediaNameListOperation } from "../../../../interfaces/write-media-name-list-operation.interface.js";
-import type { ConsolesData } from "../../../../types/consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 import buildMediaListPaths from "./build-media-list-paths.helper.js";
 import buildWriteMediaNameListOperations from "./build-write-media-name-list-operations.helper.js";
 import validateListPaths, {
@@ -13,27 +12,24 @@ export type WriteMediaListsError = ValidateListPathsError;
 
 const writeMediaLists = async (
   paths: AlejandroG751JTPaths,
-  consolesData: ConsolesData,
+  consoles: Consoles,
   fileIOExtras: FileIOExtras,
-): Promise<
-  | [WriteMediaNameListOperation["names"][], undefined]
-  | [undefined, WriteMediaListsError]
-> => {
+): Promise<WriteMediaListsError | undefined> => {
   const listPaths = buildMediaListPaths(paths);
-  const ops = buildWriteMediaNameListOperations(paths, consolesData);
+  const ops = buildWriteMediaNameListOperations(paths, consoles);
 
   const validationError = await validateListPaths(listPaths, fileIOExtras);
-
-  if (validationError) return [undefined, validationError];
-
-  const consoleMediaNamesToSkip: WriteMediaNameListOperation["names"][] = [];
+  if (validationError) return validationError;
 
   for (const op of ops) {
     const writeError = await writeMediaNameList(op, fileIOExtras.fileIO.ls);
-    if (writeError) consoleMediaNamesToSkip.push(op.names);
-  }
+    if (!writeError) continue;
 
-  return [consoleMediaNamesToSkip, undefined];
+    const konsole = consoles.get(op.names.console);
+    if (!konsole) continue;
+
+    konsole.metadata.skipGlobalMediaName(op.names.media);
+  }
 };
 
 export default writeMediaLists;

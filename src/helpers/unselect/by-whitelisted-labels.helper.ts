@@ -7,17 +7,16 @@ const byWhitelistedLabels = (
   if (!title.canUnselect()) return;
 
   for (const wantedExactLabel of labelPriorityList) {
-    const romIdsWithoutWhitelistedLabel = title.selectedRomSet
-      .entries()
+    const romIdsWithoutWhitelistedLabel = title.selectedRoms.entries
       .filter(([, rom]) => !rom.labels.includes(wantedExactLabel))
       .map(([id]) => id)
       .toArray();
 
     const romSetLacksWhitelistedLabel =
-      romIdsWithoutWhitelistedLabel.length === title.selectedRomAmount;
+      romIdsWithoutWhitelistedLabel.length === title.selectedRomsSize;
     if (romSetLacksWhitelistedLabel) continue;
 
-    title.unselectByIds(romIdsWithoutWhitelistedLabel);
+    title.unselectMany(romIdsWithoutWhitelistedLabel);
   }
 };
 

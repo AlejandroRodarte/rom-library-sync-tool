@@ -1,46 +1,31 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteMediaNameDiffOperation } from "../../../../interfaces/write-media-name-diff-operation.interface.js";
-import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 
 const buildWriteMediaNameDiffOperations = (
   paths: AlejandroG751JTPaths,
-  diffConsolesData: DiffConsolesData,
+  consoles: Consoles,
 ): WriteMediaNameDiffOperation[] => {
   const ops: WriteMediaNameDiffOperation[] = [];
 
-  for (const [, diffConsoleData] of Object.entries(diffConsolesData)) {
+  for (const [, konsole] of consoles) {
     const projectConsoleMediaListFilePaths =
-      paths.files.project.lists.media.consoles[diffConsoleData.name];
-
+      paths.files.project.lists.media.consoles[konsole.name];
     const projectConsoleMediaDiffFilePaths =
-      paths.files.project.diffs.media.consoles[diffConsoleData.name];
-
+      paths.files.project.diffs.media.consoles[konsole.name];
     if (!projectConsoleMediaListFilePaths || !projectConsoleMediaDiffFilePaths)
       continue;
 
-    for (const mediaName of diffConsoleData.data["content-targets"].media
-      .names) {
-      if (
-        diffConsoleData.data.skipFlags.global ||
-        diffConsoleData.data.skipFlags.diff.global ||
-        diffConsoleData.data.skipFlags.diff["content-targets"].media.global ||
-        diffConsoleData.data.skipFlags.diff["content-targets"].media.names[
-          mediaName
-        ]
-      )
-        continue;
+    for (const [mediaName, basenameMediaEntries] of konsole.medias) {
+      if (!konsole.metadata.canDiffMediaName(mediaName)) continue;
 
       const projectConsoleMediaNameListFilePath =
         projectConsoleMediaListFilePaths[mediaName];
       const projectConsoleMediaNameDiffFilePath =
         projectConsoleMediaDiffFilePaths[mediaName];
-
-      const basenameMediaEntries = diffConsoleData.medias.get(mediaName);
-
       if (
         !projectConsoleMediaNameListFilePath ||
-        !projectConsoleMediaNameDiffFilePath ||
-        !basenameMediaEntries
+        !projectConsoleMediaNameDiffFilePath
       )
         continue;
 
@@ -56,17 +41,15 @@ const buildWriteMediaNameDiffOperations = (
           },
         },
         console: {
-          name: diffConsoleData.name,
+          name: konsole.name,
           roms: {
-            all: diffConsoleData.roms.all,
-            selected: diffConsoleData.roms.selected,
+            all: konsole.games.allRoms,
+            selected: konsole.games.selectedRoms,
           },
         },
         media: {
           name: mediaName,
-          basename: {
-            entries: basenameMediaEntries,
-          },
+          entries: basenameMediaEntries,
         },
       });
     }

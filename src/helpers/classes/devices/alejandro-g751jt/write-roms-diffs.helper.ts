@@ -1,41 +1,33 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
-import logger from "../../../../objects/logger.object.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
-import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 import buildRomsDiffsDirPaths from "./build-roms-diff-paths.helper.js";
 import buildWriteRomsDiffOperations from "./build-write-roms-diff-operations.helper.js";
 import validateDiffPaths, {
   type ValidateDiffPathsError,
 } from "./validate-diff-paths.helper.js";
-import writeRomsDiff, {
-  type WriteRomsDiffError,
-} from "./write-roms-diff.helper.js";
+import writeRomsDiff from "./write-roms-diff.helper.js";
 
 export type WriteRomsDiffsError = ValidateDiffPathsError;
 
 const writeRomsDiffs = async (
   paths: AlejandroG751JTPaths,
-  diffConsolesData: DiffConsolesData,
-): Promise<[ConsoleName[], undefined] | [undefined, WriteRomsDiffError]> => {
+  consoles: Consoles,
+): Promise<WriteRomsDiffsError | undefined> => {
   const diffPaths = buildRomsDiffsDirPaths(paths);
-  const ops = buildWriteRomsDiffOperations(
-    paths.files.project,
-    diffConsolesData,
-  );
-
-  logger.debug(JSON.stringify(diffPaths, undefined, 2));
+  const ops = buildWriteRomsDiffOperations(paths.files.project, consoles);
 
   const pathsValidationError = await validateDiffPaths(diffPaths);
-  if (pathsValidationError) return [undefined, pathsValidationError];
+  if (pathsValidationError) return pathsValidationError;
 
-  const consolesToSkip: ConsoleName[] = [];
   for (const op of ops) {
     const writeError = await writeRomsDiff(op);
-    if (writeError) consolesToSkip.push(op.console.name);
-  }
+    if (!writeError) continue;
 
-  return [consolesToSkip, undefined];
+    const konsole = consoles.get(op.console.name);
+    if (!konsole) continue;
+
+    konsole.metadata.skipGlobalRoms();
+  }
 };
 
 export default writeRomsDiffs;

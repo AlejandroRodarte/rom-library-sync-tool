@@ -1,28 +1,18 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteRomsDiffOperation } from "../../../../interfaces/write-roms-diff-operation.interface.js";
-import type { DiffConsolesData } from "../../../../types/diff-consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 
 const buildWriteRomsDiffOperations = (
   paths: AlejandroG751JTPaths["files"]["project"],
-  diffConsolesData: DiffConsolesData,
+  consoles: Consoles,
 ): WriteRomsDiffOperation[] => {
   const ops: WriteRomsDiffOperation[] = [];
 
-  for (const [, diffConsoleData] of Object.entries(diffConsolesData)) {
-    const consoleData = diffConsoleData.data;
+  for (const [, konsole] of consoles) {
+    if (!konsole.metadata.canDiffRoms()) continue;
 
-    if (
-      consoleData.skipFlags.global ||
-      consoleData.skipFlags.diff.global ||
-      consoleData.skipFlags.diff["content-targets"].roms
-    )
-      continue;
-
-    const projectConsoleListRomsFile =
-      paths.lists.roms.consoles[diffConsoleData.name];
-    const projectConsoleDiffRomsFile =
-      paths.diffs.roms.consoles[diffConsoleData.name];
-
+    const projectConsoleListRomsFile = paths.lists.roms.consoles[konsole.name];
+    const projectConsoleDiffRomsFile = paths.diffs.roms.consoles[konsole.name];
     if (!projectConsoleListRomsFile || !projectConsoleDiffRomsFile) continue;
 
     ops.push({
@@ -37,10 +27,10 @@ const buildWriteRomsDiffOperations = (
         },
       },
       console: {
-        name: diffConsoleData.name,
+        name: konsole.name,
         roms: {
-          all: diffConsoleData.roms.all,
-          selected: diffConsoleData.roms.selected,
+          all: konsole.games.allRoms,
+          selected: konsole.games.selectedRoms,
         },
       },
     });

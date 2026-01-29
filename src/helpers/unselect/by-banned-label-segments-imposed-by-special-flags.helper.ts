@@ -11,7 +11,7 @@ import byBannedLabelSegments from "./by-banned-label-segments.helper.js";
 const byBannedLabelSegmentsImposedBySpecialFlags = (title: Title): void => {
   if (!title.canUnselect()) return;
 
-  const specialFlags = title.getSpecialFlags("selected-roms");
+  const specialFlags = title.getSpecialFlags("selected");
   const bannedLabelSegments: string[] = [];
 
   if (!specialFlags.allRomsAreSample)

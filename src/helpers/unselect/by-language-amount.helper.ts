@@ -9,8 +9,7 @@ const byLanguageAmount = (title: Title): void => {
   if (!title.canUnselect()) return;
 
   const selectedRomsWithLanguages: RomIdAndLanguageAmount[] =
-    title.selectedRomSet
-      .entries()
+    title.selectedRoms.entries
       .filter(([, rom]) => rom.languages.length > 0)
       .map(([id, rom]) => ({ id, languageAmount: rom.languages.length }))
       .toArray();
@@ -46,7 +45,7 @@ const byLanguageAmount = (title: Title): void => {
     const romHasLowerLanguageAmount = !romIdsWithHighestLanguageAmount.includes(
       rom.id,
     );
-    if (romHasLowerLanguageAmount) title.unselectById(rom.id);
+    if (romHasLowerLanguageAmount) title.unselectOne(rom.id);
   }
 };
 

@@ -25,23 +25,13 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
   const [oldFilenames, listFileReadError] = await fsExtras.readUTF8Lines(
     op.paths.project.list.file,
   );
-
   if (listFileReadError) return listFileReadError;
 
   const [diffFileHandle, diffFileOpenError] = await fsExtras.openFileForWriting(
     op.paths.project.diff.file,
     { overwrite: true },
   );
-
   if (diffFileOpenError) return diffFileOpenError;
-
-  const allRomBasenameToFilenamesMap = new Map<string, string[]>();
-
-  for (const rom of op.console.roms.all.values()) {
-    const filenames = allRomBasenameToFilenamesMap.get(rom.base.name);
-    if (filenames) filenames.push(rom.file.name);
-    else allRomBasenameToFilenamesMap.set(rom.base.name, [rom.file.name]);
-  }
 
   const oldRomBasenames = [
     ...new Set(
@@ -55,7 +45,9 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
   ];
 
   const newRomBasenames = [
-    ...new Set(op.console.roms.selected.values().map((rom) => rom.base.name)),
+    ...new Set(
+      op.console.roms.selected.entries.map(([, rom]) => rom.base.name),
+    ),
   ];
 
   const sets = getLineSetsToAddAndDeleteFromOldAndNewLists(
@@ -66,25 +58,42 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
   let lines: string[] = [];
 
   for (const basenameToAdd of sets.add) {
-    const romFilenames = allRomBasenameToFilenamesMap.get(basenameToAdd);
-    if (!romFilenames) continue;
+    const mediaEntries = op.media.entries.get(basenameToAdd);
+    if (!mediaEntries) continue;
 
-    for (const romFilename of romFilenames) {
-      const rom = op.console.roms.selected.get(romFilename);
-      if (!rom) continue;
-      const line = `add-media|${rom.fs.type}|${rom.base.name}`;
+    for (const mediaEntry of mediaEntries) {
+      let line: string;
+
+      switch (mediaEntry.type) {
+        case "file":
+          const mediaFilename = `${basenameToAdd}.${mediaEntry.file.type}`;
+          line = `add-media|file|${mediaFilename}`;
+          break;
+        case "dir":
+          line = `add-media|dir|${basenameToAdd}`;
+          break;
+      }
+
       lines.push(line);
     }
   }
 
   for (const basenameToDelete of sets.delete) {
-    const romFilenames = allRomBasenameToFilenamesMap.get(basenameToDelete);
-    if (!romFilenames) continue;
+    const mediaEntries = op.media.entries.get(basenameToDelete);
+    if (!mediaEntries) continue;
 
-    for (const romFilename of romFilenames) {
-      const rom = op.console.roms.selected.get(romFilename);
-      if (!rom) continue;
-      const line = `delete-media|${rom.fs.type}|${rom.base.name}`;
+    for (const mediaEntry of mediaEntries) {
+      let line: string;
+
+      switch (mediaEntry.type) {
+        case "file":
+          const mediaFilename = `${basenameToDelete}.${mediaEntry.file.type}`;
+          line = `delete-media|file|${mediaFilename}`;
+          break;
+        case "dir":
+          line = `delete-media|dir|${basenameToDelete}`;
+      }
+
       lines.push(line);
     }
   }

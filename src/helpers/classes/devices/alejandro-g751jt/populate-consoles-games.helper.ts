@@ -1,11 +1,7 @@
 import databasePaths from "../../../../objects/database-paths.object.js";
-import type { ConsoleName } from "../../../../types/console-name.type.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import titlesFromRomsDirPath from "../../../build/titles-from-roms-dir-path.helper.js";
-import dirExists, {
-  type DirExistsError,
-} from "../../../extras/fs/dir-exists.helper.js";
-import type { ExistsFalseResult } from "../../../extras/fs/exists.helper.js";
+import dirExists from "../../../extras/fs/dir-exists.helper.js";
 
 const fsExtras = {
   dirExists,
@@ -15,11 +11,7 @@ const build = {
   titlesFromRomsDirPath,
 };
 
-export type PopulateConsolesError = DirExistsError | ExistsFalseResult["error"];
-
-const populateConsoles = async (consoles: Consoles): Promise<ConsoleName[]> => {
-  const consolesToSkip: ConsoleName[] = [];
-
+const populateConsolesGames = async (consoles: Consoles): Promise<void> => {
   for (const [consoleName, konsole] of consoles) {
     const consoleDatabaseRomDirPath =
       databasePaths.getConsoleRomsDatabaseDirPath(consoleName);
@@ -30,12 +22,12 @@ const populateConsoles = async (consoles: Consoles): Promise<ConsoleName[]> => {
     );
 
     if (dbPathExistsError) {
-      consolesToSkip.push(consoleName);
+      konsole.metadata.skipGlobal();
       continue;
     }
 
     if (!dbPathExistsResult.exists) {
-      consolesToSkip.push(consoleName);
+      konsole.metadata.skipGlobal();
       continue;
     }
 
@@ -44,14 +36,12 @@ const populateConsoles = async (consoles: Consoles): Promise<ConsoleName[]> => {
     );
 
     if (buildTitlesError) {
-      consolesToSkip.push(consoleName);
+      konsole.metadata.skipGlobal();
       continue;
     }
 
-    for (const [titleName, title] of titles) konsole.addTitle(titleName, title);
+    for (const [, title] of titles) konsole.games.addTitle(title);
   }
-
-  return consolesToSkip;
 };
 
-export default populateConsoles;
+export default populateConsolesGames;

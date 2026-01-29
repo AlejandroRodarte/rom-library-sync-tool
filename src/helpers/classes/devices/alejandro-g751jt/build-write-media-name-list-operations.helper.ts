@@ -1,37 +1,28 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
 import type { WriteMediaNameListOperation } from "../../../../interfaces/write-media-name-list-operation.interface.js";
-import type { ConsolesData } from "../../../../types/consoles-data.type.js";
+import type { Consoles } from "../../../../types/consoles.type.js";
 
 const buildWriteMediaNameListOperations = (
   paths: AlejandroG751JTPaths,
-  consolesData: ConsolesData,
+  consoles: Consoles,
 ): WriteMediaNameListOperation[] => {
   const ops: WriteMediaNameListOperation[] = [];
 
-  for (const [, consoleData] of Object.entries(consolesData)) {
+  for (const [, konsole] of consoles) {
     const deviceConsoleMediaDirPaths =
-      paths.dirs["content-targets"].media.consoles[consoleData.name];
-
+      paths.dirs["content-targets"].media.consoles[konsole.name];
     const projectConsoleMediaFilePaths =
-      paths.files.project.lists.media.consoles[consoleData.name];
+      paths.files.project.lists.media.consoles[konsole.name];
 
     if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths) continue;
 
-    for (const mediaName of consoleData["content-targets"].media.names) {
-      if (
-        consoleData.skipFlags.global ||
-        consoleData.skipFlags.list.global ||
-        consoleData.skipFlags.list["content-targets"].media.global ||
-        consoleData.skipFlags.list["content-targets"].media.names[mediaName]
-      )
-        continue;
+    for (const mediaName of konsole.metadata.mediaNames) {
+      if (!konsole.metadata.canListMediaName(mediaName)) continue;
 
       const deviceConsoleMediaNameDir =
         deviceConsoleMediaDirPaths.names[mediaName];
-
       const projectConsoleMediaNameFile =
         projectConsoleMediaFilePaths[mediaName];
-
       if (!deviceConsoleMediaNameDir || !projectConsoleMediaNameFile) continue;
 
       ops.push({
@@ -39,7 +30,7 @@ const buildWriteMediaNameListOperations = (
           device: { dir: deviceConsoleMediaNameDir },
           project: { file: projectConsoleMediaNameFile },
         },
-        names: { console: consoleData.name, media: mediaName },
+        names: { console: konsole.name, media: mediaName },
       });
     }
   }

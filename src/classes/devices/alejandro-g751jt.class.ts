@@ -1,77 +1,42 @@
-import path from "node:path";
-
 import type { Device } from "../../interfaces/device.interface.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { Consoles } from "../../types/consoles.type.js";
 import type { DeviceName } from "../../types/device-name.type.js";
 import Console from "../console.class.js";
-import AppExistsError from "../errors/app-exists-error.class.js";
-import AppNotFoundError from "../errors/app-not-found-error.class.js";
-import { DEVICES_DIR_PATH } from "../../constants/paths.constants.js";
-import type { ConsolePaths } from "../../types/console-paths.types.js";
 import logger from "../../objects/logger.object.js";
 import type { DeviceWriteMethods } from "../../interfaces/device-write-methods.interface.js";
-import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
 import type { FileIO } from "../../interfaces/file-io.interface.js";
 import type { AlejandroG751JTPaths } from "../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
-import type { MediaName } from "../../types/media-name.type.js";
-import type { MediaPaths } from "../../types/media-paths.type.js";
 import writeDuplicateRomsFile from "../../helpers/extras/fs/write-duplicate-roms-file.helper.js";
 import writeScrappedRomsFile from "../../helpers/extras/fs/write-scrapped-roms-file.helper.js";
-import writeToFileOrDelete from "../../helpers/extras/fs/write-to-file-or-delete.helper.js";
-import deleteAndOpenWriteOnlyFile from "../../helpers/extras/fs/delete-and-open-new-write-only-file.helper.js";
-import writeConsoleDiffFile from "../../helpers/extras/fs/write-console-diff-file.helper.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
-import dirExists from "../../helpers/extras/fs/dir-exists.helper.js";
-import allDirsExist from "../../helpers/extras/fs/all-dirs-exist.helper.js";
 import writeRomsLists from "../../helpers/classes/devices/alejandro-g751jt/write-roms-lists.helper.js";
-import type { ConsolesData } from "../../types/consoles-data.type.js";
 import writeMediaLists from "../../helpers/classes/devices/alejandro-g751jt/write-media-lists.helper.js";
-import populateConsoles from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles.helper.js";
-import filterConsoles from "../../helpers/classes/devices/alejandro-g751jt/filter-consoles.helper.js";
+import populateConsolesGames from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles-games.helper.js";
+import filterConsolesGames from "../../helpers/classes/devices/alejandro-g751jt/filter-consoles-games.helper.js";
 import writeRomsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-roms-diffs.helper.js";
 import writeMediaDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-media-diffs.helper.js";
 import type { ContentTargetContent } from "../../types/content-target-content.type.js";
-import buildConsolesSkipFlags from "../../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
-import type { DiffConsolesData } from "../../types/diff-consoles-data.type.js";
 import writeEsDeGamelistsLists from "../../helpers/classes/devices/alejandro-g751jt/write-es-de-gamelists-lists.helper.js";
-import type { Medias } from "../../types/medias.type.js";
-import type { BasenameMediaEntries } from "../../types/basename-media-entries.type.js";
-import type { MediaEntry } from "../../types/media-entry.type.js";
-import type { ConsolesMedias } from "../../types/consoles-medias.type.js";
 import populateConsolesMedias from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles-medias.helper.js";
-
-export type AddConsoleMethodError = AppNotFoundError | AppExistsError;
-export type GetConsoleRomsFailedFilePathError = AppNotFoundError;
-export type GetConsoleRomsDiffFilePath = AppNotFoundError;
-export type GetConsoleRomsSyncDirPath = AppNotFoundError;
+import ConsoleMetadata from "../console-metadata.class.js";
+import type { ContentTargetPaths } from "../../types/content-target-paths.type.js";
+import buildPaths from "../../helpers/classes/devices/alejandro-g751jt/build-paths.helper.js";
+import type { ConsolesEnvData } from "../../types/consoles-env-data.type.js";
 
 const fsExtras = {
-  dirExists,
-  allDirsExist,
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
-  writeToFileOrDelete,
-  deleteAndOpenWriteOnlyFile,
-  writeConsoleDiffFile,
 };
 
 const ALEJANDRO_G751JT = "alejandro-g751jt" as const;
 
 class AlejandroG751JT implements Device, Debug {
   private _name: typeof ALEJANDRO_G751JT = ALEJANDRO_G751JT;
-
   private _paths: AlejandroG751JTPaths;
-
   private _consoles: Consoles;
-  private _consolesData: ConsolesData;
-  private _consoleNames: ConsoleName[];
-  private _consolesMedias: ConsolesMedias = new Map<ConsoleName, Medias>();
-
-  private _allMediaNames: MediaName[];
-
   private _contentTargetSkipFlags: ContentTargetContent<boolean>;
   private _fileIOExtras: FileIOExtras;
 
@@ -79,53 +44,31 @@ class AlejandroG751JT implements Device, Debug {
     envData: Environment["device"]["data"][typeof ALEJANDRO_G751JT],
     fileIO: FileIO,
   ) {
-    this._consolesData = {};
-
-    for (const [, c] of Object.entries(envData.consoles))
-      this._consolesData[c.name] = {
-        name: c.name,
-        "content-targets": c["content-targets"],
-        skipFlags: buildConsolesSkipFlags(c["content-targets"].media.names),
-      };
-
-    this._consoleNames = Object.entries(this._consolesData).map(
-      ([, c]) => c.name,
+    this._paths = this._buildAlejandroG751JTPaths(
+      envData.consoles,
+      envData["content-targets"].paths,
     );
 
     this._fileIOExtras = new FileIOExtras(fileIO);
 
+    this._consoles = new Map<ConsoleName, Console>();
+    for (const [, consoleEnvData] of Object.entries(envData.consoles)) {
+      const newConsole = new Console(
+        consoleEnvData.name,
+        new ConsoleMetadata(consoleEnvData["content-targets"].media.names),
+      );
+      this._consoles.set(consoleEnvData.name, newConsole);
+    }
+
     const uniqueContentTargetNames = [
       ...new Set(envData["content-targets"].names),
     ];
-
-    const allMediaNames = new Set<MediaName>();
-
-    for (const [, consoleData] of Object.entries(this._consolesData)) {
-      const consoleMedias = new Map<MediaName, BasenameMediaEntries>();
-
-      for (const mediaName of consoleData["content-targets"].media.names) {
-        if (!allMediaNames.has(mediaName)) allMediaNames.add(mediaName);
-        consoleMedias.set(mediaName, new Map<string, MediaEntry[]>());
-      }
-
-      this._consolesMedias.set(consoleData.name, consoleMedias);
-    }
-
-    this._allMediaNames = [...allMediaNames];
 
     this._contentTargetSkipFlags = {
       roms: !uniqueContentTargetNames.includes("roms"),
       media: !uniqueContentTargetNames.includes("media"),
       "es-de-gamelists": !uniqueContentTargetNames.includes("es-de-gamelists"),
     };
-
-    this._consoles = new Map<ConsoleName, Console>();
-    for (const consoleName of this._consoleNames)
-      this._addConsole(consoleName, new Console(consoleName));
-
-    this._paths = this._initAlejandroG751JTPaths(
-      envData["content-targets"].paths,
-    );
 
     logger.debug(this.debug());
   }
@@ -139,22 +82,12 @@ class AlejandroG751JT implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
-    const consolesToSkip = await populateConsoles(this._consoles);
-    for (const consoleName of consolesToSkip)
-      this._skipConsoleGlobal(consoleName);
-
-    const consoleMediaNamesToSkip = await populateConsolesMedias(
-      this._consolesMedias,
-    );
-    for (const consoleMediaName of consoleMediaNamesToSkip)
-      this._skipConsoleMediaGlobal(
-        consoleMediaName.console,
-        consoleMediaName.media,
-      );
+    await populateConsolesGames(this._consoles);
+    await populateConsolesMedias(this._consoles);
   };
 
   filter: () => void = () => {
-    filterConsoles(this._consoles);
+    filterConsolesGames(this._consoles);
   };
 
   write: DeviceWriteMethods = {
@@ -174,109 +107,47 @@ class AlejandroG751JT implements Device, Debug {
     },
     lists: async () => {
       if (!this._contentTargetSkipFlags.roms) {
-        const [consolesToSkip, validationError] = await writeRomsLists(
+        const pathsValidationError = await writeRomsLists(
           this._paths,
-          this._consolesData,
+          this._consoles,
           this._fileIOExtras,
         );
-
-        if (validationError) this._skipRomsContentTarget();
-
-        if (consolesToSkip)
-          for (const consoleName of consolesToSkip) {
-            this._skipListConsoleRoms(consoleName);
-            this._skipDiffConsoleRoms(consoleName);
-          }
+        if (pathsValidationError) this._skipRomsContentTarget();
       }
 
       if (!this._contentTargetSkipFlags.media) {
-        const [consoleMediaNamesToSkip, validationError] =
-          await writeMediaLists(
-            this._paths,
-            this._consolesData,
-            this._fileIOExtras,
-          );
-
-        if (validationError) this._skipMediaContentTarget();
-
-        if (consoleMediaNamesToSkip)
-          for (const consoleMediaName of consoleMediaNamesToSkip) {
-            this._skipListConsoleMediaName(
-              consoleMediaName.console,
-              consoleMediaName.media,
-            );
-            this._skipDiffConsoleMediaName(
-              consoleMediaName.console,
-              consoleMediaName.media,
-            );
-          }
+        const pathsValidationError = await writeMediaLists(
+          this._paths,
+          this._consoles,
+          this._fileIOExtras,
+        );
+        if (pathsValidationError) this._skipMediaContentTarget();
       }
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-        const [consolesToSkip, pathsValidationError] =
-          await writeEsDeGamelistsLists(
-            this._paths,
-            this._consolesData,
-            this._fileIOExtras,
-          );
-
-        if (pathsValidationError) {
-          logger.warn(pathsValidationError.toString());
-          this._skipEsDeGamelistsContentTarget();
-        }
-
-        if (consolesToSkip)
-          for (const consoleName of consolesToSkip) {
-            this._skipListConsoleEsDeGamelists(consoleName);
-            this._skipDiffConsoleEsDeGamelists(consoleName);
-          }
+        const pathsValidationError = await writeEsDeGamelistsLists(
+          this._paths,
+          this._consoles,
+          this._fileIOExtras,
+        );
+        if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
       }
     },
     diffs: async () => {
-      const diffConsolesData: DiffConsolesData = {};
-
-      for (const [, konsole] of this._consoles) {
-        const consoleData = this._consolesData[konsole.name];
-        const consoleMedias = this._consolesMedias.get(konsole.name);
-
-        if (!consoleData || !consoleMedias) continue;
-
-        diffConsolesData[konsole.name] = {
-          name: konsole.name,
-          roms: {
-            all: konsole.roms,
-            selected: konsole.selectedRoms,
-          },
-          data: consoleData,
-          medias: consoleMedias,
-        };
-      }
-
       if (!this._contentTargetSkipFlags.roms) {
-        const [consolesToSkip, validationError] = await writeRomsDiffs(
+        const pathsValidationError = await writeRomsDiffs(
           this._paths,
-          diffConsolesData,
+          this._consoles,
         );
-
-        if (validationError) this._skipRomsContentTarget();
-
-        if (consolesToSkip)
-          for (const consoleName of consolesToSkip)
-            this._skipSyncConsoleRoms(consoleName);
+        if (pathsValidationError) this._skipRomsContentTarget();
       }
 
       if (!this._contentTargetSkipFlags.media) {
-        const [consoleMediaNamesToSkip, validationError] =
-          await writeMediaDiffs(this._paths, diffConsolesData);
-
-        if (validationError) this._skipMediaContentTarget();
-
-        if (consoleMediaNamesToSkip)
-          for (const consoleMediaName of consoleMediaNamesToSkip)
-            this._skipSyncConsoleMediaName(
-              consoleMediaName.console,
-              consoleMediaName.media,
-            );
+        const pathsValidationError = await writeMediaDiffs(
+          this._paths,
+          this._consoles,
+        );
+        if (pathsValidationError) this._skipMediaContentTarget();
       }
     },
     failed: async () => {},
@@ -292,117 +163,13 @@ class AlejandroG751JT implements Device, Debug {
       .filter(([, skip]) => !skip)
       .map(([c]) => c)
       .join(", ")}, `;
-    content += `console-names: ${this._consoleNames.join(",")}, `;
-    content += `all-media-names: ${this._allMediaNames.join(", ")}, `;
 
-    for (const [, consoleData] of Object.entries(this._consolesData))
-      content += `${consoleData.name}-media-names: ${consoleData["content-targets"].media.names.join(", ")} `;
+    for (const [, konsole] of this._consoles)
+      content += `${konsole.name}-media-names: ${konsole.metadata.mediaNames.join(", ")} `;
 
     content += "}";
-
     return content;
   };
-
-  private _addConsole(
-    consoleName: ConsoleName,
-    konsole: Console,
-  ): AddConsoleMethodError | undefined {
-    if (!this._consoleNames.includes(consoleName))
-      return new AppNotFoundError(
-        `Device ${this._name} is NOT related to console ${consoleName}. This device supports the following consoles: ${this._consoleNames.join(", ")}.`,
-      );
-
-    const consoleExists = this._consoles.has(consoleName);
-    if (consoleExists)
-      return new AppExistsError(
-        `There is already an entry for console ${consoleName}.`,
-      );
-
-    this._consoles.set(consoleName, konsole);
-  }
-
-  private _skipConsoleGlobal(consoleName: ConsoleName) {
-    if (this._consolesData[consoleName]) {
-      this._consolesData[consoleName].skipFlags.global = true;
-      this._consolesData[consoleName].skipFlags.list.global = true;
-      this._consolesData[consoleName].skipFlags.diff.global = true;
-      this._consolesData[consoleName].skipFlags.sync.global = true;
-    }
-  }
-
-  private _skipConsoleMediaGlobal(
-    consoleName: ConsoleName,
-    mediaName: MediaName,
-  ) {
-    if (this._consolesData[consoleName]) {
-      this._consolesData[consoleName].skipFlags.list[
-        "content-targets"
-      ].media.names[mediaName] = true;
-      this._consolesData[consoleName].skipFlags.diff[
-        "content-targets"
-      ].media.names[mediaName] = true;
-      this._consolesData[consoleName].skipFlags.sync[
-        "content-targets"
-      ].media.names[mediaName] = true;
-    }
-  }
-
-  private _skipListConsoleRoms(consoleName: ConsoleName) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.list["content-targets"].roms = true;
-  }
-
-  private _skipDiffConsoleRoms(consoleName: ConsoleName) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.diff["content-targets"].roms = true;
-  }
-
-  private _skipListConsoleMediaName(
-    consoleName: ConsoleName,
-    mediaName: MediaName,
-  ) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.list["content-targets"].media.names[mediaName] = true;
-  }
-
-  private _skipDiffConsoleMediaName(
-    consoleName: ConsoleName,
-    mediaName: MediaName,
-  ) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.diff["content-targets"].media.names[mediaName] = true;
-  }
-
-  private _skipListConsoleEsDeGamelists(consoleName: ConsoleName) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.list["content-targets"]["es-de-gamelists"] = true;
-  }
-
-  private _skipDiffConsoleEsDeGamelists(consoleName: ConsoleName) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.diff["content-targets"]["es-de-gamelists"] = true;
-  }
-
-  private _skipSyncConsoleRoms(consoleName: ConsoleName) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.sync["content-targets"].roms = true;
-  }
-
-  private _skipSyncConsoleMediaName(
-    consoleName: ConsoleName,
-    mediaName: MediaName,
-  ) {
-    const consoleData = this._consolesData[consoleName];
-    if (!consoleData) return;
-    consoleData.skipFlags.sync["content-targets"].media.names[mediaName] = true;
-  }
 
   private _skipRomsContentTarget() {
     this._contentTargetSkipFlags.roms = true;
@@ -416,251 +183,11 @@ class AlejandroG751JT implements Device, Debug {
     this._contentTargetSkipFlags["es-de-gamelists"] = true;
   }
 
-  private _initAlejandroG751JTPaths(
-    contentTargetPaths: Environment["device"]["data"][typeof ALEJANDRO_G751JT]["content-targets"]["paths"],
+  private _buildAlejandroG751JTPaths(
+    consolesEnvData: ConsolesEnvData,
+    contentTargetPaths: ContentTargetPaths,
   ): AlejandroG751JTPaths {
-    const baseDirPath = path.join(DEVICES_DIR_PATH, this._name);
-
-    const logsDirPath = path.join(baseDirPath, "logs");
-
-    const listsDirPath = path.join(baseDirPath, "lists");
-    const romsListsDirPath = path.join(listsDirPath, "roms");
-    const mediaListsDirPath = path.join(listsDirPath, "media");
-    const esDeGamelistsListsDirPath = path.join(
-      listsDirPath,
-      "es-de-gamelists",
-    );
-
-    const diffsDirPath = path.join(baseDirPath, "diffs");
-    const romsDiffsDirPath = path.join(diffsDirPath, "roms");
-    const mediaDiffsDirPath = path.join(diffsDirPath, "media");
-    const esDeGamelistsDiffsDirPath = path.join(
-      diffsDirPath,
-      "es-de-gamelists",
-    );
-
-    const failedDirPath = path.join(baseDirPath, "failed");
-    const romsFailedDirPath = path.join(failedDirPath, "roms");
-    const mediaFailedDirPath = path.join(failedDirPath, "media");
-    const esDeGamelistsFailedDirPath = path.join(
-      failedDirPath,
-      "es-de-gamelists",
-    );
-
-    const paths: AlejandroG751JTPaths = {
-      dirs: {
-        project: {
-          base: baseDirPath,
-          logs: {
-            base: logsDirPath,
-          },
-          lists: {
-            base: listsDirPath,
-            "content-targets": {
-              roms: romsListsDirPath,
-              media: {
-                base: mediaListsDirPath,
-                names: Object.fromEntries(
-                  this._allMediaNames.map((m) => [
-                    m,
-                    path.join(mediaListsDirPath, m),
-                  ]),
-                ) as Partial<MediaPaths>,
-              },
-              "es-de-gamelists": esDeGamelistsListsDirPath,
-            },
-          },
-          diffs: {
-            base: diffsDirPath,
-            "content-targets": {
-              roms: romsDiffsDirPath,
-              media: {
-                base: mediaDiffsDirPath,
-                names: Object.fromEntries(
-                  this._allMediaNames.map((m) => [
-                    m,
-                    path.join(mediaDiffsDirPath, m),
-                  ]),
-                ) as Partial<MediaPaths>,
-              },
-              "es-de-gamelists": esDeGamelistsDiffsDirPath,
-            },
-          },
-          failed: {
-            base: failedDirPath,
-            "content-targets": {
-              roms: romsFailedDirPath,
-              media: {
-                base: mediaFailedDirPath,
-                names: Object.fromEntries(
-                  this._allMediaNames.map((m) => [
-                    m,
-                    path.join(mediaFailedDirPath, m),
-                  ]),
-                ) as Partial<MediaPaths>,
-              },
-              "es-de-gamelists": esDeGamelistsFailedDirPath,
-            },
-          },
-        },
-        "content-targets": {
-          roms: {
-            base: contentTargetPaths.roms,
-            consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [
-                c,
-                path.join(contentTargetPaths.roms, c),
-              ]),
-            ) as Partial<ConsolePaths>,
-          },
-          media: {
-            base: contentTargetPaths.media,
-            consoles: Object.fromEntries(
-              Object.entries(this._consolesData).map(([, c]) => [
-                c.name,
-                {
-                  base: path.join(contentTargetPaths.media, c.name),
-                  names: Object.fromEntries(
-                    c["content-targets"].media.names.map((m) => [
-                      m,
-                      path.join(contentTargetPaths.media, c.name, m),
-                    ]),
-                  ) as Partial<MediaPaths>,
-                },
-              ]),
-            ) as Partial<
-              ConsoleContent<{ base: string; names: Partial<MediaPaths> }>
-            >,
-          },
-          "es-de-gamelists": {
-            base: contentTargetPaths["es-de-gamelists"],
-            consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [
-                c,
-                path.join(contentTargetPaths["es-de-gamelists"], c),
-              ]),
-            ) as Partial<ConsolePaths>,
-          },
-        },
-      },
-      files: {
-        project: {
-          logs: {
-            duplicates: path.join(logsDirPath, "duplicates.log.txt"),
-            scrapped: path.join(logsDirPath, "scrapped.log.txt"),
-          },
-          lists: {
-            roms: {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(romsListsDirPath, `${c}.list.txt`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-            media: {
-              consoles: Object.fromEntries(
-                Object.entries(this._consolesData).map(([, c]) => [
-                  c.name,
-                  Object.fromEntries(
-                    c["content-targets"].media.names.map((m) => [
-                      m,
-                      path.join(mediaListsDirPath, m, `${c.name}.list.txt`),
-                    ]),
-                  ) as Partial<MediaPaths>,
-                ]),
-              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
-            },
-            "es-de-gamelists": {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(esDeGamelistsListsDirPath, `${c}.list.xml`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-          },
-          diffs: {
-            roms: {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(romsDiffsDirPath, `${c}.diff.txt`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-            media: {
-              consoles: Object.fromEntries(
-                Object.entries(this._consolesData).map(([, c]) => [
-                  c.name,
-                  Object.fromEntries(
-                    c["content-targets"].media.names.map((m) => [
-                      m,
-                      path.join(mediaDiffsDirPath, m, `${c.name}.diff.txt`),
-                    ]),
-                  ) as Partial<MediaPaths>,
-                ]),
-              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
-            },
-            "es-de-gamelists": {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(esDeGamelistsDiffsDirPath, `${c}.diff.xml`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-          },
-          failed: {
-            roms: {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(romsFailedDirPath, `${c}.failed.txt`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-            media: {
-              consoles: Object.fromEntries(
-                Object.entries(this._consolesData).map(([, c]) => [
-                  c.name,
-                  Object.fromEntries(
-                    c["content-targets"].media.names.map((m) => [
-                      m,
-                      path.join(mediaFailedDirPath, m, `${c.name}.failed.txt`),
-                    ]),
-                  ) as Partial<MediaPaths>,
-                ]),
-              ) as Partial<ConsoleContent<Partial<MediaPaths>>>,
-            },
-            "es-de-gamelists": {
-              consoles: Object.fromEntries(
-                this._consoleNames.map((c) => [
-                  c,
-                  path.join(esDeGamelistsFailedDirPath, `${c}.failed.txt`),
-                ]),
-              ) as Partial<ConsolePaths>,
-            },
-          },
-        },
-        "content-targets": {
-          "es-de-gamelists": {
-            consoles: Object.fromEntries(
-              this._consoleNames.map((c) => [
-                c,
-                path.join(
-                  contentTargetPaths["es-de-gamelists"],
-                  c,
-                  "gamelist.xml",
-                ),
-              ]),
-            ),
-          },
-        },
-      },
-    };
-
-    return paths;
+    return buildPaths(this._name, consolesEnvData, contentTargetPaths);
   }
 }
 

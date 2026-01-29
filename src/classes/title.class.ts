@@ -1,63 +1,57 @@
-import AppNotFoundError from "./errors/app-not-found-error.class.js";
-import specialFlagsFromRoms from "../helpers/build/special-flags-from-roms.helper.js";
-import type { RomSet } from "../types/rom-set.type.js";
 import type { Rom } from "../interfaces/rom.interface.js";
 import type { SpecialFlags } from "../interfaces/special-flags.interface.js";
-
-const build = {
-  specialFlagsFromRoms,
-};
+import Roms from "./roms.class.js";
 
 class Title {
   private _name: string;
-  private _romSet: RomSet;
-  private _selectedRomSet: RomSet | undefined;
+
+  private _allRoms: Roms;
+  private _selectedRoms: Roms;
+
   private _keepSelected = 1;
 
-  constructor(name: string, romSet: RomSet) {
+  constructor(name: string, roms: Roms) {
     this._name = name;
-    this._romSet = romSet;
+    this._allRoms = roms;
+    this._selectedRoms = new Roms();
   }
 
   get name(): string {
     return this._name;
   }
 
-  set name(name: string) {
-    this._name = name;
+  get allRoms(): Roms {
+    return this._allRoms;
   }
 
-  get romSet(): RomSet {
-    return this._romSet;
+  get selectedRoms(): Roms {
+    return this._selectedRoms;
   }
 
-  get selectedRomSet(): RomSet {
-    if (!this._selectedRomSet)
-      throw new AppNotFoundError(
-        "The set for selected ROMs has not been initialized. Make sure to call setSelectedRomSet() after you are done adding all of the ROMs for a given title.",
-      );
-    return this._selectedRomSet;
-  }
-
-  get selectedRomAmount(): number {
-    return this.selectedRomSet.size;
+  get selectedRomsSize(): number {
+    return this.selectedRoms.size;
   }
 
   set keepSelected(keepSelected: number) {
     this._keepSelected = keepSelected;
   }
 
-  public addRom(rom: Rom): void {
-    this._romSet.set(rom.file.name, rom);
+  public addRom(rom: Rom, selected = true): void {
+    this._allRoms.add(rom);
+    if (selected) this._selectedRoms.add(rom);
   }
 
-  public setSelectedRomSet(): void {
-    this._selectedRomSet = new Map(this._romSet);
+  public unselectOne(
+    id: string,
+  ): "cant-unselect" | "rom-existed" | "rom-did-not-exist" {
+    if (!this.canUnselect()) return "cant-unselect";
+    const romExisted = this.selectedRoms.deleteOne(id);
+    return romExisted ? "rom-existed" : "rom-did-not-exist";
   }
 
-  public unselectByIds(ids: string[]): void {
+  public unselectMany(ids: string[]): void {
     for (const id of ids) {
-      const result = this.unselectById(id);
+      const result = this.unselectOne(id);
       switch (result) {
         case "cant-unselect":
           return;
@@ -66,38 +60,21 @@ class Title {
           break;
         case "rom-did-not-exist":
           break;
-        default:
-          break;
       }
     }
   }
 
-  public unselectById(
-    id: string,
-  ): "cant-unselect" | "rom-existed" | "rom-did-not-exist" {
-    if (!this.canUnselect()) return "cant-unselect";
-    const romExisted = this.selectedRomSet.delete(id);
-    return romExisted ? "rom-existed" : "rom-did-not-exist";
-  }
-
-  public getSpecialFlags(
-    from: "roms" | "selected-roms" = "selected-roms",
-  ): SpecialFlags {
+  public getSpecialFlags(from: "all" | "selected" = "selected"): SpecialFlags {
     switch (from) {
-      case "roms":
-        return this.computeSpecialFlags(this._romSet);
-      case "selected-roms":
-        return this.computeSpecialFlags(this.selectedRomSet);
+      case "all":
+        return this._allRoms.specialFlags;
+      case "selected":
+        return this._selectedRoms.specialFlags;
     }
   }
 
   public canUnselect(): boolean {
-    return this.selectedRomAmount > this._keepSelected;
-  }
-
-  private computeSpecialFlags(romSet: RomSet): SpecialFlags {
-    const roms = Array.from(romSet.values());
-    return build.specialFlagsFromRoms(roms);
+    return this.selectedRomsSize > this._keepSelected;
   }
 }
 

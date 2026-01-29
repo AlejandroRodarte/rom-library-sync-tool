@@ -21,9 +21,10 @@ const writeScrappedRomsFile = async (
 
   for (const [consoleName, konsole] of consoles) {
     lines.push(`%%%%% Scrapped titles found from console ${consoleName} %%%%%`);
-    for (const [titleName, title] of konsole.scrappedTitles) {
+    for (const [titleName, title] of konsole.games.scrappedTitles) {
       lines.push(`===== Title: ${titleName} =====`);
-      for (const [, rom] of title.romSet) lines.push(`ROM: ${rom.file.name}`);
+      for (const [, rom] of title.allRoms.entries)
+        lines.push(`ROM: ${rom.file.name}`);
     }
   }
 

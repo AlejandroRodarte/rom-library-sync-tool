@@ -5,6 +5,7 @@ import type { Rom } from "../../interfaces/rom.interface.js";
 import type { Dirent } from "node:fs";
 import logger from "../../objects/logger.object.js";
 import buildTitleNameFromDirEntry from "../classes/devices/alejandro-g751jt/build-title-name-from-dir-entry.helper.js";
+import Roms from "../../classes/roms.class.js";
 
 const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
   const titles = new Map<string, Title>();
@@ -48,13 +49,12 @@ const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
 
     if (title) title.addRom(newRom);
     else {
-      const newTitle = new Title(titleName, new Map<string, Rom>());
+      const newTitle = new Title(titleName, new Roms());
       newTitle.addRom(newRom);
       titles.set(titleName, newTitle);
     }
   }
 
-  for (const [_, title] of titles) title.setSelectedRomSet();
   return titles;
 };
 

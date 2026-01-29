@@ -11,7 +11,7 @@ const byVersionSystem = (
   for (const versionSystem of versioningSystemsPriorityList) {
     const versionedRoms: RomIdAndVersion[] = [];
 
-    title.selectedRomSet.entries().forEach(([id, rom]) => {
+    title.selectedRoms.entries.forEach(([id, rom]) => {
       const versionLabelIndex = rom.labels.findIndex((label) =>
         label.match(versionSystem.pattern),
       );
@@ -53,12 +53,11 @@ const byVersionSystem = (
       const romIsOfLowerVersion = !romIdsWithHighestVersion.includes(
         versionedRom.id,
       );
-      if (romIsOfLowerVersion) title.unselectById(versionedRom.id);
+      if (romIsOfLowerVersion) title.unselectOne(versionedRom.id);
     }
 
     if (versionedRomsFound) {
-      const nonVersionedRomIds = title.selectedRomSet
-        .entries()
+      const nonVersionedRomIds = title.selectedRoms.entries
         .filter(
           ([, rom]) =>
             !rom.labels.some((label) => label.match(versionSystem.pattern)),
@@ -66,7 +65,7 @@ const byVersionSystem = (
         .map(([id]) => id)
         .toArray();
 
-      title.unselectByIds(nonVersionedRomIds);
+      title.unselectMany(nonVersionedRomIds);
     }
 
     if (versionedRomsFound) break;

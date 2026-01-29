@@ -36,9 +36,8 @@ const writeRomsDiff = async (
   );
   if (diffFileOpenError) return diffFileOpenError;
 
-  const newFilenames = op.console.roms.selected
-    .values()
-    .map((rom) => rom.file.name)
+  const newFilenames = op.console.roms.selected.entries
+    .map(([, rom]) => rom.file.name)
     .toArray();
 
   const sets = getLineSetsToAddAndDeleteFromOldAndNewLists(
