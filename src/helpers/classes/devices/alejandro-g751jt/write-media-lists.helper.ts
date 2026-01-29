@@ -1,5 +1,6 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import logger from "../../../../objects/logger.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import buildMediaListPaths from "./build-media-list-paths.helper.js";
 import buildWriteMediaNameListOperations from "./build-write-media-name-list-operations.helper.js";
@@ -17,6 +18,8 @@ const writeMediaLists = async (
 ): Promise<WriteMediaListsError | undefined> => {
   const listPaths = buildMediaListPaths(paths);
   const ops = buildWriteMediaNameListOperations(paths, consoles);
+
+  logger.debug(JSON.stringify(listPaths, undefined, 2));
 
   const validationError = await validateListPaths(listPaths, fileIOExtras);
   if (validationError) return validationError;

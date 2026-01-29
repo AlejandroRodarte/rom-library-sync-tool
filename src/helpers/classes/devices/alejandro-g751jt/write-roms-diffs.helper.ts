@@ -1,4 +1,5 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import logger from "../../../../objects/logger.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import buildRomsDiffsDirPaths from "./build-roms-diff-paths.helper.js";
 import buildWriteRomsDiffOperations from "./build-write-roms-diff-operations.helper.js";
@@ -15,6 +16,8 @@ const writeRomsDiffs = async (
 ): Promise<WriteRomsDiffsError | undefined> => {
   const diffPaths = buildRomsDiffsDirPaths(paths);
   const ops = buildWriteRomsDiffOperations(paths.files.project, consoles);
+
+  logger.debug(JSON.stringify(diffPaths, undefined, 2));
 
   const pathsValidationError = await validateDiffPaths(diffPaths);
   if (pathsValidationError) return pathsValidationError;

@@ -1,4 +1,5 @@
 import type { AlejandroG751JTPaths } from "../../../../interfaces/devices/alejandro-g751jt/alejandro-g751jt-paths.interface.js";
+import logger from "../../../../objects/logger.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import buildMediaDiffPaths from "./build-media-diff-paths.helper.js";
 import buildWriteMediaNameDiffOperations from "./build-write-media-name-diff-operations.helper.js";
@@ -15,6 +16,8 @@ const writeMediaDiffs = async (
 ): Promise<WriteMediaDiffsError | undefined> => {
   const diffPaths = buildMediaDiffPaths(paths);
   const ops = buildWriteMediaNameDiffOperations(paths, consoles);
+
+  logger.debug(JSON.stringify(diffPaths, undefined, 2));
 
   const pathsValidationError = await validateDiffPaths(diffPaths);
   if (pathsValidationError) return pathsValidationError;
