@@ -1,10 +1,12 @@
 import databasePaths from "../../../../objects/database-paths.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import type { MediaEntry } from "../../../../types/media-entry.type.js";
+import dirExists from "../../../extras/fs/dir-exists.helper.js";
 import ls from "../../../extras/fs/ls.helper.js";
 
 const fsExtras = {
   ls,
+  dirExists,
 };
 
 const populateConsolesMedias = async (consoles: Consoles): Promise<void> => {
@@ -14,6 +16,21 @@ const populateConsolesMedias = async (consoles: Consoles): Promise<void> => {
         konsole.name,
         mediaName,
       );
+
+      const [dirExistsResult, dirExistsError] = await fsExtras.dirExists(
+        dbPath,
+        "r",
+      );
+
+      if (dirExistsError) {
+        konsole.metadata.skipGlobalMediaName(mediaName);
+        continue;
+      }
+
+      if (!dirExistsResult.exists) {
+        konsole.metadata.skipGlobalMediaName(mediaName);
+        continue;
+      }
 
       const [lsEntries, lsError] = await fsExtras.ls(dbPath);
 
