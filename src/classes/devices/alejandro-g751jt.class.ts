@@ -83,7 +83,9 @@ class AlejandroG751JT implements Device, Debug {
 
   populate: () => Promise<void> = async () => {
     await populateConsolesGames(this._consoles);
-    await populateConsolesMedias(this._consoles);
+
+    if (!this._contentTargetSkipFlags.media)
+      await populateConsolesMedias(this._consoles);
   };
 
   filter: () => void = () => {
