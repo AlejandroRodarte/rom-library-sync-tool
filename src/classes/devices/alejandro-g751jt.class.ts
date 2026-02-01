@@ -25,6 +25,8 @@ import ConsoleMetadata from "../console-metadata.class.js";
 import type { ContentTargetPaths } from "../../types/content-target-paths.type.js";
 import buildPaths from "../../helpers/classes/devices/alejandro-g751jt/build-paths.helper.js";
 import type { ConsolesEnvData } from "../../types/consoles-env-data.type.js";
+import populateConsolesGamelists from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles-gamelists.helper.js";
+import writeEsDeGamelistsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-es-de-gamelists-diffs.helper.js";
 
 const fsExtras = {
   writeDuplicateRomsFile,
@@ -83,9 +85,10 @@ class AlejandroG751JT implements Device, Debug {
 
   populate: () => Promise<void> = async () => {
     await populateConsolesGames(this._consoles);
-
     if (!this._contentTargetSkipFlags.media)
       await populateConsolesMedias(this._consoles);
+    if (!this._contentTargetSkipFlags["es-de-gamelists"])
+      await populateConsolesGamelists(this._consoles);
   };
 
   filter: () => void = () => {
@@ -148,6 +151,14 @@ class AlejandroG751JT implements Device, Debug {
           this._consoles,
         );
         if (pathsValidationError) this._skipMediaContentTarget();
+      }
+
+      if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+        const pathsValidationError = await writeEsDeGamelistsDiffs(
+          this._paths,
+          this._consoles,
+        );
+        if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
       }
     },
     failed: async () => {},

@@ -20,11 +20,16 @@ class DatabasePaths {
     return this._paths.dirs.roms.consoles[consoleName];
   }
 
-  public getConsoleMediaNamesDatabaseDirPath(consoleName: ConsoleName, mediaName: MediaName): string {
+  public getConsoleMediaNamesDatabaseDirPath(
+    consoleName: ConsoleName,
+    mediaName: MediaName,
+  ): string {
     return this._paths.dirs.media.consoles[consoleName][mediaName];
   }
 
-  public getConsoleEsDeMetadataDatabaseFilePath(consoleName: ConsoleName): string {
+  public getConsoleEsDeGamelistDatabaseFilePath(
+    consoleName: ConsoleName,
+  ): string {
     return this._paths.files["es-de-gamelists"].consoles[consoleName];
   }
 
