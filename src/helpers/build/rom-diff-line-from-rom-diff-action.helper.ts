@@ -1,6 +1,6 @@
 import type { RomDiffAction } from "../../types/rom-diff-action.type.js";
 
-const diffLineFromDiffAction = (diffAction: RomDiffAction): string => {
+const romDiffLineFromRomDiffAction = (diffAction: RomDiffAction): string => {
   switch (diffAction.type) {
     case "add-rom":
       return `add-rom|${diffAction.data.fs.type}|${diffAction.data.filename}`;
@@ -9,4 +9,4 @@ const diffLineFromDiffAction = (diffAction: RomDiffAction): string => {
   }
 };
 
-export default diffLineFromDiffAction;
+export default romDiffLineFromRomDiffAction;

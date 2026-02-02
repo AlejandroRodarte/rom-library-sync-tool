@@ -1,5 +1,8 @@
 import type { PathAccessItem } from "../../../interfaces/path-access-item.interface.js";
-import type { AnyExistsError } from "./any-exists.helper.js";
+import type {
+  AnyExistsError,
+  AnyExistsTrueResult,
+} from "./any-exists.helper.js";
 import anyExists from "./any-exists.helper.js";
 
 export type FileAccessItem = Omit<PathAccessItem, "type">;
@@ -7,11 +10,13 @@ export type FileAccessItem = Omit<PathAccessItem, "type">;
 export interface AnyFileExistsTrueResult {
   anyExists: true;
   fileAccessItem: FileAccessItem;
+  error: AnyExistsTrueResult["error"];
 }
 
 export interface AnyFileExistsFalseResult {
   anyExists: false;
   fileAccessItem: undefined;
+  error: undefined;
 }
 
 export type AnyFileExistsResult =
@@ -41,10 +46,16 @@ const anyFileExists = async (
     if (anyExistsResult.pathAccessItem.rights)
       fileAccessItem.rights = anyExistsResult.pathAccessItem.rights;
 
-    return [{ anyExists: true, fileAccessItem }, undefined];
+    return [
+      { anyExists: true, fileAccessItem, error: anyExistsResult.error },
+      undefined,
+    ];
   }
 
-  return [{ anyExists: false, fileAccessItem: undefined }, undefined];
+  return [
+    { anyExists: false, fileAccessItem: undefined, error: undefined },
+    undefined,
+  ];
 };
 
 export default anyFileExists;

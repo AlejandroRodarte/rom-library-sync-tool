@@ -27,6 +27,9 @@ import buildPaths from "../../helpers/classes/devices/alejandro-g751jt/build-pat
 import type { ConsolesEnvData } from "../../types/consoles-env-data.type.js";
 import populateConsolesGamelists from "../../helpers/classes/devices/alejandro-g751jt/populate-consoles-gamelists.helper.js";
 import writeEsDeGamelistsDiffs from "../../helpers/classes/devices/alejandro-g751jt/write-es-de-gamelists-diffs.helper.js";
+import syncRoms from "../../helpers/classes/devices/alejandro-g751jt/sync-roms.helper.js";
+import syncMedia from "../../helpers/classes/devices/alejandro-g751jt/sync-media.helper.js";
+import syncEsDeGamelists from "../../helpers/classes/devices/alejandro-g751jt/sync-es-de-gamelists.helper.js";
 
 const fsExtras = {
   writeDuplicateRomsFile,
@@ -164,7 +167,34 @@ class AlejandroG751JT implements Device, Debug {
     failed: async () => {},
   };
 
-  sync: () => Promise<void> = async () => {};
+  sync: () => Promise<void> = async () => {
+    if (!this._contentTargetSkipFlags.roms) {
+      const pathsValidationError = await syncRoms(
+        this._paths,
+        this._consoles,
+        this._fileIOExtras,
+      );
+      if (pathsValidationError) this._skipRomsContentTarget();
+    }
+
+    if (!this._contentTargetSkipFlags.media) {
+      const pathsValidationError = await syncMedia(
+        this._paths,
+        this._consoles,
+        this._fileIOExtras,
+      );
+      if (pathsValidationError) this._skipMediaContentTarget();
+    }
+
+    if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+      const pathsValidationError = await syncEsDeGamelists(
+        this._paths,
+        this._consoles,
+        this._fileIOExtras,
+      );
+      if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
+    }
+  };
 
   debug: () => string = () => {
     let content = "AlejandroG751JT { ";

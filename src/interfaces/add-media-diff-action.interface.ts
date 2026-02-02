@@ -1,13 +1,11 @@
-import type { RomFsType } from "../types/rom-fs-type.type.js";
+import type { MediaFsType } from "../types/media-fs-type.type.js";
 
 export interface AddMediaDiffAction {
   type: "add-media";
   data: {
-    rom: {
-      basename: string;
-      fs: {
-        type: RomFsType;
-      };
+    filename: string;
+    fs: {
+      type: MediaFsType;
     };
   };
 }

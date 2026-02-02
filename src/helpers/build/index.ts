@@ -5,7 +5,7 @@ import specialFlagsFromRoms from "./special-flags-from-roms.helper.js";
 import environmentFromProcessVariables from "./environment-from-process-variables.helper.js";
 import filenameIndexesToAddAndDelete from "./filename-indexes-to-add-and-delete.helper.js";
 import romDiffActionFromRomDiffLine from "./rom-diff-action-from-rom-diff-line.helper.js";
-import diffLineFromDiffAction from "./rom-diff-line-from-rom-diff-action.helper.js";
+import romDiffLineFromRomDiffAction from "./rom-diff-line-from-rom-diff-action.helper.js";
 import steamDeckSftpClient from "./steam-deck-sftp-client.helper.js";
 import deviceNamesFromSyncDevicesList from "./device-names-from-sync-devices-list.helper.js";
 import deviceNamesFromDevicesList from "./device-names-from-devices-list.helper.js";
@@ -24,7 +24,7 @@ const build = {
   environmentFromProcessVariables,
   filenameIndexesToAddAndDelete,
   diffActionFromDiffLine: romDiffActionFromRomDiffLine,
-  diffLineFromDiffAction,
+  diffLineFromDiffAction: romDiffLineFromRomDiffAction,
   steamDeckSftpClient,
   deviceNamesFromSyncDevicesList,
   deviceNamesFromDevicesList,
