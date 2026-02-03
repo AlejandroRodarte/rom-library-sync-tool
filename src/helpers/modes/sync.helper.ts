@@ -21,10 +21,7 @@ const sync = async (devices: (Device & Debug)[]) => {
       `Mode ${mode} is NOT supported for the sync task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
 
-  for (const device of devices) {
-    await device.sync();
-    await device.write.failed();
-  }
+  for (const device of devices) await device.sync();
 };
 
 export default sync;

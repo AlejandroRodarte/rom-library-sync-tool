@@ -1,10 +1,10 @@
-import buildConsolesSkipFlags from "../helpers/classes/devices/alejandro-g751jt/build-consoles-skip-flags.helper.js";
-import type { AlejandroG751JTConsolesSkipFlags } from "../interfaces/devices/alejandro-g751jt/alejandro-g751jt-consoles-skip-flags.interface.js";
+import buildConsolesSkipFlags from "../helpers/classes/devices/generic-device/build-consoles-skip-flags.helper.js";
+import type { ConsolesSkipFlags } from "../interfaces/devices/generic-device/consoles-skip-flags.interface.js";
 import type { MediaName } from "../types/media-name.type.js";
 
 class ConsoleMetadata {
   private _mediaNames: MediaName[];
-  private _skipFlags: AlejandroG751JTConsolesSkipFlags;
+  private _skipFlags: ConsolesSkipFlags;
 
   constructor(mediaNames: MediaName[]) {
     this._mediaNames = [...new Set(mediaNames)];

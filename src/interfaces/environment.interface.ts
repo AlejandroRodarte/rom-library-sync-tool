@@ -1,8 +1,7 @@
 import type { ContentTargetPaths } from "../types/content-target-paths.type.js";
-import type { DeviceName } from "../types/device-name.type.js";
 import type { LogLevel } from "../types/log-level.type.js";
 import type { ModeName } from "../types/mode-name.type.js";
-import type { DeviceData } from "./device-data.interface.js";
+import type { DeviceEnvData } from "./devices/generic-device/device-env-data.interface.js";
 
 export interface Environment {
   options: {
@@ -18,9 +17,9 @@ export interface Environment {
     paths: ContentTargetPaths;
   };
   device: {
-    names: DeviceName[];
+    names: string[];
     data: {
-      [D in DeviceName]: DeviceData[D];
+      [deviceName: string]: DeviceEnvData;
     };
   };
 }

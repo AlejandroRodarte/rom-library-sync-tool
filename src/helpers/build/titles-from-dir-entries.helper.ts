@@ -4,7 +4,7 @@ import type { Titles } from "../../types/titles.type.js";
 import type { Rom } from "../../interfaces/rom.interface.js";
 import type { Dirent } from "node:fs";
 import logger from "../../objects/logger.object.js";
-import buildTitleNameFromDirEntry from "../classes/devices/alejandro-g751jt/build-title-name-from-dir-entry.helper.js";
+import buildTitleNameFromDirEntry from "../classes/devices/generic-device/build-title-name-from-dir-entry.helper.js";
 import Roms from "../../classes/roms.class.js";
 
 const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {

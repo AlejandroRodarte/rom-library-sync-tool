@@ -1,8 +1,9 @@
 import dotEnv from "dotenv";
-import environmentFromProcessVariables from "../helpers/build/environment-from-process-variables.helper.js";
 import type { Environment } from "../interfaces/environment.interface.js";
+import buildEnvironment from "../helpers/build/environment.helper.js";
 
 dotEnv.config();
-const environment: Environment = environmentFromProcessVariables();
+const environment: Environment = buildEnvironment();
+console.log(JSON.stringify(environment, undefined, 2));
 
 export default environment;
