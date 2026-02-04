@@ -1,3 +1,9 @@
+import DIFF_LINE_SEPARATOR from "../../../../constants/diff-line-separator.constant.js";
+import { DIR, FILE } from "../../../../constants/fs-types.constants.js";
+import {
+  ADD_MEDIA,
+  DELETE_MEDIA,
+} from "../../../../constants/media-diff-action-types.constants.js";
 import type { WriteMediaNameDiffOperation } from "../../../../interfaces/write-media-name-diff-operation.interface.js";
 import getLineSetsToAddAndDeleteFromOldAndNewLists from "../../../build/get-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
 import openFileForWriting, {
@@ -65,12 +71,12 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
       let line: string;
 
       switch (mediaEntry.type) {
-        case "file":
+        case FILE:
           const mediaFilename = `${basenameToAdd}.${mediaEntry.file.type}`;
-          line = `add-media|file|${mediaFilename}`;
+          line = `${ADD_MEDIA}${DIFF_LINE_SEPARATOR}${FILE}${DIFF_LINE_SEPARATOR}${mediaFilename}`;
           break;
-        case "dir":
-          line = `add-media|dir|${basenameToAdd}`;
+        case DIR:
+          line = `${ADD_MEDIA}${DIFF_LINE_SEPARATOR}${DIR}${DIFF_LINE_SEPARATOR}${basenameToAdd}`;
           break;
       }
 
@@ -86,12 +92,12 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
       let line: string;
 
       switch (mediaEntry.type) {
-        case "file":
+        case FILE:
           const mediaFilename = `${basenameToDelete}.${mediaEntry.file.type}`;
-          line = `delete-media|file|${mediaFilename}`;
+          line = `${DELETE_MEDIA}${DIFF_LINE_SEPARATOR}${FILE}${DIFF_LINE_SEPARATOR}${mediaFilename}`;
           break;
-        case "dir":
-          line = `delete-media|dir|${basenameToDelete}`;
+        case DIR:
+          line = `${DELETE_MEDIA}${DIFF_LINE_SEPARATOR}${DIR}${DIFF_LINE_SEPARATOR}${basenameToDelete}`;
       }
 
       lines.push(line);

@@ -1,4 +1,5 @@
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
+import type { FileOrDir } from "../../../types/file-or-dir.type.js";
 import symlink, {
   type SymlinkError,
 } from "../../wrappers/modules/fs/symlink.helper.js";
@@ -19,7 +20,7 @@ export interface CreateSymlinkOpts {
 }
 
 const createSymlink = async (
-  type: "file" | "dir",
+  type: FileOrDir,
   path: string,
   symlinkPath: string,
   opts?: CreateSymlinkOpts,

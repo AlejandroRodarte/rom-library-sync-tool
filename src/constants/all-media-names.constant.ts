@@ -1,0 +1,25 @@
+import {
+  BACK_COVERS,
+  COVERS,
+  MANUALS,
+  MARQUEES,
+  MIX_IMAGES,
+  PHYSICAL_MEDIA,
+  SCREENSHOTS,
+  THREED_BOXES,
+  TITLE_SCREENS,
+} from "./media-names.constants.js";
+
+const ALL_MEDIA_NAMES = [
+  THREED_BOXES,
+  BACK_COVERS,
+  COVERS,
+  MANUALS,
+  MARQUEES,
+  MIX_IMAGES,
+  PHYSICAL_MEDIA,
+  SCREENSHOTS,
+  TITLE_SCREENS,
+] as const;
+
+export default ALL_MEDIA_NAMES;

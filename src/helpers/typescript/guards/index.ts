@@ -5,20 +5,13 @@ import isSftpError from "./is-sftp-error.helper.js";
 import isLogLevel from "./is-log-level.helper.js";
 import isMediaName from "./is-media-name.helper.js";
 import isMediaList from "./is-media-list.helper.js";
-import isMediasListItem from "./is-medias-list-item.helper.js";
-import isMediasList from "./is-medias-list.helper.js";
-import isConsolesListItem from "./is-consoles-list-item.helper.js";
-import isConsolesList from "./is-consoles-list.helper.js";
 import isModeName from "./is-mode-name.helper.js";
-import isRight from "./is-right.helper.js";
-import isRightList from "./is-right-list.helper.js";
+import isIndividualRight from "./is-individual-right.helper.js";
+import isIndividualRightList from "./is-individual-right-list.helper.js";
 import isContentTargetName from "./is-content-target-name.helper.js";
 import isContentTargetList from "./is-content-target-list.helper.js";
-import isContentTargetsListItem from "./is-content-targets-list-item.helper.js";
-import isContentTargetsList from "./is-content-targets-list.helper.js";
 import isFileIOStrategy from "./is-file-io-strategy.helper.js";
 import isFileIOFsCrudStrategy from "./is-file-io-fs-crud-strategy.helper.js";
-import isConsolesListItemOrRest from "./is-consoles-list-item-or-rest.helper.js";
 import isRomFsType from "./is-rom-fs-type.helper.js";
 import isMediaFsType from "./is-media-fs-type.helper.js";
 import isRomDiffActionType from "./is-rom-diff-action.type.helper.js";
@@ -27,7 +20,6 @@ import isContentTargetPaths from "./is-content-target-paths.helper.js";
 import isAllOrNone from "./is-all-or-none.helper.js";
 import isConsoleNameAllNoneOrRest from "./is-console-name-all-none-or-rest.helper.js";
 import isConsoleNameAllNoneOrRestList from "./is-console-name-all-none-or-rest-list.helper.js";
-import isRawModeConsolesMediaNames from "./is-raw-mode-consoles-media-names.helper.js";
 import isNone from "./is-none.helper.js";
 
 const typeGuards = {
@@ -38,20 +30,13 @@ const typeGuards = {
   isLogLevel,
   isMediaName,
   isMediaList,
-  isMediasListItem,
-  isMediasList,
-  isConsolesListItem,
-  isConsolesList,
   isModeName,
-  isRight,
-  isRightList,
+  isIndividualRight,
+  isIndividualRightList,
   isFileIOStrategy,
   isFileIOFsCrudStrategy,
   isContentTargetName,
   isContentTargetList,
-  isContentTargetsListItem,
-  isContentTargetsList,
-  isConsolesListItemOrRest,
   isRomFsType,
   isMediaFsType,
   isRomDiffActionType,
@@ -60,7 +45,6 @@ const typeGuards = {
   isAllOrNone,
   isConsoleNameAllNoneOrRest,
   isConsoleNameAllNoneOrRestList,
-  isRawModeConsolesMediaNames,
   isNone,
 };
 

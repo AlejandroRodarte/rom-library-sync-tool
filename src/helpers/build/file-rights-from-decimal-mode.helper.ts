@@ -1,12 +1,13 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import type { FileRights } from "../../interfaces/file-rights.helper.js";
+import { EXECUTE, READ, WRITE } from "../../constants/rights.constants.js";
+import type { FileRightsSet } from "../../interfaces/file-rights-set.helper.js";
 
 export type FileRightsFromDecimalError = AppValidationError;
 
 const fileRightsFromDecimalMode = (
   decimal: number,
-): [FileRights, undefined] | [undefined, FileRightsFromDecimalError] => {
-  const rights: FileRights = {
+): [FileRightsSet, undefined] | [undefined, FileRightsFromDecimalError] => {
+  const rights: FileRightsSet = {
     user: "",
     group: "",
     other: "",
@@ -52,26 +53,35 @@ const fileRightsFromDecimalMode = (
       `Other permissions are represented in a number ranging from 1 to 7.`,
     );
 
-  const userBits = userDigit.toString(2);
-  const groupBits = groupDigit.toString(2);
-  const otherBits = otherDigit.toString(2);
+  const userBits = userDigit
+    .toString(2)
+    .split("")
+    .map((b) => +b);
+  const groupBits = groupDigit
+    .toString(2)
+    .split("")
+    .map((b) => +b);
+  const otherBits = otherDigit
+    .toString(2)
+    .split("")
+    .map((b) => +b);
 
-  for (const [index, bit] of userBits.split("").entries()) {
-    if (index === 0 && bit === "1") rights.user += "r";
-    if (index === 1 && bit === "1") rights.user += "w";
-    if (index === 2 && bit === "1") rights.user += "x";
+  for (const [index, bit] of userBits.entries()) {
+    if (index === 0 && bit === 1) rights.user += READ;
+    if (index === 1 && bit === 1) rights.user += WRITE;
+    if (index === 2 && bit === 1) rights.user += EXECUTE;
   }
 
-  for (const [index, bit] of groupBits.split("").entries()) {
-    if (index === 0 && bit === "1") rights.group += "r";
-    if (index === 1 && bit === "1") rights.group += "w";
-    if (index === 2 && bit === "1") rights.group += "x";
+  for (const [index, bit] of groupBits.entries()) {
+    if (index === 0 && bit === 1) rights.group += READ;
+    if (index === 1 && bit === 1) rights.group += WRITE;
+    if (index === 2 && bit === 1) rights.group += EXECUTE;
   }
 
-  for (const [index, bit] of otherBits.split("").entries()) {
-    if (index === 0 && bit === "1") rights.other += "r";
-    if (index === 1 && bit === "1") rights.other += "w";
-    if (index === 2 && bit === "1") rights.other += "x";
+  for (const [index, bit] of otherBits.entries()) {
+    if (index === 0 && bit === 1) rights.other += READ;
+    if (index === 1 && bit === 1) rights.other += WRITE;
+    if (index === 2 && bit === 1) rights.other += EXECUTE;
   }
 
   return [rights, undefined];

@@ -6,9 +6,10 @@ import type { Dirent } from "node:fs";
 import logger from "../../objects/logger.object.js";
 import buildTitleNameFromDirEntry from "../classes/devices/generic-device/build-title-name-from-dir-entry.helper.js";
 import Roms from "../../classes/roms.class.js";
+import { DIR, FILE } from "../../constants/fs-types.constants.js";
 
 const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
-  const titles = new Map<string, Title>();
+  const titles: Titles = new Map<string, Title>();
 
   for (const entry of entries) {
     if (entry.isSymbolicLink()) {
@@ -40,7 +41,7 @@ const titlesFromDirEntries = (entries: Dirent<NonSharedBuffer>[]): Titles => {
     const newRom: Rom = {
       base: { name: basename },
       file: { name: filename, type: extension },
-      fs: { type: entry.isFile() ? "file" : "dir" },
+      fs: { type: entry.isFile() ? FILE : DIR },
       labels,
       languages,
     };

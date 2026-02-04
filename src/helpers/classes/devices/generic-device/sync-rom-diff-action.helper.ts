@@ -16,6 +16,12 @@ import type {
 } from "../../../../interfaces/file-io.interface.js";
 import environment from "../../../../objects/environment.object.js";
 import logger from "../../../../objects/logger.object.js";
+import { DIR, FILE } from "../../../../constants/fs-types.constants.js";
+import {
+  ADD_ROM,
+  DELETE_ROM,
+} from "../../../../constants/rom-diff-action-types.constants.js";
+import { READ } from "../../../../constants/rights.constants.js";
 
 const fsExtras = {
   exists,
@@ -35,13 +41,13 @@ const syncRomDiffAction = async (
   const deviceRomPath = path.join(paths.device, romDiffAction.data.filename);
 
   switch (romDiffAction.type) {
-    case "add-rom": {
+    case ADD_ROM: {
       const dbRomPath = path.join(paths.db, romDiffAction.data.filename);
 
       const [existsResult, existsError] = await fsExtras.exists(
         romDiffAction.data.fs.type,
         dbRomPath,
-        "r",
+        READ,
       );
 
       if (existsError) return existsError;
@@ -55,10 +61,10 @@ const syncRomDiffAction = async (
       let addError: AddMethodError | undefined;
 
       switch (romDiffAction.data.fs.type) {
-        case "file": {
+        case FILE: {
           const args: AddFilePayload = {
             ...commonArgs,
-            type: "file",
+            type: FILE,
             opts: {
               overwrite: false,
             },
@@ -74,10 +80,10 @@ const syncRomDiffAction = async (
             addError = await fileIO.add(args);
           break;
         }
-        case "dir": {
+        case DIR: {
           const args: AddDirPayload = {
             ...commonArgs,
-            type: "dir",
+            type: DIR,
             opts: {
               overwrite: false,
               recursive: true,
@@ -99,13 +105,13 @@ const syncRomDiffAction = async (
       if (addError) return addError;
       break;
     }
-    case "delete-rom": {
+    case DELETE_ROM: {
       let deleteError: DeleteMethodError | undefined;
 
       switch (romDiffAction.data.fs.type) {
-        case "file": {
+        case FILE: {
           const args: DeleteFilePayload = {
-            type: "file",
+            type: FILE,
             path: deviceRomPath,
             opts: { mustExist: false },
           };
@@ -119,9 +125,9 @@ const syncRomDiffAction = async (
             deleteError = await fileIO.delete(args);
           break;
         }
-        case "dir": {
+        case DIR: {
           const args: DeleteDirPayload = {
-            type: "dir",
+            type: DIR,
             path: deviceRomPath,
             opts: { mustExist: false, recursive: true },
           };

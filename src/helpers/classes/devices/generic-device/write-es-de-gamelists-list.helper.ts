@@ -1,3 +1,4 @@
+import { FILE } from "../../../../constants/fs-types.constants.js";
 import type {
   FileIO,
   GetMethodError,
@@ -11,7 +12,7 @@ const writeEsDeGamelistsList = async (
   get: FileIO["get"],
 ): Promise<WriteEsDeGamelistsListError | undefined> => {
   const getError = await get(
-    "file",
+    FILE,
     {
       src: op.paths.device.file,
       dst: op.paths.project.file,

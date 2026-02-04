@@ -1,4 +1,5 @@
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
+import { READ, READ_WRITE } from "../../../../constants/rights.constants.js";
 import type { SyncPaths } from "../../../../interfaces/sync-paths.interface.js";
 import allDeviceDirsExist, {
   type AllDeviceDirsExistError,
@@ -25,25 +26,25 @@ const validateSyncPaths = async (
 ): Promise<ValidateSyncPathsError | undefined> => {
   const projectDiffDirsValidationError = await allProjectDirsExist(
     paths.project.diff.dirs,
-    "r",
+    READ,
   );
   if (projectDiffDirsValidationError) return projectDiffDirsValidationError;
 
   const projectDiffFilesValidationError = await allProjectFilesExist(
     paths.project.diff.files,
-    "r",
+    READ,
   );
   if (projectDiffFilesValidationError) return projectDiffFilesValidationError;
 
   const projectFailedDirsValidationError = await allProjectDirsExist(
     paths.project.failed.dirs,
-    "rw",
+    READ_WRITE,
   );
   if (projectFailedDirsValidationError) return projectFailedDirsValidationError;
 
   const projectFailedFilesValidationError = await anyProjectFileExists(
     paths.project.failed.files,
-    "r",
+    READ,
   );
   if (projectFailedFilesValidationError)
     return projectFailedFilesValidationError;
@@ -51,7 +52,7 @@ const validateSyncPaths = async (
   const deviceDirsValidationError = await allDeviceDirsExist(
     paths.device.dirs,
     fileIOExtras.allDirsExist,
-    "rw",
+    READ_WRITE,
   );
   if (deviceDirsValidationError) return deviceDirsValidationError;
 };

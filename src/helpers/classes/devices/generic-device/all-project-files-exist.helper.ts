@@ -1,3 +1,5 @@
+import { READ } from "../../../../constants/rights.constants.js";
+import type { RightsForValidation } from "../../../../types/rights-for-validation.type.js";
 import allFilesExist, {
   type AllFilesExistError,
   type AllFilesExistFalseResult,
@@ -14,7 +16,7 @@ export type AllProjectFilesExistError =
 
 const allProjectFilesExist = async (
   paths: string[],
-  rights: "r" | "w" | "rw" = "r",
+  rights: RightsForValidation = READ,
 ): Promise<AllProjectFilesExistError | undefined> => {
   const projectDirAccessItems: FileAccessItem[] = paths.map((p) => ({
     path: p,

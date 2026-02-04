@@ -1,9 +1,9 @@
 import path from "node:path";
-import CONSOLE_NAMES from "../constants/console-names.constant.js";
+import ALL_CONSOLE_NAMES from "../constants/all-console-names.constant.js";
 import type { DatabasePaths as IDatabasePaths } from "../interfaces/database-paths.interface.js";
 import environment from "../objects/environment.object.js";
 import type { ConsolePaths } from "../types/console-paths.types.js";
-import MEDIA_NAMES from "../constants/media-names.constant.js";
+import ALL_MEDIA_NAMES from "../constants/all-media-names.constant.js";
 import type { ConsoleContent } from "../types/console-content.type.js";
 import type { MediaPaths } from "../types/media-paths.type.js";
 import type { ConsoleName } from "../types/console-name.type.js";
@@ -39,7 +39,7 @@ class DatabasePaths {
         roms: {
           base: environment.database.paths.roms,
           consoles: Object.fromEntries(
-            CONSOLE_NAMES.map((c) => [
+            ALL_CONSOLE_NAMES.map((c) => [
               c,
               path.join(environment.database.paths.roms, c),
             ]),
@@ -48,10 +48,10 @@ class DatabasePaths {
         media: {
           base: environment.database.paths.media,
           consoles: Object.fromEntries(
-            CONSOLE_NAMES.map((c) => [
+            ALL_CONSOLE_NAMES.map((c) => [
               c,
               Object.fromEntries(
-                MEDIA_NAMES.map((m) => [
+                ALL_MEDIA_NAMES.map((m) => [
                   m,
                   path.join(environment.database.paths.media, c, m),
                 ]),
@@ -62,7 +62,7 @@ class DatabasePaths {
         "es-de-gamelists": {
           base: environment.database.paths["es-de-gamelists"],
           consoles: Object.fromEntries(
-            CONSOLE_NAMES.map((c) => [
+            ALL_CONSOLE_NAMES.map((c) => [
               c,
               path.join(environment.database.paths["es-de-gamelists"], c),
             ]),
@@ -72,7 +72,7 @@ class DatabasePaths {
       files: {
         "es-de-gamelists": {
           consoles: Object.fromEntries(
-            CONSOLE_NAMES.map((c) => [
+            ALL_CONSOLE_NAMES.map((c) => [
               c,
               path.join(
                 environment.database.paths["es-de-gamelists"],

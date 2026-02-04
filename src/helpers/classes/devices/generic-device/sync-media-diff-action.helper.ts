@@ -16,6 +16,12 @@ import type {
 import environment from "../../../../objects/environment.object.js";
 import logger from "../../../../objects/logger.object.js";
 import type { MediaDiffAction } from "../../../../types/media-diff-action.type.js";
+import { DIR, FILE } from "../../../../constants/fs-types.constants.js";
+import {
+  ADD_MEDIA,
+  DELETE_MEDIA,
+} from "../../../../constants/media-diff-action-types.constants.js";
+import { READ } from "../../../../constants/rights.constants.js";
 
 const fsExtras = {
   exists,
@@ -38,13 +44,13 @@ const syncMediaDiffAction = async (
   );
 
   switch (mediaDiffAction.type) {
-    case "add-media": {
+    case ADD_MEDIA: {
       const dbMediaPath = path.join(paths.db, mediaDiffAction.data.filename);
 
       const [existsResult, existsError] = await fsExtras.exists(
         mediaDiffAction.data.fs.type,
         dbMediaPath,
-        "r",
+        READ,
       );
 
       if (existsError) return existsError;
@@ -58,10 +64,10 @@ const syncMediaDiffAction = async (
       let addError: AddMethodError | undefined;
 
       switch (mediaDiffAction.data.fs.type) {
-        case "file": {
+        case FILE: {
           const args: AddFilePayload = {
             ...commonArgs,
-            type: "file",
+            type: FILE,
             opts: {
               overwrite: false,
             },
@@ -77,10 +83,10 @@ const syncMediaDiffAction = async (
             addError = await fileIO.add(args);
           break;
         }
-        case "dir": {
+        case DIR: {
           const args: AddDirPayload = {
             ...commonArgs,
-            type: "dir",
+            type: DIR,
             opts: {
               overwrite: false,
               recursive: true,
@@ -102,13 +108,13 @@ const syncMediaDiffAction = async (
       if (addError) return addError;
       break;
     }
-    case "delete-media": {
+    case DELETE_MEDIA: {
       let deleteError: DeleteMethodError | undefined;
 
       switch (mediaDiffAction.data.fs.type) {
-        case "file": {
+        case FILE: {
           const args: DeleteFilePayload = {
-            type: "file",
+            type: FILE,
             path: deviceMediaPath,
             opts: { mustExist: false },
           };
@@ -122,9 +128,9 @@ const syncMediaDiffAction = async (
             deleteError = await fileIO.delete(args);
           break;
         }
-        case "dir": {
+        case DIR: {
           const args: DeleteDirPayload = {
-            type: "dir",
+            type: DIR,
             path: deviceMediaPath,
             opts: { mustExist: false, recursive: true },
           };

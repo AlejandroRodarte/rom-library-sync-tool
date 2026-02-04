@@ -1,3 +1,4 @@
+import { DIR, FILE } from "../../constants/fs-types.constants.js";
 import type { FileIOLsEntry } from "../../interfaces/file-io-ls-entry.interface.js";
 import type {
   FileIO,
@@ -15,6 +16,9 @@ import type {
   GetMethodError,
   GetMethodOpts,
 } from "../../interfaces/file-io.interface.js";
+import type { FileOrDir } from "../../types/file-or-dir.type.js";
+import type { FsType } from "../../types/fs-type.type.js";
+import type { RightsForValidation } from "../../types/rights-for-validation.type.js";
 import type SftpClient from "../sftp-client.class.js";
 
 class Sftp implements FileIO {
@@ -36,12 +40,12 @@ class Sftp implements FileIO {
     };
 
   get: (
-    type: "file" | "dir",
+    type: FileOrDir,
     paths: { src: string; dst: string },
     opts?: GetMethodOpts,
   ) => Promise<GetMethodError | undefined> = async (type, paths, opts) => {
     switch (type) {
-      case "file": {
+      case FILE: {
         const downloadFileError = await this._client.downloadFileToFs(
           paths.src,
           paths.dst,
@@ -50,7 +54,7 @@ class Sftp implements FileIO {
         if (downloadFileError) return downloadFileError;
         break;
       }
-      case "dir": {
+      case DIR: {
         const downloadDirError = await this._client.downloadDirToFs(
           paths.src,
           paths.dst,
@@ -63,9 +67,9 @@ class Sftp implements FileIO {
   };
 
   exists: (
-    type: "file" | "dir" | "link",
+    type: FsType,
     path: string,
-    rights?: "r" | "w" | "rw",
+    rights?: RightsForValidation,
   ) => Promise<
     [ExistsMethodResult, undefined] | [undefined, ExistsMethodError]
   > = async (type, path, rights) => {
@@ -76,7 +80,7 @@ class Sftp implements FileIO {
     fileTypePayload: AddFileTypePayload,
   ) => Promise<AddMethodError | undefined> = async (fileTypePayload) => {
     switch (fileTypePayload.type) {
-      case "file": {
+      case FILE: {
         const addFileOpts: Required<AddFilePayloadOpts> = { overwrite: false };
 
         if (fileTypePayload.opts)
@@ -93,7 +97,7 @@ class Sftp implements FileIO {
 
         break;
       }
-      case "dir": {
+      case DIR: {
         const addDirOpts: Required<AddDirPayloadOpts> = {
           overwrite: false,
           recursive: true,
@@ -123,7 +127,7 @@ class Sftp implements FileIO {
     fileTypePayload: DeleteFileTypePayload,
   ) => Promise<DeleteMethodError | undefined> = async (fileTypePayload) => {
     switch (fileTypePayload.type) {
-      case "file": {
+      case FILE: {
         const deleteFileOpts: Required<DeleteFilePayloadOpts> = {
           mustExist: false,
         };
@@ -141,7 +145,7 @@ class Sftp implements FileIO {
 
         break;
       }
-      case "dir": {
+      case DIR: {
         const deleteDirOpts: Required<DeleteDirPayloadOpts> = {
           mustExist: false,
           recursive: true,

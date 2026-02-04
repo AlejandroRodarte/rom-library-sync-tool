@@ -1,0 +1,9 @@
+export const ATARI_2600 = "atari2600";
+export const ATARI_7800 = "atari7800";
+export const SEGA_GAMEGEAR = "gamegear";
+export const NINTENDO_GAMEBOY = "gb";
+export const NINTENDO_GAMEBOY_ADVANCE = "gba";
+export const NINTENDO_GAMEBOY_COLOR = "gbc";
+export const SEGA_MASTERSYSTEM = "mastersystem";
+export const NINTENDO_ENTERTAINMENT_SYSTEM = "nes";
+export const SUPER_NINTENDO_ENTERTAINMENT_SYSTEM = "snes";

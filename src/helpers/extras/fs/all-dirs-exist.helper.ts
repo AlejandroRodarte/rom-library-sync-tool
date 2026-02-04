@@ -1,3 +1,4 @@
+import { DIR } from "../../../constants/fs-types.constants.js";
 import type { PathAccessItem } from "../../../interfaces/path-access-item.interface.js";
 import allExist, {
   type AllExistError,
@@ -30,7 +31,7 @@ const allDirsExist = async (
   [AllDirsExistResult, undefined] | [undefined, AllDirsExistError]
 > => {
   const pathAccessItems: PathAccessItem[] = dirAccessItems.map((i) => ({
-    type: "dir",
+    type: DIR,
     ...i,
   }));
 

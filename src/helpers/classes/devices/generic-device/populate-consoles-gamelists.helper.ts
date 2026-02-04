@@ -1,3 +1,4 @@
+import { READ } from "../../../../constants/rights.constants.js";
 import databasePaths from "../../../../objects/database-paths.object.js";
 import dbEsDeGamelistItemFields from "../../../../objects/db-es-de-gamelist-item-fields.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
@@ -22,7 +23,7 @@ const populateConsolesGamelists = async (consoles: Consoles): Promise<void> => {
 
     const [fileExistsResult, fileExistsError] = await fsExtras.fileExists(
       dbPath,
-      "r",
+      READ,
     );
 
     if (fileExistsError) {

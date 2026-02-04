@@ -1,5 +1,5 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import ALL_OR_NONE from "../../constants/all-or-none.constant.js";
+import ALL_AND_NONE from "../../constants/all-and-none.constant.js";
 import typeGuards from "../typescript/guards/index.js";
 
 const deviceNames = (
@@ -13,7 +13,7 @@ const deviceNames = (
       return [
         undefined,
         new AppValidationError(
-          `List device names as a string accepts only two values: ${ALL_OR_NONE.join(", ")}.`,
+          `List device names as a string accepts only two values: ${ALL_AND_NONE.join(", ")}.`,
         ),
       ];
 

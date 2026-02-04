@@ -1,3 +1,8 @@
+import DIFF_LINE_SEPARATOR from "../../../../constants/diff-line-separator.constant.js";
+import {
+  ADD_ROM,
+  DELETE_ROM,
+} from "../../../../constants/rom-diff-action-types.constants.js";
 import type { WriteRomsDiffOperation } from "../../../../interfaces/write-roms-diff-operation.interface.js";
 import getLineSetsToAddAndDeleteFromOldAndNewLists from "../../../build/get-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
 import openFileForWriting, {
@@ -50,14 +55,14 @@ const writeRomsDiff = async (
   for (const romFilenameToAdd of sets.add) {
     const romToAdd = op.console.roms.selected.get(romFilenameToAdd);
     if (!romToAdd) continue;
-    const line = `add-rom|${romToAdd.fs.type}|${romToAdd.file.name}`;
+    const line = `${ADD_ROM}${DIFF_LINE_SEPARATOR}${romToAdd.fs.type}${DIFF_LINE_SEPARATOR}${romToAdd.file.name}`;
     lines.push(line);
   }
 
   for (const romFilenameToDelete of sets.delete) {
     const romToDelete = op.console.roms.all.get(romFilenameToDelete);
     if (!romToDelete) continue;
-    const line = `delete-rom|${romToDelete.fs.type}|${romToDelete.file.name}`;
+    const line = `${DELETE_ROM}${DIFF_LINE_SEPARATOR}${romToDelete.fs.type}${DIFF_LINE_SEPARATOR}${romToDelete.file.name}`;
     lines.push(line);
   }
 

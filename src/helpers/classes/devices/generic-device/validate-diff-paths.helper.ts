@@ -1,3 +1,4 @@
+import { READ, READ_WRITE } from "../../../../constants/rights.constants.js";
 import type { DiffPaths } from "../../../../interfaces/diff-paths.interface.js";
 import allProjectDirsExist, {
   type AllProjectDirsExistError,
@@ -15,19 +16,19 @@ const validateDiffPaths = async (
 ): Promise<ValidateDiffPathsError | undefined> => {
   const listDirsValidationError = await allProjectDirsExist(
     paths.project.list.dirs,
-    "r",
+    READ,
   );
   if (listDirsValidationError) return listDirsValidationError;
 
   const listFilesValidationError = await allProjectFilesExist(
     paths.project.list.files,
-    "r",
+    READ,
   );
   if (listFilesValidationError) return listFilesValidationError;
 
   const diffDirsValidationError = await allProjectDirsExist(
     paths.project.diff.dirs,
-    "rw",
+    READ_WRITE,
   );
   if (diffDirsValidationError) return diffDirsValidationError;
 };

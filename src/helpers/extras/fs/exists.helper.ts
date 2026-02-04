@@ -2,6 +2,8 @@ import type FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-er
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorized-error.class.js";
 import UnknownError from "../../../classes/errors/unknown-error.class.js";
+import type { FsType } from "../../../types/fs-type.type.js";
+import type { RightsForValidation } from "../../../types/rights-for-validation.type.js";
 import type { ModeFromRightsError } from "../../build/mode-from-rights.helper.js";
 import modeFromRights from "../../build/mode-from-rights.helper.js";
 import access from "./access.helper.js";
@@ -30,9 +32,9 @@ export interface ExistsFalseResult {
 export type ExistsResult = ExistsTrueResult | ExistsFalseResult;
 
 const exists = async (
-  type: "file" | "dir" | "link",
+  type: FsType,
   path: string,
-  rights?: "r" | "w" | "rw",
+  rights?: RightsForValidation,
 ): Promise<[ExistsResult, undefined] | [undefined, ExistsError]> => {
   let mode = 0;
 

@@ -1,3 +1,3 @@
-import type CONSOLE_NAMES from "../constants/console-names.constant.js";
+import type ALL_CONSOLE_NAMES from "../constants/all-console-names.constant.js";
 
-export type ConsoleName = (typeof CONSOLE_NAMES)[number];
+export type ConsoleName = (typeof ALL_CONSOLE_NAMES)[number];

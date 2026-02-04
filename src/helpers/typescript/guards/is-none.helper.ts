@@ -1,6 +1,5 @@
-import NONE from "../../../constants/none.constant.js";
-import type { None } from "../../../types/none.type.js";
+import { NONE } from "../../../constants/all-none-rest.constants.js";
 
-const isNone = (s: string): s is None => s === NONE;
+const isNone = (s: string): s is typeof NONE => s === NONE;
 
 export default isNone;

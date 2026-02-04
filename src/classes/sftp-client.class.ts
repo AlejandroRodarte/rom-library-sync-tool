@@ -37,6 +37,8 @@ import downloadFileToFs, {
 import downloadDirToFs, {
   type DownloadDirToFsError,
 } from "../helpers/extras/sftp/download-dir-to-fs.helper.js";
+import type { FsType } from "../types/fs-type.type.js";
+import type { RightsForValidation } from "../types/rights-for-validation.type.js";
 
 const sftpExtras = {
   access,
@@ -145,7 +147,7 @@ class SftpClient {
   }
 
   public async access(
-    type: "file" | "dir" | "link",
+    type: FsType,
     path: string,
     mode?: number,
   ): Promise<AccessMethodError | undefined> {
@@ -157,9 +159,9 @@ class SftpClient {
   }
 
   public async exists(
-    type: "file" | "dir" | "link",
+    type: FsType,
     path: string,
-    rights?: "r" | "w" | "rw",
+    rights?: RightsForValidation,
   ): Promise<[ExistsMethodResult, undefined] | [undefined, ExistsError]> {
     const connectionError = await this._tryConnect();
     if (connectionError) return [undefined, connectionError];

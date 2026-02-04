@@ -1,11 +1,10 @@
 import data from "../../../data/environment.json" with { type: "json" };
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
 import ALL_LOG_LEVELS from "../../constants/all-log-levels.constant.js";
-import CONTENT_TARGET_NAMES from "../../constants/content-target-names.constant.js";
-import FILE_IO_FS_CRUD_STRATEGIES from "../../constants/file-io-fs-crud-strategies.constant.js";
-import FILE_IO_STRATEGIES from "../../constants/file-io-strategies.constant.js";
-import MODE_NAMES from "../../constants/mode-names.constant.js";
-import NONE from "../../constants/none.constant.js";
+import ALL_CONTENT_TARGET_NAMES from "../../constants/all-content-target-names.constant.js";
+import ALL_FILE_IO_FS_CRUD_STRATEGIES from "../../constants/all-file-io-fs-crud-strategies.constant.js";
+import ALL_FILE_IO_STRATEGIES from "../../constants/all-file-io-strategies.constant.js";
+import ALL_MODE_NAMES from "../../constants/all-mode-names.constant.js";
 import type { Environment } from "../../interfaces/environment.interface.js";
 import type { JsonRawEnvironment } from "../../interfaces/json-raw-environment.interface.js";
 import type { DeviceConsolesEnvData } from "../../types/device-consoles-env-data.type.js";
@@ -17,6 +16,7 @@ import buildContentTargetNames from "./content-target-names.helper.js";
 import deviceConsolesEnvDataFromModeDeviceConsolesEnvData from "./device-consoles-env-data-from-mode-device-consoles-env-data.helper.js";
 import deviceNamesFromModeDeviceNames from "./device-names-from-mode-device-names.helper.js";
 import buildDeviceNames from "./device-names.helper.js";
+import { NONE } from "../../constants/all-none-rest.constants.js";
 
 const mutate = {
   setConsolesEnvDataMediaNamesFromRawObject,
@@ -40,7 +40,7 @@ const environment = (): Environment => {
   const mode = jsonRawEnvironment.options.mode;
   if (!typeGuards.isModeName(mode))
     throw new AppValidationError(
-      `${mode} is an invalid mode. Please choose one from the following: ${MODE_NAMES.join(", ")}.`,
+      `${mode} is an invalid mode. Please choose one from the following: ${ALL_MODE_NAMES.join(", ")}.`,
     );
 
   /**
@@ -54,7 +54,7 @@ const environment = (): Environment => {
   const databasePaths = jsonRawEnvironment.database.paths;
   if (!typeGuards.isContentTargetPaths(databasePaths))
     throw new AppValidationError(
-      `Database paths can only be related to content target names: ${CONTENT_TARGET_NAMES.join(", ")}.`,
+      `Database paths can only be related to content target names: ${ALL_CONTENT_TARGET_NAMES.join(", ")}.`,
     );
   for (const path of Object.values(databasePaths))
     if (!validation.isStringAbsoluteUnixPath(path))
@@ -243,7 +243,7 @@ const environment = (): Environment => {
     const contentTargetPaths = deviceData["content-targets"].paths;
     if (!typeGuards.isContentTargetPaths(contentTargetPaths))
       throw new AppValidationError(
-        `Device paths can only be related to content target names: ${CONTENT_TARGET_NAMES.join(", ")}.`,
+        `Device paths can only be related to content target names: ${ALL_CONTENT_TARGET_NAMES.join(", ")}.`,
       );
     for (const path of Object.values(contentTargetPaths))
       if (!validation.isStringAbsoluteUnixPath(path))
@@ -257,7 +257,7 @@ const environment = (): Environment => {
     const fileIOStrategyName = deviceData.fileIO.strategy.name;
     if (!typeGuards.isFileIOStrategy(fileIOStrategyName))
       throw new AppValidationError(
-        `Invalid File IO strategy ${fileIOStrategyName}. Please choose one of the following: ${FILE_IO_STRATEGIES.join(", ")}.`,
+        `Invalid File IO strategy ${fileIOStrategyName}. Please choose one of the following: ${ALL_FILE_IO_STRATEGIES.join(", ")}.`,
       );
 
     /**
@@ -267,7 +267,7 @@ const environment = (): Environment => {
       deviceData.fileIO.strategy.data.fs.crud.strategy.name;
     if (!typeGuards.isFileIOFsCrudStrategy(fileIOFsCrudStrategyName))
       throw new AppValidationError(
-        `Invalid File IO Fs strategy ${fileIOFsCrudStrategyName}. Please choose one of the following: ${FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
+        `Invalid File IO Fs strategy ${fileIOFsCrudStrategyName}. Please choose one of the following: ${ALL_FILE_IO_FS_CRUD_STRATEGIES.join(", ")}.`,
       );
 
     /**

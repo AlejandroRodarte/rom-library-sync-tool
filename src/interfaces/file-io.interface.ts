@@ -11,6 +11,10 @@ import type FileIONotFoundError from "../classes/errors/file-io-not-found-error.
 import type FileIOStorageFullError from "../classes/errors/file-io-storage-full-error.class.js";
 import type FileIOUnauthorizedError from "../classes/errors/file-io-unauthorized-error.class.js";
 import type UnknownError from "../classes/errors/unknown-error.class.js";
+import type { DIR, FILE } from "../constants/fs-types.constants.js";
+import type { FileOrDir } from "../types/file-or-dir.type.js";
+import type { FsType } from "../types/fs-type.type.js";
+import type { RightsForValidation } from "../types/rights-for-validation.type.js";
 import type { FileIOLsEntry } from "./file-io-ls-entry.interface.js";
 
 export interface ExistsMethodFalseResult {
@@ -87,7 +91,7 @@ export interface AddFilePayloadOpts {
 }
 
 export interface AddFilePayload {
-  type: "file";
+  type: typeof FILE;
   srcPath: string;
   dstPath: string;
   opts?: AddFilePayloadOpts;
@@ -99,7 +103,7 @@ export interface AddDirPayloadOpts {
 }
 
 export interface AddDirPayload {
-  type: "dir";
+  type: typeof DIR;
   srcPath: string;
   dstPath: string;
   opts?: AddDirPayloadOpts;
@@ -110,7 +114,7 @@ export interface DeleteFilePayloadOpts {
 }
 
 export interface DeleteFilePayload {
-  type: "file";
+  type: typeof FILE;
   path: string;
   opts?: DeleteFilePayloadOpts;
 }
@@ -121,7 +125,7 @@ export interface DeleteDirPayloadOpts {
 }
 
 export interface DeleteDirPayload {
-  type: "dir";
+  type: typeof DIR;
   path: string;
   opts?: DeleteDirPayloadOpts;
 }
@@ -135,7 +139,7 @@ export interface FileIO {
   ) => Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]>;
 
   get: (
-    type: "file" | "dir",
+    type: FileOrDir,
     paths: {
       src: string;
       dst: string;
@@ -144,9 +148,9 @@ export interface FileIO {
   ) => Promise<GetMethodError | undefined>;
 
   exists: (
-    type: "file" | "dir" | "link",
+    type: FsType,
     path: string,
-    rights?: "r" | "w" | "rw",
+    rights?: RightsForValidation,
   ) => Promise<
     [ExistsMethodResult, undefined] | [undefined, ExistsMethodError]
   >;

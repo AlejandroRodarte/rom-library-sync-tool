@@ -1,3 +1,5 @@
+import { DIR, FILE } from "../../../../constants/fs-types.constants.js";
+import { READ } from "../../../../constants/rights.constants.js";
 import databasePaths from "../../../../objects/database-paths.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import type { MediaEntry } from "../../../../types/media-entry.type.js";
@@ -19,7 +21,7 @@ const populateConsolesMedias = async (consoles: Consoles): Promise<void> => {
 
       const [dirExistsResult, dirExistsError] = await fsExtras.dirExists(
         dbPath,
-        "r",
+        READ,
       );
 
       if (dirExistsError) {
@@ -52,19 +54,19 @@ const populateConsolesMedias = async (consoles: Consoles): Promise<void> => {
           lastDotIndex === -1 ? "" : filename.substring(lastDotIndex + 1);
 
         const mediaEntryType: MediaEntry["type"] = lsEntry.is.file
-          ? "file"
+          ? FILE
           : lsEntry.is.dir
-            ? "dir"
-            : "file";
+            ? DIR
+            : FILE;
 
         let newMediaEntry: MediaEntry;
 
         switch (mediaEntryType) {
-          case "file":
-            newMediaEntry = { type: "file", file: { type: extension } };
+          case FILE:
+            newMediaEntry = { type: FILE, file: { type: extension } };
             break;
-          case "dir":
-            newMediaEntry = { type: "dir" };
+          case DIR:
+            newMediaEntry = { type: DIR };
             break;
         }
 

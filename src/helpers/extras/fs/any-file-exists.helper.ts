@@ -1,3 +1,4 @@
+import { FILE } from "../../../constants/fs-types.constants.js";
 import type { PathAccessItem } from "../../../interfaces/path-access-item.interface.js";
 import type {
   AnyExistsError,
@@ -31,7 +32,7 @@ const anyFileExists = async (
   [AnyFileExistsResult, undefined] | [undefined, AnyFileExistsError]
 > => {
   const pathAccessItems: PathAccessItem[] = fileAccessItems.map((i) => ({
-    type: "file",
+    type: FILE,
     ...i,
   }));
 

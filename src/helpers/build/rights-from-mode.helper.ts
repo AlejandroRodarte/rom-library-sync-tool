@@ -1,4 +1,5 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
+import { EXECUTE, READ, WRITE } from "../../constants/rights.constants.js";
 
 export type RightsFromIntegerError = AppValidationError;
 
@@ -21,9 +22,9 @@ const rightsFromMode = (
   let rights: string = "";
 
   for (const [index, bit] of bits.entries()) {
-    if (index === 0 && bit === 1) rights += "r";
-    if (index === 1 && bit === 1) rights += "w";
-    if (index === 2 && bit === 1) rights += "x";
+    if (index === 0 && bit === 1) rights += READ;
+    if (index === 1 && bit === 1) rights += WRITE;
+    if (index === 2 && bit === 1) rights += EXECUTE;
   }
 
   return [rights, undefined];

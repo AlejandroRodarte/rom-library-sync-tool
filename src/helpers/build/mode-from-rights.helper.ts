@@ -1,4 +1,5 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
+import { EXECUTE, READ, WRITE } from "../../constants/rights.constants.js";
 import typeGuards from "../typescript/guards/index.js";
 
 export type ModeFromRightsError = AppValidationError;
@@ -19,7 +20,7 @@ const modeFromRights = (
 
   const uniqueRights = [...new Set(rightsList)];
 
-  if (!typeGuards.isRightList(uniqueRights))
+  if (!typeGuards.isIndividualRightList(uniqueRights))
     return [
       undefined,
       new AppValidationError(
@@ -31,12 +32,12 @@ const modeFromRights = (
 
   for (const right of uniqueRights)
     switch (right) {
-      case "r":
+      case READ:
         acc += 4;
         break;
-      case "w":
+      case WRITE:
         acc += 2;
-      case "x":
+      case EXECUTE:
         acc += 1;
         break;
     }

@@ -10,6 +10,8 @@ import access from "./access.helper.js";
 import type UnknownError from "../../../classes/errors/unknown-error.class.js";
 import type FileIOConnectionError from "../../../classes/errors/file-io-connection-error.class.js";
 import type FileIOBadCredentialsError from "../../../classes/errors/file-io-bad-credentials-error.class.js";
+import type { FsType } from "../../../types/fs-type.type.js";
+import type { RightsForValidation } from "../../../types/rights-for-validation.type.js";
 
 export type ExistsFalseErrors =
   | FileIONotFoundError
@@ -37,9 +39,9 @@ export type ExistsError =
 
 const exists = async (
   client: Client,
-  type: "file" | "dir" | "link",
+  type: FsType,
   path: string,
-  rights?: "r" | "w" | "rw",
+  rights?: RightsForValidation,
 ): Promise<[ExistsResult, undefined] | [undefined, ExistsError]> => {
   let mode = 0;
 

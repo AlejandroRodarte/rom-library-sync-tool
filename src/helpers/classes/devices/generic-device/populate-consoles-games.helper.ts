@@ -1,3 +1,4 @@
+import { READ } from "../../../../constants/rights.constants.js";
 import databasePaths from "../../../../objects/database-paths.object.js";
 import type { Consoles } from "../../../../types/consoles.type.js";
 import titlesFromRomsDirPath from "../../../build/titles-from-roms-dir-path.helper.js";
@@ -18,7 +19,7 @@ const populateConsolesGames = async (consoles: Consoles): Promise<void> => {
 
     const [dbPathExistsResult, dbPathExistsError] = await fsExtras.dirExists(
       consoleDatabaseRomDirPath,
-      "r",
+      READ,
     );
 
     if (dbPathExistsError) {

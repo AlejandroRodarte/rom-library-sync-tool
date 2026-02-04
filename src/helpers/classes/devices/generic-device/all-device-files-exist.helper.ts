@@ -4,6 +4,8 @@ import type {
   FileAccessItem as FileIOFileAccessItem,
 } from "../../../../classes/file-io/file-io-extras.class.js";
 import type FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
+import { READ } from "../../../../constants/rights.constants.js";
+import type { RightsForValidation } from "../../../../types/rights-for-validation.type.js";
 
 export type AllDeviceFilesExistError =
   | AllFilesExistMethodError
@@ -12,7 +14,7 @@ export type AllDeviceFilesExistError =
 const allDeviceFilesExist = async (
   paths: string[],
   allFilesExist: FileIOExtras["allFilesExist"],
-  rights: "r" | "w" | "rw" = "r",
+  rights: RightsForValidation = READ,
 ) => {
   const fileAccessItems: FileIOFileAccessItem[] = paths.map((p) => ({
     path: p,

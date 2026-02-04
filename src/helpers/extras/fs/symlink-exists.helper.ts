@@ -1,3 +1,5 @@
+import { LINK } from "../../../constants/fs-types.constants.js";
+import type { RightsForValidation } from "../../../types/rights-for-validation.type.js";
 import exists, {
   type ExistsError,
   type ExistsResult,
@@ -8,15 +10,11 @@ export type SymlinkExistsError = ExistsError;
 
 const symlinkExists = async (
   symlinkPath: string,
-  rights?: "r" | "w" | "rw",
+  rights?: RightsForValidation,
 ): Promise<
   [SymlinkExistsResult, undefined] | [undefined, SymlinkExistsError]
 > => {
-  const [symlinkExists, existsError] = await exists(
-    "link",
-    symlinkPath,
-    rights,
-  );
+  const [symlinkExists, existsError] = await exists(LINK, symlinkPath, rights);
 
   if (existsError) return [undefined, existsError];
   return [symlinkExists, undefined];

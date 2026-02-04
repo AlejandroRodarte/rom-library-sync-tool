@@ -1,3 +1,4 @@
+import { FILE } from "../../../../constants/fs-types.constants.js";
 import type {
   AddFilePayload,
   AddMethodError,
@@ -21,7 +22,7 @@ const syncConsoleEsDeGamelist = async (
   fileIO: FileIO,
 ): Promise<SyncConsoleEsDeGamelistError | undefined> => {
   const args: AddFilePayload = {
-    type: "file",
+    type: FILE,
     srcPath: op.paths.project.diff.file,
     dstPath: op.paths.device.file,
     opts: {

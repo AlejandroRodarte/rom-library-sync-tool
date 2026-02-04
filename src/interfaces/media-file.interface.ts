@@ -1,5 +1,7 @@
+import type { FILE } from "../constants/fs-types.constants.js";
+
 export interface MediaFile {
-  type: "file";
+  type: typeof FILE;
   file: {
     type: string;
   };

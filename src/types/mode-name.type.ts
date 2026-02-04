@@ -1,3 +1,3 @@
-import MODE_NAMES from "../constants/mode-names.constant.js";
+import ALL_MODE_NAMES from "../constants/all-mode-names.constant.js";
 
-export type ModeName = (typeof MODE_NAMES)[number];
+export type ModeName = (typeof ALL_MODE_NAMES)[number];

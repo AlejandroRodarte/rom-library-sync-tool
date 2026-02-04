@@ -1,5 +1,5 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import CONSOLE_NAME_ALL_NONE_OR_REST from "../../constants/console-name-all-none-or-rest.constant.js";
+import CONSOLE_NAME_ALL_NONE_AND_REST from "../../constants/console-name-all-none-and-rest.constant.js";
 import type { ConsoleContent } from "../../types/console-content.type.js";
 import type { ConsoleName } from "../../types/console-name.type.js";
 import type { DeviceConsolesEnvData } from "../../types/device-consoles-env-data.type.js";
@@ -26,7 +26,7 @@ const setConsolesEnvDataMediaNamesFromRawObject = (
 
     if (!typeGuards.isConsoleNameAllNoneOrRest(consoleKey))
       return new AppValidationError(
-        `Console key ${consoleKey} is invalid. It must be one of the following values: ${CONSOLE_NAME_ALL_NONE_OR_REST.join(", ")}.`,
+        `Console key ${consoleKey} is invalid. It must be one of the following values: ${CONSOLE_NAME_ALL_NONE_AND_REST.join(", ")}.`,
       );
 
     const [consoleMediaNames, mediaNamesValidationError] =

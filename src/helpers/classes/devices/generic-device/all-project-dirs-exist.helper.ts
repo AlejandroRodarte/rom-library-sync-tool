@@ -1,3 +1,5 @@
+import { READ_WRITE } from "../../../../constants/rights.constants.js";
+import type { RightsForValidation } from "../../../../types/rights-for-validation.type.js";
 import allDirsExist, {
   type AllDirsExistError,
   type AllDirsExistFalseResult,
@@ -14,7 +16,7 @@ export type AllProjectDirsExistError =
 
 const allProjectDirsExist = async (
   paths: string[],
-  rights: "r" | "w" | "rw" = "rw",
+  rights: RightsForValidation = READ_WRITE,
 ): Promise<AllProjectDirsExistError | undefined> => {
   const projectDirAccessItems: DirAccessItem[] = paths.map((p) => ({
     path: p,

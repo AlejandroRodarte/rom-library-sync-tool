@@ -1,0 +1,9 @@
+export const THREED_BOXES = "3dboxes";
+export const BACK_COVERS = "backcovers";
+export const COVERS = "covers";
+export const MANUALS = "manuals";
+export const MARQUEES = "marquees";
+export const MIX_IMAGES = "miximages";
+export const PHYSICAL_MEDIA = "physicalmedia";
+export const SCREENSHOTS = "screenshots";
+export const TITLE_SCREENS = "titlescreens";

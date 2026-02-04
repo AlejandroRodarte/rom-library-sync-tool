@@ -3,8 +3,12 @@ import AppValidationError from "../../classes/errors/app-validation-error.class.
 import AppBadTypeError from "../../classes/errors/app-bad-type-error.class.js";
 import type { RomDiffAction } from "../../types/rom-diff-action.type.js";
 import typeGuards from "../typescript/guards/index.js";
-import ROM_DIFF_ACTION_TYPES from "../../constants/rom-diff-action-types.constant.js";
-import ROM_FS_TYPES from "../../constants/rom-fs-types.constant.js";
+import ALL_ROM_DIFF_ACTION_TYPES from "../../constants/all-rom-diff-action-types.constant.js";
+import ALL_ROM_FS_TYPES from "../../constants/all-rom-fs-types.constant.js";
+import {
+  ADD_ROM,
+  DELETE_ROM,
+} from "../../constants/rom-diff-action-types.constants.js";
 
 export type RomDiffActionFromRomDiffLineError =
   | AppValidationError
@@ -39,7 +43,7 @@ const romDiffActionFromRomDiffLine = (
     return [
       undefined,
       new AppBadTypeError(
-        `Action type ${romActionType} is not valid. It must be one of the following: ${ROM_DIFF_ACTION_TYPES.join(", ")}.`,
+        `Action type ${romActionType} is not valid. It must be one of the following: ${ALL_ROM_DIFF_ACTION_TYPES.join(", ")}.`,
       ),
     ];
 
@@ -47,23 +51,23 @@ const romDiffActionFromRomDiffLine = (
     return [
       undefined,
       new AppBadTypeError(
-        `Rom filesystem type ${romFsType} is not valid. It must be one of the following. ${ROM_FS_TYPES.join(", ")}.`,
+        `Rom filesystem type ${romFsType} is not valid. It must be one of the following. ${ALL_ROM_FS_TYPES.join(", ")}.`,
       ),
     ];
 
   switch (romActionType) {
-    case "add-rom":
+    case ADD_ROM:
       return [
         {
-          type: "add-rom",
+          type: ADD_ROM,
           data: { filename: romFilename, fs: { type: romFsType } },
         },
         undefined,
       ];
-    case "delete-rom":
+    case DELETE_ROM:
       return [
         {
-          type: "delete-rom",
+          type: DELETE_ROM,
           data: { filename: romFilename, fs: { type: romFsType } },
         },
         undefined,

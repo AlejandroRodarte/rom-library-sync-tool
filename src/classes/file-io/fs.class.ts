@@ -23,6 +23,14 @@ import deleteDir from "../../helpers/extras/fs/delete-dir.helper.js";
 import copyFile from "../../helpers/extras/fs/copy-file.helper.js";
 import createSymlink from "../../helpers/extras/fs/create-symlink.helper.js";
 import copyDir from "../../helpers/extras/fs/copy-dir.helper.js";
+import type { FileOrDir } from "../../types/file-or-dir.type.js";
+import { DIR, FILE } from "../../constants/fs-types.constants.js";
+import type { FsType } from "../../types/fs-type.type.js";
+import type { RightsForValidation } from "../../types/rights-for-validation.type.js";
+import {
+  COPY,
+  SYMLINK,
+} from "../../constants/file-io-fs-crud-strategies.constants.js";
 
 const fsExtras = {
   exists,
@@ -47,18 +55,18 @@ class Fs implements FileIO {
     };
 
   get: (
-    type: "file" | "dir",
+    type: FileOrDir,
     paths: { src: string; dst: string },
   ) => Promise<GetMethodError | undefined> = async (type, paths) => {
     switch (type) {
-      case "file": {
+      case FILE: {
         const copyFileError = await copyFile(paths.src, paths.dst, {
           overwrite: true,
         });
         if (copyFileError) return copyFileError;
         break;
       }
-      case "dir": {
+      case DIR: {
         const copyDirError = await copyDir(paths.src, paths.dst, {
           overwrite: true,
           recursive: true,
@@ -70,9 +78,9 @@ class Fs implements FileIO {
   };
 
   exists: (
-    type: "file" | "dir" | "link",
+    type: FsType,
     path: string,
-    rights?: "r" | "w" | "rw",
+    rights?: RightsForValidation,
   ) => Promise<
     [ExistsMethodResult, undefined] | [undefined, ExistsMethodError]
   > = async (type, path, rights) => {
@@ -83,7 +91,7 @@ class Fs implements FileIO {
     fileTypePayload: AddFileTypePayload,
   ) => Promise<AddMethodError | undefined> = async (fileTypePayload) => {
     switch (fileTypePayload.type) {
-      case "file": {
+      case FILE: {
         const addFileOpts: Required<AddFilePayloadOpts> = { overwrite: false };
 
         if (fileTypePayload.opts)
@@ -91,7 +99,7 @@ class Fs implements FileIO {
             addFileOpts.overwrite = fileTypePayload.opts.overwrite;
 
         switch (this._crudMode) {
-          case "copy": {
+          case COPY: {
             const copyFileError = await copyFile(
               fileTypePayload.srcPath,
               fileTypePayload.dstPath,
@@ -100,9 +108,9 @@ class Fs implements FileIO {
             if (copyFileError) return copyFileError;
             break;
           }
-          case "symlink": {
+          case SYMLINK: {
             const createSymlinkError = await createSymlink(
-              "file",
+              FILE,
               fileTypePayload.srcPath,
               fileTypePayload.dstPath,
               addFileOpts,
@@ -113,7 +121,7 @@ class Fs implements FileIO {
         }
         break;
       }
-      case "dir": {
+      case DIR: {
         const addDirOpts: Required<AddDirPayloadOpts> = {
           overwrite: false,
           recursive: true,
@@ -127,7 +135,7 @@ class Fs implements FileIO {
         }
 
         switch (this._crudMode) {
-          case "copy": {
+          case COPY: {
             const copyDirError = await copyDir(
               fileTypePayload.srcPath,
               fileTypePayload.dstPath,
@@ -136,9 +144,9 @@ class Fs implements FileIO {
             if (copyDirError) return copyDirError;
             break;
           }
-          case "symlink": {
+          case SYMLINK: {
             const createSymlinkError = await createSymlink(
-              "dir",
+              DIR,
               fileTypePayload.srcPath,
               fileTypePayload.dstPath,
               addDirOpts,
@@ -156,7 +164,7 @@ class Fs implements FileIO {
     fileTypePayload: DeleteFileTypePayload,
   ) => Promise<DeleteMethodError | undefined> = async (fileTypePayload) => {
     switch (fileTypePayload.type) {
-      case "file": {
+      case FILE: {
         const deleteFileOpts: Required<DeleteFilePayloadOpts> = {
           mustExist: false,
         };
@@ -166,7 +174,7 @@ class Fs implements FileIO {
             deleteFileOpts.mustExist = fileTypePayload.opts.mustExist;
 
         switch (this._crudMode) {
-          case "copy": {
+          case COPY: {
             const deleteFileError = await fsExtras.deleteFile(
               fileTypePayload.path,
               deleteFileOpts,
@@ -174,7 +182,7 @@ class Fs implements FileIO {
             if (deleteFileError) return deleteFileError;
             break;
           }
-          case "symlink": {
+          case SYMLINK: {
             const deleteSymlinkError = await fsExtras.deleteSymlink(
               fileTypePayload.path,
               deleteFileOpts,
@@ -186,7 +194,7 @@ class Fs implements FileIO {
 
         break;
       }
-      case "dir": {
+      case DIR: {
         const deleteDirOpts: Required<DeleteDirPayloadOpts> = {
           mustExist: false,
           recursive: true,
@@ -200,7 +208,7 @@ class Fs implements FileIO {
         }
 
         switch (this._crudMode) {
-          case "copy": {
+          case COPY: {
             const deleteDirError = await deleteDir(
               fileTypePayload.path,
               deleteDirOpts,
@@ -208,7 +216,7 @@ class Fs implements FileIO {
             if (deleteDirError) return deleteDirError;
             break;
           }
-          case "symlink": {
+          case SYMLINK: {
             const deleteSymlinkError = await fsExtras.deleteSymlink(
               fileTypePayload.path,
               deleteDirOpts,

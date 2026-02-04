@@ -1,6 +1,6 @@
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import ALL_OR_NONE from "../../constants/all-or-none.constant.js";
-import MEDIA_NAMES from "../../constants/media-names.constant.js";
+import ALL_AND_NONE from "../../constants/all-and-none.constant.js";
+import ALL_MEDIA_NAMES from "../../constants/all-media-names.constant.js";
 import type { MediaName } from "../../types/media-name.type.js";
 import typeGuards from "../typescript/guards/index.js";
 
@@ -14,13 +14,13 @@ const mediaNames = (
       [
         undefined,
         new AppValidationError(
-          `Media names for a given console, when provided as a single string, it can only be one of the following values: ${ALL_OR_NONE.join(", ")}.`,
+          `Media names for a given console, when provided as a single string, it can only be one of the following values: ${ALL_AND_NONE.join(", ")}.`,
         ),
       ];
 
     switch (rawMediaNames) {
       case "all":
-        mediaNames.push(...MEDIA_NAMES);
+        mediaNames.push(...ALL_MEDIA_NAMES);
         break;
       case "none":
         break;
@@ -30,7 +30,7 @@ const mediaNames = (
       return [
         undefined,
         new AppValidationError(
-          `The official media names allowed are: ${MEDIA_NAMES.join(", ")}. Your raw media list ${rawMediaNames} has element that do NOT belong to the official list.`,
+          `The official media names allowed are: ${ALL_MEDIA_NAMES.join(", ")}. Your raw media list ${rawMediaNames} has element that do NOT belong to the official list.`,
         ),
       ];
 

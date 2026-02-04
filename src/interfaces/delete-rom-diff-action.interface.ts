@@ -1,7 +1,8 @@
+import type { DELETE_ROM } from "../constants/rom-diff-action-types.constants.js";
 import type { RomFsType } from "../types/rom-fs-type.type.js";
 
 export interface DeleteRomDiffAction {
-  type: "delete-rom";
+  type: typeof DELETE_ROM;
   data: {
     filename: string;
     fs: {

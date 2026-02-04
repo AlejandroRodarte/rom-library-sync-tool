@@ -12,6 +12,8 @@ import rightsFromMode from "../../build/rights-from-mode.helper.js";
 import FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-error.class.js";
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorized-error.class.js";
+import type { FsType } from "../../../types/fs-type.type.js";
+import { DIR, FILE, LINK } from "../../../constants/fs-types.constants.js";
 
 const build = {
   fileRightsFromDecimalMode,
@@ -29,7 +31,7 @@ export type AccessError =
 
 const access = async (
   client: Client,
-  type: "file" | "dir" | "link",
+  type: FsType,
   path: string,
   mode?: number,
 ): Promise<AccessError | undefined> => {
@@ -41,19 +43,19 @@ const access = async (
 
   switch (remotePathType) {
     case "d":
-      if (type !== "dir")
+      if (type !== DIR)
         return new FileIOBadTypeError(
           `Tried to access a ${type}, but remote path ${path} is a directory.`,
         );
       break;
     case "-":
-      if (type !== "file")
+      if (type !== FILE)
         return new FileIOBadTypeError(
           `Tried to access a ${type}, but remote path ${path} is a file.`,
         );
       break;
     case "l":
-      if (type !== "link")
+      if (type !== LINK)
         return new FileIOBadTypeError(
           `Tried to access a ${type}, but remote path ${path} is a link.`,
         );

@@ -1,15 +1,16 @@
+import type { Titles } from "../types/titles.type.js";
 import Roms from "./roms.class.js";
 import type Title from "./title.class.js";
 
 class Games {
-  private _allTitles: Map<string, Title>;
+  private _allTitles: Titles;
 
-  private _scrappedTitles: Map<string, Title>;
-  private _selectedTitles: Map<number, Map<string, Title>>;
+  private _scrappedTitles: Titles;
+  private _selectedTitles: Map<number, Titles>;
   private _allRoms: Roms;
   private _selectedRoms: Roms;
 
-  constructor(titles: Map<string, Title>) {
+  constructor(titles: Titles) {
     this._allTitles = titles;
     this._scrappedTitles = new Map();
     this._selectedTitles = new Map();

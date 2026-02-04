@@ -1,8 +1,13 @@
 import AppBadTypeError from "../../classes/errors/app-bad-type-error.class.js";
 import AppNotFoundError from "../../classes/errors/app-not-found-error.class.js";
 import AppValidationError from "../../classes/errors/app-validation-error.class.js";
-import MEDIA_DIFF_ACTION_TYPES from "../../constants/media-diff-action-types.constant.js";
-import MEDIA_FS_TYPES from "../../constants/media-fs-types.constant.js";
+import ALL_MEDIA_DIFF_ACTION_TYPES from "../../constants/all-media-diff-action-types.constant.js";
+import ALL_MEDIA_FS_TYPES from "../../constants/all-media-fs-types.constant.js";
+import DIFF_LINE_SEPARATOR from "../../constants/diff-line-separator.constant.js";
+import {
+  ADD_MEDIA,
+  DELETE_MEDIA,
+} from "../../constants/media-diff-action-types.constants.js";
 import type { MediaDiffAction } from "../../types/media-diff-action.type.js";
 import typeGuards from "../typescript/guards/index.js";
 
@@ -16,7 +21,7 @@ const mediaDiffActionFromMediaDiffLine = (
 ):
   | [MediaDiffAction, undefined]
   | [undefined, MediaDiffActionFromMediaDiffLineError] => {
-  const action = diffLine.split("|");
+  const action = diffLine.split(DIFF_LINE_SEPARATOR);
 
   if (action.length !== 3)
     return [
@@ -39,7 +44,7 @@ const mediaDiffActionFromMediaDiffLine = (
     return [
       undefined,
       new AppBadTypeError(
-        `Action type ${mediaActionType} is not valid. It must be one of the following: ${MEDIA_DIFF_ACTION_TYPES.join(", ")}.`,
+        `Action type ${mediaActionType} is not valid. It must be one of the following: ${ALL_MEDIA_DIFF_ACTION_TYPES.join(", ")}.`,
       ),
     ];
 
@@ -47,23 +52,23 @@ const mediaDiffActionFromMediaDiffLine = (
     return [
       undefined,
       new AppBadTypeError(
-        `Rom filesystem type ${mediaFsType} is not valid. It must be one of the following. ${MEDIA_FS_TYPES.join(", ")}.`,
+        `Rom filesystem type ${mediaFsType} is not valid. It must be one of the following. ${ALL_MEDIA_FS_TYPES.join(", ")}.`,
       ),
     ];
 
   switch (mediaActionType) {
-    case "add-media":
+    case ADD_MEDIA:
       return [
         {
-          type: "add-media",
+          type: ADD_MEDIA,
           data: { filename: mediaFilename, fs: { type: mediaFsType } },
         },
         undefined,
       ];
-    case "delete-media":
+    case DELETE_MEDIA:
       return [
         {
-          type: "delete-media",
+          type: DELETE_MEDIA,
           data: { filename: mediaFilename, fs: { type: mediaFsType } },
         },
         undefined,

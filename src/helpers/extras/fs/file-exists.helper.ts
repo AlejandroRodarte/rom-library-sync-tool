@@ -1,3 +1,5 @@
+import { FILE } from "../../../constants/fs-types.constants.js";
+import type { RightsForValidation } from "../../../types/rights-for-validation.type.js";
 import exists, {
   type ExistsError,
   type ExistsResult,
@@ -8,9 +10,9 @@ export type FileExistsError = ExistsError;
 
 const fileExists = async (
   filePath: string,
-  rights?: "r" | "w" | "rw",
+  rights?: RightsForValidation,
 ): Promise<[FileExistsResult, undefined] | [undefined, FileExistsError]> => {
-  const [fileExists, existsError] = await exists("file", filePath, rights);
+  const [fileExists, existsError] = await exists(FILE, filePath, rights);
 
   if (existsError) return [undefined, existsError];
   return [fileExists, undefined];

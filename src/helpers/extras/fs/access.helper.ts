@@ -4,11 +4,13 @@ import rawAccess, {
   type AccessError as RawAccessError,
 } from "../../wrappers/modules/fs/access.helper.js";
 import stat, { type StatError } from "../../wrappers/modules/fs/stat.helper.js";
+import type { FsType } from "../../../types/fs-type.type.js";
+import { DIR, FILE, LINK } from "../../../constants/fs-types.constants.js";
 
 export type AccessError = RawAccessError | StatError | FileIOBadTypeError;
 
 const access = async (
-  type: "file" | "dir" | "link",
+  type: FsType,
   path: PathLike,
   mode?: number,
 ): Promise<undefined | AccessError> => {
@@ -19,19 +21,19 @@ const access = async (
   if (statsError) return statsError;
 
   switch (type) {
-    case "file":
+    case FILE:
       if (!pathStats.isFile())
         return new FileIOBadTypeError(
           `Path ${path} exists, but is NOT a file.`,
         );
       break;
-    case "dir":
+    case DIR:
       if (!pathStats.isDirectory())
         return new FileIOBadTypeError(
           `Path ${path} exists, but is NOT a directory.`,
         );
       break;
-    case "link":
+    case LINK:
       if (!pathStats.isSymbolicLink())
         return new FileIOBadTypeError(
           `Path ${path} exists, but is NOT a symbolic link.`,

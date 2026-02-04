@@ -1,3 +1,4 @@
+import { DIR, FILE } from "../../constants/fs-types.constants.js";
 import type {
   ExistsMethodError,
   ExistsMethodFalseResult,
@@ -104,7 +105,7 @@ class FileIOExtras {
     [AllDirsExistMethodResult, undefined] | [undefined, AllDirsExistMethodError]
   > = async (dirAccessList) => {
     const pathAccessList: PathAccessItem[] = dirAccessList.map((d) => ({
-      type: "dir",
+      type: DIR,
       ...d,
     }));
 
@@ -138,7 +139,7 @@ class FileIOExtras {
     | [undefined, AllFilesExistMethodError]
   > = async (fileAccessItems) => {
     const pathAccessItems: PathAccessItem[] = fileAccessItems.map((i) => ({
-      type: "file",
+      type: FILE,
       ...i,
     }));
 

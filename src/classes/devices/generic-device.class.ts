@@ -32,6 +32,7 @@ import type { DeviceEnvData } from "../../interfaces/devices/generic-device/devi
 import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
 import SftpClient from "../sftp-client.class.js";
+import { FS, SFTP } from "../../constants/file-io-strategies.constants.js";
 
 const fsExtras = {
   writeDuplicateRomsFile,
@@ -55,10 +56,10 @@ class GenericDevice implements Device, Debug {
     let fileIO: FileIO;
 
     switch (envData.fileIO.strategy.name) {
-      case "fs":
+      case FS:
         fileIO = new Fs(envData.fileIO.strategy.data.fs.crud.strategy);
         break;
-      case "sftp":
+      case SFTP:
         fileIO = new Sftp(
           new SftpClient(
             this._name,

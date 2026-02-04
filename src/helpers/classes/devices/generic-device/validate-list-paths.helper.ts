@@ -1,4 +1,5 @@
 import FileIOExtras from "../../../../classes/file-io/file-io-extras.class.js";
+import { READ, READ_WRITE } from "../../../../constants/rights.constants.js";
 import type { ListPaths } from "../../../../interfaces/list-paths.interface.js";
 import allDeviceDirsExist, {
   type AllDeviceDirsExistError,
@@ -18,14 +19,14 @@ const validateListPaths = async (
 ): Promise<ValidateListPathsError | undefined> => {
   const projectDirsValidationError = await allProjectDirsExist(
     paths.project.dirs,
-    "rw",
+    READ_WRITE,
   );
   if (projectDirsValidationError) return projectDirsValidationError;
 
   const deviceDirsValidationError = await allDeviceDirsExist(
     paths.device.dirs,
     fileIOExtras.allDirsExist,
-    "r",
+    READ,
   );
   if (deviceDirsValidationError) return deviceDirsValidationError;
 
@@ -34,7 +35,7 @@ const validateListPaths = async (
   const deviceFilesValidationError = await allDeviceFilesExist(
     paths.device.files,
     fileIOExtras.allFilesExist,
-    "r",
+    READ,
   );
   if (deviceFilesValidationError) return deviceFilesValidationError;
 };
