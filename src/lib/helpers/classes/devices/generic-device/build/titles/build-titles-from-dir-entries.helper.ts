@@ -9,7 +9,7 @@ import {
 } from "../../../../../../constants/fs/fs-types.constants.js";
 import Roms from "../../../../../../classes/entities/roms.class.js";
 import type AppConversionError from "../../../../../../classes/errors/app-conversion-error.class.js";
-import labelsAndLanguagesFromRomFilename from "../../../../../build/roms/labels-and-languages-from-rom-filename.helper.js";
+import buildRomLabelsAndLanguagesFromRomFilename from "../../../../../build/roms/build-rom-labels-and-languages-from-rom-filename.helper.js";
 
 const buildTitlesFromDirEntries = (
   entries: Dirent<NonSharedBuffer>[],
@@ -44,7 +44,8 @@ const buildTitlesFromDirEntries = (
       lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
     const extension = filename.substring(lastDotIndex + 1);
 
-    const { labels, languages } = labelsAndLanguagesFromRomFilename(filename);
+    const { labels, languages } =
+      buildRomLabelsAndLanguagesFromRomFilename(filename);
 
     const newRom: Rom = {
       base: { name: basename },

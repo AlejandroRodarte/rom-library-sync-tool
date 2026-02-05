@@ -3,7 +3,7 @@ import CONSOLE_NAMES_ALL_NONE_AND_REST from "../../../../../constants/consoles/c
 import type { GenericDeviceConsolesEnvData } from "../../../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
 import type { ConsoleContent } from "../../../../../types/consoles/console-content.type.js";
 import type { ConsoleName } from "../../../../../types/consoles/console-name.type.js";
-import mediaNames from "../../../../build/env/media-names.helper.js";
+import buildMediaNamesFromRawValue from "../../../../build/env/build-media-names-from-raw-value.helper.js";
 import typeGuards from "../../../../typescript/guards/index.js";
 
 const populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject = (
@@ -30,7 +30,7 @@ const populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject = (
       );
 
     const [consoleMediaNames, mediaNamesValidationError] =
-      mediaNames(rawMediaNames);
+      buildMediaNamesFromRawValue(rawMediaNames);
     if (mediaNamesValidationError) return mediaNamesValidationError;
 
     switch (consoleKey) {

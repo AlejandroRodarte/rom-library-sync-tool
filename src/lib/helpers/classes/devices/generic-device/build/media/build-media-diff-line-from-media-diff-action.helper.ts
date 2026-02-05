@@ -1,8 +1,11 @@
 import DIFF_LINE_SEPARATOR from "../../../../../../constants/diff-line-separator.constant.js";
-import { ADD_MEDIA, DELETE_MEDIA } from "../../../../../../constants/media/media-diff-action-types.constants.js";
+import {
+  ADD_MEDIA,
+  DELETE_MEDIA,
+} from "../../../../../../constants/media/media-diff-action-types.constants.js";
 import type { MediaDiffAction } from "../../../../../../types/classes/devices/generic-device/media/media-diff-action.type.js";
 
-const mediaDiffLineFromMediaDiffAction = (
+const buildMediaDiffLineFromMediaDiffAction = (
   diffAction: MediaDiffAction,
 ): string => {
   switch (diffAction.type) {
@@ -13,4 +16,4 @@ const mediaDiffLineFromMediaDiffAction = (
   }
 };
 
-export default mediaDiffLineFromMediaDiffAction;
+export default buildMediaDiffLineFromMediaDiffAction;

@@ -1,8 +1,8 @@
 import logger from "../../../../../../objects/logger.object.js";
 import type { RomDiffAction } from "../../../../../../types/classes/devices/generic-device/roms/rom-diff-action.type.js";
-import romDiffActionFromRomDiffLine from "./rom-diff-action-from-rom-diff-line.helper.js";
+import buildRomDiffActionFromRomDiffLine from "./build-rom-diff-action-from-rom-diff-line.helper.js";
 
-const romDiffActionsFromRomDiffLines = (
+const buildRomDiffActionsFromRomDiffLines = (
   romDiffLines: string[],
 ): [RomDiffAction[], string[]] => {
   const failedLines: string[] = [];
@@ -10,7 +10,7 @@ const romDiffActionsFromRomDiffLines = (
   const romDiffActions = romDiffLines
     .map((romDiffLine) => {
       const [romDiffAction, parsingError] =
-        romDiffActionFromRomDiffLine(romDiffLine);
+        buildRomDiffActionFromRomDiffLine(romDiffLine);
 
       if (parsingError) {
         logger.warn(
@@ -28,4 +28,4 @@ const romDiffActionsFromRomDiffLines = (
   return [romDiffActions, failedLines];
 };
 
-export default romDiffActionsFromRomDiffLines;
+export default buildRomDiffActionsFromRomDiffLines;

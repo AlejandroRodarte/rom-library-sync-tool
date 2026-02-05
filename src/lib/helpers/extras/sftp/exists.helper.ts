@@ -3,9 +3,9 @@ import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error
 import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorized-error.class.js";
 import FileIOBadPathError from "../../../classes/errors/file-io-bad-path-error.class.js";
 import FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-error.class.js";
-import modeFromRights, {
-  type ModeFromRightsError,
-} from "../../build/rights/mode-from-rights.helper.js";
+import buildModeFromRights, {
+  type BuildModeFromRightsError,
+} from "../../build/rights/build-mode-from-rights.helper.js";
 import access from "./access.helper.js";
 import type UnknownError from "../../../classes/errors/unknown-error.class.js";
 import type FileIOConnectionError from "../../../classes/errors/file-io-connection-error.class.js";
@@ -32,7 +32,7 @@ export interface ExistsTrueResult {
 export type ExistsResult = ExistsFalseResult | ExistsTrueResult;
 
 export type ExistsError =
-  | ModeFromRightsError
+  | BuildModeFromRightsError
   | UnknownError
   | FileIOConnectionError
   | FileIOBadCredentialsError;
@@ -46,7 +46,7 @@ const exists = async (
   let mode = 0;
 
   if (rights) {
-    const [rightsMode, parsingError] = modeFromRights(rights);
+    const [rightsMode, parsingError] = buildModeFromRights(rights);
     if (parsingError) return [undefined, parsingError];
     mode = rightsMode;
   }

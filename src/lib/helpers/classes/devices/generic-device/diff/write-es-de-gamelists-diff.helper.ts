@@ -13,8 +13,8 @@ import Gamelist, {
 } from "../../../../../classes/entities/gamelist.class.js";
 import populateGamelistWithXmlNodes from "../populate/populate-gamelist-with-xml-nodes.helper.js";
 import deviceEsDeGamelistItemFields from "../../../../../objects/es-de-gamelists/device-es-de-gamelist-item-fields.object.js";
-import esDeGamelistAlternativeEmulators from "../build/es-de-gamelists/es-de-gamelist-alternative-emulators.helper.js";
-import stringWithoutFirstLine from "../../../../build/string-without-first-line.helper.js";
+import buildEsDeGamelistAlternativeEmulators from "../build/es-de-gamelists/build-es-de-gamelist-alternative-emulators.helper.js";
+import buildStringWithoutFirstLine from "../../../../build/build-string-without-first-line.helper.js";
 import type { WriteEsDeGamelistsDiffOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/write-es-de-gamelists-diff-operation.interface.js";
 
 const fsExtras = {
@@ -23,7 +23,7 @@ const fsExtras = {
 };
 
 const build = {
-  stringWithoutFirstLine,
+  stringWithoutFirstLine: buildStringWithoutFirstLine,
 };
 
 export type WriteEsDeGamelistsDiffError =
@@ -89,7 +89,7 @@ const writeEsDeGamelistsDiff = async (
       rootName: "alternativeEmulator",
     });
     deviceAlternativeEmulatorXml = alternativeEmulatorBuilder.buildObject(
-      esDeGamelistAlternativeEmulators(deviceAlternativeEmulatorLabels),
+      buildEsDeGamelistAlternativeEmulators(deviceAlternativeEmulatorLabels),
     );
   }
 

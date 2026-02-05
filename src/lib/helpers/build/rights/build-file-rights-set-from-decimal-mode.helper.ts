@@ -1,12 +1,18 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
-import { EXECUTE, READ, WRITE } from "../../../constants/rights/rights.constants.js";
+import {
+  EXECUTE,
+  READ,
+  WRITE,
+} from "../../../constants/rights/rights.constants.js";
 import type { FileRightsSet } from "../../../interfaces/file-rights-set.interface.js";
 
-export type FileRightsFromDecimalError = AppValidationError;
+export type BuildFileRightsFromDecimalError = AppValidationError;
 
-const fileRightsSetFromDecimalMode = (
+const buildFileRightsSetFromDecimalMode = (
   decimal: number,
-): [FileRightsSet, undefined] | [undefined, FileRightsFromDecimalError] => {
+):
+  | [FileRightsSet, undefined]
+  | [undefined, BuildFileRightsFromDecimalError] => {
   const rights: FileRightsSet = {
     user: "",
     group: "",
@@ -87,4 +93,4 @@ const fileRightsSetFromDecimalMode = (
   return [rights, undefined];
 };
 
-export default fileRightsSetFromDecimalMode;
+export default buildFileRightsSetFromDecimalMode;

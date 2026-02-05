@@ -1,12 +1,16 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
-import { EXECUTE, READ, WRITE } from "../../../constants/rights/rights.constants.js";
+import {
+  EXECUTE,
+  READ,
+  WRITE,
+} from "../../../constants/rights/rights.constants.js";
 import typeGuards from "../../typescript/guards/index.js";
 
-export type ModeFromRightsError = AppValidationError;
+export type BuildModeFromRightsError = AppValidationError;
 
-const modeFromRights = (
+const buildModeFromRights = (
   rights: string,
-): [number, undefined] | [undefined, ModeFromRightsError] => {
+): [number, undefined] | [undefined, BuildModeFromRightsError] => {
   if (!rights) return [0, undefined];
 
   const rightsList = rights.split("");
@@ -45,4 +49,4 @@ const modeFromRights = (
   return [acc, undefined];
 };
 
-export default modeFromRights;
+export default buildModeFromRights;

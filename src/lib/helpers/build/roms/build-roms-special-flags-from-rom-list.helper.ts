@@ -15,7 +15,7 @@ const UNRELEASED_LABEL_SEGMENT_LIST = [
   SAMPLE_LABEL_SEGMENT,
 ];
 
-const specialFlagsFromRoms = (roms: Rom[]): RomsSpecialFlags => {
+const buildRomsSpecialFlagsFromRomList = (roms: Rom[]): RomsSpecialFlags => {
   const allRomsAreUnreleased = roms.every((rom) =>
     rom.labels.some((label) => {
       for (const unwantedLabelSegment of UNRELEASED_LABEL_SEGMENT_LIST) {
@@ -51,4 +51,4 @@ const specialFlagsFromRoms = (roms: Rom[]): RomsSpecialFlags => {
   };
 };
 
-export default specialFlagsFromRoms;
+export default buildRomsSpecialFlagsFromRomList;

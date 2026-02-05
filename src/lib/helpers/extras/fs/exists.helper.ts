@@ -4,14 +4,14 @@ import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorize
 import UnknownError from "../../../classes/errors/unknown-error.class.js";
 import type { FsType } from "../../../types/fs-type.type.js";
 import type { RightsForValidation } from "../../../types/rights/rights-for-validation.type.js";
-import type { ModeFromRightsError } from "../../build/rights/mode-from-rights.helper.js";
-import modeFromRights from "../../build/rights/mode-from-rights.helper.js";
+import type { BuildModeFromRightsError } from "../../build/rights/build-mode-from-rights.helper.js";
+import buildModeFromRights from "../../build/rights/build-mode-from-rights.helper.js";
 import access from "./access.helper.js";
 
-export type ExistsError = ModeFromRightsError | UnknownError;
+export type ExistsError = BuildModeFromRightsError | UnknownError;
 
 const build = {
-  modeFromRights,
+  modeFromRights: buildModeFromRights,
 };
 
 export interface ExistsTrueResult {

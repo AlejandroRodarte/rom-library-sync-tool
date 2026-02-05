@@ -5,10 +5,10 @@ import exists, {
 import stat, {
   type StatError,
 } from "../../wrappers/modules/ssh2-sftp-client/stat.helper.js";
-import type { FileRightsFromDecimalError } from "../../build/rights/file-rights-set-from-decimal-mode.helper.js";
-import type { RightsFromIntegerError } from "../../build/rights/rights-from-mode.helper.js";
-import fileRightsSetFromDecimalMode from "../../build/rights/file-rights-set-from-decimal-mode.helper.js";
-import rightsFromMode from "../../build/rights/rights-from-mode.helper.js";
+import type { BuildFileRightsFromDecimalError } from "../../build/rights/build-file-rights-set-from-decimal-mode.helper.js";
+import type { BuildRightsFromIntegerError } from "../../build/rights/build-rights-from-mode.helper.js";
+import buildFileRightsSetFromDecimalMode from "../../build/rights/build-file-rights-set-from-decimal-mode.helper.js";
+import buildRightsFromMode from "../../build/rights/build-rights-from-mode.helper.js";
 import FileIOBadTypeError from "../../../classes/errors/file-io-bad-type-error.class.js";
 import FileIONotFoundError from "../../../classes/errors/file-io-not-found-error.class.js";
 import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorized-error.class.js";
@@ -16,8 +16,8 @@ import type { FsType } from "../../../types/fs-type.type.js";
 import { DIR, FILE, LINK } from "../../../constants/fs/fs-types.constants.js";
 
 const build = {
-  fileRightsFromDecimalMode: fileRightsSetFromDecimalMode,
-  rightsFromMode,
+  fileRightsFromDecimalMode: buildFileRightsSetFromDecimalMode,
+  rightsFromMode: buildRightsFromMode,
 };
 
 export type AccessError =
@@ -25,8 +25,8 @@ export type AccessError =
   | FileIONotFoundError
   | FileIOBadTypeError
   | StatError
-  | FileRightsFromDecimalError
-  | RightsFromIntegerError
+  | BuildFileRightsFromDecimalError
+  | BuildRightsFromIntegerError
   | FileIOUnauthorizedError;
 
 const access = async (

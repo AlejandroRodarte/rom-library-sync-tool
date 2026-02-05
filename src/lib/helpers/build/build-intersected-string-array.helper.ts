@@ -1,4 +1,4 @@
-const intersectStringArraySimple = <T extends string>(
+const buildIntersectedStringArray = <T extends string>(
   arr1: T[],
   arr2: T[],
 ): T[] => {
@@ -6,4 +6,4 @@ const intersectStringArraySimple = <T extends string>(
   return intersect;
 };
 
-export default intersectStringArraySimple;
+export default buildIntersectedStringArray;

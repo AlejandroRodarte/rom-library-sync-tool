@@ -1,4 +1,4 @@
-import specialFlagsFromRoms from "../../helpers/build/roms/special-flags-from-roms.helper.js";
+import buildRomsSpecialFlagsFromRomList from "../../helpers/build/roms/build-roms-special-flags-from-rom-list.helper.js";
 import type { Rom } from "../../interfaces/roms/rom.interface.js";
 import type { RomsSpecialFlags } from "../../interfaces/roms/roms-special-flags.interface.js";
 
@@ -18,7 +18,7 @@ class Roms {
   }
 
   get specialFlags(): RomsSpecialFlags {
-    return specialFlagsFromRoms(this._roms.values().toArray());
+    return buildRomsSpecialFlagsFromRomList(this._roms.values().toArray());
   }
 
   public get(id: string): Rom | undefined {

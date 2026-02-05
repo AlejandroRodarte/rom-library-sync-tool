@@ -2,7 +2,7 @@ import AppValidationError from "../../../classes/errors/app-validation-error.cla
 import ALL_AND_NONE from "../../../constants/all-and-none.constant.js";
 import typeGuards from "../../typescript/guards/index.js";
 
-const deviceNames = (
+const buildDeviceNamesFromRawValue = (
   registeredDeviceNames: string[],
   rawDeviceNames: string | string[],
 ): [string[], undefined] | [undefined, AppValidationError] => {
@@ -48,4 +48,4 @@ const deviceNames = (
   return [modeDeviceNames, undefined];
 };
 
-export default deviceNames;
+export default buildDeviceNamesFromRawValue;

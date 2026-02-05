@@ -1,7 +1,7 @@
 import type { RomLabelsAndLanguages } from "../../../interfaces/roms/rom-labels-and-languages.interface.js";
 import LANGUAGE_BASE_PRIORITY_LIST from "../../../objects/classes/devices/generic-device/language-base-priority-list.constant.js";
 
-const labelsAndLanguagesFromRomFilename = (
+const buildRomLabelsAndLanguagesFromRomFilename = (
   filename: string,
 ): RomLabelsAndLanguages => {
   const labels: string[] = [];
@@ -30,4 +30,4 @@ const labelsAndLanguagesFromRomFilename = (
   return { labels, languages };
 };
 
-export default labelsAndLanguagesFromRomFilename;
+export default buildRomLabelsAndLanguagesFromRomFilename;

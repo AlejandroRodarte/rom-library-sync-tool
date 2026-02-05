@@ -1,6 +1,6 @@
 import os from "node:os";
 
-const stringWithoutFirstLine = (s: string): string => {
+const buildStringWithoutFirstLine = (s: string): string => {
   if (s.length === 0) return s;
   const lines = s.split(os.EOL);
   lines.shift();
@@ -8,4 +8,4 @@ const stringWithoutFirstLine = (s: string): string => {
   return newString;
 };
 
-export default stringWithoutFirstLine;
+export default buildStringWithoutFirstLine;

@@ -4,7 +4,7 @@ import ALL_CONTENT_TARGET_NAMES from "../../../constants/content-targets/all-con
 import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
 
-const contentTargetNames = (
+const buildContentTargetNamesFromRawValue = (
   rawContentTargetNames: string | string[],
 ): [ContentTargetName[], undefined] | [undefined, AppValidationError] => {
   const contentTargetNames: ContentTargetName[] = [];
@@ -39,4 +39,4 @@ const contentTargetNames = (
   return [contentTargetNames, undefined];
 };
 
-export default contentTargetNames;
+export default buildContentTargetNamesFromRawValue;

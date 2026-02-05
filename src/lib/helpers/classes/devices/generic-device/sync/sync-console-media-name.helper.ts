@@ -12,8 +12,8 @@ import writeLines, {
 import unlink, {
   type UnlinkError,
 } from "../../../../wrappers/modules/fs/unlink.helper.js";
-import mediaDiffActionsFromMediaDiffLines from "../build/media/media-diff-actions-from-media-diff-lines.helper.js";
-import mediaDiffLineFromMediaDiffAction from "../build/media/media-diff-line-from-media-diff-action.helper.js";
+import mediaDiffActionsFromMediaDiffLines from "../build/media/build-media-diff-actions-from-media-diff-lines.helper.js";
+import buildMediaDiffLineFromMediaDiffAction from "../build/media/build-media-diff-line-from-media-diff-action.helper.js";
 import syncMediaDiffAction from "./sync-media-diff-action.helper.js";
 
 const fsExtras = {
@@ -59,7 +59,9 @@ const syncConsoleMediaName = async (
     );
 
     if (syncDiffActionError)
-      failedDiffLines.push(mediaDiffLineFromMediaDiffAction(mediaDiffAction));
+      failedDiffLines.push(
+        buildMediaDiffLineFromMediaDiffAction(mediaDiffAction),
+      );
   }
 
   if (failedDiffLines.length === 0) {

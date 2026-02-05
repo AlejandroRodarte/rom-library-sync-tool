@@ -1,11 +1,15 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
-import { EXECUTE, READ, WRITE } from "../../../constants/rights/rights.constants.js";
+import {
+  EXECUTE,
+  READ,
+  WRITE,
+} from "../../../constants/rights/rights.constants.js";
 
-export type RightsFromIntegerError = AppValidationError;
+export type BuildRightsFromIntegerError = AppValidationError;
 
-const rightsFromMode = (
+const buildRightsFromMode = (
   integer: number,
-): [string, undefined] | [undefined, RightsFromIntegerError] => {
+): [string, undefined] | [undefined, BuildRightsFromIntegerError] => {
   if (integer < 1 || integer > 7)
     return [
       undefined,
@@ -30,4 +34,4 @@ const rightsFromMode = (
   return [rights, undefined];
 };
 
-export default rightsFromMode;
+export default buildRightsFromMode;

@@ -4,7 +4,7 @@ import {
   DELETE_ROM,
 } from "../../../../../constants/roms/rom-diff-action-types.constants.js";
 import type { WriteRomsDiffOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/write-roms-diff-operation.interface.js";
-import getLineSetsToAddAndDeleteFromOldAndNewLists from "../../../../build/get-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
+import buildLineSetsToAddAndDeleteFromOldAndNewLists from "../../../../build/build-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../../extras/fs/open-file-for-writing.helper.js";
@@ -45,7 +45,7 @@ const writeRomsDiff = async (
     .map(([, rom]) => rom.file.name)
     .toArray();
 
-  const sets = getLineSetsToAddAndDeleteFromOldAndNewLists(
+  const sets = buildLineSetsToAddAndDeleteFromOldAndNewLists(
     oldFilenames,
     newFilenames,
   );

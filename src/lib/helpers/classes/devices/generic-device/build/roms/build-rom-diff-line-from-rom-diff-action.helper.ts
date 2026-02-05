@@ -5,7 +5,9 @@ import {
 } from "../../../../../../constants/roms/rom-diff-action-types.constants.js";
 import type { RomDiffAction } from "../../../../../../types/classes/devices/generic-device/roms/rom-diff-action.type.js";
 
-const romDiffLineFromRomDiffAction = (diffAction: RomDiffAction): string => {
+const buildRomDiffLineFromRomDiffAction = (
+  diffAction: RomDiffAction,
+): string => {
   switch (diffAction.type) {
     case ADD_ROM:
       return `${ADD_ROM}${DIFF_LINE_SEPARATOR}${diffAction.data.fs.type}${DIFF_LINE_SEPARATOR}${diffAction.data.filename}`;
@@ -14,4 +16,4 @@ const romDiffLineFromRomDiffAction = (diffAction: RomDiffAction): string => {
   }
 };
 
-export default romDiffLineFromRomDiffAction;
+export default buildRomDiffLineFromRomDiffAction;

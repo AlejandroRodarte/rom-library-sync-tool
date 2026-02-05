@@ -1,8 +1,8 @@
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
-import intersectStringArraySimple from "../intersect-string-array-simple.helper.js";
+import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
 
-const consoleNamesFromModeConsoleNames = (
+const buildConsoleNamesFromModes = (
   mode: ModeName,
   modeConsoleNames: {
     list: ConsoleName[];
@@ -26,14 +26,14 @@ const consoleNamesFromModeConsoleNames = (
       break;
     }
     case "diff-sync": {
-      consoleNames = intersectStringArraySimple(
+      consoleNames = buildIntersectedStringArray(
         modeConsoleNames.diff,
         modeConsoleNames.sync,
       );
       break;
     }
     case "sync-list": {
-      consoleNames = intersectStringArraySimple(
+      consoleNames = buildIntersectedStringArray(
         modeConsoleNames.sync,
         modeConsoleNames.list,
       );
@@ -41,9 +41,9 @@ const consoleNamesFromModeConsoleNames = (
     }
     case "diff-sync-list":
     case "list-diff-sync-list": {
-      consoleNames = intersectStringArraySimple(
+      consoleNames = buildIntersectedStringArray(
         modeConsoleNames.diff,
-        intersectStringArraySimple(
+        buildIntersectedStringArray(
           modeConsoleNames.list,
           modeConsoleNames.sync,
         ),
@@ -55,4 +55,4 @@ const consoleNamesFromModeConsoleNames = (
   return consoleNames;
 };
 
-export default consoleNamesFromModeConsoleNames;
+export default buildConsoleNamesFromModes;

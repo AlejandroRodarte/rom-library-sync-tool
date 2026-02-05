@@ -4,20 +4,23 @@ import AppValidationError from "../../../../../../classes/errors/app-validation-
 import DIFF_LINE_SEPARATOR from "../../../../../../constants/diff-line-separator.constant.js";
 import ALL_MEDIA_DIFF_ACTION_TYPES from "../../../../../../constants/media/all-media-diff-action-types.constant.js";
 import ALL_MEDIA_FS_TYPES from "../../../../../../constants/media/all-media-fs-types.constant.js";
-import { ADD_MEDIA, DELETE_MEDIA } from "../../../../../../constants/media/media-diff-action-types.constants.js";
+import {
+  ADD_MEDIA,
+  DELETE_MEDIA,
+} from "../../../../../../constants/media/media-diff-action-types.constants.js";
 import type { MediaDiffAction } from "../../../../../../types/classes/devices/generic-device/media/media-diff-action.type.js";
 import typeGuards from "../../../../../typescript/guards/index.js";
 
-export type MediaDiffActionFromMediaDiffLineError =
+export type BuildMediaDiffActionFromMediaDiffLineError =
   | AppValidationError
   | AppNotFoundError
   | AppBadTypeError;
 
-const mediaDiffActionFromMediaDiffLine = (
+const buildMediaDiffActionFromMediaDiffLine = (
   diffLine: string,
 ):
   | [MediaDiffAction, undefined]
-  | [undefined, MediaDiffActionFromMediaDiffLineError] => {
+  | [undefined, BuildMediaDiffActionFromMediaDiffLineError] => {
   const action = diffLine.split(DIFF_LINE_SEPARATOR);
 
   if (action.length !== 3)
@@ -73,4 +76,4 @@ const mediaDiffActionFromMediaDiffLine = (
   }
 };
 
-export default mediaDiffActionFromMediaDiffLine;
+export default buildMediaDiffActionFromMediaDiffLine;

@@ -3,7 +3,7 @@ export interface LinesToAddAndDelete {
   delete: Set<string>;
 }
 
-const getLineSetsToAddAndDeleteFromOldAndNewLists = (
+const buildLineSetsToAddAndDeleteFromOldAndNewLists = (
   oldList: string[],
   newList: string[],
 ): LinesToAddAndDelete => {
@@ -16,4 +16,4 @@ const getLineSetsToAddAndDeleteFromOldAndNewLists = (
   return { add: setToAdd, delete: setToDelete };
 };
 
-export default getLineSetsToAddAndDeleteFromOldAndNewLists;
+export default buildLineSetsToAddAndDeleteFromOldAndNewLists;

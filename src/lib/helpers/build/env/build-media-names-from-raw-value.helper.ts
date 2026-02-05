@@ -4,7 +4,7 @@ import ALL_MEDIA_NAMES from "../../../constants/media/all-media-names.constant.j
 import type { MediaName } from "../../../types/media/media-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
 
-const mediaNames = (
+const buildMediaNamesFromRawValue = (
   rawMediaNames: string | string[],
 ): [MediaName[], undefined] | [undefined, AppValidationError] => {
   const mediaNames: MediaName[] = [];
@@ -40,4 +40,4 @@ const mediaNames = (
   return [mediaNames, undefined];
 };
 
-export default mediaNames;
+export default buildMediaNamesFromRawValue;

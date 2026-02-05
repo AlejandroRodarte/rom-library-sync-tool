@@ -12,8 +12,8 @@ import writeLines, {
 import unlink, {
   type UnlinkError,
 } from "../../../../wrappers/modules/fs/unlink.helper.js";
-import romDiffActionsFromRomDiffLines from "../build/roms/rom-diff-actions-from-rom-diff-lines.helper.js";
-import romDiffLineFromRomDiffAction from "../build/roms/rom-diff-line-from-rom-diff-action.helper.js";
+import buildRomDiffActionsFromRomDiffLines from "../build/roms/build-rom-diff-actions-from-rom-diff-lines.helper.js";
+import romDiffLineFromRomDiffAction from "../build/roms/build-rom-diff-line-from-rom-diff-action.helper.js";
 import syncRomDiffAction from "./sync-rom-diff-action.helper.js";
 
 const fsExtras = {
@@ -47,7 +47,7 @@ const syncConsoleRoms = async (
   if (diffReadError) return diffReadError;
 
   const [romDiffActions, parsingFailedLines] =
-    romDiffActionsFromRomDiffLines(diffLines);
+    buildRomDiffActionsFromRomDiffLines(diffLines);
   const failedDiffLines = [...parsingFailedLines];
 
   for (const romDiffAction of romDiffActions) {

@@ -1,10 +1,10 @@
 import type { GenericDeviceConsolesEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
-import intersectStringArraySimple from "../intersect-string-array-simple.helper.js";
-import consoleNamesFromModeConsoleNames from "./console-names-from-mode-console-names.helper.js";
+import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
+import buildConsoleNamesFromModes from "./build-console-names-from-modes.helper.js";
 
-const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
+const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
   mode: ModeName,
   modeDeviceConsolesEnvData: {
     list: GenericDeviceConsolesEnvData;
@@ -22,7 +22,7 @@ const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
     modeDeviceConsolesEnvData.sync,
   ).map(([, cd]) => cd.name);
 
-  const consoleNames: ConsoleName[] = consoleNamesFromModeConsoleNames(mode, {
+  const consoleNames: ConsoleName[] = buildConsoleNamesFromModes(mode, {
     list: listConsoleNames,
     diff: diffConsoleNames,
     sync: syncConsoleNames,
@@ -80,7 +80,7 @@ const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
           name: consoleName,
           "content-targets": {
             media: {
-              names: intersectStringArraySimple(
+              names: buildIntersectedStringArray(
                 diffConsoleEnvData["content-targets"].media.names,
                 syncConsoleEnvData["content-targets"].media.names,
               ),
@@ -99,7 +99,7 @@ const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
           name: consoleName,
           "content-targets": {
             media: {
-              names: intersectStringArraySimple(
+              names: buildIntersectedStringArray(
                 syncConsoleEnvData["content-targets"].media.names,
                 listConsoleEnvData["content-targets"].media.names,
               ),
@@ -121,9 +121,9 @@ const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
           name: consoleName,
           "content-targets": {
             media: {
-              names: intersectStringArraySimple(
+              names: buildIntersectedStringArray(
                 diffConsoleEnvData["content-targets"].media.names,
-                intersectStringArraySimple(
+                buildIntersectedStringArray(
                   syncConsoleEnvData["content-targets"].media.names,
                   listConsoleEnvData["content-targets"].media.names,
                 ),
@@ -138,4 +138,4 @@ const deviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
   return deviceConsolesEnvData;
 };
 
-export default deviceConsolesEnvDataFromModeDeviceConsolesEnvData;
+export default buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData;

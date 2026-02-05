@@ -10,16 +10,16 @@ import {
 import type { RomDiffAction } from "../../../../../../types/classes/devices/generic-device/roms/rom-diff-action.type.js";
 import typeGuards from "../../../../../typescript/guards/index.js";
 
-export type RomDiffActionFromRomDiffLineError =
+export type BuildRomDiffActionFromRomDiffLineError =
   | AppValidationError
   | AppNotFoundError
   | AppBadTypeError;
 
-const romDiffActionFromRomDiffLine = (
+const buildRomDiffActionFromRomDiffLine = (
   diffLine: string,
 ):
   | [RomDiffAction, undefined]
-  | [undefined, RomDiffActionFromRomDiffLineError] => {
+  | [undefined, BuildRomDiffActionFromRomDiffLineError] => {
   const action = diffLine.split("|");
 
   if (action.length !== 3)
@@ -75,4 +75,4 @@ const romDiffActionFromRomDiffLine = (
   }
 };
 
-export default romDiffActionFromRomDiffLine;
+export default buildRomDiffActionFromRomDiffLine;

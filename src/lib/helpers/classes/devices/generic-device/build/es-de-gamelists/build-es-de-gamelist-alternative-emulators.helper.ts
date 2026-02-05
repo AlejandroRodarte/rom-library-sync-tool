@@ -1,6 +1,6 @@
 import type { EsDeGamelistAlternativeEmulator } from "../../../../../../types/es-de-gamelists/es-de-gamelist-alternative-emulator.type.js";
 
-const esDeGamelistAlternativeEmulators = (
+const buildEsDeGamelistAlternativeEmulators = (
   labels: string[],
 ): EsDeGamelistAlternativeEmulator[] => {
   const alternativeEmulators: EsDeGamelistAlternativeEmulator[] = [];
@@ -10,4 +10,4 @@ const esDeGamelistAlternativeEmulators = (
   return alternativeEmulators;
 };
 
-export default esDeGamelistAlternativeEmulators;
+export default buildEsDeGamelistAlternativeEmulators;

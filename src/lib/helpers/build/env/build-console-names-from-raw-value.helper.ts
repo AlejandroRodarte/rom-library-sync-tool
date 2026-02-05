@@ -4,7 +4,7 @@ import ALL_CONSOLE_NAMES from "../../../constants/consoles/all-console-names.con
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
 
-const consoleNames = (
+const buildConsoleNamesFromRawValue = (
   rawConsoleNames: string | string[],
 ): [ConsoleName[], undefined] | [undefined, AppValidationError] => {
   const modeConsoleNames: ConsoleName[] = [];
@@ -40,4 +40,4 @@ const consoleNames = (
   return [modeConsoleNames, undefined];
 };
 
-export default consoleNames;
+export default buildConsoleNamesFromRawValue;

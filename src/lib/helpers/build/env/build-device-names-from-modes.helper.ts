@@ -1,7 +1,7 @@
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
-import intersectStringArraySimple from "../intersect-string-array-simple.helper.js";
+import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
 
-const deviceNamesFromModeDeviceNames = (
+const deviceNamesFromModes = (
   mode: ModeName,
   modeDeviceNames: { list: string[]; diff: string[]; sync: string[] },
 ): string[] => {
@@ -21,14 +21,14 @@ const deviceNamesFromModeDeviceNames = (
       break;
     }
     case "diff-sync": {
-      deviceNames = intersectStringArraySimple(
+      deviceNames = buildIntersectedStringArray(
         modeDeviceNames.diff,
         modeDeviceNames.sync,
       );
       break;
     }
     case "sync-list": {
-      deviceNames = intersectStringArraySimple(
+      deviceNames = buildIntersectedStringArray(
         modeDeviceNames.sync,
         modeDeviceNames.list,
       );
@@ -36,9 +36,9 @@ const deviceNamesFromModeDeviceNames = (
     }
     case "diff-sync-list":
     case "list-diff-sync-list": {
-      deviceNames = intersectStringArraySimple(
+      deviceNames = buildIntersectedStringArray(
         modeDeviceNames.diff,
-        intersectStringArraySimple(modeDeviceNames.list, modeDeviceNames.sync),
+        buildIntersectedStringArray(modeDeviceNames.list, modeDeviceNames.sync),
       );
       break;
     }
@@ -47,4 +47,4 @@ const deviceNamesFromModeDeviceNames = (
   return deviceNames;
 };
 
-export default deviceNamesFromModeDeviceNames;
+export default deviceNamesFromModes;

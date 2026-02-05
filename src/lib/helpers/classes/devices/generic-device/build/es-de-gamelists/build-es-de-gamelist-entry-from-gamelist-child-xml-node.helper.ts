@@ -4,7 +4,7 @@ import type { EsDeGamelistItem } from "../../../../../../types/es-de-gamelists/e
 import type { GamelistChildXmlNodeFields } from "../../../../../../types/classes/devices/generic-device/xml/gamelist-child-xml-node-fields.type.js";
 import populateEsDeGamelistItemFieldsFromGamelistChildXmlNode from "../../populate/populate-es-de-gamelist-item-fields-from-gamelist-child-xml-node.helper.js";
 
-const esDeGamelistEntry = (
+const buildEsDeGamelistEntryFromGamelistChildXmlNode = (
   gamelistChildXmlNode: GamelistChildXmlNode,
   fields: GamelistChildXmlNodeFields[],
 ): [string, EsDeGamelistItem] | undefined => {
@@ -27,4 +27,4 @@ const esDeGamelistEntry = (
   return [romFilename, newEsDeGamelistItem];
 };
 
-export default esDeGamelistEntry;
+export default buildEsDeGamelistEntryFromGamelistChildXmlNode;
