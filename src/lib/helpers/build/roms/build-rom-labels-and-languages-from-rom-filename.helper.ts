@@ -1,5 +1,5 @@
+import ALL_ROM_LANGUAGES_SET from "../../../constants/roms/all-rom-languages-set.helper.js";
 import type { RomLabelsAndLanguages } from "../../../interfaces/roms/rom-labels-and-languages.interface.js";
-import LANGUAGE_BASE_PRIORITY_LIST from "../../../objects/classes/devices/generic-device/language-base-priority-list.constant.js";
 
 const buildRomLabelsAndLanguagesFromRomFilename = (
   filename: string,
@@ -19,7 +19,7 @@ const buildRomLabelsAndLanguagesFromRomFilename = (
         parenthesesItems.forEach((item) => {
           const trimmedItem = item.trim();
           const itemIsALanguage =
-            LANGUAGE_BASE_PRIORITY_LIST.includes(trimmedItem);
+            ALL_ROM_LANGUAGES_SET.has(trimmedItem);
           if (itemIsALanguage) languages.push(trimmedItem);
           else labels.push(trimmedItem);
         });
