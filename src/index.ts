@@ -1,9 +1,9 @@
-import environment from "./objects/environment.object.js";
-import logger from "./objects/logger.object.js";
-import modes from "./helpers/modes/index.js";
-import type { Device } from "./interfaces/device.interface.js";
-import GenericDevice from "./classes/devices/generic-device.class.js";
-import type { Debug } from "./interfaces/debug.interface.js";
+import GenericDevice from "./lib/classes/devices/generic-device.class.js";
+import modes from "./lib/helpers/modes/index.js";
+import type { Debug } from "./lib/interfaces/debug.interface.js";
+import type { Device } from "./lib/interfaces/device.interface.js";
+import environment from "./lib/objects/environment.object.js";
+import logger from "./lib/objects/logger.object.js";
 
 const main = async () => {
   const mode = environment.options.mode;

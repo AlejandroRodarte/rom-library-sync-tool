@@ -1,0 +1,297 @@
+import Client from "ssh2-sftp-client";
+import access, { type AccessError } from "../../helpers/extras/sftp/access.helper.js";
+import exists, { type ExistsError } from "../../helpers/extras/sftp/exists.helper.js";
+import list from "../../helpers/wrappers/modules/ssh2-sftp-client/list.helper.js";
+import ls, { type LsError } from "../../helpers/extras/sftp/ls.helper.js";
+import copyFileFromFs, { type CopyFileFromFsError } from "../../helpers/extras/sftp/copy-file-from-fs.helper.js";
+import copyDirFromFs, { type CopyDirFromFsError } from "../../helpers/extras/sftp/copy-dir-from-fs.helper.js";
+import deleteFile, { type DeleteFileError } from "../../helpers/extras/sftp/delete-file.helper.js";
+import deleteDir, { type DeleteDirError } from "../../helpers/extras/sftp/delete-dir.gelper.js";
+import downloadFileToFs, { type DownloadFileToFsError } from "../../helpers/extras/sftp/download-file-to-fs.helper.js";
+import downloadDirToFs, { type DownloadDirToFsError } from "../../helpers/extras/sftp/download-dir-to-fs.helper.js";
+import connect, { type ConnectError } from "../../helpers/wrappers/modules/ssh2-sftp-client/connect.helper.js";
+import disconnect, { type DisconnectError } from "../../helpers/wrappers/modules/ssh2-sftp-client/disconnect.helper.js";
+import type { ListError } from "../../helpers/wrappers/modules/ssh2-sftp-client/list.helper.js";
+import type { SftpCredentials } from "../../interfaces/sftp/sftp-credentials.interface.js";
+import logger from "../../objects/logger.object.js";
+import type { FileIOLsEntry } from "../../interfaces/file-io-ls-entry.interface.js";
+import type { FsType } from "../../types/fs-type.type.js";
+import type { RightsForValidation } from "../../types/rights/rights-for-validation.type.js";
+import type { ExistsMethodResult } from "../../interfaces/file-io.interface.js";
+
+const sftpExtras = {
+  connect,
+  disconnect,
+  access,
+  exists,
+  list,
+  ls,
+  copyFileFromFs,
+  copyDirFromFs,
+  deleteFile,
+  deleteDir,
+  downloadFileToFs,
+  downloadDirToFs,
+};
+
+type ConnectMethodError = ConnectError;
+type DisconnectMethodError = DisconnectError;
+
+type TryConnectMethodError = ConnectMethodError;
+
+export type ListMethodError = ListError | TryConnectMethodError;
+export type LsMethodError = LsError | TryConnectMethodError;
+export type AccessMethodError = AccessError | TryConnectMethodError;
+export type ExistsMethodError = ExistsError | TryConnectMethodError;
+
+export type AddFileFromFsMethodError =
+  | CopyFileFromFsError
+  | TryConnectMethodError;
+export type DeleteFileMethodError = DeleteFileError | TryConnectMethodError;
+export type AddDirFromFsMethodError =
+  | CopyDirFromFsError
+  | TryConnectMethodError;
+export type DeleteDirMethodError = DeleteDirError | TryConnectMethodError;
+
+export type DownloadFileToFsMethodError =
+  | DownloadFileToFsError
+  | TryConnectMethodError;
+
+export type DownloadDirToFsMethodError =
+  | DownloadDirToFsError
+  | TryConnectMethodError;
+
+export interface AddFileFromFsMethodOpts {
+  overwrite?: boolean;
+}
+
+export interface DeleteFileMethodOpts {
+  mustExist?: boolean;
+}
+
+export interface AddDirFromFsMethodOpts {
+  overwrite?: boolean;
+  recursive?: boolean;
+}
+
+export interface DeleteDirMethodOpts {
+  mustExist?: boolean;
+  recursive?: boolean;
+}
+
+export interface DownloadFileToFsMethodOpts {
+  overwrite?: boolean;
+}
+
+export interface DownloadDirToFsMethodOpts {
+  overwrite?: boolean;
+}
+
+class SftpClient {
+  private _name: string;
+  private _credentials: SftpCredentials;
+  private _client: Client;
+  private _connected = false;
+
+  constructor(name: string, credentials: SftpCredentials) {
+    this._name = name;
+    this._credentials = credentials;
+    this._client = new Client(name);
+  }
+
+  async [Symbol.asyncDispose](): Promise<void> {
+    const disconnectError = await this._disconnect();
+    if (disconnectError) logger.fatal(disconnectError.toString());
+  }
+
+  get connected() {
+    return this._connected;
+  }
+
+  public async list(
+    path: string,
+  ): Promise<[Client.FileInfo[], undefined] | [undefined, ListMethodError]> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return [undefined, connectionError];
+
+    const [fileList, listError] = await sftpExtras.list(this._client, path);
+
+    if (listError) return [undefined, listError];
+    return [fileList, listError];
+  }
+
+  public async ls(
+    path: string,
+  ): Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]> {
+    const [lsEntries, lsError] = await sftpExtras.ls(this._client, path);
+    if (lsError) return [undefined, lsError];
+    return [lsEntries, undefined];
+  }
+
+  public async access(
+    type: FsType,
+    path: string,
+    mode?: number,
+  ): Promise<AccessMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const accessError = await sftpExtras.access(this._client, type, path, mode);
+    return accessError;
+  }
+
+  public async exists(
+    type: FsType,
+    path: string,
+    rights?: RightsForValidation,
+  ): Promise<[ExistsMethodResult, undefined] | [undefined, ExistsError]> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return [undefined, connectionError];
+
+    const [existsResult, existsError] = await sftpExtras.exists(
+      this._client,
+      type,
+      path,
+      rights,
+    );
+
+    if (existsError) return [undefined, existsError];
+    return [existsResult, undefined];
+  }
+
+  public async addFileFromFs(
+    srcFilePath: string,
+    dstFilePath: string,
+    opts?: AddFileFromFsMethodOpts,
+  ): Promise<AddFileFromFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const copyFileError = await sftpExtras.copyFileFromFs(
+      this._client,
+      srcFilePath,
+      dstFilePath,
+      opts,
+    );
+
+    if (copyFileError) return copyFileError;
+  }
+
+  public async addDirFromFs(
+    srcDirPath: string,
+    dstDirPath: string,
+    opts?: AddDirFromFsMethodOpts,
+  ): Promise<AddDirFromFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const copyDirError = await sftpExtras.copyDirFromFs(
+      this._client,
+      srcDirPath,
+      dstDirPath,
+      opts,
+    );
+
+    if (copyDirError) return copyDirError;
+  }
+
+  public async deleteFile(
+    filePath: string,
+    opts?: DeleteFileMethodOpts,
+  ): Promise<DeleteFileMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const deleteFileError = await sftpExtras.deleteFile(
+      this._client,
+      filePath,
+      opts,
+    );
+    if (deleteFileError) return deleteFileError;
+  }
+
+  public async deleteDir(
+    dirPath: string,
+    opts?: DeleteDirMethodOpts,
+  ): Promise<DeleteDirMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const deleteDirError = await sftpExtras.deleteDir(
+      this._client,
+      dirPath,
+      opts,
+    );
+    if (deleteDirError) return deleteDirError;
+  }
+
+  public async downloadFileToFs(
+    srcFilePath: string,
+    dstFilePath: string,
+    opts?: DownloadFileToFsMethodOpts,
+  ): Promise<DownloadFileToFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const downloadFileError = await sftpExtras.downloadFileToFs(
+      this._client,
+      srcFilePath,
+      dstFilePath,
+      opts,
+    );
+    if (downloadFileError) return downloadFileError;
+  }
+
+  public async downloadDirToFs(
+    srcDirPath: string,
+    dstDirPath: string,
+    opts?: DownloadDirToFsMethodOpts,
+  ): Promise<DownloadDirToFsMethodError | undefined> {
+    const connectionError = await this._tryConnect();
+    if (connectionError) return connectionError;
+
+    const downloadDirError = await sftpExtras.downloadDirToFs(
+      this._client,
+      srcDirPath,
+      dstDirPath,
+      opts,
+    );
+    if (downloadDirError) return downloadDirError;
+  }
+
+  private async _connect(): Promise<ConnectMethodError | undefined> {
+    if (this._connected) {
+      logger.warn(
+        `This SFTP client is already connected to device ${this._name}.`,
+      );
+      return undefined;
+    }
+
+    const connectionError = await sftpExtras.connect(this._client, this._credentials);
+    if (connectionError) return connectionError;
+
+    this._connected = true;
+  }
+
+  private async _disconnect(): Promise<DisconnectMethodError | undefined> {
+    if (!this._connected) {
+      logger.warn(
+        `This SFTP client is not connected to remote device ${this._name}.`,
+      );
+      return undefined;
+    }
+
+    const disconnectionError = await sftpExtras.disconnect(this._client);
+    if (disconnectionError) return disconnectionError;
+
+    this._connected = false;
+  }
+
+  private async _tryConnect(): Promise<TryConnectMethodError | undefined> {
+    if (this._connected) return undefined;
+    const connectionError = await this._connect();
+    if (connectionError) return connectionError;
+  }
+}
+
+export default SftpClient;
