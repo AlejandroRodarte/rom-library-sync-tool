@@ -2,11 +2,9 @@ import {
   FS,
   SFTP,
 } from "../../constants/file-io/file-io-strategies.constants.js";
-import buildGenericDevicePaths from "../../helpers/classes/devices/generic-device/build/paths/build-generic-device-paths.helper.js";
 import writeEsDeGamelistsDiffs from "../../helpers/classes/devices/generic-device/diff/write-es-de-gamelists-diffs.helper.js";
 import writeMediaDiffs from "../../helpers/classes/devices/generic-device/diff/write-media-diffs.helper.js";
 import writeRomsDiffs from "../../helpers/classes/devices/generic-device/diff/write-roms-diffs.helper.js";
-import filterConsolesGames from "../../helpers/classes/devices/generic-device/filter/filter-consoles-games.helper.js";
 import writeEsDeGamelistsLists from "../../helpers/classes/devices/generic-device/list/write-es-de-gamelists-lists.helper.js";
 import writeMediaLists from "../../helpers/classes/devices/generic-device/list/write-media-lists.helper.js";
 import writeRomsLists from "../../helpers/classes/devices/generic-device/list/write-roms-lists.helper.js";
@@ -18,19 +16,23 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import type { GenericDeviceOpts } from "../../interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { GenericDevicePaths } from "../../interfaces/classes/devices/generic-device/paths/generic-device-paths.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Device } from "../../interfaces/device.interface.js";
 import type { Environment } from "../../interfaces/env/environment.interface.js";
 import type { FileIO } from "../../interfaces/file-io.interface.js";
+import consolesGamesFilterFunctions from "../../objects/devices/consoles-games-filter-functions.object.js";
+import genericDevicePathsFromDeviceEnvDataBuilders from "../../objects/devices/generic-device-paths-from-device-env-data-builders.object.js";
 import logger from "../../objects/logger.object.js";
-import type { GenericDeviceConsolesEnvData } from "../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
 import type { ConsoleName } from "../../types/consoles/console-name.type.js";
 import type { Consoles } from "../../types/consoles/consoles.type.js";
 import type { ContentTargetContent } from "../../types/content-targets/content-target-content.type.js";
-import type { ContentTargetPaths } from "../../types/content-targets/content-target-paths.type.js";
+import type { DeepPartial } from "../../types/deep-partial.type.js";
+import type { RomTitleNameBuildStrategy } from "../../types/roms/rom-title-name-build-strategy.type.js";
 import ConsoleMetadata from "../entities/console-metadata.class.js";
 import Console from "../entities/console.class.js";
+import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
 import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
@@ -43,16 +45,53 @@ const fsExtras = {
 
 class GenericDevice implements Device, Debug {
   private _name: string;
+  private _opts: GenericDeviceOpts;
   private _paths: GenericDevicePaths;
   private _consoles: Consoles;
   private _contentTargetSkipFlags: ContentTargetContent<boolean>;
+  private _titleNameBuildStrategy: RomTitleNameBuildStrategy;
   private _fileIOExtras: FileIOExtras;
 
-  constructor(name: string, envData: Environment["device"]["data"][string]) {
+  constructor(
+    name: string,
+    envData: Environment["device"]["data"][string],
+    opts?: DeepPartial<GenericDeviceOpts>,
+  ) {
     this._name = name;
-    this._paths = this._buildGenericDevicePaths(
-      envData.generic.consoles,
-      envData.generic["content-targets"].paths,
+    this._titleNameBuildStrategy =
+      envData.generic.populate.games.titleName.strategy;
+
+    if (!genericDevicePathsFromDeviceEnvDataBuilders.default)
+      throw new AppNotFoundError(
+        `We need a default strategy to build the paths.`,
+      );
+    if (!consolesGamesFilterFunctions.default)
+      throw new AppNotFoundError(`We need a default strategy to filter games.`);
+
+    this._opts = {
+      build: {
+        paths: {
+          deviceEnvDataToGenericDevicePathsFn:
+            genericDevicePathsFromDeviceEnvDataBuilders.default,
+        },
+      },
+      filter: {
+        roms: {
+          consolesGamesFilterFn: consolesGamesFilterFunctions.default,
+        },
+      },
+    };
+
+    if (opts?.build?.paths?.deviceEnvDataToGenericDevicePathsFn)
+      this._opts.build.paths.deviceEnvDataToGenericDevicePathsFn =
+        opts.build.paths.deviceEnvDataToGenericDevicePathsFn;
+    if (opts?.filter?.roms?.consolesGamesFilterFn)
+      this._opts.filter.roms.consolesGamesFilterFn =
+        opts.filter.roms.consolesGamesFilterFn;
+
+    this._paths = this._opts.build.paths.deviceEnvDataToGenericDevicePathsFn(
+      this._name,
+      envData,
     );
 
     let fileIO: FileIO;
@@ -104,15 +143,23 @@ class GenericDevice implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
-    await populateConsolesGames(this._consoles);
+    if (this._titleNameBuildStrategy === "es-de-gamelist-name")
+      await populateConsolesGamelists(this._consoles);
+
+    await populateConsolesGames(this._consoles, this._titleNameBuildStrategy);
+
     if (!this._contentTargetSkipFlags.media)
       await populateConsolesMedias(this._consoles);
-    if (!this._contentTargetSkipFlags["es-de-gamelists"])
+
+    if (
+      !this._contentTargetSkipFlags["es-de-gamelists"] &&
+      this._titleNameBuildStrategy !== "es-de-gamelist-name"
+    )
       await populateConsolesGamelists(this._consoles);
   };
 
   filter: () => void = () => {
-    filterConsolesGames(this._consoles);
+    this._opts.filter.roms.consolesGamesFilterFn(this._consoles);
   };
 
   write = {
@@ -238,17 +285,6 @@ class GenericDevice implements Device, Debug {
 
   private _skipEsDeGamelistsContentTarget() {
     this._contentTargetSkipFlags["es-de-gamelists"] = true;
-  }
-
-  private _buildGenericDevicePaths(
-    consolesEnvData: GenericDeviceConsolesEnvData,
-    contentTargetPaths: ContentTargetPaths,
-  ): GenericDevicePaths {
-    return buildGenericDevicePaths(
-      this._name,
-      consolesEnvData,
-      contentTargetPaths,
-    );
   }
 }
 

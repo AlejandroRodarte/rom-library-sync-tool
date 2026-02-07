@@ -17,6 +17,7 @@ import deviceNamesFromModes from "./build-device-names-from-modes.helper.js";
 import buildDeviceNamesFromRawValue from "./build-device-names-from-raw-value.helper.js";
 import buildConsoleNamesFromRawValue from "./build-console-names-from-raw-value.helper.js";
 import buildContentTargetNamesFromRawValue from "./build-content-target-names-from-raw-value.helper.js";
+import ALL_ROM_TITLE_NAME_BUILD_STRATEGIES from "../../../constants/roms/all-rom-title-name-build-strategies.constant.js";
 
 const buildEnvironment = (): Environment => {
   const jsonRawEnvironment: JsonRawEnvironment = data;
@@ -67,30 +68,24 @@ const buildEnvironment = (): Environment => {
    * device.names.list
    */
   const rawListDeviceNames = jsonRawEnvironment.device.names.list;
-  const [listDeviceNames, listDeviceNamesValidationError] = buildDeviceNamesFromRawValue(
-    dataDeviceNames,
-    rawListDeviceNames,
-  );
+  const [listDeviceNames, listDeviceNamesValidationError] =
+    buildDeviceNamesFromRawValue(dataDeviceNames, rawListDeviceNames);
   if (listDeviceNamesValidationError) throw listDeviceNamesValidationError;
 
   /**
    * device.names.diff
    **/
   const rawDiffDeviceNames = jsonRawEnvironment.device.names.diff;
-  const [diffDeviceNames, diffDeviceNamesValidationError] = buildDeviceNamesFromRawValue(
-    dataDeviceNames,
-    rawDiffDeviceNames,
-  );
+  const [diffDeviceNames, diffDeviceNamesValidationError] =
+    buildDeviceNamesFromRawValue(dataDeviceNames, rawDiffDeviceNames);
   if (diffDeviceNamesValidationError) throw diffDeviceNamesValidationError;
 
   /**
    * device.names.sync
    **/
   const rawSyncDeviceNames = jsonRawEnvironment.device.names.sync;
-  const [syncDeviceNames, syncDeviceNamesValidationError] = buildDeviceNamesFromRawValue(
-    dataDeviceNames,
-    rawSyncDeviceNames,
-  );
+  const [syncDeviceNames, syncDeviceNamesValidationError] =
+    buildDeviceNamesFromRawValue(dataDeviceNames, rawSyncDeviceNames);
   if (syncDeviceNamesValidationError) throw syncDeviceNamesValidationError;
 
   /**
@@ -104,6 +99,16 @@ const buildEnvironment = (): Environment => {
   for (const [deviceName, deviceData] of Object.entries(
     jsonRawEnvironment.device.data,
   )) {
+    /**
+     * device.populate.games.titleName.build.strategy.name
+     **/
+    const titleNameBuildStrategyName =
+      deviceData.populate.games.titleName.build.strategy.name;
+    if (!typeGuards.isRomTitleNameBuildStrategy(titleNameBuildStrategyName))
+      throw new AppValidationError(
+        `${titleNameBuildStrategyName} is not a valid strategy to build ROM title names. Please choose one of the following: ${ALL_ROM_TITLE_NAME_BUILD_STRATEGIES.join(", ")}.`,
+      );
+
     /**
      * device.data["<device-name>"].consoles.names.list
      **/
@@ -321,6 +326,13 @@ const buildEnvironment = (): Environment => {
 
     devicesData[deviceName] = {
       generic: {
+        populate: {
+          games: {
+            titleName: {
+              strategy: titleNameBuildStrategyName,
+            },
+          },
+        },
         consoles: deviceConsolesEnvData,
         "content-targets": {
           names: contentTargetNames,

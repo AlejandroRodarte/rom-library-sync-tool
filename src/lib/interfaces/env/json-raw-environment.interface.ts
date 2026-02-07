@@ -21,6 +21,17 @@ export interface JsonRawEnvironment {
     };
     data: {
       [deviceName: string]: {
+        populate: {
+          games: {
+            titleName: {
+              build: {
+                strategy: {
+                  name: string;
+                };
+              };
+            };
+          };
+        };
         consoles: {
           names: {
             list: string | string[];

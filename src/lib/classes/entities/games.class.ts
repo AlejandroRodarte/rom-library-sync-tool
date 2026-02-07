@@ -18,6 +18,10 @@ class Games {
     this._selectedRoms = new Roms();
   }
 
+  get allTitles() {
+    return this._allTitles;
+  }
+
   get scrappedTitles() {
     if (this._scrappedTitles.size === 0) this._populateScrappedTitles();
     return this._scrappedTitles;
@@ -42,6 +46,10 @@ class Games {
   get selectedRoms() {
     if (this._selectedRoms.size === 0) this._populateSelectedRoms();
     return this._selectedRoms;
+  }
+
+  public getTitle(titleName: string): Title | undefined {
+    return this._allTitles.get(titleName);
   }
 
   public addTitle(title: Title): void {

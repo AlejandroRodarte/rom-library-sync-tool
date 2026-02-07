@@ -1,4 +1,5 @@
 import type { RomFsType } from "../../types/roms/rom-fs-type.type.js";
+import type { RomLanguage } from "../../types/roms/rom-language.type.js";
 
 export interface Rom {
   base: {
@@ -12,5 +13,5 @@ export interface Rom {
     type: RomFsType;
   };
   labels: string[];
-  languages: string[];
+  languages: RomLanguage[];
 }

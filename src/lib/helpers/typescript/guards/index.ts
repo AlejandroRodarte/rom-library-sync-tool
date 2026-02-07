@@ -21,6 +21,8 @@ import isAllOrNone from "./is-all-or-none.helper.js";
 import isConsoleNameAllNoneOrRest from "./is-console-name-all-none-or-rest.helper.js";
 import isConsoleNameAllNoneOrRestList from "./is-console-name-all-none-or-rest-list.helper.js";
 import isNone from "./is-none.helper.js";
+import isRomTitleNameBuildStrategy from "./is-rom-title-name-build-strategy.helper.js";
+import isRomLanguage from "./is-rom-language.helper.js";
 
 const typeGuards = {
   isErrnoException,
@@ -46,6 +48,8 @@ const typeGuards = {
   isConsoleNameAllNoneOrRest,
   isConsoleNameAllNoneOrRestList,
   isNone,
+  isRomTitleNameBuildStrategy,
+  isRomLanguage,
 };
 
 export default typeGuards;

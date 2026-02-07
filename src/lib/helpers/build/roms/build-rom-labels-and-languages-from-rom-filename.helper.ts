@@ -1,11 +1,12 @@
-import ALL_ROM_LANGUAGES_SET from "../../../constants/roms/all-rom-languages-set.helper.js";
 import type { RomLabelsAndLanguages } from "../../../interfaces/roms/rom-labels-and-languages.interface.js";
+import type { RomLanguage } from "../../../types/roms/rom-language.type.js";
+import typeGuards from "../../typescript/guards/index.js";
 
 const buildRomLabelsAndLanguagesFromRomFilename = (
   filename: string,
 ): RomLabelsAndLanguages => {
   const labels: string[] = [];
-  const languages: string[] = [];
+  const languages: RomLanguage[] = [];
 
   const labelsRegexp = /\((.*?)\)/g;
   const matches = filename.matchAll(labelsRegexp);
@@ -18,8 +19,7 @@ const buildRomLabelsAndLanguagesFromRomFilename = (
         const parenthesesItems = parenthesesGroup.split("+");
         parenthesesItems.forEach((item) => {
           const trimmedItem = item.trim();
-          const itemIsALanguage =
-            ALL_ROM_LANGUAGES_SET.has(trimmedItem);
+          const itemIsALanguage = typeGuards.isRomLanguage(trimmedItem);
           if (itemIsALanguage) languages.push(trimmedItem);
           else labels.push(trimmedItem);
         });
