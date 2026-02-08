@@ -5,6 +5,7 @@ import {
   DELETE_MEDIA,
 } from "../../../../../constants/media/media-diff-action-types.constants.js";
 import type { WriteMediaNameDiffOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/write-media-name-diff-operation.interface.js";
+import logger from "../../../../../objects/logger.object.js";
 import buildLineSetsToAddAndDeleteFromOldAndNewLists from "../../../../build/build-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
@@ -61,7 +62,18 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
     newRomBasenames,
   );
 
+  logger.debug(
+    `ROM basenames to possibly add media for: ${sets.add.size}.`,
+    `ROM basenames to posibly delete media from: ${sets.delete.size}`,
+  );
+  logger.debug(
+    `NOTE: remember that not all ROMs have media associated to them.`,
+  );
+
   let lines: string[] = [];
+
+  let addMediaCounter = 0;
+  let deleteMediaCounter = 0;
 
   for (const basenameToAdd of sets.add) {
     const mediaEntries = op.media.entries.get(basenameToAdd);
@@ -81,6 +93,7 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
       }
 
       lines.push(line);
+      addMediaCounter++;
     }
   }
 
@@ -101,8 +114,14 @@ const writeMediaNameDiff = async (op: WriteMediaNameDiffOperation) => {
       }
 
       lines.push(line);
+      deleteMediaCounter++;
     }
   }
+
+  logger.debug(
+    `Actual media entries to add: ${addMediaCounter}.`,
+    `Actual media entries to delete: ${deleteMediaCounter}.`,
+  );
 
   const writeError = await fsExtras.writeLines(diffFileHandle, lines);
 

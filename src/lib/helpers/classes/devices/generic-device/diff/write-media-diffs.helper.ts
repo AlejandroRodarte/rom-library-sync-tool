@@ -17,14 +17,35 @@ const writeMediaDiffs = async (
   const diffPaths = buildMediaDiffPaths(paths);
   const ops = buildWriteMediaNameDiffOperations(paths, consoles);
 
-  logger.debug(JSON.stringify(diffPaths, undefined, 2));
+  logger.debug(`Paths to validate: `, JSON.stringify(diffPaths, undefined, 2));
 
   const pathsValidationError = await validateDiffPaths(diffPaths);
-  if (pathsValidationError) return pathsValidationError;
+  if (pathsValidationError) {
+    logger.warn(
+      `Something went wrong during path validation: `,
+      pathsValidationError.toString(),
+    );
+    return pathsValidationError;
+  }
 
   for (const op of ops) {
+    logger.info(
+      `Processing media diff file for console-media combo ${op.console.name}/${op.media.name}.`,
+    );
+
     const writeError = await writeMediaNameDiff(op);
-    if (!writeError) continue;
+    if (!writeError) {
+      logger.info(
+        `Successfully wrote media diff file at ${op.paths.project.diff.file}.`,
+      );
+      continue;
+    }
+
+    logger.warn(
+      `Something went wrong while producing the media diff file: `,
+      writeError.toString(),
+      `Will skip this console-media combo of ${op.console.name}/${op.media.name} on all modes going further.`,
+    );
 
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;
