@@ -17,14 +17,35 @@ const writeEsDeGamelistsDiffs = async (
   const diffPaths = buildEsDeGamelistsDiffPaths(paths);
   const ops = buildWriteEsDeGamelistsDiffOperations(paths, consoles);
 
-  const pathsValidationError = await validateDiffPaths(diffPaths);
-  if (pathsValidationError) return pathsValidationError;
+  logger.debug(`Paths to validate: `, JSON.stringify(diffPaths, undefined, 2));
 
-  logger.debug(JSON.stringify(diffPaths, undefined, 2));
+  const pathsValidationError = await validateDiffPaths(diffPaths);
+  if (pathsValidationError) {
+    logger.warn(
+      `Something went wrong during path validation: `,
+      pathsValidationError.toString(),
+    );
+    return pathsValidationError;
+  }
 
   for (const op of ops) {
+    logger.info(
+      `Processing es-de-gamelist diff file for console ${op.console.name}.`,
+    );
+
     const writeError = await writeEsDeGamelistsDiff(op);
-    if (!writeError) continue;
+    if (!writeError) {
+      logger.info(
+        `Successfully wrote es-de-gamelist diff file at ${op.paths.project.diff.file}.`,
+      );
+      continue;
+    }
+
+    logger.info(
+      `Something went wrong while producing the es-de-gamelist diff file.`,
+      writeError.toString(),
+      `Will skip the "es-de-gamelist" content target for console ${op.console.name} on all modes.`,
+    );
 
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;

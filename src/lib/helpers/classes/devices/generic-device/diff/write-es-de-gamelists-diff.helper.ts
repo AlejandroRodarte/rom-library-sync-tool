@@ -16,6 +16,7 @@ import deviceEsDeGamelistItemFields from "../../../../../objects/es-de-gamelists
 import buildEsDeGamelistAlternativeEmulators from "../build/es-de-gamelists/build-es-de-gamelist-alternative-emulators.helper.js";
 import buildStringWithoutFirstLine from "../../../../build/build-string-without-first-line.helper.js";
 import type { WriteEsDeGamelistsDiffOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/write-es-de-gamelists-diff-operation.interface.js";
+import logger from "../../../../../objects/logger.object.js";
 
 const fsExtras = {
   writeLine,
@@ -65,17 +66,27 @@ const writeEsDeGamelistsDiff = async (
     },
   });
 
+  let gameNodesAdded = 0;
+  let folderNodesAdded = 0;
+
   for (const [dbRomFilename, dbEsDeGamelistItem] of op.console.gamelist
     .gameEntries) {
     if (deviceGamelist.hasGame(dbRomFilename)) continue;
     deviceGamelist.addGame(dbRomFilename, dbEsDeGamelistItem);
+    gameNodesAdded++;
   }
 
   for (const [dbRomDirname, dbEsDeGamelistItem] of op.console.gamelist
     .folderEntries) {
     if (deviceGamelist.hasFolder(dbRomDirname)) continue;
     deviceGamelist.addFolder(dbRomDirname, dbEsDeGamelistItem);
+    folderNodesAdded++;
   }
+
+  logger.debug(
+    `Game XML nodes to add: ${gameNodesAdded}.`,
+    `Folder XML nodes to add: ${folderNodesAdded}.`,
+  );
 
   const [deviceGamelistXml, serializationError] = deviceGamelist.xml();
   if (serializationError) return serializationError;
