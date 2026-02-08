@@ -40,6 +40,13 @@ const downloadFileToFs = async (
     if (typeof opts.overwrite === "boolean")
       downloadFileToFsOpts.overwrite = opts.overwrite;
 
+  const [sftpFileExistsResult, sftpFileExistsError] = await fileExists(
+    client,
+    srcFilePath,
+  );
+  if (sftpFileExistsError) return sftpFileExistsError;
+  if (!sftpFileExistsResult.exists) return sftpFileExistsResult.error;
+
   const [fsFileExistsResult, fsFileExistsError] =
     await fsExtras.fileExists(dstFilePath);
   if (fsFileExistsError) return fsFileExistsError;
@@ -47,16 +54,9 @@ const downloadFileToFs = async (
     return undefined;
 
   if (fsFileExistsResult.exists && downloadFileToFsOpts.overwrite) {
-    const unlinkError = await fsUnlink(dstFilePath);
+    const unlinkError = await fsExtras.unlink(dstFilePath);
     if (unlinkError) return unlinkError;
   }
-
-  const [sftpFileExistsResult, sftpFileExistsError] = await fileExists(
-    client,
-    srcFilePath,
-  );
-  if (sftpFileExistsError) return sftpFileExistsError;
-  if (!sftpFileExistsResult.exists) return sftpFileExistsResult.error;
 
   const [, getError] = await get(client, srcFilePath, dstFilePath);
   if (getError) return getError;

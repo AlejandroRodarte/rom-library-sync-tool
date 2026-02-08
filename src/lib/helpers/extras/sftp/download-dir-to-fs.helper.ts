@@ -40,6 +40,13 @@ const downloadDirToFs = async (
     if (typeof opts.overwrite === "boolean")
       downloadDirToFsOpts.overwrite = opts.overwrite;
 
+  const [sftpDirExistsResult, sftpDirExistsError] = await dirExists(
+    client,
+    srcDirPath,
+  );
+  if (sftpDirExistsError) return sftpDirExistsError;
+  if (!sftpDirExistsResult.exists) return sftpDirExistsResult.error;
+
   const [fsDirExistsResult, fsDirExistsError] =
     await fsExtras.dirExists(dstDirPath);
   if (fsDirExistsError) return fsDirExistsError;
@@ -47,16 +54,9 @@ const downloadDirToFs = async (
     return undefined;
 
   if (fsDirExistsResult.exists && downloadDirToFsOpts.overwrite) {
-    const rmError = await fsRm(dstDirPath, { recursive: true });
+    const rmError = await fsExtras.rm(dstDirPath, { recursive: true });
     if (rmError) return rmError;
   }
-
-  const [sftpDirExistsResult, sftpDirExistsError] = await dirExists(
-    client,
-    srcDirPath,
-  );
-  if (sftpDirExistsError) return sftpDirExistsError;
-  if (!sftpDirExistsResult.exists) return sftpDirExistsResult.error;
 
   const [, downloadDirError] = await downloadDir(
     client,
