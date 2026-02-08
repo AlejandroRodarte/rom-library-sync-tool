@@ -20,10 +20,14 @@ const readUTF8Lines = async (
   if (existsError) return [undefined, existsError];
   if (!fileExistsResult.exists) return [undefined, fileExistsResult.error];
 
-  const [lines, readFileError] = await readFile(filePath, { encoding: "utf8" });
+  const [content, readFileError] = await readFile(filePath, {
+    encoding: "utf8",
+  });
   if (readFileError) return [undefined, readFileError];
 
-  return [lines.toString().split(os.EOL), undefined];
+  const lines = content.toString().trim().split(os.EOL);
+  if (lines.length === 1 && lines[0] === "") return [[], undefined];
+  return [lines.toString().trim().split(os.EOL), undefined];
 };
 
 export default readUTF8Lines;
