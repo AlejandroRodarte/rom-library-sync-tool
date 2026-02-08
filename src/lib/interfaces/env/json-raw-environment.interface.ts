@@ -57,7 +57,11 @@ export interface JsonRawEnvironment {
           };
         };
         "content-targets": {
-          names: string | string[];
+          names: {
+            list: string | string[];
+            diff: string | string[];
+            sync: string | string[];
+          };
           paths: {
             [contentTargetName: string]: string;
           };

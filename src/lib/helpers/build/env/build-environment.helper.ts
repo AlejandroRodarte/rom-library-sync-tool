@@ -18,6 +18,8 @@ import buildDeviceNamesFromRawValue from "./build-device-names-from-raw-value.he
 import buildConsoleNamesFromRawValue from "./build-console-names-from-raw-value.helper.js";
 import buildContentTargetNamesFromRawValue from "./build-content-target-names-from-raw-value.helper.js";
 import ALL_ROM_TITLE_NAME_BUILD_STRATEGIES from "../../../constants/roms/all-rom-title-name-build-strategies.constant.js";
+import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
+import buildContentTargetNamesFromModes from "./build-content-target-names-from-modes.helper.js";
 
 const buildEnvironment = (): Environment => {
   const jsonRawEnvironment: JsonRawEnvironment = data;
@@ -230,13 +232,31 @@ const buildEnvironment = (): Environment => {
     }
 
     /**
-     * device.data["<device-name>"]["content-targets"].names
+     * device.data["<device-name>"]["content-targets"].names.list
      **/
-    const rawContentTargetNames = deviceData["content-targets"].names;
-    const [contentTargetNames, contentTargetNamesValidationError] =
-      buildContentTargetNamesFromRawValue(rawContentTargetNames);
-    if (contentTargetNamesValidationError)
-      throw contentTargetNamesValidationError;
+    const rawListContentTargetNames = deviceData["content-targets"].names.list;
+    const [listContentTargetNames, listContentTargetNamesValidationError] =
+      buildContentTargetNamesFromRawValue(rawListContentTargetNames);
+    if (listContentTargetNamesValidationError)
+      throw listContentTargetNamesValidationError;
+
+    /**
+     * device.data["<device-name>"]["content-targets"].names.diff
+     **/
+    const rawDiffContentTargetNames = deviceData["content-targets"].names.diff;
+    const [diffContentTargetNames, diffContentTargetNamesValidationError] =
+      buildContentTargetNamesFromRawValue(rawDiffContentTargetNames);
+    if (diffContentTargetNamesValidationError)
+      throw diffContentTargetNamesValidationError;
+
+    /**
+     * device.data["<device-name>"]["content-targets"].names.sync
+     **/
+    const rawSyncContentTargetNames = deviceData["content-targets"].names.sync;
+    const [syncContentTargetNames, syncContentTargetNamesValidationError] =
+      buildContentTargetNamesFromRawValue(rawSyncContentTargetNames);
+    if (syncContentTargetNamesValidationError)
+      throw syncContentTargetNamesValidationError;
 
     /**
      * device.data["<device-name>"]["content-targets"].paths
@@ -313,6 +333,16 @@ const buildEnvironment = (): Environment => {
     /**
      * computed environment variables
      **/
+
+    /**
+     * filtered content target names, depending on mode
+     **/
+    const contentTargetNames: ContentTargetName[] =
+      buildContentTargetNamesFromModes(mode, {
+        list: listContentTargetNames,
+        diff: diffContentTargetNames,
+        sync: syncContentTargetNames,
+      });
 
     /**
      * filtered device consoles env data, depending on mode
