@@ -19,14 +19,35 @@ const writeMediaLists = async (
   const listPaths = buildMediaListPaths(paths);
   const ops = buildWriteMediaNameListOperations(paths, consoles);
 
-  logger.debug(JSON.stringify(listPaths, undefined, 2));
+  logger.debug(`Paths to validate: `, JSON.stringify(listPaths, undefined, 2));
 
   const validationError = await validateListPaths(listPaths, fileIOExtras);
-  if (validationError) return validationError;
+  if (validationError) {
+    logger.warn(
+      `Something went wrong during path validation.`,
+      validationError.toString(),
+    );
+    return validationError;
+  }
 
   for (const op of ops) {
+    logger.info(
+      `Processing media list operation for console-media combo ${op.names.console}/${op.names.media}.`,
+    );
+
     const writeError = await writeMediaNameList(op, fileIOExtras.fileIO.ls);
-    if (!writeError) continue;
+    if (!writeError) {
+      logger.info(
+        `Successfuly built media list file at ${op.paths.project.file}.`,
+      );
+      continue;
+    }
+
+    logger.warn(
+      `Something went wrong while producing the media list file.`,
+      writeError.toString(),
+      `Will skip console-media combo ${op.names.console}/${op.names.media} for all modes.`,
+    );
 
     const konsole = consoles.get(op.names.console);
     if (!konsole) continue;
