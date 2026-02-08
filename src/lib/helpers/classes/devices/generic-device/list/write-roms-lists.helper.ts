@@ -19,15 +19,35 @@ const writeRomsLists = async (
   const listPaths = buildRomsListPaths(paths);
   const ops = buildWriteRomsListOperations(paths, consoles);
 
-  logger.debug(JSON.stringify(listPaths, undefined, 2));
+  logger.debug(`Paths to validate: `, JSON.stringify(listPaths, undefined, 2));
 
   const dirsValidationError = await validateListPaths(listPaths, fileIOExtras);
-
-  if (dirsValidationError) return dirsValidationError;
+  if (dirsValidationError) {
+    logger.warn(
+      `Something went wrong during path validation: `,
+      dirsValidationError.toString(),
+    );
+    return dirsValidationError;
+  }
 
   for (const op of ops) {
+    logger.info(
+      `Processing ROMs list operation for console ${op.names.console}.`,
+    );
+
     const writeError = await writeRomsList(op, fileIOExtras.fileIO.ls);
-    if (!writeError) continue;
+    if (!writeError) {
+      logger.info(
+        `Successfully produced ROMs list file at ${op.paths.project.file}.`,
+      );
+      continue;
+    }
+
+    logger.warn(
+      `Something went wrong while producing ROMs list file: `,
+      writeError.toString(),
+      `Will skip "roms" content target (for all modes) for console ${op.names.console}.`,
+    );
 
     const konsole = consoles.get(op.names.console);
     if (!konsole) continue;
