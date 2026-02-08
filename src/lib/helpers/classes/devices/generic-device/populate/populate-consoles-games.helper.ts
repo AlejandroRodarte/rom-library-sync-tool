@@ -57,8 +57,8 @@ const populateConsolesGames = async (
     );
 
     for (const entry of filteredEntries) {
-      if (!entry.isSymbolicLink()) {
-        logger.error(
+      if (entry.isSymbolicLink()) {
+        logger.warn(
           `Entry ${entry.name} is a symlink, which is not a valid ROM file type. Skipping entry.`,
         );
         continue;
