@@ -1,5 +1,6 @@
 import type { SyncRomsOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/sync-roms-operation.interface.js";
 import type { FileIO } from "../../../../../interfaces/file-io.interface.js";
+import logger from "../../../../../objects/logger.object.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../../extras/fs/open-file-for-writing.helper.js";
@@ -51,6 +52,13 @@ const syncConsoleRoms = async (
   const failedDiffLines = [...parsingFailedLines];
 
   for (const romDiffAction of romDiffActions) {
+    logger.info(
+      `----- Processing ROM Diff Action -----`,
+      `Action type: ${romDiffAction.type}`,
+      `ROM filesystem type: ${romDiffAction.data.fs.type}`,
+      `ROM Filename: ${romDiffAction.data.filename}`,
+    );
+
     const syncDiffActionError = await syncRomDiffAction(
       romDiffAction,
       {
@@ -60,15 +68,29 @@ const syncConsoleRoms = async (
       fileIO,
     );
 
-    if (syncDiffActionError)
+    if (syncDiffActionError) {
+      logger.warn(
+        `Failed to synchronize this diff action: `,
+        syncDiffActionError.toString(),
+        `Will add this to the failed diff line list.`,
+      );
       failedDiffLines.push(romDiffLineFromRomDiffAction(romDiffAction));
+    } else logger.info(`Successfully processed this diff action. Continuing.`);
   }
 
   if (failedDiffLines.length === 0) {
+    logger.info(
+      `No failures occurred during synchronization. Deleting empty failed file at ${op.paths.project.failed.file}.`,
+    );
     await failedFileHandle.close();
     const unlinkError = await fsExtras.unlink(op.paths.project.failed.file);
     if (unlinkError) return unlinkError;
+    return undefined;
   }
+
+  logger.info(
+    `Failures that occured during synchronization: ${failedDiffLines.length}. Will write them into failed file at ${op.paths.project.failed.file}.`,
+  );
 
   const writeFailedLinesError = await fsExtras.writeLines(
     failedFileHandle,

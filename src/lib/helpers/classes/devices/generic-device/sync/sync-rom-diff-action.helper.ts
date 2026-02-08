@@ -91,7 +91,7 @@ const syncRomDiffAction = async (
           };
 
           logger.info(
-            `==== Adding ROM Directory =====`,
+            `===== Adding ROM Directory =====`,
             `Database ROM dirpath: ${dbRomPath}`,
             `Device ROM dirpath: ${deviceRomPath}`,
           );
