@@ -17,13 +17,9 @@ const syncRoms = async (
   fileIOExtras: FileIOExtras,
 ): Promise<SyncRomsError | undefined> => {
   const syncPaths = buildRomsSyncPaths(paths);
+  logger.debug(`Paths to validate: `, JSON.stringify(syncPaths, undefined, 2));
+
   const pathsValidationError = await validateSyncPaths(syncPaths, fileIOExtras);
-
-  logger.debug(
-    `Paths to validate: `,
-    JSON.stringify(pathsValidationError, undefined, 2),
-  );
-
   if (pathsValidationError) {
     logger.warn(
       `Something went wrong during path validation: `,

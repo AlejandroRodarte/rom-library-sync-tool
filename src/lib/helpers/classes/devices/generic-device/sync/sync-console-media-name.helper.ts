@@ -1,5 +1,6 @@
 import type { SyncMediaOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/sync-media-operation.interface.js";
 import type { FileIO } from "../../../../../interfaces/file-io.interface.js";
+import logger from "../../../../../objects/logger.object.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
 } from "../../../../extras/fs/open-file-for-writing.helper.js";
@@ -49,6 +50,13 @@ const syncConsoleMediaName = async (
   const failedDiffLines = [...parsingFailedLines];
 
   for (const mediaDiffAction of mediaDiffActions) {
+    logger.info(
+      `----- Processing Media Diff Action -----`,
+      `Action type: ${mediaDiffAction.type}`,
+      `Media filesystem type: ${mediaDiffAction.data.fs.type}`,
+      `Media filename: ${mediaDiffAction.data.filename}`,
+    );
+
     const syncDiffActionError = await syncMediaDiffAction(
       mediaDiffAction,
       {
@@ -58,17 +66,31 @@ const syncConsoleMediaName = async (
       fileIO,
     );
 
-    if (syncDiffActionError)
+    if (syncDiffActionError) {
+      logger.warn(
+        `Failed to synchronize this diff action: `,
+        syncDiffActionError.toString(),
+        `Will add this to the failed diff line list.`,
+      );
       failedDiffLines.push(
         buildMediaDiffLineFromMediaDiffAction(mediaDiffAction),
       );
+    } else logger.info(`Successfully processed this diff action. Continuing.`);
   }
 
   if (failedDiffLines.length === 0) {
+    logger.info(
+      `No failures occured during synchronization. Deleting empty failed file at ${op.paths.project.failed.file}.`,
+    );
     await failedFileHandle.close();
     const unlinkError = await fsExtras.unlink(op.paths.project.failed.file);
     if (unlinkError) return unlinkError;
+    return undefined;
   }
+
+  logger.info(
+    `Failures that occured during synchronization: ${failedDiffLines.length}. Will write them into failed file at ${op.paths.project.failed.file}.`,
+  );
 
   const writeFailedLinesError = await fsExtras.writeLines(
     failedFileHandle,
