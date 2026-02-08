@@ -28,6 +28,7 @@ const main = async () => {
       break;
     case "sync":
       await modes.sync(devices);
+      break;
     default:
       logger.warn(`Mode ${mode} not implemented yet`);
   }
