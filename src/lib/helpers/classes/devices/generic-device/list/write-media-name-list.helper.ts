@@ -27,9 +27,7 @@ const writeMediaNameList = async (
   const [lsEntries, lsError] = await ls(op.paths.device.dir);
   if (lsError) return lsError;
 
-  const fsTypeandFilenameList = lsEntries
-    .filter((e) => e.is.link)
-    .map((e) => e.name);
+  const fsTypeandFilenameList = lsEntries.map((e) => e.name);
 
   const [listFileHandle, listFileError] = await fsExtras.openFileForWriting(
     op.paths.project.file,
