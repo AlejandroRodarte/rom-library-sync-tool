@@ -4,6 +4,7 @@ import {
   DELETE_ROM,
 } from "../../../../../constants/roms/rom-diff-action-types.constants.js";
 import type { WriteRomsDiffOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/write-roms-diff-operation.interface.js";
+import logger from "../../../../../objects/logger.object.js";
 import buildLineSetsToAddAndDeleteFromOldAndNewLists from "../../../../build/build-line-sets-to-add-and-delete-from-old-and-new-lists.helper.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
@@ -48,6 +49,11 @@ const writeRomsDiff = async (
   const sets = buildLineSetsToAddAndDeleteFromOldAndNewLists(
     oldFilenames,
     newFilenames,
+  );
+
+  logger.debug(
+    `ROM filenames to add: ${sets.add.size}.`,
+    `ROM filenames to delete: ${sets.delete.size}.`,
   );
 
   let lines: string[] = [];

@@ -1,3 +1,4 @@
+import logger from "../../../../../objects/logger.object.js";
 import type { Consoles } from "../../../../../types/consoles/consoles.type.js";
 import openFileForWriting, {
   type OpenFileForWritingError,
@@ -40,6 +41,7 @@ const writeDuplicateRomsFile = async (
     return writeLinesError;
   }
 
+  logger.info(`Successfully wrote duplicate ROMs file at ${filePath}.`);
   await fileHandle.close();
 };
 

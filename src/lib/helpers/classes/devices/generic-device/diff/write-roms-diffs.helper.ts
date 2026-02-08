@@ -17,14 +17,33 @@ const writeRomsDiffs = async (
   const diffPaths = buildRomsDiffsDirPaths(paths);
   const ops = buildWriteRomsDiffOperations(paths, consoles);
 
-  logger.debug(JSON.stringify(diffPaths, undefined, 2));
+  logger.debug(`Paths to validate: `, JSON.stringify(diffPaths, undefined, 2));
 
   const pathsValidationError = await validateDiffPaths(diffPaths);
-  if (pathsValidationError) return pathsValidationError;
+  if (pathsValidationError) {
+    logger.warn(
+      `Something went wrong during path validation:`,
+      pathsValidationError.toString(),
+    );
+    return pathsValidationError;
+  }
 
   for (const op of ops) {
+    logger.info(`Processing ROMs diff file for console ${op.console.name}.`);
+
     const writeError = await writeRomsDiff(op);
-    if (!writeError) continue;
+    if (!writeError) {
+      logger.info(
+        `Successfully built ROMs diff file at ${op.paths.project.diff.file}.`,
+      );
+      continue;
+    }
+
+    logger.warn(
+      `Something went wrong while producing the ROMs diff file: `,
+      writeError.toString(),
+      `Will skip the "roms" content target for all modes on console ${op.console.name}.`,
+    );
 
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;

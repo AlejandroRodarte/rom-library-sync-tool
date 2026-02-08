@@ -32,7 +32,7 @@ const writeEsDeGamelistsLists = async (
 
   for (const op of ops) {
     logger.info(
-      `Processing es-de-gamelist file for console ${op.names.console}.`,
+      `Processing es-de-gamelist list file for console ${op.names.console}.`,
     );
 
     const writeError = await writeEsDeGamelistsList(

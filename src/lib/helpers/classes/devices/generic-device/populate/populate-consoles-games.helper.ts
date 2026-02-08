@@ -68,7 +68,7 @@ const populateConsolesGames = async (
       const lastDotIndex = filename.lastIndexOf(".");
 
       if (entry.isFile() && lastDotIndex === -1) {
-        logger.error(
+        logger.warn(
           `Entry ${entry.name} is a file, and does not have a dot that separates basename from extension. Skipping entry.`,
         );
         continue;
