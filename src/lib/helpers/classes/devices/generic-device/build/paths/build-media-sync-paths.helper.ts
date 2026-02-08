@@ -45,7 +45,7 @@ const buildMediaSyncPaths = (paths: GenericDevicePaths): SyncPaths => {
           paths.dirs.project.failed.base,
           paths.dirs.project.failed["content-targets"].media.base,
           ...Object.values(
-            paths.dirs.project.diffs["content-targets"].media.names,
+            paths.dirs.project.failed["content-targets"].media.names,
           ),
         ],
         files: failedFiles,

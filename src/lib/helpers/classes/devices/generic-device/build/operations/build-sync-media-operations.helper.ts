@@ -13,7 +13,7 @@ const buildSyncMediaOperations = (
     const projectConsoleMediaDiffFilePaths =
       paths.files.project.diffs.media.consoles[konsole.name];
     const projectConsoleMediaFailedFilePaths =
-      paths.files.project.diffs.media.consoles[konsole.name];
+      paths.files.project.failed.media.consoles[konsole.name];
     const deviceConsoleMediaDirPaths =
       paths.dirs["content-targets"].media.consoles[konsole.name];
 
