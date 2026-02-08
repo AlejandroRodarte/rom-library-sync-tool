@@ -27,7 +27,7 @@ const readUTF8Lines = async (
 
   const lines = content.toString().trim().split(os.EOL);
   if (lines.length === 1 && lines[0] === "") return [[], undefined];
-  return [lines.toString().trim().split(os.EOL), undefined];
+  return [lines, undefined];
 };
 
 export default readUTF8Lines;
