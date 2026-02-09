@@ -7,3 +7,4 @@ export const NINTENDO_GAMEBOY_COLOR = "gbc";
 export const SEGA_MASTERSYSTEM = "mastersystem";
 export const NINTENDO_ENTERTAINMENT_SYSTEM = "nes";
 export const SUPER_NINTENDO_ENTERTAINMENT_SYSTEM = "snes";
+export const FINAL_BURN_NEO = "fbneo";
