@@ -16,12 +16,16 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import type { AsyncDrop } from "../../interfaces/async-drop.interface.js";
 import type { GenericDeviceOpts } from "../../interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { GenericDevicePaths } from "../../interfaces/classes/devices/generic-device/paths/generic-device-paths.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
 import type { Device } from "../../interfaces/device.interface.js";
 import type { Environment } from "../../interfaces/env/environment.interface.js";
-import type { FileIO } from "../../interfaces/file-io.interface.js";
+import type {
+  ConnectMethodError as FileIOConnectMethodError,
+  FileIO,
+} from "../../interfaces/file-io.interface.js";
 import consolesGamesFilterFunctions from "../../objects/devices/consoles-games-filter-functions.object.js";
 import genericDevicePathsFromDeviceEnvDataBuilders from "../../objects/devices/generic-device-paths-from-device-env-data-builders.object.js";
 import logger from "../../objects/logger.object.js";
@@ -43,7 +47,9 @@ const fsExtras = {
   writeScrappedRomsFile,
 };
 
-class GenericDevice implements Device, Debug {
+export type BuildStaticMethodError = FileIOConnectMethodError;
+
+class GenericDevice implements Device, Debug, AsyncDrop {
   private _name: string;
   private _opts: GenericDeviceOpts;
   private _paths: GenericDevicePaths;
@@ -52,7 +58,7 @@ class GenericDevice implements Device, Debug {
   private _titleNameBuildStrategy: RomTitleNameBuildStrategy;
   private _fileIOExtras: FileIOExtras;
 
-  constructor(
+  private constructor(
     name: string,
     envData: Environment["device"]["data"][string],
     opts?: DeepPartial<GenericDeviceOpts>,
@@ -133,6 +139,31 @@ class GenericDevice implements Device, Debug {
 
     logger.debug(this.debug());
   }
+
+  public static async build(
+    name: string,
+    envData: Environment["device"]["data"][string],
+    opts?: DeepPartial<GenericDeviceOpts>,
+  ): Promise<[GenericDevice, undefined] | [undefined, BuildStaticMethodError]> {
+    const genericDevice = new GenericDevice(name, envData, opts);
+    const connectionError = await genericDevice._fileIOExtras.fileIO.connect();
+    if (connectionError) return [undefined, connectionError];
+    return [genericDevice, undefined];
+  }
+
+  asyncDrop: () => Promise<void> = async () => {
+    const disconnectError = await this._fileIOExtras.fileIO.disconnect();
+
+    if (disconnectError) {
+      logger.error(
+        `Failed to drop device ${this._name}.`,
+        disconnectError.toString(),
+      );
+      return;
+    }
+
+    logger.info(`Successfully cleaned up device ${this._name}.`);
+  };
 
   name: () => string = () => {
     return this._name;
