@@ -12,7 +12,7 @@ const allowedModes: ModeName[] = [
   "list-diff-sync-list",
 ];
 
-const diff = async (devices: (Device & Debug)[]) => {
+const diff = async (device: Device & Debug) => {
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
@@ -21,11 +21,9 @@ const diff = async (devices: (Device & Debug)[]) => {
       `Mode ${mode} is NOT supported for the diff task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
 
-  for (const device of devices) {
-    await device.populate();
-    device.filter();
-    await device.write.diffs();
-  }
+  await device.populate();
+  device.filter();
+  await device.write.diffs();
 };
 
 export default diff;

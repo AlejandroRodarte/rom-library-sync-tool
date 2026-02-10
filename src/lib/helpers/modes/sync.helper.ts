@@ -12,7 +12,7 @@ const allowedModes: ModeName[] = [
   "list-diff-sync-list",
 ];
 
-const sync = async (devices: (Device & Debug)[]) => {
+const sync = async (device: Device & Debug) => {
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
@@ -21,7 +21,7 @@ const sync = async (devices: (Device & Debug)[]) => {
       `Mode ${mode} is NOT supported for the sync task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
 
-  for (const device of devices) await device.sync();
+  await device.sync();
 };
 
 export default sync;

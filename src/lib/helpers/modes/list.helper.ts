@@ -12,7 +12,7 @@ const allowedModes: ModeName[] = [
   "list-diff-sync-list",
 ];
 
-const list = async (devices: (Device & Debug)[]) => {
+const list = async (device: Device & Debug) => {
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}, Allowed Modes: ${allowedModes.join(",")}`);
 
@@ -21,9 +21,7 @@ const list = async (devices: (Device & Debug)[]) => {
       `Mode ${mode} is NOT supported for the list task. Plase operate one one of the following modes to make it work: ${allowedModes.join(",")}.`,
     );
 
-  for (const device of devices) {
-    await device.write.lists();
-  }
+  await device.write.lists();
 };
 
 export default list;
