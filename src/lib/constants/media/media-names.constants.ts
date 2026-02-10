@@ -7,3 +7,5 @@ export const MIX_IMAGES = "miximages";
 export const PHYSICAL_MEDIA = "physicalmedia";
 export const SCREENSHOTS = "screenshots";
 export const TITLE_SCREENS = "titlescreens";
+export const FANART = "fanart";
+export const VIDEOS = "videos";

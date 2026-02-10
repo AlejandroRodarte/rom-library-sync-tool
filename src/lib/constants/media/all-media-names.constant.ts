@@ -1,6 +1,7 @@
 import {
   BACK_COVERS,
   COVERS,
+  FANART,
   MANUALS,
   MARQUEES,
   MIX_IMAGES,
@@ -8,6 +9,7 @@ import {
   SCREENSHOTS,
   THREED_BOXES,
   TITLE_SCREENS,
+  VIDEOS,
 } from "./media-names.constants.js";
 
 const ALL_MEDIA_NAMES = [
@@ -20,6 +22,8 @@ const ALL_MEDIA_NAMES = [
   PHYSICAL_MEDIA,
   SCREENSHOTS,
   TITLE_SCREENS,
+  FANART,
+  VIDEOS,
 ] as const;
 
 export default ALL_MEDIA_NAMES;
