@@ -21,7 +21,10 @@ const buildFileRightsSetFromDecimalMode = (
 
   const octal = decimal.toString(8);
   const octalDigits = octal.split("").map((s) => +s);
-  const [, , , userDigit, groupDigit, otherDigit] = octalDigits;
+
+  const userDigit = octalDigits.at(octalDigits.length - 3);
+  const groupDigit = octalDigits.at(octalDigits.length - 2);
+  const otherDigit = octalDigits.at(octalDigits.length - 1);
 
   if (typeof userDigit === "undefined")
     return [
