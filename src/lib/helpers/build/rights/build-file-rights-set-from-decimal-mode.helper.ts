@@ -24,31 +24,49 @@ const buildFileRightsSetFromDecimalMode = (
   const [, , , userDigit, groupDigit, otherDigit] = octalDigits;
 
   if (typeof userDigit === "undefined")
-    throw new AppValidationError(
-      `User permissions not found on ${octal} file mode.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `User permissions not found on ${octal} file mode.`,
+      ),
+    ];
   if (userDigit < 1 || userDigit > 7)
-    throw new AppValidationError(
-      `User permissions are represented in a number ranging from 1 to 7.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `User permissions are represented in a number ranging from 1 to 7.`,
+      ),
+    ];
 
   if (typeof groupDigit === "undefined")
-    throw new AppValidationError(
-      `Group permissions not found on ${octal} file mode.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `Group permissions not found on ${octal} file mode.`,
+      ),
+    ];
   if (groupDigit < 1 || groupDigit > 7)
-    throw new AppValidationError(
-      `Group permissions are represented in a number ranging from 1 to 7.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `Group permissions are represented in a number ranging from 1 to 7.`,
+      ),
+    ];
 
   if (typeof otherDigit === "undefined")
-    throw new AppValidationError(
-      `Other permissions not found on ${octal} file mode.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `Other permissions not found on ${octal} file mode.`,
+      ),
+    ];
   if (otherDigit < 1 || otherDigit > 7)
-    throw new AppValidationError(
-      `Other permissions are represented in a number ranging from 1 to 7.`,
-    );
+    return [
+      undefined,
+      new AppValidationError(
+        `Other permissions are represented in a number ranging from 1 to 7.`,
+      ),
+    ];
 
   const userBits = userDigit
     .toString(2)
