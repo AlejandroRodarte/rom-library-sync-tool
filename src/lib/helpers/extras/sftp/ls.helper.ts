@@ -20,9 +20,9 @@ const ls = async (
     name: d.name,
     path: path.join(dirPath, d.name),
     is: {
-      file: d.type === "l",
+      file: d.type === "-",
       dir: d.type === "d",
-      link: d.type === "-",
+      link: d.type === "l",
     },
   }));
 
