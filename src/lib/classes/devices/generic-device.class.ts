@@ -58,7 +58,7 @@ class GenericDevice implements Device, Debug, AsyncDrop {
   private _titleNameBuildStrategy: RomTitleNameBuildStrategy;
   private _fileIOExtras: FileIOExtras;
 
-  private constructor(
+  public constructor(
     name: string,
     envData: Environment["device"]["data"][string],
     opts?: DeepPartial<GenericDeviceOpts>,

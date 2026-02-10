@@ -16,21 +16,27 @@ const main = async () => {
     const deviceData = environment.device.data[deviceName];
     if (!deviceData) continue;
 
-    const [newGenericDevice, buildError] = await GenericDevice.build(
-      deviceName,
-      deviceData,
-    );
+    let genericDevice: GenericDevice | undefined;
 
-    if (buildError) {
-      logger.error(
-        `Failed to build device ${deviceName}.`,
-        buildError.toString(),
-        `Skipping this device.`,
+    if (mode === "diff")
+      genericDevice = new GenericDevice(deviceName, deviceData);
+    else {
+      const [newGenericDevice, buildError] = await GenericDevice.build(
+        deviceName,
+        deviceData,
       );
-      continue;
+
+      if (buildError)
+        logger.error(
+          `Failed to build device ${deviceName}.`,
+          buildError.toString(),
+          `Skipping this device.`,
+        );
+
+      genericDevice = newGenericDevice;
     }
 
-    devices.push(newGenericDevice);
+    if (genericDevice) devices.push(genericDevice);
   }
 
   logger.debug(`amount of devices to process: ${devices.length}`);
@@ -70,7 +76,7 @@ const main = async () => {
     `Finished processing all devices. Disconnecting them from their respective FileIO implementors.`,
   );
 
-  for (const device of devices) await device.asyncDrop();
+  if (mode !== "diff") for (const device of devices) await device.asyncDrop();
 };
 
 main();
