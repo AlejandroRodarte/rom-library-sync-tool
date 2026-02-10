@@ -68,7 +68,7 @@ const populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject = (
       default: {
         if (!consoleNames.includes(consoleKey)) {
           console.warn(
-            `Console environment data only contemplates the following consoles: ${consoleNames.join(", ")}. However, you have provided media names for console ${consoleKey}. Will simply ignore it.`,
+            `[WARN]: Console environment data only contemplates the following consoles: ${consoleNames.join(", ")}. However, you have provided media names for console ${consoleKey}. Will simply ignore it.`,
           );
           break;
         }
