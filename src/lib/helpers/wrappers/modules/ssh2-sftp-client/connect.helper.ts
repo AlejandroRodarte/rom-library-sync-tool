@@ -30,6 +30,10 @@ const connect = async (
         return new FileIOBadCredentialsError(
           `Client suffers from bad credentials. Host: ${credentials.host}. Port: ${credentials.port}. Username: ${credentials.username}.`,
         );
+      case "EHOSTUNREACH":
+        return new FileIOConnectionError(
+          `Host ${credentials.host} is unreachable.`,
+        );
       default:
         return new UnknownError(
           `Something went wrong while connecting via SFTP. Error code: ${e.code}. Error message: ${e.message}.`,
