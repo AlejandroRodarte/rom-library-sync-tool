@@ -13,6 +13,8 @@ import type {
   AddDirPayloadOpts,
   ExistsMethodResult,
   GetMethodError,
+  ConnectMethodError,
+  DisconnectMethodError,
 } from "../../interfaces/file-io.interface.js";
 import exists from "../../helpers/extras/fs/exists.helper.js";
 import ls from "../../helpers/extras/fs/ls.helper.js";
@@ -46,6 +48,14 @@ class Fs implements FileIO {
   constructor(crudMode: FileIOFsCrudStrategy) {
     this._crudMode = crudMode;
   }
+
+  connect: () => Promise<ConnectMethodError | undefined> = async () => {
+    return undefined;
+  };
+
+  disconnect: () => Promise<DisconnectMethodError | undefined> = async () => {
+    return undefined;
+  };
 
   ls: (
     dirPath: string,

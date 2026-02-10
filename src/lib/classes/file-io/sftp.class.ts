@@ -15,6 +15,8 @@ import type {
   DeleteDirPayloadOpts,
   GetMethodError,
   GetMethodOpts,
+  ConnectMethodError,
+  DisconnectMethodError,
 } from "../../interfaces/file-io.interface.js";
 import type { FileOrDir } from "../../types/file-or-dir.type.js";
 import type { FsType } from "../../types/fs-type.type.js";
@@ -28,9 +30,13 @@ class Sftp implements FileIO {
     this._client = client;
   }
 
-  async [Symbol.asyncDispose](): Promise<void> {
-    await this._client[Symbol.asyncDispose]();
-  }
+  connect: () => Promise<ConnectMethodError | undefined> = async () => {
+    return await this._client.tryConnect();
+  };
+
+  disconnect: () => Promise<DisconnectMethodError | undefined> = async () => {
+    return await this._client.tryDisconnect();
+  };
 
   ls: (
     dirPath: string,

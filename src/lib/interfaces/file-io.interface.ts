@@ -4,6 +4,7 @@ import type FileIOBadPathError from "../classes/errors/file-io-bad-path-error.cl
 import type FileIOBadTypeError from "../classes/errors/file-io-bad-type-error.class.js";
 import type FileIOCircularReferenceError from "../classes/errors/file-io-circular-reference-error.class.js";
 import type FileIOConnectionError from "../classes/errors/file-io-connection-error.class.js";
+import type FileIODisconnectionError from "../classes/errors/file-io-disconnection-error.class.js";
 import type FileIOExistsError from "../classes/errors/file-io-exists-error.class.js";
 import type FileIOLockedError from "../classes/errors/file-io-locked-error.class.js";
 import type FileIONotEmptyError from "../classes/errors/file-io-not-empty-error.class.js";
@@ -38,15 +39,18 @@ export type ExistsMethodResult =
 type CommonErrors =
   | UnknownError
   | FileIOConnectionError
-  | FileIOBadCredentialsError
-  | AppValidationError;
+  | FileIOBadCredentialsError;
+
+export type ConnectMethodError = CommonErrors;
+export type DisconnectMethodError = CommonErrors | FileIODisconnectionError;
 
 export type LsMethodError =
   | CommonErrors
   | FileIONotFoundError
   | FileIOBadTypeError
   | FileIOBadPathError
-  | FileIOUnauthorizedError;
+  | FileIOUnauthorizedError
+  | AppValidationError;
 
 export type GetMethodError =
   | CommonErrors
@@ -57,9 +61,10 @@ export type GetMethodError =
   | FileIOLockedError
   | FileIOExistsError
   | FileIOStorageFullError
-  | FileIONotEmptyError;
+  | FileIONotEmptyError
+  | AppValidationError;
 
-export type ExistsMethodError = CommonErrors;
+export type ExistsMethodError = CommonErrors | AppValidationError;
 
 export type AddMethodError =
   | CommonErrors
@@ -71,7 +76,8 @@ export type AddMethodError =
   | FileIOCircularReferenceError
   | FileIOLockedError
   | FileIONotEmptyError
-  | FileIOStorageFullError;
+  | FileIOStorageFullError
+  | AppValidationError;
 
 export type DeleteMethodError =
   | CommonErrors
@@ -80,7 +86,8 @@ export type DeleteMethodError =
   | FileIOBadPathError
   | FileIOUnauthorizedError
   | FileIOLockedError
-  | FileIONotEmptyError;
+  | FileIONotEmptyError
+  | AppValidationError;
 
 export interface GetMethodOpts {
   overwrite?: boolean;
@@ -134,6 +141,9 @@ export type AddFileTypePayload = AddFilePayload | AddDirPayload;
 export type DeleteFileTypePayload = DeleteFilePayload | DeleteDirPayload;
 
 export interface FileIO {
+  connect: () => Promise<ConnectMethodError | undefined>;
+  disconnect: () => Promise<DisconnectMethodError | undefined>;
+
   ls: (
     dirPath: string,
   ) => Promise<[FileIOLsEntry[], undefined] | [undefined, LsMethodError]>;
