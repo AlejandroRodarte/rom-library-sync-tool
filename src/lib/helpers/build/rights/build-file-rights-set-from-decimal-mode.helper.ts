@@ -21,15 +21,6 @@ const buildFileRightsSetFromDecimalMode = (
 
   const octal = decimal.toString(8);
   const octalDigits = octal.split("").map((s) => +s);
-
-  if (octalDigits.length !== 6)
-    return [
-      undefined,
-      new AppValidationError(
-        `Decimal ${decimal} is represented as ${octal} in octal. To parse Unix rights, we need the octal number to be 6 digits long.`,
-      ),
-    ];
-
   const [, , , userDigit, groupDigit, otherDigit] = octalDigits;
 
   if (typeof userDigit === "undefined")
