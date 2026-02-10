@@ -15,11 +15,6 @@ import FileIOUnauthorizedError from "../../../classes/errors/file-io-unauthorize
 import type { FsType } from "../../../types/fs-type.type.js";
 import { DIR, FILE, LINK } from "../../../constants/fs/fs-types.constants.js";
 
-const build = {
-  fileRightsFromDecimalMode: buildFileRightsSetFromDecimalMode,
-  rightsFromMode: buildRightsFromMode,
-};
-
 export type AccessError =
   | ExistsError
   | FileIONotFoundError
@@ -68,10 +63,10 @@ const access = async (
   if (statError) return statError;
 
   const [remotePathRights, remotePathRightsError] =
-    build.fileRightsFromDecimalMode(remotePathStats.mode);
+    buildFileRightsSetFromDecimalMode(remotePathStats.mode);
   if (remotePathRightsError) return remotePathRightsError;
 
-  const [desiredRights, desiredRightsError] = build.rightsFromMode(mode);
+  const [desiredRights, desiredRightsError] = buildRightsFromMode(mode);
   if (desiredRightsError) return desiredRightsError;
 
   if (!remotePathRights.user.includes(desiredRights))
