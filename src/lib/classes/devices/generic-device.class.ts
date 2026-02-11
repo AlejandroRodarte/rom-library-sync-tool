@@ -2,6 +2,7 @@ import {
   FS,
   SFTP,
 } from "../../constants/file-io/file-io-strategies.constants.js";
+import buildGenericDevicePathsUsingDefaultStrategy from "../../helpers/classes/devices/generic-device/build/paths/build-generic-device-paths-using-default-strategy.helper.js";
 import writeEsDeGamelistsDiffs from "../../helpers/classes/devices/generic-device/diff/write-es-de-gamelists-diffs.helper.js";
 import writeMediaDiffs from "../../helpers/classes/devices/generic-device/diff/write-media-diffs.helper.js";
 import writeRomsDiffs from "../../helpers/classes/devices/generic-device/diff/write-roms-diffs.helper.js";
@@ -16,6 +17,7 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import filterConsolesGamesUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy.helper.js";
 import type { GenericDeviceOpts } from "../../interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { GenericDevicePaths } from "../../interfaces/classes/devices/generic-device/paths/generic-device-paths.interface.js";
 import type { Debug } from "../../interfaces/debug.interface.js";
@@ -26,8 +28,6 @@ import type {
   FileIO,
   DisconnectMethodError as FileIODisconnectMethodError,
 } from "../../interfaces/file-io.interface.js";
-import consolesGamesFilterFunctions from "../../objects/devices/consoles-games-filter-functions.object.js";
-import genericDevicePathsFromDeviceEnvDataBuilders from "../../objects/devices/generic-device-paths-from-device-env-data-builders.object.js";
 import logger from "../../objects/logger.object.js";
 import type { ConsoleName } from "../../types/consoles/console-name.type.js";
 import type { Consoles } from "../../types/consoles/consoles.type.js";
@@ -36,7 +36,6 @@ import type { DeepPartial } from "../../types/deep-partial.type.js";
 import type { RomTitleNameBuildStrategy } from "../../types/roms/rom-title-name-build-strategy.type.js";
 import ConsoleMetadata from "../entities/console-metadata.class.js";
 import Console from "../entities/console.class.js";
-import AppNotFoundError from "../errors/app-not-found-error.class.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
 import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
@@ -67,23 +66,16 @@ class GenericDevice implements Device, Debug {
     this._titleNameBuildStrategy =
       envData.generic.populate.games.titleName.strategy;
 
-    if (!genericDevicePathsFromDeviceEnvDataBuilders.default)
-      throw new AppNotFoundError(
-        `We need a default strategy to build the paths.`,
-      );
-    if (!consolesGamesFilterFunctions.default)
-      throw new AppNotFoundError(`We need a default strategy to filter games.`);
-
     this._opts = {
       build: {
         paths: {
           deviceEnvDataToGenericDevicePathsFn:
-            genericDevicePathsFromDeviceEnvDataBuilders.default,
+            buildGenericDevicePathsUsingDefaultStrategy,
         },
       },
       filter: {
         roms: {
-          consolesGamesFilterFn: consolesGamesFilterFunctions.default,
+          consolesGamesFilterFn: filterConsolesGamesUsingDefaultStrategy,
         },
       },
     };
@@ -275,7 +267,7 @@ class GenericDevice implements Device, Debug {
   };
 
   debug: () => string = () => {
-    let content = "AlejandroG751JT { ";
+    let content = `${this._name} { `;
 
     content += `name: ${this._name}, `;
     content += `content-targets: ${Object.entries(this._contentTargetSkipFlags)

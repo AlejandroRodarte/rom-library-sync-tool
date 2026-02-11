@@ -1,9 +1,13 @@
 import GenericDevice from "./lib/classes/devices/generic-device.class.js";
 import modes from "./lib/helpers/modes/index.js";
+import type { GenericDeviceOpts } from "./lib/interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { Debug } from "./lib/interfaces/debug.interface.js";
 import type { Device } from "./lib/interfaces/device.interface.js";
+import consolesGamesFilterFunctions from "./lib/objects/devices/consoles-games-filter-functions.object.js";
+import genericDevicePathsFromDeviceEnvDataBuilders from "./lib/objects/devices/generic-device-paths-from-device-env-data-builders.object.js";
 import environment from "./lib/objects/environment.object.js";
 import logger from "./lib/objects/logger.object.js";
+import type { DeepPartial } from "./lib/types/deep-partial.type.js";
 
 const main = async () => {
   const mode = environment.options.mode;
@@ -14,7 +18,23 @@ const main = async () => {
   for (const deviceName of environment.device.names) {
     const deviceData = environment.device.data[deviceName];
     if (!deviceData) continue;
-    devices.push(new GenericDevice(deviceName, deviceData));
+
+    const opts: DeepPartial<GenericDeviceOpts> = {};
+    if (genericDevicePathsFromDeviceEnvDataBuilders[deviceName])
+      opts.build = {
+        paths: {
+          deviceEnvDataToGenericDevicePathsFn:
+            genericDevicePathsFromDeviceEnvDataBuilders[deviceName],
+        },
+      };
+    if (consolesGamesFilterFunctions[deviceName])
+      opts.filter = {
+        roms: {
+          consolesGamesFilterFn: consolesGamesFilterFunctions[deviceName],
+        },
+      };
+
+    devices.push(new GenericDevice(deviceName, deviceData, opts));
   }
 
   logger.debug(`amount of devices to process: ${devices.length}`);
