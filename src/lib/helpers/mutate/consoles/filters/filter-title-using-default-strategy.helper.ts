@@ -1,10 +1,10 @@
 import type Title from "../../../../classes/entities/title.class.js";
 import { BIOS_TITLE_SEGMENT } from "../../../../constants/roms/rom-title-segments.constnats.js";
-import bannedRomLabelsPriorityList from "../../../../objects/helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy/banned-rom-labels-priority-list.object.js";
-import romLanguagesPriorityList from "../../../../objects/helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy/language-base-priority-list.object.js";
-import romCountriesPriorityList from "../../../../objects/helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy/rom-countries-priority-list.object.js";
-import romVersionSystemsPriorityList from "../../../../objects/helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy/rom-version-systems-priority-list.object.js";
-import whitelistedRomLabelsPriorityList from "../../../../objects/helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy/whitelisted-rom-labels-priority-list.object.js";
+import bannedRomLabelsPriorityList from "../../../../objects/helpers/mutate/title/filters/filter-title-using-default-strategy/banned-rom-labels-priority-list.object.js";
+import romLanguagesPriorityList from "../../../../objects/helpers/mutate/title/filters/filter-title-using-default-strategy/language-base-priority-list.object.js";
+import romCountriesPriorityList from "../../../../objects/helpers/mutate/title/filters/filter-title-using-default-strategy/rom-countries-priority-list.object.js";
+import romVersionSystemsPriorityList from "../../../../objects/helpers/mutate/title/filters/filter-title-using-default-strategy/rom-version-systems-priority-list.object.js";
+import whitelistedRomLabelsPriorityList from "../../../../objects/helpers/mutate/title/filters/filter-title-using-default-strategy/whitelisted-rom-labels-priority-list.object.js";
 import buildRomVersionSystemsListFromTitleSpecialFlagsAndBaseList from "../../../build/roms/build-rom-version-systems-list-from-title-special-flags-and-base-list.helper.js";
 import unselectManyByBannedLabelSegmentsImposedBySpecialFlags from "../title/filters/unselect/unselect-many-by-banned-label-segments-imposed-by-special-flags.helper.js";
 import unselectManyByBannedLabelSegmentsPriorityList from "../title/filters/unselect/unselect-many-by-banned-label-segments-priority-list.helper.js";
