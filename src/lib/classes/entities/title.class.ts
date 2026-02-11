@@ -64,6 +64,11 @@ class Title {
     }
   }
 
+  public ban() {
+    this._keepSelected = 0;
+    this._selectedRoms.clear();
+  }
+
   public getSpecialFlags(
     from: "all" | "selected" = "selected",
   ): RomsSpecialFlags {

@@ -43,6 +43,10 @@ class Roms {
 
     return acc;
   }
+
+  public clear(): void {
+    return this._roms.clear();
+  }
 }
 
 export default Roms;
