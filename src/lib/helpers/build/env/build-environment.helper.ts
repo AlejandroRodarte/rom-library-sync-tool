@@ -1,4 +1,4 @@
-import data from "../../../../../data/environment.json" with { type: "json" };
+import path from "node:path";
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
 import ALL_CONTENT_TARGET_NAMES from "../../../constants/content-targets/all-content-target-names.constant.js";
 import ALL_LOG_LEVELS from "../../../constants/log/all-log-levels.constant.js";
@@ -20,9 +20,19 @@ import buildContentTargetNamesFromRawValue from "./build-content-target-names-fr
 import ALL_ROM_TITLE_NAME_BUILD_STRATEGIES from "../../../constants/roms/all-rom-title-name-build-strategies.constant.js";
 import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
 import buildContentTargetNamesFromModes from "./build-content-target-names-from-modes.helper.js";
+import readFileSync from "../../wrappers/modules/fs/read-file-sync.helper.js";
+import { DATA_DIR_PATH } from "../../../constants/paths.constants.js";
 
 const buildEnvironment = (): Environment => {
-  const jsonRawEnvironment: JsonRawEnvironment = data;
+  const [environmentFileRawContent, readFileError] = readFileSync(
+    path.join(DATA_DIR_PATH, "environment.json"),
+    "utf8",
+  );
+  if (readFileError) throw readFileError;
+
+  const jsonRawEnvironment: JsonRawEnvironment = JSON.parse(
+    environmentFileRawContent.toString(),
+  );
 
   /**
    * options.log.level
