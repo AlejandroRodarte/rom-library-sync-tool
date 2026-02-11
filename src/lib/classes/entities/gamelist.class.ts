@@ -1,6 +1,8 @@
 import xml2Js from "xml2js";
 import type { EsDeGamelistItem } from "../../types/es-de-gamelists/es-de-gamelist-item.type.js";
-import buildObject, { type BuildObjectError } from "../../helpers/wrappers/modules/xml2js/build-object.helper.js";
+import buildObject, {
+  type BuildObjectError,
+} from "../../helpers/wrappers/modules/xml2js/build-object.helper.js";
 
 export type XmlMethodError = BuildObjectError;
 
@@ -19,6 +21,14 @@ class Gamelist {
 
   get folderEntries() {
     return this._folders.entries();
+  }
+
+  public getGame(romFilename: string): EsDeGamelistItem | undefined {
+    return this._games.get(romFilename);
+  }
+
+  public getFolder(romDirname: string): EsDeGamelistItem | undefined {
+    return this._folders.get(romDirname);
   }
 
   public hasGame(romFilename: string): boolean {

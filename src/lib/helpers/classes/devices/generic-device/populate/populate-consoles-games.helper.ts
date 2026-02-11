@@ -10,6 +10,7 @@ import type { Consoles } from "../../../../../types/consoles/consoles.type.js";
 import type { RomTitleNameBuildStrategy } from "../../../../../types/roms/rom-title-name-build-strategy.type.js";
 import buildRomLabelsAndLanguagesFromRomFilename from "../../../../build/roms/build-rom-labels-and-languages-from-rom-filename.helper.js";
 import buildTitleNameUsingOnlyRomFilename from "../../../../build/titles/build-title-name-only-using-rom-filename.helper.js";
+import buildTitleNameUsingEsDeGamelistName from "../../../../build/titles/build-title-name-using-es-de-gamelist-name.helper.js";
 import dirExists from "../../../../extras/fs/dir-exists.helper.js";
 import readdir from "../../../../wrappers/modules/fs/readdir.helper.js";
 
@@ -106,7 +107,15 @@ const populateConsolesGames = async (
           break;
         }
         case "es-de-gamelist-name": {
-          throw new Error("unimplemented");
+          const [strategyTitleName, strategyConversionError] =
+            buildTitleNameUsingEsDeGamelistName(entry, konsole.gamelist);
+
+          if (strategyConversionError) {
+            conversionError = strategyConversionError;
+            break;
+          }
+
+          titleName = strategyTitleName;
           break;
         }
       }
