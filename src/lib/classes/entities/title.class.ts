@@ -10,9 +10,9 @@ class Title {
 
   private _keepSelected = 1;
 
-  constructor(name: string, roms: Roms) {
+  constructor(name: string) {
     this._name = name;
-    this._allRoms = roms;
+    this._allRoms = new Roms();
     this._selectedRoms = new Roms();
   }
 
@@ -64,7 +64,9 @@ class Title {
     }
   }
 
-  public getSpecialFlags(from: "all" | "selected" = "selected"): RomsSpecialFlags {
+  public getSpecialFlags(
+    from: "all" | "selected" = "selected",
+  ): RomsSpecialFlags {
     switch (from) {
       case "all":
         return this._allRoms.specialFlags;

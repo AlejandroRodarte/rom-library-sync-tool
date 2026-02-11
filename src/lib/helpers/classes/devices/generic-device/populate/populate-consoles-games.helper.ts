@@ -127,7 +127,7 @@ const populateConsolesGames = async (
 
       if (title) title.addRom(newRom);
       else {
-        const newTitle = new Title(titleName, new Roms());
+        const newTitle = new Title(titleName);
         newTitle.addRom(newRom);
         konsole.games.addTitle(newTitle);
       }
