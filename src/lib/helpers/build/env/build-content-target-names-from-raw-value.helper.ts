@@ -1,5 +1,6 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
 import ALL_AND_NONE from "../../../constants/all-and-none.constant.js";
+import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_CONTENT_TARGET_NAMES from "../../../constants/content-targets/all-content-target-names.constant.js";
 import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
@@ -18,10 +19,10 @@ const buildContentTargetNamesFromRawValue = (
       ];
 
     switch (rawContentTargetNames) {
-      case "all":
+      case ALL:
         contentTargetNames.push(...ALL_CONTENT_TARGET_NAMES);
         break;
-      case "none":
+      case NONE:
         break;
     }
   } else {

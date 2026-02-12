@@ -1,5 +1,6 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
 import ALL_AND_NONE from "../../../constants/all-and-none.constant.js";
+import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_MEDIA_NAMES from "../../../constants/media/all-media-names.constant.js";
 import type { MediaName } from "../../../types/media/media-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
@@ -19,10 +20,10 @@ const buildMediaNamesFromRawValue = (
       ];
 
     switch (rawMediaNames) {
-      case "all":
+      case ALL:
         mediaNames.push(...ALL_MEDIA_NAMES);
         break;
-      case "none":
+      case NONE:
         break;
     }
   } else {

@@ -1,5 +1,6 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
 import ALL_AND_NONE from "../../../constants/all-and-none.constant.js";
+import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_CONSOLE_NAMES from "../../../constants/consoles/all-console-names.constant.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
@@ -19,10 +20,10 @@ const buildConsoleNamesFromRawValue = (
       ];
 
     switch (rawConsoleNames) {
-      case "all":
+      case ALL:
         modeConsoleNames.push(...ALL_CONSOLE_NAMES);
         break;
-      case "none":
+      case NONE:
         break;
     }
   } else {

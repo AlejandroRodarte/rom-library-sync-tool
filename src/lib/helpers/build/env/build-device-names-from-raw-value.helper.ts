@@ -1,5 +1,6 @@
 import AppValidationError from "../../../classes/errors/app-validation-error.class.js";
 import ALL_AND_NONE from "../../../constants/all-and-none.constant.js";
+import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import typeGuards from "../../typescript/guards/index.js";
 
 const buildDeviceNamesFromRawValue = (
@@ -18,10 +19,10 @@ const buildDeviceNamesFromRawValue = (
       ];
 
     switch (rawDeviceNames) {
-      case "all":
+      case ALL:
         modeDeviceNames.push(...registeredDeviceNames);
         break;
-      case "none":
+      case NONE:
         break;
     }
   } else {

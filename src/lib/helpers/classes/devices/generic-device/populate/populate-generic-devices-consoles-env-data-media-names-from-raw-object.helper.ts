@@ -1,4 +1,5 @@
 import AppValidationError from "../../../../../classes/errors/app-validation-error.class.js";
+import { ALL, NONE, REST } from "../../../../../constants/all-none-rest.constants.js";
 import CONSOLE_NAMES_ALL_NONE_AND_REST from "../../../../../constants/consoles/console-names-all-none-and-rest.constant.js";
 import type { GenericDeviceConsolesEnvData } from "../../../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
 import type { ConsoleContent } from "../../../../../types/consoles/console-content.type.js";
@@ -34,7 +35,7 @@ const populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject = (
     if (mediaNamesValidationError) return mediaNamesValidationError;
 
     switch (consoleKey) {
-      case "all": {
+      case ALL: {
         for (const [, consoleEnvData] of Object.entries(consolesEnvData)) {
           consoleEnvData["content-targets"].media.names.length = 0;
           consoleEnvData["content-targets"].media.names.push(
@@ -44,13 +45,13 @@ const populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject = (
         finished = true;
         break;
       }
-      case "none": {
+      case NONE: {
         for (const [, consoleEnvData] of Object.entries(consolesEnvData))
           consoleEnvData["content-targets"].media.names.length = 0;
         finished = true;
         break;
       }
-      case "rest": {
+      case REST: {
         for (const [, processedConsole] of Object.entries(processedConsoles)) {
           if (processedConsole.processed) continue;
 
