@@ -1,5 +1,6 @@
 import type { RomVersionSystem } from "../../../../../../interfaces/roms/rom-version-system.interface.js";
 import a8fVersioning from "../../../../../rom-version-systems/a8f-versioning.object.js";
+import carsVersioning from "../../../../../rom-version-systems/cars-versioning.object.js";
 import dateVersioning from "../../../../../rom-version-systems/date-versioning.object.js";
 import dshVersioning from "../../../../../rom-version-systems/ds-h-versioning.object.js";
 import fightersVersioning from "../../../../../rom-version-systems/fighters-versioning.object.js";
@@ -26,6 +27,7 @@ const romVersionSystemsPriorityList: RomVersionSystem[] = [
   dateVersioning,
   fightersVersioning,
   peopleVersioning,
+  carsVersioning,
   fsVersioning,
   dshVersioning,
   tjVersioning,

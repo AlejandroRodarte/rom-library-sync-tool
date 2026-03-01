@@ -6,6 +6,7 @@ const whitelistedRomLabelsPriorityList: string[] = [
   "Anniversary Edition",
   "Rumble Version",
   "Final Version",
+  "Final Cut",
   "Emulator Optimized",
   "Fixed",
   "Remastered",
@@ -13,6 +14,7 @@ const whitelistedRomLabelsPriorityList: string[] = [
   "Multiple Endings",
   "Unlocked",
   "Bugfix",
+  "dmaSafe",
 ];
 
 export default whitelistedRomLabelsPriorityList;

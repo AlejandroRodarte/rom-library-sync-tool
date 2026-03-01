@@ -9,6 +9,7 @@ const ALL_ROM_LANGUAGES = [
   "Ca",
   "Pt",
   "Pt-BR",
+  "Pt-PT",
   "It",
   "Fr",
   "Ge",
