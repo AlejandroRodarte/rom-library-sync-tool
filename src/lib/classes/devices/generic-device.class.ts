@@ -2,6 +2,7 @@ import {
   FS,
   SFTP,
 } from "../../constants/file-io/file-io-strategies.constants.js";
+import { ES_DE_GAMELIST_NAME } from "../../constants/roms/rom-title-name-build-strategies.constants.js";
 import buildGenericDevicePathsUsingDefaultStrategy from "../../helpers/classes/devices/generic-device/build/paths/build-generic-device-paths-using-default-strategy.helper.js";
 import writeEsDeGamelistsDiffs from "../../helpers/classes/devices/generic-device/diff/write-es-de-gamelists-diffs.helper.js";
 import writeMediaDiffs from "../../helpers/classes/devices/generic-device/diff/write-media-diffs.helper.js";
@@ -150,7 +151,7 @@ class GenericDevice implements Device, Debug {
   };
 
   populate: () => Promise<void> = async () => {
-    if (this._titleNameBuildStrategy === "es-de-gamelist-name")
+    if (this._titleNameBuildStrategy === ES_DE_GAMELIST_NAME)
       await populateConsolesGamelists(this._consoles);
 
     await populateConsolesGames(this._consoles, this._titleNameBuildStrategy);
@@ -160,7 +161,7 @@ class GenericDevice implements Device, Debug {
 
     if (
       !this._contentTargetSkipFlags["es-de-gamelists"] &&
-      this._titleNameBuildStrategy !== "es-de-gamelist-name"
+      this._titleNameBuildStrategy !== ES_DE_GAMELIST_NAME
     )
       await populateConsolesGamelists(this._consoles);
   };

@@ -3,6 +3,7 @@ import Title from "../../../../../classes/entities/title.class.js";
 import type AppConversionError from "../../../../../classes/errors/app-conversion-error.class.js";
 import { DIR, FILE } from "../../../../../constants/fs/fs-types.constants.js";
 import { READ } from "../../../../../constants/rights/rights.constants.js";
+import { ES_DE_GAMELIST_NAME, ROM_FILENAME } from "../../../../../constants/roms/rom-title-name-build-strategies.constants.js";
 import type { Rom } from "../../../../../interfaces/roms/rom.interface.js";
 import databasePaths from "../../../../../objects/database-paths.object.js";
 import logger from "../../../../../objects/logger.object.js";
@@ -94,7 +95,7 @@ const populateConsolesGames = async (
       let conversionError: AppConversionError | undefined;
 
       switch (titleNameBuildStratgy) {
-        case "rom-filename": {
+        case ROM_FILENAME: {
           const [strategyTitleName, strategyConversionError] =
             buildTitleNameUsingOnlyRomFilename(entry);
 
@@ -106,7 +107,7 @@ const populateConsolesGames = async (
           titleName = strategyTitleName;
           break;
         }
-        case "es-de-gamelist-name": {
+        case ES_DE_GAMELIST_NAME: {
           const [strategyTitleName, strategyConversionError] =
             buildTitleNameUsingEsDeGamelistName(entry, konsole.gamelist);
 
