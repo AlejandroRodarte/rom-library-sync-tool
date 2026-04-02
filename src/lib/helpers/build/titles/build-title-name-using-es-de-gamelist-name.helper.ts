@@ -29,8 +29,16 @@ const buildTitleNameUsingEsDeGamelistName = (
       break;
   }
 
-  if (esDeGamelistItem && esDeGamelistItem.name)
-    return [esDeGamelistItem.name, undefined];
+  if (esDeGamelistItem && esDeGamelistItem.name) {
+    const lastDotIndex = romFilename.lastIndexOf(".");
+    const romBasename =
+      lastDotIndex === -1
+        ? romFilename
+        : romFilename.substring(0, lastDotIndex);
+
+    if (romBasename !== esDeGamelistItem.name)
+      return [esDeGamelistItem.name, undefined];
+  }
 
   const [defaultTitleName, defaultConversionError] =
     buildTitleNameUsingOnlyRomFilename(entry);
