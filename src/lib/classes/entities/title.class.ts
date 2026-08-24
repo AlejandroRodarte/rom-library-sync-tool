@@ -57,12 +57,15 @@ class Title {
 
     if (opts) if (opts.force) unselectOneMethodOpts.force = opts.force;
 
-    if (!unselectOneMethodOpts.force && !this.canUnselect())
+    const canUnselectBeforeDeleting = this.canUnselect();
+
+    if (!unselectOneMethodOpts.force && !canUnselectBeforeDeleting)
       return "cant-unselect";
 
     const romExisted = this.selectedRoms.deleteOne(id);
 
-    if (unselectOneMethodOpts.force && romExisted) this._keepSelected--;
+    if (unselectOneMethodOpts.force && !canUnselectBeforeDeleting && romExisted)
+      this._keepSelected--;
     return romExisted ? "rom-existed" : "rom-did-not-exist";
   }
 
