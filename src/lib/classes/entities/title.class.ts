@@ -8,6 +8,7 @@ interface UnselectOneMethodOpts {
 
 type UnselectManyMethodOpts = UnselectOneMethodOpts;
 type SelectOneMethodOpts = UnselectOneMethodOpts;
+type SelectManyMethodOpts = UnselectOneMethodOpts;
 
 class Title {
   private _name: string;
@@ -123,6 +124,27 @@ class Title {
           if (!unselectManyMethodOpts.force && !this.canUnselect()) return;
           break;
         case "rom-did-not-exist":
+          break;
+      }
+    }
+  }
+
+  public selectMany(ids: string[], opts?: SelectManyMethodOpts): void {
+    const selectManyMethodOpts: Required<SelectManyMethodOpts> = {
+      force: false,
+    };
+
+    if (opts) if (opts.force) selectManyMethodOpts.force = opts.force;
+
+    for (const id of ids) {
+      const result = this.selectOne(id, selectManyMethodOpts);
+      switch (result) {
+        case "cant-select":
+          return;
+        case "rom-added":
+          if (!selectManyMethodOpts.force && !this.canSelect()) return;
+        case "rom-did-not-exist":
+        case "rom-already-selected":
           break;
       }
     }
