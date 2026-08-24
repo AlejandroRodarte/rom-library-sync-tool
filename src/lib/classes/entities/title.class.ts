@@ -98,6 +98,10 @@ class Title {
   public canUnselect(): boolean {
     return this.selectedRomsSize > this._keepSelected;
   }
+
+  public canSelect(): boolean {
+    return this.selectedRomsSize < this._keepSelected;
+  }
 }
 
 export default Title;
