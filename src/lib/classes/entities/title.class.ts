@@ -50,7 +50,7 @@ class Title {
   public unselectOne(
     id: string,
     opts?: UnselectOneMethodOpts,
-  ): "cant-unselect" | "rom-existed" | "rom-did-not-exist" {
+  ): "cant-unselect" | "rom-deleted" | "rom-did-not-exist" {
     const unselectOneMethodOpts: Required<UnselectOneMethodOpts> = {
       force: false,
     };
@@ -68,7 +68,7 @@ class Title {
     if (unselectOneMethodOpts.force && !canUnselectBeforeDeleting)
       this._keepSelected--;
 
-    return "rom-existed";
+    return "rom-deleted";
   }
 
   public unselectMany(ids: string[], opts?: UnselectManyMethodOpts): void {
@@ -83,7 +83,7 @@ class Title {
       switch (result) {
         case "cant-unselect":
           return;
-        case "rom-existed":
+        case "rom-deleted":
           if (!unselectManyMethodOpts.force && !this.canUnselect()) return;
           break;
         case "rom-did-not-exist":
