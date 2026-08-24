@@ -2,6 +2,10 @@ import type { Rom } from "../../interfaces/roms/rom.interface.js";
 import type { RomsSpecialFlags } from "../../interfaces/roms/roms-special-flags.interface.js";
 import Roms from "./roms.class.js";
 
+interface UnselectOneMethodOpts {
+  force?: boolean;
+}
+
 class Title {
   private _name: string;
 
@@ -43,9 +47,20 @@ class Title {
 
   public unselectOne(
     id: string,
+    opts?: UnselectOneMethodOpts,
   ): "cant-unselect" | "rom-existed" | "rom-did-not-exist" {
-    if (!this.canUnselect()) return "cant-unselect";
+    const unselectOneMethodOpts: Required<UnselectOneMethodOpts> = {
+      force: false,
+    };
+
+    if (opts) if (opts.force) unselectOneMethodOpts.force = opts.force;
+
+    if (!unselectOneMethodOpts.force && !this.canUnselect())
+      return "cant-unselect";
+
     const romExisted = this.selectedRoms.deleteOne(id);
+
+    if (unselectOneMethodOpts.force && romExisted) this._keepSelected--;
     return romExisted ? "rom-existed" : "rom-did-not-exist";
   }
 
