@@ -25,6 +25,10 @@ class Roms {
     return this._roms.get(id);
   }
 
+  public has(id: string): boolean {
+    return this._roms.has(id);
+  }
+
   public add(rom: Rom): void {
     this._roms.set(rom.file.name, rom);
   }
