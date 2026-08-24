@@ -6,6 +6,8 @@ interface UnselectOneMethodOpts {
   force?: boolean;
 }
 
+type UnselectManyMethodOpts = UnselectOneMethodOpts;
+
 class Title {
   private _name: string;
 
@@ -64,14 +66,20 @@ class Title {
     return romExisted ? "rom-existed" : "rom-did-not-exist";
   }
 
-  public unselectMany(ids: string[]): void {
+  public unselectMany(ids: string[], opts?: UnselectManyMethodOpts): void {
+    const unselectManyMethodOpts: Required<UnselectManyMethodOpts> = {
+      force: false,
+    };
+
+    if (opts) if (opts.force) unselectManyMethodOpts.force = opts.force;
+
     for (const id of ids) {
-      const result = this.unselectOne(id);
+      const result = this.unselectOne(id, unselectManyMethodOpts);
       switch (result) {
         case "cant-unselect":
           return;
         case "rom-existed":
-          if (!this.canUnselect()) return;
+          if (!unselectManyMethodOpts.force && !this.canUnselect()) return;
           break;
         case "rom-did-not-exist":
           break;
