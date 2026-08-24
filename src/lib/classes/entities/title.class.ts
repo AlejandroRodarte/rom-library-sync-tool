@@ -7,6 +7,7 @@ interface UnselectOneMethodOpts {
 }
 
 type UnselectManyMethodOpts = UnselectOneMethodOpts;
+type SelectOneMethodOpts = UnselectOneMethodOpts;
 
 class Title {
   private _name: string;
@@ -69,6 +70,41 @@ class Title {
       this._keepSelected--;
 
     return "rom-deleted";
+  }
+
+  public selectOne(
+    id: string,
+    opts?: SelectOneMethodOpts,
+  ):
+    | "cant-select"
+    | "rom-added"
+    | "rom-did-not-exist"
+    | "rom-already-selected" {
+    const selectOneMethodOpts: Required<SelectOneMethodOpts> = {
+      force: false,
+    };
+
+    if (opts) if (opts.force) selectOneMethodOpts.force = opts.force;
+
+    const canSelectBeforeMutating = !this.canSelect();
+
+    if (!selectOneMethodOpts.force && !canSelectBeforeMutating)
+      return "cant-select";
+
+    const romToSelect = this.allRoms.get(id);
+    const romExistsInAllRomsSet = typeof romToSelect !== "undefined";
+
+    if (!romExistsInAllRomsSet) return "rom-did-not-exist";
+
+    const romIsAlreadySelected = this.selectedRoms.has(id);
+    if (romIsAlreadySelected) return "rom-already-selected";
+
+    this.selectedRoms.add(romToSelect);
+
+    if (selectOneMethodOpts.force && !canSelectBeforeMutating)
+      this._keepSelected++;
+
+    return "rom-added";
   }
 
   public unselectMany(ids: string[], opts?: UnselectManyMethodOpts): void {
