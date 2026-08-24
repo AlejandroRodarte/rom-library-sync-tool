@@ -59,16 +59,11 @@ class Title {
 
     if (opts) if (opts.force) unselectOneMethodOpts.force = opts.force;
 
-    const canUnselectBeforeDeleting = this.canUnselect();
-
-    if (!unselectOneMethodOpts.force && !canUnselectBeforeDeleting)
+    if (!unselectOneMethodOpts.force && !this.canUnselect())
       return "cant-unselect";
 
     const romExisted = this.selectedRoms.deleteOne(id);
     if (!romExisted) return "rom-did-not-exist";
-
-    if (unselectOneMethodOpts.force && !canUnselectBeforeDeleting)
-      this._keepSelected--;
 
     return "rom-deleted";
   }
@@ -87,10 +82,7 @@ class Title {
 
     if (opts) if (opts.force) selectOneMethodOpts.force = opts.force;
 
-    const canSelectBeforeMutating = !this.canSelect();
-
-    if (!selectOneMethodOpts.force && !canSelectBeforeMutating)
-      return "cant-select";
+    if (!selectOneMethodOpts.force && !this.canSelect()) return "cant-select";
 
     const romToSelect = this.allRoms.get(id);
     const romExistsInAllRomsSet = typeof romToSelect !== "undefined";
@@ -101,10 +93,6 @@ class Title {
     if (romIsAlreadySelected) return "rom-already-selected";
 
     this.selectedRoms.add(romToSelect);
-
-    if (selectOneMethodOpts.force && !canSelectBeforeMutating)
-      this._keepSelected++;
-
     return "rom-added";
   }
 
@@ -151,7 +139,6 @@ class Title {
   }
 
   public ban() {
-    this._keepSelected = 0;
     this._selectedRoms.clear();
   }
 
