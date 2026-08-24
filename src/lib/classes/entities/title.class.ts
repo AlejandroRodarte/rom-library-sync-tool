@@ -63,10 +63,12 @@ class Title {
       return "cant-unselect";
 
     const romExisted = this.selectedRoms.deleteOne(id);
+    if (!romExisted) return "rom-did-not-exist";
 
-    if (unselectOneMethodOpts.force && !canUnselectBeforeDeleting && romExisted)
+    if (unselectOneMethodOpts.force && !canUnselectBeforeDeleting)
       this._keepSelected--;
-    return romExisted ? "rom-existed" : "rom-did-not-exist";
+
+    return "rom-existed";
   }
 
   public unselectMany(ids: string[], opts?: UnselectManyMethodOpts): void {
