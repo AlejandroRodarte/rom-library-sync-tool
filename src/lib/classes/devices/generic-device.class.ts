@@ -244,17 +244,6 @@ class GenericDevice implements Device, Debug {
   };
 
   sync: () => Promise<void> = async () => {
-    const syncedFileExists = await fs.fileExists(
-      this._paths.files.project.synced,
-    );
-
-    if (syncedFileExists) {
-      logger.error(
-        `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again.`,
-      );
-      return;
-    }
-
     if (!this._contentTargetSkipFlags.roms) {
       const pathsValidationError = await syncRoms(
         this._paths,
@@ -274,6 +263,17 @@ class GenericDevice implements Device, Debug {
     }
 
     if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+      const syncedFileExists = await fs.fileExists(
+        this._paths.files.project.synced,
+      );
+
+      if (syncedFileExists) {
+        logger.error(
+          `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again.`,
+        );
+        return;
+      }
+
       const pathsValidationError = await syncEsDeGamelists(
         this._paths,
         this._consoles,
