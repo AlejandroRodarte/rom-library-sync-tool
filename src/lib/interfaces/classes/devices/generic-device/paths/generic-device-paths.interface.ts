@@ -40,6 +40,7 @@ export interface GenericDevicePaths {
   };
   files: {
     project: {
+      synced: string; // devices/<device>/synced,
       logs: {
         duplicates: string; // devices/<device>/logs/duplicates.log.txt
         scrapped: string; // devices/<device>/logs/scrapped.log.txt

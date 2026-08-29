@@ -150,6 +150,7 @@ const buildGenericDevicePathsUsingDefaultStrategy: DeviceEnvDataToGenericDeviceP
       },
       files: {
         project: {
+          synced: path.join(baseDirPath, "synced"),
           logs: {
             duplicates: path.join(logsDirPath, "duplicates.log.txt"),
             scrapped: path.join(logsDirPath, "scrapped.log.txt"),
