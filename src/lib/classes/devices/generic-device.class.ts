@@ -18,6 +18,7 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import fileExists from "../../helpers/extras/fs/file-exists.helper.js";
 import filterConsolesGamesUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy.helper.js";
 import type { GenericDeviceOpts } from "../../interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { GenericDevicePaths } from "../../interfaces/classes/devices/generic-device/paths/generic-device-paths.interface.js";
@@ -41,6 +42,10 @@ import FileIOExtras from "../file-io/file-io-extras.class.js";
 import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
 import SftpClient from "../sftp/sftp-client.class.js";
+
+const fs = {
+  fileExists,
+};
 
 const fsExtras = {
   writeDuplicateRomsFile,
@@ -239,6 +244,17 @@ class GenericDevice implements Device, Debug {
   };
 
   sync: () => Promise<void> = async () => {
+    const syncedFileExists = await fs.fileExists(
+      this._paths.files.project.synced,
+    );
+
+    if (syncedFileExists) {
+      logger.error(
+        `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again.`,
+      );
+      return;
+    }
+
     if (!this._contentTargetSkipFlags.roms) {
       const pathsValidationError = await syncRoms(
         this._paths,
