@@ -1,3 +1,4 @@
+import ALL_CONSOLE_NAMES from "../../constants/consoles/all-console-names.constant.js";
 import {
   FS,
   SFTP,
@@ -196,6 +197,22 @@ class GenericDevice implements Device, Debug {
       }
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+        const syncedFileExists = await fs.fileExists(
+          this._paths.files.project.synced,
+        );
+
+        if (syncedFileExists) {
+          const willListAllConsoles =
+            this._consoles.size === ALL_CONSOLE_NAMES.length;
+
+          if (!willListAllConsoles) {
+            logger.error(
+              `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again.`,
+            );
+            return;
+          }
+        }
+
         const pathsValidationError = await writeEsDeGamelistsLists(
           this._paths,
           this._consoles,
