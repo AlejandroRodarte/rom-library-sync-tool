@@ -5,7 +5,7 @@ import {
 } from "../../constants/consoles/console-names.constants.js";
 import filterConsolesGamesUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy.helper.js";
 import filterTitleUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-title-using-default-strategy.helper.js";
-import banTitlesByName from "../../helpers/mutate/consoles/titles/filters/ban/ban-titles-by-name.helper.js";
+import mutateTitlesByName from "../../helpers/mutate/consoles/titles/mutate-titles-by-name.helper.js";
 import type { ConsolesGamesFilterFn } from "../../types/consoles/consoles-games-filter-fn.type.js";
 
 const consolesGamesFilterFunctions: {
@@ -19,29 +19,50 @@ const consolesGamesFilterFunctions: {
 
       switch (konsole.name) {
         case NINTENDO_GAMECUBE:
-          banTitlesByName(konsole.games.allTitles, [
-            "Mario Party 4",
-            "Mario Party 5",
-            "Mario Party 6",
-            "Mario Party 7",
-          ]);
+          mutateTitlesByName(
+            konsole.games.allTitles,
+            new Map([
+              ["Mario Party 4", (title) => title.ban()],
+              ["Mario Party 5", (title) => title.ban()],
+              ["Mario Party 6", (title) => title.ban()],
+              ["Mario Party 7", (title) => title.ban()],
+              [
+                "Luigi's Mansion",
+                (title) => {
+                  title.unselectOne("Luigi's Mansion (USA, Canada).rvz", {
+                    force: true,
+                  });
+                  title.selectOne(
+                    "Luigi's Mansion (Europe) (En,Fr,De,Es,It) (Rev 1).rvz",
+                    { force: true },
+                  );
+                },
+              ],
+            ]),
+          );
           break;
         case NINTENDO_WII:
-          banTitlesByName(konsole.games.allTitles, [
-            "Mario Kart Wii",
-            "Mario Strikers Charged Football",
-            "Metal Slug Anthology",
-          ]);
+          mutateTitlesByName(
+            konsole.games.allTitles,
+            new Map([
+              ["Mario Kart Wii", (title) => title.ban()],
+              ["Mario Strikers Charged Football", (title) => title.ban()],
+              ["Metal Slug Anthology", (title) => title.ban()],
+            ]),
+          );
           break;
         case PLAYSTATION_PORTABLE:
-          banTitlesByName(konsole.games.allTitles, [
-            "2010 FIFA World Cup : South Africa",
-            "Densha De Go! Pocket Yamanotesen Hen",
-            "Dragon Ball Z : Shin Budokai 2",
-            "FIFA 10",
-            "Gran Turismo",
-            "Ridge Racer",
-          ]);
+          mutateTitlesByName(
+            konsole.games.allTitles,
+            new Map([
+              ["2010 FIFA World Cup : South Africa", (title) => title.ban()],
+              ["Densha De Go! Pocket Yamanotesen Hen", (title) => title.ban()],
+              ["Dragon Ball Z : Shin Budokai 2", (title) => title.ban()],
+              ["FIFA 10", (title) => title.ban()],
+              ["Gran Turismo", (title) => title.ban()],
+              ["Ridge Racer", (title) => title.ban()],
+            ]),
+          );
           break;
         default:
           break;
