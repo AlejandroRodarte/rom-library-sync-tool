@@ -1,6 +1,6 @@
 import type { MediaContent } from "../../types/media/media-content.type.js";
 
-export interface ModeContentTargetsSkipFlags {
+export interface ContentTargetSkipFlags {
   roms: boolean;
   media: {
     global: boolean;
