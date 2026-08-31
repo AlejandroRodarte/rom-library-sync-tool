@@ -53,19 +53,22 @@ class ConsoleMetadata {
   }
 
   public skipListMediaName(mediaName: MediaName): void {
-    const mediaNameFlags = this._modesSkipFlags.list["content-targets"].media.names;
+    const mediaNameFlags =
+      this._modesSkipFlags.list["content-targets"].media.names;
     if (typeof mediaNameFlags[mediaName] === "boolean")
       mediaNameFlags[mediaName] = true;
   }
 
   public skipDiffMediaName(mediaName: MediaName): void {
-    const mediaNameFlags = this._modesSkipFlags.diff["content-targets"].media.names;
+    const mediaNameFlags =
+      this._modesSkipFlags.diff["content-targets"].media.names;
     if (typeof mediaNameFlags[mediaName] === "boolean")
       mediaNameFlags[mediaName] = true;
   }
 
   public skipSyncMediaName(mediaName: MediaName): void {
-    const mediaNameFlags = this._modesSkipFlags.sync["content-targets"].media.names;
+    const mediaNameFlags =
+      this._modesSkipFlags.sync["content-targets"].media.names;
     if (typeof mediaNameFlags[mediaName] === "boolean")
       mediaNameFlags[mediaName] = true;
   }
@@ -101,8 +104,9 @@ class ConsoleMetadata {
   public canListMediaName(mediaName: MediaName): boolean {
     return (
       this.canList() &&
-      typeof this._modesSkipFlags.list["content-targets"].media.names[mediaName] ===
-        "boolean" &&
+      typeof this._modesSkipFlags.list["content-targets"].media.names[
+        mediaName
+      ] === "boolean" &&
       !this._modesSkipFlags.list["content-targets"].media.names[mediaName]
     );
   }
@@ -121,8 +125,9 @@ class ConsoleMetadata {
   public canDiffMediaName(mediaName: MediaName): boolean {
     return (
       this.canDiff() &&
-      typeof this._modesSkipFlags.diff["content-targets"].media.names[mediaName] ===
-        "boolean" &&
+      typeof this._modesSkipFlags.diff["content-targets"].media.names[
+        mediaName
+      ] === "boolean" &&
       !this._modesSkipFlags.diff["content-targets"].media.names[mediaName]
     );
   }
@@ -141,8 +146,9 @@ class ConsoleMetadata {
   public canSyncMediaName(mediaName: MediaName): boolean {
     return (
       this.canSync() &&
-      typeof this._modesSkipFlags.sync["content-targets"].media.names[mediaName] ===
-        "boolean" &&
+      typeof this._modesSkipFlags.sync["content-targets"].media.names[
+        mediaName
+      ] === "boolean" &&
       !this._modesSkipFlags.sync["content-targets"].media.names[mediaName]
     );
   }
