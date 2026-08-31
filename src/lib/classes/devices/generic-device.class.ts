@@ -38,6 +38,7 @@ import type { DeepPartial } from "../../types/deep-partial.type.js";
 import type { RomTitleNameBuildStrategy } from "../../types/roms/rom-title-name-build-strategy.type.js";
 import ConsoleMetadata from "../entities/console-metadata.class.js";
 import Console from "../entities/console.class.js";
+import FileIONotFoundError from "../errors/file-io-not-found-error.class.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
 import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
@@ -120,7 +121,9 @@ class GenericDevice implements Device, Debug {
     this._registeredConsoleNames = [...envData.generic.consoles.list];
 
     this._consoles = new Map<ConsoleName, Console>();
-    for (const [, consoleEnvData] of Object.entries(envData.generic.consoles.data)) {
+    for (const [, consoleEnvData] of Object.entries(
+      envData.generic.consoles.data,
+    )) {
       const newConsole = new Console(
         consoleEnvData.name,
         new ConsoleMetadata(consoleEnvData["content-targets"].media.names),
@@ -199,11 +202,24 @@ class GenericDevice implements Device, Debug {
       }
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-        const syncedFileExists = await fs.fileExists(
-          this._paths.files.project.synced,
-        );
+        const [syncedFileExistsResult, syncedFileExistsError] =
+          await fs.fileExists(this._paths.files.project.synced);
 
-        if (syncedFileExists) {
+        if (syncedFileExistsError) {
+          logger.error(syncedFileExistsError.reason);
+          this._skipEsDeGamelistsContentTarget();
+          return;
+        }
+        if (
+          syncedFileExistsResult.error &&
+          !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+        ) {
+          logger.error(syncedFileExistsResult.error.reason);
+          this._skipEsDeGamelistsContentTarget();
+          return;
+        }
+
+        if (syncedFileExistsResult.exists) {
           const willListAllRegisteredConsoles =
             this._consoles.size === this._registeredConsoleNames.length;
 
@@ -282,11 +298,24 @@ class GenericDevice implements Device, Debug {
     }
 
     if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-      const syncedFileExists = await fs.fileExists(
-        this._paths.files.project.synced,
-      );
+      const [syncedFileExistsResult, syncedFileExistsError] =
+        await fs.fileExists(this._paths.files.project.synced);
 
-      if (syncedFileExists) {
+      if (syncedFileExistsError) {
+        logger.error(syncedFileExistsError.reason);
+        this._skipEsDeGamelistsContentTarget();
+        return;
+      }
+      if (
+        syncedFileExistsResult.error &&
+        !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+      ) {
+        logger.error(syncedFileExistsResult.error.reason);
+        this._skipEsDeGamelistsContentTarget();
+        return;
+      }
+
+      if (syncedFileExistsResult.exists) {
         logger.error(
           `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again.`,
         );
