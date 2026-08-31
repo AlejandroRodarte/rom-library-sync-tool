@@ -270,6 +270,31 @@ class GenericDevice implements Device, Debug {
       }
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
+        const [syncedFileExistsResult, syncedFileExistsError] =
+          await fs.fileExists(this._paths.files.project.synced);
+
+        if (syncedFileExistsError) {
+          logger.error(syncedFileExistsError.reason);
+          this._skipEsDeGamelistsContentTarget();
+          return;
+        }
+        if (
+          syncedFileExistsResult.error &&
+          !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+        ) {
+          logger.error(syncedFileExistsResult.error.reason);
+          this._skipEsDeGamelistsContentTarget();
+          return;
+        }
+
+        if (syncedFileExistsResult.exists) {
+          logger.error(
+            `"Synced" file exists device ${this._name}. This means the last action you did against this device was to sync it. This also means that you haven't listed all consoles yet in "list mode". Please execute that mode before attempting to diff es-de-gamelists (for data preservation). Will skip "es-de-gamelists" content target globally.`,
+          );
+          this._skipEsDeGamelistsContentTarget();
+          return;
+        }
+
         const pathsValidationError = await writeEsDeGamelistsDiffs(
           this._paths,
           this._consoles,
