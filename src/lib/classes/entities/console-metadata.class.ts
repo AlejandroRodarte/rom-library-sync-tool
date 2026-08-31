@@ -159,6 +159,26 @@ class ConsoleMetadata {
       !this._modesSkipFlags.sync["content-targets"]["es-de-gamelists"]
     );
   }
+
+  public canFullyProcessRoms(): boolean {
+    return this.canListRoms() && this.canDiffRoms() && this.canSyncRoms();
+  }
+
+  public canFullyProcessMediaName(mediaName: MediaName): boolean {
+    return (
+      this.canListMediaName(mediaName) &&
+      this.canDiffMediaName(mediaName) &&
+      this.canSyncMediaName(mediaName)
+    );
+  }
+
+  public canFullyProcessEsDeGamelist(): boolean {
+    return (
+      this.canListEsDeGamelist() &&
+      this.canDiffEsDeGamelist() &&
+      this.canSyncEsDeGamelist()
+    );
+  }
 }
 
 export default ConsoleMetadata;
