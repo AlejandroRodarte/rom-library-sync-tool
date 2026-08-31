@@ -225,8 +225,9 @@ class GenericDevice implements Device, Debug {
 
           if (!willListAllRegisteredConsoles) {
             logger.error(
-              `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again.`,
+              `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again. Will skip the "es-de-gamelists" content target in general.`,
             );
+            this._skipEsDeGamelistsContentTarget();
             return;
           }
         }
@@ -317,8 +318,9 @@ class GenericDevice implements Device, Debug {
 
       if (syncedFileExistsResult.exists) {
         logger.error(
-          `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again.`,
+          `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again. Will skip the "es-de-gamelists" content target in general.`,
         );
+        this._skipEsDeGamelistsContentTarget();
         return;
       }
 
