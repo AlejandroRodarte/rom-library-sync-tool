@@ -4,11 +4,13 @@ import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_CONSOLE_NAMES from "../../../constants/consoles/all-console-names.constant.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
+import isStringArrayASubset from "../../validation/is-string-array-a-subset.helper.js";
 
 const buildConsoleNamesFromRawValue = (
   rawConsoleNames: string | string[],
+  validConsoleNames: ConsoleName[] = [...ALL_CONSOLE_NAMES],
 ): [ConsoleName[], undefined] | [undefined, AppValidationError] => {
-  const modeConsoleNames: ConsoleName[] = [];
+  const consoleNames: ConsoleName[] = [];
 
   if (typeof rawConsoleNames === "string") {
     if (!typeGuards.isAllOrNone(rawConsoleNames))
@@ -21,7 +23,7 @@ const buildConsoleNamesFromRawValue = (
 
     switch (rawConsoleNames) {
       case ALL:
-        modeConsoleNames.push(...ALL_CONSOLE_NAMES);
+        consoleNames.push(...[...validConsoleNames]);
         break;
       case NONE:
         break;
@@ -35,10 +37,18 @@ const buildConsoleNamesFromRawValue = (
         ),
       ];
 
-    modeConsoleNames.push(...rawConsoleNames);
+    if (!isStringArrayASubset(validConsoleNames, rawConsoleNames))
+      return [
+        undefined,
+        new AppValidationError(
+          `Tried to build a console name list based on the following "official list": ${validConsoleNames.join(", ")}. However, the real list has console names that are NOT part of the official list: ${rawConsoleNames.join(", ")}. Please make sure that the "real list" is a subset of the "official list".`,
+        ),
+      ];
+
+    consoleNames.push(...[...rawConsoleNames]);
   }
 
-  return [modeConsoleNames, undefined];
+  return [consoleNames, undefined];
 };
 
 export default buildConsoleNamesFromRawValue;

@@ -4,9 +4,11 @@ import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_MEDIA_NAMES from "../../../constants/media/all-media-names.constant.js";
 import type { MediaName } from "../../../types/media/media-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
+import isStringArrayASubset from "../../validation/is-string-array-a-subset.helper.js";
 
 const buildMediaNamesFromRawValue = (
   rawMediaNames: string | string[],
+  validMediaNames: MediaName[] = [...ALL_MEDIA_NAMES],
 ): [MediaName[], undefined] | [undefined, AppValidationError] => {
   const mediaNames: MediaName[] = [];
 
@@ -21,7 +23,7 @@ const buildMediaNamesFromRawValue = (
 
     switch (rawMediaNames) {
       case ALL:
-        mediaNames.push(...ALL_MEDIA_NAMES);
+        mediaNames.push(...[...validMediaNames]);
         break;
       case NONE:
         break;
@@ -35,7 +37,15 @@ const buildMediaNamesFromRawValue = (
         ),
       ];
 
-    mediaNames.push(...rawMediaNames);
+    if (!isStringArrayASubset(validMediaNames, rawMediaNames))
+      return [
+        undefined,
+        new AppValidationError(
+          `Attempted to create media name list based on the following "official list": ${validMediaNames.join(", ")}. However, the "real list" provided has elements that are NOT in the official list: ${rawMediaNames.join(", ")}. Please make the "real list" be a subset of the "official list".`,
+        ),
+      ];
+
+    mediaNames.push(...[...rawMediaNames]);
   }
 
   return [mediaNames, undefined];

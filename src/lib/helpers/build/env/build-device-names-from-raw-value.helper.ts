@@ -4,8 +4,8 @@ import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import typeGuards from "../../typescript/guards/index.js";
 
 const buildDeviceNamesFromRawValue = (
-  registeredDeviceNames: string[],
   rawDeviceNames: string | string[],
+  validDeviceNames: string[],
 ): [string[], undefined] | [undefined, AppValidationError] => {
   const modeDeviceNames: string[] = [];
 
@@ -20,30 +20,30 @@ const buildDeviceNamesFromRawValue = (
 
     switch (rawDeviceNames) {
       case ALL:
-        modeDeviceNames.push(...registeredDeviceNames);
+        modeDeviceNames.push(...[...validDeviceNames]);
         break;
       case NONE:
         break;
     }
   } else {
-    if (rawDeviceNames.length > registeredDeviceNames.length)
+    if (rawDeviceNames.length > validDeviceNames.length)
       return [
         undefined,
         new AppValidationError(
-          `You listed ${rawDeviceNames.length} devices, when you only registered data for ${registeredDeviceNames.length} of them.`,
+          `You listed ${rawDeviceNames.length} devices, when you only registered data for ${validDeviceNames.length} of them.`,
         ),
       ];
 
     for (const rawListDeviceName of rawDeviceNames)
-      if (!registeredDeviceNames.includes(rawListDeviceName))
+      if (!validDeviceNames.includes(rawListDeviceName))
         return [
           undefined,
           new AppValidationError(
-            `You provided data for these devices: ${registeredDeviceNames.join(", ")}. Device ${rawListDeviceName} is NOT part of this list.`,
+            `You provided data for these devices: ${validDeviceNames.join(", ")}. Device ${rawListDeviceName} is NOT part of this list.`,
           ),
         ];
 
-    modeDeviceNames.push(...rawDeviceNames);
+    modeDeviceNames.push(...[...rawDeviceNames]);
   }
 
   return [modeDeviceNames, undefined];

@@ -4,9 +4,11 @@ import { ALL, NONE } from "../../../constants/all-none-rest.constants.js";
 import ALL_CONTENT_TARGET_NAMES from "../../../constants/content-targets/all-content-target-names.constant.js";
 import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
 import typeGuards from "../../typescript/guards/index.js";
+import isStringArrayASubset from "../../validation/is-string-array-a-subset.helper.js";
 
 const buildContentTargetNamesFromRawValue = (
   rawContentTargetNames: string | string[],
+  validContentTargetNames: ContentTargetName[] = [...ALL_CONTENT_TARGET_NAMES],
 ): [ContentTargetName[], undefined] | [undefined, AppValidationError] => {
   const contentTargetNames: ContentTargetName[] = [];
   if (typeof rawContentTargetNames === "string") {
@@ -20,7 +22,7 @@ const buildContentTargetNamesFromRawValue = (
 
     switch (rawContentTargetNames) {
       case ALL:
-        contentTargetNames.push(...ALL_CONTENT_TARGET_NAMES);
+        contentTargetNames.push(...[...validContentTargetNames]);
         break;
       case NONE:
         break;
@@ -34,7 +36,15 @@ const buildContentTargetNamesFromRawValue = (
         ),
       ];
 
-    contentTargetNames.push(...rawContentTargetNames);
+    if (!isStringArrayASubset(validContentTargetNames, rawContentTargetNames))
+      return [
+        undefined,
+        new AppValidationError(
+          `Attempted to build a content target name list based on the following "official list": ${validContentTargetNames.join(", ")}. However, the "real list" has elements that are NOT part of the official list: ${rawContentTargetNames.join(", ")}. Please make sure the "real list" is a subset of the "official list".`,
+        ),
+      ];
+
+    contentTargetNames.push(...[...rawContentTargetNames]);
   }
 
   return [contentTargetNames, undefined];

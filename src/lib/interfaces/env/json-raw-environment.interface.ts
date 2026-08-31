@@ -1,3 +1,5 @@
+import type { RawConsolesMediaNames } from "../../types/env/raw-consoles-media-names.type.js";
+
 export interface JsonRawEnvironment {
   options: {
     log: {
@@ -15,9 +17,12 @@ export interface JsonRawEnvironment {
   };
   device: {
     names: {
-      list: string | string[];
-      diff: string | string[];
-      sync: string | string[];
+      list: string[];
+      modes: {
+        list: string | string[];
+        diff: string | string[];
+        sync: string | string[];
+      };
     };
     data: {
       [deviceName: string]: {
@@ -34,33 +39,30 @@ export interface JsonRawEnvironment {
         };
         consoles: {
           names: {
-            list: string | string[];
-            diff: string | string[];
-            sync: string | string[];
+            list: string[];
+            modes: {
+              list: string | string[];
+              diff: string | string[];
+              sync: string | string[];
+            };
           };
           media: {
-            list:
-              | string
-              | {
-                  [consoleNameAllNoneOrRest: string]: string | string[];
-                };
-            diff:
-              | string
-              | {
-                  [consoleNameAllNoneOrRest: string]: string | string[];
-                };
-            sync:
-              | string
-              | {
-                  [consoleNameAllNoneOrRest: string]: string | string[];
-                };
+            list: RawConsolesMediaNames;
+            modes: {
+              list: RawConsolesMediaNames;
+              diff: RawConsolesMediaNames;
+              sync: RawConsolesMediaNames;
+            };
           };
         };
         "content-targets": {
           names: {
-            list: string | string[];
-            diff: string | string[];
-            sync: string | string[];
+            list: string[];
+            modes: {
+              list: string | string[];
+              diff: string | string[];
+              sync: string | string[];
+            };
           };
           paths: {
             [contentTargetName: string]: string;

@@ -8,8 +8,6 @@ import type { JsonRawEnvironment } from "../../../interfaces/env/json-raw-enviro
 import typeGuards from "../../typescript/guards/index.js";
 import validation from "../../validation/index.js";
 import type { GenericDeviceConsolesEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
-import { NONE } from "../../../constants/all-none-rest.constants.js";
-import populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject from "../../classes/devices/generic-device/populate/populate-generic-devices-consoles-env-data-media-names-from-raw-object.helper.js";
 import ALL_FILE_IO_STRATEGIES from "../../../constants/file-io/all-file-io-strategies.constant.js";
 import ALL_FILE_IO_FS_CRUD_STRATEGIES from "../../../constants/file-io/all-file-io-fs-crud-strategies.constant.js";
 import buildDeviceConsolesEnvDataFromModes from "./build-device-consoles-env-data-from-modes.helper.js";
@@ -22,6 +20,10 @@ import type { ContentTargetName } from "../../../types/content-targets/content-t
 import buildContentTargetNamesFromModes from "./build-content-target-names-from-modes.helper.js";
 import readFileSync from "../../wrappers/modules/fs/read-file-sync.helper.js";
 import { DATA_DIR_PATH } from "../../../constants/paths.constants.js";
+import isStringArrayASubset from "../../validation/is-string-array-a-subset.helper.js";
+import buildConsolesMediaNamesFromRawValue from "./build-consoles-media-names-from-raw-value.helper.js";
+import ALL_MEDIA_NAMES from "../../../constants/media/all-media-names.constant.js";
+import AppNotFoundError from "../../../classes/errors/app-not-found-error.class.js";
 
 const buildEnvironment = (): Environment => {
   const [environmentFileRawContent, readFileError] = readFileSync(
@@ -78,26 +80,36 @@ const buildEnvironment = (): Environment => {
 
   /**
    * device.names.list
+   **/
+  const officialDeviceNames = jsonRawEnvironment.device.names.list;
+
+  if (!isStringArrayASubset(dataDeviceNames, officialDeviceNames))
+    throw new AppValidationError(
+      `You provided data for the following devices: ${dataDeviceNames.join(", ")}. However, you are telling the program that "${officialDeviceNames.join(", ")}" is the official list of devices you want to work with. Please make your "official" device list a subset of the device list you actually provide data for.`,
+    );
+
+  /**
+   * device.names.modes.list
    */
-  const rawListDeviceNames = jsonRawEnvironment.device.names.list;
+  const rawListDeviceNames = jsonRawEnvironment.device.names.modes.list;
   const [listDeviceNames, listDeviceNamesValidationError] =
-    buildDeviceNamesFromRawValue(dataDeviceNames, rawListDeviceNames);
+    buildDeviceNamesFromRawValue(rawListDeviceNames, officialDeviceNames);
   if (listDeviceNamesValidationError) throw listDeviceNamesValidationError;
 
   /**
-   * device.names.diff
+   * device.names.modes.diff
    **/
-  const rawDiffDeviceNames = jsonRawEnvironment.device.names.diff;
+  const rawDiffDeviceNames = jsonRawEnvironment.device.names.modes.diff;
   const [diffDeviceNames, diffDeviceNamesValidationError] =
-    buildDeviceNamesFromRawValue(dataDeviceNames, rawDiffDeviceNames);
+    buildDeviceNamesFromRawValue(rawDiffDeviceNames, officialDeviceNames);
   if (diffDeviceNamesValidationError) throw diffDeviceNamesValidationError;
 
   /**
-   * device.names.sync
+   * device.names.modes.sync
    **/
-  const rawSyncDeviceNames = jsonRawEnvironment.device.names.sync;
+  const rawSyncDeviceNames = jsonRawEnvironment.device.names.modes.sync;
   const [syncDeviceNames, syncDeviceNamesValidationError] =
-    buildDeviceNamesFromRawValue(dataDeviceNames, rawSyncDeviceNames);
+    buildDeviceNamesFromRawValue(rawSyncDeviceNames, officialDeviceNames);
   if (syncDeviceNamesValidationError) throw syncDeviceNamesValidationError;
 
   /**
@@ -108,9 +120,15 @@ const buildEnvironment = (): Environment => {
   /**
    * device.data["<device-name>"]
    **/
-  for (const [deviceName, deviceData] of Object.entries(
-    jsonRawEnvironment.device.data,
-  )) {
+  for (const officialDeviceName of officialDeviceNames) {
+    console.log(`processing device ${officialDeviceName}`);
+    const deviceData = jsonRawEnvironment.device.data[officialDeviceName];
+
+    if (!deviceData)
+      throw new AppNotFoundError(
+        `Data absent for device ${officialDeviceName}. This should be unreachable.`,
+      );
+
     /**
      * device.populate.games.titleName.build.strategy.name
      **/
@@ -122,27 +140,35 @@ const buildEnvironment = (): Environment => {
       );
 
     /**
-     * device.data["<device-name>"].consoles.names.list
+     * device.data["<device-name>"].console.names.list
      **/
-    const rawListConsoleNames = deviceData.consoles.names.list;
+    const rawConsoleNames = deviceData.consoles.names.list;
+    const [consoleNames, consoleNamesValidationError] =
+      buildConsoleNamesFromRawValue(rawConsoleNames);
+    if (consoleNamesValidationError) throw consoleNamesValidationError;
+
+    /**
+     * device.data["<device-name>"].consoles.names.modes.list
+     **/
+    const rawListConsoleNames = deviceData.consoles.names.modes.list;
     const [listConsoleNames, listConsoleNamesValidationError] =
-      buildConsoleNamesFromRawValue(rawListConsoleNames);
+      buildConsoleNamesFromRawValue(rawListConsoleNames, consoleNames);
     if (listConsoleNamesValidationError) throw listConsoleNamesValidationError;
 
     /**
-     * device.data["<device-name>"].consoles.names.diff
+     * device.data["<device-name>"].consoles.names.modes.diff
      **/
-    const rawDiffConsoleNames = deviceData.consoles.names.diff;
+    const rawDiffConsoleNames = deviceData.consoles.names.modes.diff;
     const [diffConsoleNames, diffConsoleNamesValidationError] =
-      buildConsoleNamesFromRawValue(rawDiffConsoleNames);
+      buildConsoleNamesFromRawValue(rawDiffConsoleNames, listConsoleNames);
     if (diffConsoleNamesValidationError) throw diffConsoleNamesValidationError;
 
     /**
-     * device.data["<device-name>"].consoles.names.sync
+     * device.data["<device-name>"].consoles.names.modes.sync
      **/
-    const rawSyncConsoleNames = deviceData.consoles.names.sync;
+    const rawSyncConsoleNames = deviceData.consoles.names.modes.sync;
     const [syncConsoleNames, syncConsoleNamesValidationError] =
-      buildConsoleNamesFromRawValue(rawSyncConsoleNames);
+      buildConsoleNamesFromRawValue(rawSyncConsoleNames, diffConsoleNames);
     if (syncConsoleNamesValidationError) throw syncConsoleNamesValidationError;
 
     /**
@@ -190,81 +216,123 @@ const buildEnvironment = (): Environment => {
     /**
      * device.data["<device-name>"].consoles.media.list
      **/
-    const rawListConsolesMediaNames = deviceData.consoles.media.list;
-    if (typeof rawListConsolesMediaNames === "string") {
-      if (!typeGuards.isNone(rawListConsolesMediaNames))
-        throw new AppValidationError(
-          `When console media names is provided as a single string, only the ${NONE} keyword is allowed.`,
-        );
-    } else {
-      const setListConsolesMediaNamesError =
-        populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject(
-          listConsolesEnvData,
-          rawListConsolesMediaNames,
-        );
-      if (setListConsolesMediaNamesError) throw setListConsolesMediaNamesError;
-    }
+    const rawConsolesMediaNames = deviceData.consoles.media.list;
+    const [consolesMediaNames, buildConsolesMediaNamesValidationError] =
+      buildConsolesMediaNamesFromRawValue(
+        rawConsolesMediaNames,
+        new Map(consoleNames.map((c) => [c, [...ALL_MEDIA_NAMES]])),
+      );
+    if (buildConsolesMediaNamesValidationError)
+      throw buildConsolesMediaNamesValidationError;
 
     /**
-     * device.data["<device-name>"].consoles.media.diff
+     * device.data["<device-name>"].consoles.media.modes.list
      **/
-    const rawDiffConsolesMediaNames = deviceData.consoles.media.diff;
-    if (typeof rawDiffConsolesMediaNames === "string") {
-      if (!typeGuards.isNone(rawDiffConsolesMediaNames))
-        throw new AppValidationError(
-          `When console media names is provided as a single string, only the ${NONE} keyword is allowed.`,
-        );
-    } else {
-      const setDiffConsolesMediaNamesError =
-        populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject(
-          diffConsolesEnvData,
-          rawDiffConsolesMediaNames,
-        );
-      if (setDiffConsolesMediaNamesError) throw setDiffConsolesMediaNamesError;
-    }
+    const rawListConsolesMediaNames = deviceData.consoles.media.modes.list;
+    const [listConsolesMediaNames, buildListConsolesMediaNamesValidationError] =
+      buildConsolesMediaNamesFromRawValue(
+        rawListConsolesMediaNames,
+        consolesMediaNames,
+      );
+    if (buildListConsolesMediaNamesValidationError)
+      throw buildListConsolesMediaNamesValidationError;
+
+    for (const [
+      listConsoleName,
+      listConsoleMediaNames,
+    ] of listConsolesMediaNames)
+      if (listConsolesEnvData[listConsoleName])
+        listConsolesEnvData[listConsoleName]["content-targets"].media.names =
+          listConsoleMediaNames;
 
     /**
-     * device.data["<device-name>"].consoles.media.sync
+     * device.data["<device-name>"].consoles.media.modes.diff
      **/
-    const rawSyncConsolesMediaNames = deviceData.consoles.media.sync;
-    if (typeof rawSyncConsolesMediaNames === "string") {
-      if (!typeGuards.isNone(rawSyncConsolesMediaNames))
-        throw new AppValidationError(
-          `When console media names is provided as a single string, only the ${NONE} keyword is allowed.`,
-        );
-    } else {
-      const setSyncConsolesMediaNamesError =
-        populateGenericDeviceConsolesEnvDataMediaNamesFromRawObject(
-          syncConsolesEnvData,
-          rawSyncConsolesMediaNames,
-        );
-      if (setSyncConsolesMediaNamesError) throw setSyncConsolesMediaNamesError;
-    }
+    const rawDiffConsolesMediaNames = deviceData.consoles.media.modes.diff;
+    const [diffConsolesMediaNames, buildDiffConsolesMediaNamesValidationError] =
+      buildConsolesMediaNamesFromRawValue(
+        rawDiffConsolesMediaNames,
+        listConsolesMediaNames,
+      );
+    if (buildDiffConsolesMediaNamesValidationError)
+      throw buildDiffConsolesMediaNamesValidationError;
+
+    for (const [
+      diffConsoleName,
+      diffConsoleMediaNames,
+    ] of diffConsolesMediaNames)
+      if (diffConsolesEnvData[diffConsoleName])
+        diffConsolesEnvData[diffConsoleName]["content-targets"].media.names =
+          diffConsoleMediaNames;
+
+    /**
+     * device.data["<device-name>"].consoles.media.modes.sync
+     **/
+    const rawSyncConsolesMediaNames = deviceData.consoles.media.modes.sync;
+    const [syncConsolesMediaNames, buildSyncConsolesMediaNamesValidationError] =
+      buildConsolesMediaNamesFromRawValue(
+        rawSyncConsolesMediaNames,
+        diffConsolesMediaNames,
+      );
+    if (buildSyncConsolesMediaNamesValidationError)
+      throw buildSyncConsolesMediaNamesValidationError;
+
+    for (const [
+      syncConsoleName,
+      syncConsoleMediaNames,
+    ] of syncConsolesMediaNames)
+      if (syncConsolesEnvData[syncConsoleName])
+        syncConsolesEnvData[syncConsoleName]["content-targets"].media.names =
+          syncConsoleMediaNames;
 
     /**
      * device.data["<device-name>"]["content-targets"].names.list
      **/
-    const rawListContentTargetNames = deviceData["content-targets"].names.list;
+    const rawOfficialContentTargetNames =
+      deviceData["content-targets"].names.list;
+    const [
+      officialContentTargetNames,
+      officialContentTargetNamesValidationError,
+    ] = buildContentTargetNamesFromRawValue(rawOfficialContentTargetNames);
+    if (officialContentTargetNamesValidationError)
+      throw officialContentTargetNamesValidationError;
+
+    /**
+     * device.data["<device-name>"]["content-targets"].names.modes.list
+     **/
+    const rawListContentTargetNames =
+      deviceData["content-targets"].names.modes.list;
     const [listContentTargetNames, listContentTargetNamesValidationError] =
-      buildContentTargetNamesFromRawValue(rawListContentTargetNames);
+      buildContentTargetNamesFromRawValue(
+        rawListContentTargetNames,
+        officialContentTargetNames,
+      );
     if (listContentTargetNamesValidationError)
       throw listContentTargetNamesValidationError;
 
     /**
-     * device.data["<device-name>"]["content-targets"].names.diff
+     * device.data["<device-name>"]["content-targets"].names.modes.diff
      **/
-    const rawDiffContentTargetNames = deviceData["content-targets"].names.diff;
+    const rawDiffContentTargetNames =
+      deviceData["content-targets"].names.modes.diff;
     const [diffContentTargetNames, diffContentTargetNamesValidationError] =
-      buildContentTargetNamesFromRawValue(rawDiffContentTargetNames);
+      buildContentTargetNamesFromRawValue(
+        rawDiffContentTargetNames,
+        listContentTargetNames,
+      );
     if (diffContentTargetNamesValidationError)
       throw diffContentTargetNamesValidationError;
 
     /**
-     * device.data["<device-name>"]["content-targets"].names.sync
+     * device.data["<device-name>"]["content-targets"].names.modes.sync
      **/
-    const rawSyncContentTargetNames = deviceData["content-targets"].names.sync;
+    const rawSyncContentTargetNames =
+      deviceData["content-targets"].names.modes.sync;
     const [syncContentTargetNames, syncContentTargetNamesValidationError] =
-      buildContentTargetNamesFromRawValue(rawSyncContentTargetNames);
+      buildContentTargetNamesFromRawValue(
+        rawSyncContentTargetNames,
+        diffContentTargetNames,
+      );
     if (syncContentTargetNamesValidationError)
       throw syncContentTargetNamesValidationError;
 
@@ -364,7 +432,7 @@ const buildEnvironment = (): Environment => {
         sync: syncConsolesEnvData,
       });
 
-    devicesData[deviceName] = {
+    devicesData[officialDeviceName] = {
       generic: {
         populate: {
           games: {
