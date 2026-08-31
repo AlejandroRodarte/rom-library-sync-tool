@@ -397,6 +397,10 @@ class GenericDevice implements Device, Debug {
         this._paths.files.project.synced,
       );
       if (createSyncedFileError) logger.error(createSyncedFileError.reason);
+
+      logger.info(
+        `All consoles had their gamelist data synced successfully. Creating empty "synced" file to prohibit a new sync.`,
+      );
     }
   };
 
