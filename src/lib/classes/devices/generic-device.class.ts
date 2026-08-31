@@ -18,6 +18,7 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import deleteFile from "../../helpers/extras/fs/delete-file.helper.js";
 import fileExists from "../../helpers/extras/fs/file-exists.helper.js";
 import filterConsolesGamesUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy.helper.js";
 import type { GenericDeviceOpts } from "../../interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
@@ -46,6 +47,7 @@ import SftpClient from "../sftp/sftp-client.class.js";
 
 const fs = {
   fileExists,
+  deleteFile,
 };
 
 const fsExtras = {
@@ -238,6 +240,31 @@ class GenericDevice implements Device, Debug {
           this._fileIOExtras,
         );
         if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
+
+        if (!syncedFileExistsResult.exists) return;
+
+        const canFullyProcessEsDeGamelistsForAllConsoles = this._consoles
+          .entries()
+          .every(([, konsole]) =>
+            konsole.metadata.canFullyProcessEsDeGamelist(),
+          );
+
+        if (!canFullyProcessEsDeGamelistsForAllConsoles) {
+          logger.error(
+            `Not all consoles for device ${this._name} had their gamelist file listed. Can't delete synced file until ALL gamelist files are listed properly.`,
+          );
+          return;
+        }
+
+        logger.info(
+          `All consoles for device ${this._name} has their gamelist file listed. Deleting "synced" file.`,
+        );
+
+        const deleteSyncedFileError = await fs.deleteFile(
+          this._paths.files.project.synced,
+        );
+
+        if (deleteSyncedFileError) logger.error(deleteSyncedFileError.reason);
       }
     },
     diffs: async () => {
