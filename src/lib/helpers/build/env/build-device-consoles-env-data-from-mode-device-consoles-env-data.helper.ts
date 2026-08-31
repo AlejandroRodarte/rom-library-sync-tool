@@ -1,3 +1,11 @@
+import {
+  DIFF,
+  DIFF_SYNC,
+  LIST,
+  LIST_DIFF,
+  LIST_DIFF_SYNC,
+  SYNC,
+} from "../../../constants/modes/mode-names.constants.js";
 import type { GenericDeviceConsolesDataEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-data-env-data.type.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
@@ -31,7 +39,7 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
   const deviceConsolesEnvData: GenericDeviceConsolesDataEnvData = {};
   for (const consoleName of consoleNames)
     switch (mode) {
-      case "list": {
+      case LIST: {
         const listConsoleEnvData = modeDeviceConsolesEnvData.list[consoleName];
         if (!listConsoleEnvData) continue;
         deviceConsolesEnvData[consoleName] = {
@@ -44,7 +52,7 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
         };
         break;
       }
-      case "diff": {
+      case DIFF: {
         const diffConsoleEnvData = modeDeviceConsolesEnvData.diff[consoleName];
         if (!diffConsoleEnvData) continue;
         deviceConsolesEnvData[consoleName] = {
@@ -57,7 +65,7 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
         };
         break;
       }
-      case "sync": {
+      case SYNC: {
         const syncConsoleEnvData = modeDeviceConsolesEnvData.sync[consoleName];
         if (!syncConsoleEnvData) continue;
         deviceConsolesEnvData[consoleName] = {
@@ -70,7 +78,26 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
         };
         break;
       }
-      case "diff-sync": {
+      case LIST_DIFF: {
+        const listConsoleEnvData = modeDeviceConsolesEnvData.list[consoleName];
+        const diffConsoleEnvData = modeDeviceConsolesEnvData.diff[consoleName];
+
+        if (!listConsoleEnvData || !diffConsoleEnvData) continue;
+
+        deviceConsolesEnvData[consoleName] = {
+          name: consoleName,
+          "content-targets": {
+            media: {
+              names: buildIntersectedStringArray(
+                listConsoleEnvData["content-targets"].media.names,
+                diffConsoleEnvData["content-targets"].media.names,
+              ),
+            },
+          },
+        };
+        break;
+      }
+      case DIFF_SYNC: {
         const diffConsoleEnvData = modeDeviceConsolesEnvData.diff[consoleName];
         const syncConsoleEnvData = modeDeviceConsolesEnvData.sync[consoleName];
 
@@ -81,40 +108,20 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
           "content-targets": {
             media: {
               names: buildIntersectedStringArray(
+                syncConsoleEnvData["content-targets"].media.names,
                 diffConsoleEnvData["content-targets"].media.names,
-                syncConsoleEnvData["content-targets"].media.names,
               ),
             },
           },
         };
         break;
       }
-      case "sync-list": {
-        const syncConsoleEnvData = modeDeviceConsolesEnvData.sync[consoleName];
+      case LIST_DIFF_SYNC: {
         const listConsoleEnvData = modeDeviceConsolesEnvData.list[consoleName];
-
-        if (!listConsoleEnvData || !syncConsoleEnvData) continue;
-
-        deviceConsolesEnvData[consoleName] = {
-          name: consoleName,
-          "content-targets": {
-            media: {
-              names: buildIntersectedStringArray(
-                syncConsoleEnvData["content-targets"].media.names,
-                listConsoleEnvData["content-targets"].media.names,
-              ),
-            },
-          },
-        };
-        break;
-      }
-      case "diff-sync-list":
-      case "list-diff-sync-list": {
         const diffConsoleEnvData = modeDeviceConsolesEnvData.diff[consoleName];
         const syncConsoleEnvData = modeDeviceConsolesEnvData.sync[consoleName];
-        const listConsoleEnvData = modeDeviceConsolesEnvData.list[consoleName];
 
-        if (!diffConsoleEnvData || !syncConsoleEnvData || !listConsoleEnvData)
+        if (!listConsoleEnvData || !diffConsoleEnvData || !syncConsoleEnvData)
           continue;
 
         deviceConsolesEnvData[consoleName] = {
@@ -122,10 +129,10 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
           "content-targets": {
             media: {
               names: buildIntersectedStringArray(
-                diffConsoleEnvData["content-targets"].media.names,
+                listConsoleEnvData["content-targets"].media.names,
                 buildIntersectedStringArray(
+                  diffConsoleEnvData["content-targets"].media.names,
                   syncConsoleEnvData["content-targets"].media.names,
-                  listConsoleEnvData["content-targets"].media.names,
                 ),
               ),
             },

@@ -1,3 +1,11 @@
+import {
+  DIFF,
+  DIFF_SYNC,
+  LIST,
+  LIST_DIFF,
+  LIST_DIFF_SYNC,
+  SYNC,
+} from "../../../constants/modes/mode-names.constants.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
 import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
@@ -13,38 +21,37 @@ const buildConsoleNamesFromModes = (
   let consoleNames: ConsoleName[] = [];
 
   switch (mode) {
-    case "list": {
+    case LIST: {
       consoleNames = modeConsoleNames.list;
       break;
     }
-    case "diff": {
+    case DIFF: {
       consoleNames = modeConsoleNames.diff;
       break;
     }
-    case "sync": {
+    case SYNC: {
       consoleNames = modeConsoleNames.sync;
       break;
     }
-    case "diff-sync": {
+    case LIST_DIFF: {
       consoleNames = buildIntersectedStringArray(
-        modeConsoleNames.diff,
-        modeConsoleNames.sync,
-      );
-      break;
-    }
-    case "sync-list": {
-      consoleNames = buildIntersectedStringArray(
-        modeConsoleNames.sync,
         modeConsoleNames.list,
+        modeConsoleNames.diff,
       );
       break;
     }
-    case "diff-sync-list":
-    case "list-diff-sync-list": {
+    case DIFF_SYNC: {
       consoleNames = buildIntersectedStringArray(
         modeConsoleNames.diff,
+        modeConsoleNames.sync,
+      );
+      break;
+    }
+    case LIST_DIFF_SYNC: {
+      consoleNames = buildIntersectedStringArray(
+        modeConsoleNames.list,
         buildIntersectedStringArray(
-          modeConsoleNames.list,
+          modeConsoleNames.diff,
           modeConsoleNames.sync,
         ),
       );

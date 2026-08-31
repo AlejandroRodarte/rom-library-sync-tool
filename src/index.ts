@@ -1,4 +1,12 @@
 import GenericDevice from "./lib/classes/devices/generic-device.class.js";
+import {
+  DIFF,
+  DIFF_SYNC,
+  LIST,
+  LIST_DIFF,
+  LIST_DIFF_SYNC,
+  SYNC,
+} from "./lib/constants/modes/mode-names.constants.js";
 import modes from "./lib/helpers/modes/index.js";
 import type { GenericDeviceOpts } from "./lib/interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
 import type { Debug } from "./lib/interfaces/debug.interface.js";
@@ -54,33 +62,27 @@ const main = async () => {
     }
 
     switch (mode) {
-      case "list":
+      case LIST:
         await modes.list(device);
         break;
-      case "diff":
+      case DIFF:
         await modes.diff(device);
         break;
-      case "sync":
+      case SYNC:
         await modes.sync(device);
         break;
-      case "diff-sync":
-        await modes.diff(device);
-        await modes.sync(device);
-        break;
-      case "sync-list":
-        await modes.sync(device);
+      case LIST_DIFF:
         await modes.list(device);
+        await modes.diff(device);
         break;
-      case "diff-sync-list":
+      case DIFF_SYNC:
         await modes.diff(device);
         await modes.sync(device);
-        await modes.list(device);
         break;
-      case "list-diff-sync-list":
+      case LIST_DIFF_SYNC:
         await modes.list(device);
         await modes.diff(device);
         await modes.sync(device);
-        await modes.list(device);
         break;
     }
 

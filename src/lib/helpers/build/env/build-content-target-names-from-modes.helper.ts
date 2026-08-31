@@ -1,3 +1,11 @@
+import {
+  DIFF,
+  DIFF_SYNC,
+  LIST,
+  LIST_DIFF,
+  LIST_DIFF_SYNC,
+  SYNC,
+} from "../../../constants/modes/mode-names.constants.js";
 import type { ContentTargetName } from "../../../types/content-targets/content-target-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
 import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
@@ -13,38 +21,37 @@ const buildContentTargetNamesFromModes = (
   let contentTargetNames: ContentTargetName[] = [];
 
   switch (mode) {
-    case "list": {
+    case LIST: {
       contentTargetNames = modeContentTargetNames.list;
       break;
     }
-    case "diff": {
+    case DIFF: {
       contentTargetNames = modeContentTargetNames.diff;
       break;
     }
-    case "sync": {
+    case SYNC: {
       contentTargetNames = modeContentTargetNames.sync;
       break;
     }
-    case "diff-sync": {
+    case LIST_DIFF: {
       contentTargetNames = buildIntersectedStringArray(
-        modeContentTargetNames.diff,
-        modeContentTargetNames.sync,
-      );
-      break;
-    }
-    case "sync-list": {
-      contentTargetNames = buildIntersectedStringArray(
-        modeContentTargetNames.sync,
         modeContentTargetNames.list,
+        modeContentTargetNames.diff,
       );
       break;
     }
-    case "diff-sync-list":
-    case "list-diff-sync-list": {
+    case DIFF_SYNC: {
       contentTargetNames = buildIntersectedStringArray(
         modeContentTargetNames.diff,
+        modeContentTargetNames.sync,
+      );
+      break;
+    }
+    case LIST_DIFF_SYNC: {
+      contentTargetNames = buildIntersectedStringArray(
+        modeContentTargetNames.list,
         buildIntersectedStringArray(
-          modeContentTargetNames.list,
+          modeContentTargetNames.diff,
           modeContentTargetNames.sync,
         ),
       );
