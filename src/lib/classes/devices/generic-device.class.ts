@@ -46,15 +46,12 @@ import Fs from "../file-io/fs.class.js";
 import Sftp from "../file-io/sftp.class.js";
 import SftpClient from "../sftp/sftp-client.class.js";
 
-const fs = {
-  fileExists,
-  deleteFile,
-};
-
 const fsExtras = {
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
   createEmptyFile,
+  fileExists,
+  deleteFile,
 };
 
 export type BuildStaticMethodError = FileIOConnectMethodError;
@@ -207,7 +204,7 @@ class GenericDevice implements Device, Debug {
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
         const [syncedFileExistsResult, syncedFileExistsError] =
-          await fs.fileExists(this._paths.files.project.synced);
+          await fsExtras.fileExists(this._paths.files.project.synced);
 
         if (syncedFileExistsError) {
           logger.error(syncedFileExistsError.reason);
@@ -262,7 +259,7 @@ class GenericDevice implements Device, Debug {
           `All consoles for device ${this._name} has their gamelist file listed. Deleting "synced" file.`,
         );
 
-        const deleteSyncedFileError = await fs.deleteFile(
+        const deleteSyncedFileError = await fsExtras.deleteFile(
           this._paths.files.project.synced,
         );
 
@@ -300,7 +297,7 @@ class GenericDevice implements Device, Debug {
 
       if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
         const [syncedFileExistsResult, syncedFileExistsError] =
-          await fs.fileExists(this._paths.files.project.synced);
+          await fsExtras.fileExists(this._paths.files.project.synced);
 
         if (syncedFileExistsError) {
           logger.error(syncedFileExistsError.reason);
@@ -354,7 +351,7 @@ class GenericDevice implements Device, Debug {
 
     if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
       const [syncedFileExistsResult, syncedFileExistsError] =
-        await fs.fileExists(this._paths.files.project.synced);
+        await fsExtras.fileExists(this._paths.files.project.synced);
 
       if (syncedFileExistsError) {
         logger.error(syncedFileExistsError.reason);
