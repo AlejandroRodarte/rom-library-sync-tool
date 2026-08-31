@@ -1,4 +1,3 @@
-import ALL_CONSOLE_NAMES from "../../constants/consoles/all-console-names.constant.js";
 import {
   FS,
   SFTP,
@@ -59,6 +58,7 @@ class GenericDevice implements Device, Debug {
   private _name: string;
   private _opts: GenericDeviceOpts;
   private _paths: GenericDevicePaths;
+  private _registeredConsoleNames: ConsoleName[];
   private _consoles: Consoles;
   private _contentTargetSkipFlags: ContentTargetContent<boolean>;
   private _titleNameBuildStrategy: RomTitleNameBuildStrategy;
@@ -116,6 +116,8 @@ class GenericDevice implements Device, Debug {
     }
 
     this._fileIOExtras = new FileIOExtras(fileIO);
+
+    this._registeredConsoleNames = [...envData.generic.consoles.list];
 
     this._consoles = new Map<ConsoleName, Console>();
     for (const [, consoleEnvData] of Object.entries(envData.generic.consoles.data)) {
@@ -202,10 +204,10 @@ class GenericDevice implements Device, Debug {
         );
 
         if (syncedFileExists) {
-          const willListAllConsoles =
-            this._consoles.size === ALL_CONSOLE_NAMES.length;
+          const willListAllRegisteredConsoles =
+            this._consoles.size === this._registeredConsoleNames.length;
 
-          if (!willListAllConsoles) {
+          if (!willListAllRegisteredConsoles) {
             logger.error(
               `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again.`,
             );
