@@ -18,6 +18,7 @@ import populateConsolesMedias from "../../helpers/classes/devices/generic-device
 import syncEsDeGamelists from "../../helpers/classes/devices/generic-device/sync/sync-es-de-gamelists.helper.js";
 import syncMedia from "../../helpers/classes/devices/generic-device/sync/sync-media.helper.js";
 import syncRoms from "../../helpers/classes/devices/generic-device/sync/sync-roms.helper.js";
+import createEmptyFile from "../../helpers/extras/fs/create-empty-file.helper.js";
 import deleteFile from "../../helpers/extras/fs/delete-file.helper.js";
 import fileExists from "../../helpers/extras/fs/file-exists.helper.js";
 import filterConsolesGamesUsingDefaultStrategy from "../../helpers/mutate/consoles/filters/filter-consoles-games-using-default-strategy.helper.js";
@@ -53,6 +54,7 @@ const fs = {
 const fsExtras = {
   writeDuplicateRomsFile,
   writeScrappedRomsFile,
+  createEmptyFile,
 };
 
 export type BuildStaticMethodError = FileIOConnectMethodError;
@@ -382,6 +384,22 @@ class GenericDevice implements Device, Debug {
         this._fileIOExtras,
       );
       if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
+
+      const canFullyProcessEsDeGamelistForAllConsoles = this._consoles
+        .entries()
+        .every(([, konsole]) => konsole.metadata.canFullyProcessEsDeGamelist());
+
+      if (!canFullyProcessEsDeGamelistForAllConsoles) {
+        logger.error(
+          `Some consoles from device ${this._name} failed to sync their gamelist file properly. Will NOT create "synced" file until ALL consoles have their es-de-gamelist file synced.`,
+        );
+        return;
+      }
+
+      const createSyncedFileError = await fsExtras.createEmptyFile(
+        this._paths.files.project.synced,
+      );
+      if (createSyncedFileError) logger.error(createSyncedFileError.reason);
     }
   };
 
