@@ -118,7 +118,7 @@ class GenericDevice implements Device, Debug {
     this._fileIOExtras = new FileIOExtras(fileIO);
 
     this._consoles = new Map<ConsoleName, Console>();
-    for (const [, consoleEnvData] of Object.entries(envData.generic.consoles)) {
+    for (const [, consoleEnvData] of Object.entries(envData.generic.consoles.data)) {
       const newConsole = new Console(
         consoleEnvData.name,
         new ConsoleMetadata(consoleEnvData["content-targets"].media.names),

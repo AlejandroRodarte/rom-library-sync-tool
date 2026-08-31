@@ -10,7 +10,7 @@ import type { DeviceEnvDataToGenericDevicePathsFn } from "../../../../../../type
 
 const buildGenericDevicePathsUsingDefaultStrategy: DeviceEnvDataToGenericDevicePathsFn =
   (name, envData): GenericDevicePaths => {
-    const consolesEnvData = envData.generic.consoles;
+    const consolesEnvData = envData.generic.consoles.data;
     const contentTargetPaths = envData.generic["content-targets"].paths;
 
     const consoleNames: ConsoleName[] = [];

@@ -7,7 +7,6 @@ import type { Environment } from "../../../interfaces/env/environment.interface.
 import type { JsonRawEnvironment } from "../../../interfaces/env/json-raw-environment.interface.js";
 import typeGuards from "../../typescript/guards/index.js";
 import validation from "../../validation/index.js";
-import type { GenericDeviceConsolesEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
 import ALL_FILE_IO_STRATEGIES from "../../../constants/file-io/all-file-io-strategies.constant.js";
 import ALL_FILE_IO_FS_CRUD_STRATEGIES from "../../../constants/file-io/all-file-io-fs-crud-strategies.constant.js";
 import buildDeviceConsolesEnvDataFromModes from "./build-device-consoles-env-data-from-modes.helper.js";
@@ -24,6 +23,7 @@ import isStringArrayASubset from "../../validation/is-string-array-a-subset.help
 import buildConsolesMediaNamesFromRawValue from "./build-consoles-media-names-from-raw-value.helper.js";
 import ALL_MEDIA_NAMES from "../../../constants/media/all-media-names.constant.js";
 import AppNotFoundError from "../../../classes/errors/app-not-found-error.class.js";
+import type { GenericDeviceConsolesDataEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-data-env-data.type.js";
 
 const buildEnvironment = (): Environment => {
   const [environmentFileRawContent, readFileError] = readFileSync(
@@ -174,7 +174,7 @@ const buildEnvironment = (): Environment => {
     /**
      * device's consoles environment data for list mode
      **/
-    const listConsolesEnvData: GenericDeviceConsolesEnvData = {};
+    const listConsolesEnvData: GenericDeviceConsolesDataEnvData = {};
     for (const listConsoleName of listConsoleNames)
       listConsolesEnvData[listConsoleName] = {
         name: listConsoleName,
@@ -188,7 +188,7 @@ const buildEnvironment = (): Environment => {
     /**
      * device's consoles environment data for diff mode
      **/
-    const diffConsolesEnvData: GenericDeviceConsolesEnvData = {};
+    const diffConsolesEnvData: GenericDeviceConsolesDataEnvData = {};
     for (const diffConsoleName of diffConsoleNames)
       diffConsolesEnvData[diffConsoleName] = {
         name: diffConsoleName,
@@ -202,7 +202,7 @@ const buildEnvironment = (): Environment => {
     /**
      * device's consoles environment data for sync mode
      **/
-    const syncConsolesEnvData: GenericDeviceConsolesEnvData = {};
+    const syncConsolesEnvData: GenericDeviceConsolesDataEnvData = {};
     for (const syncConsoleName of syncConsoleNames)
       syncConsolesEnvData[syncConsoleName] = {
         name: syncConsoleName,
@@ -425,7 +425,7 @@ const buildEnvironment = (): Environment => {
     /**
      * filtered device consoles env data, depending on mode
      **/
-    const deviceConsolesEnvData: GenericDeviceConsolesEnvData =
+    const deviceConsolesEnvData: GenericDeviceConsolesDataEnvData =
       buildDeviceConsolesEnvDataFromModes(mode, {
         list: listConsolesEnvData,
         diff: diffConsolesEnvData,
@@ -441,7 +441,10 @@ const buildEnvironment = (): Environment => {
             },
           },
         },
-        consoles: deviceConsolesEnvData,
+        consoles: {
+          list: consoleNames,
+          data: deviceConsolesEnvData,
+        },
         "content-targets": {
           names: contentTargetNames,
           paths: contentTargetPaths,

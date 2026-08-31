@@ -1,4 +1,4 @@
-import type { GenericDeviceConsolesEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-env-data.type.js";
+import type { GenericDeviceConsolesDataEnvData } from "../../../types/classes/devices/generic-device/env/generic-device-consoles-data-env-data.type.js";
 import type { ConsoleName } from "../../../types/consoles/console-name.type.js";
 import type { ModeName } from "../../../types/modes/mode-name.type.js";
 import buildIntersectedStringArray from "../build-intersected-string-array.helper.js";
@@ -7,11 +7,11 @@ import buildConsoleNamesFromModes from "./build-console-names-from-modes.helper.
 const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
   mode: ModeName,
   modeDeviceConsolesEnvData: {
-    list: GenericDeviceConsolesEnvData;
-    diff: GenericDeviceConsolesEnvData;
-    sync: GenericDeviceConsolesEnvData;
+    list: GenericDeviceConsolesDataEnvData;
+    diff: GenericDeviceConsolesDataEnvData;
+    sync: GenericDeviceConsolesDataEnvData;
   },
-): GenericDeviceConsolesEnvData => {
+): GenericDeviceConsolesDataEnvData => {
   const listConsoleNames: ConsoleName[] = Object.entries(
     modeDeviceConsolesEnvData.list,
   ).map(([, cd]) => cd.name);
@@ -28,7 +28,7 @@ const buildDeviceConsolesEnvDataFromModeDeviceConsolesEnvData = (
     sync: syncConsoleNames,
   });
 
-  const deviceConsolesEnvData: GenericDeviceConsolesEnvData = {};
+  const deviceConsolesEnvData: GenericDeviceConsolesDataEnvData = {};
   for (const consoleName of consoleNames)
     switch (mode) {
       case "list": {
