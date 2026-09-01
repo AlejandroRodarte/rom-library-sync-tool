@@ -50,7 +50,7 @@ const writeMediaDiffs = async (
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;
 
-    konsole.metadata.skipGlobalMediaName(op.media.name);
+    konsole.metadata.contentTargetSkipFlags.skipMediaName(op.media.name);
   }
 };
 

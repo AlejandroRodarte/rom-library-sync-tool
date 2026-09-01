@@ -25,7 +25,10 @@ const buildSyncMediaOperations = (
       continue;
 
     for (const mediaName of konsole.metadata.mediaNames) {
-      if (!konsole.metadata.canSyncMediaName(mediaName)) continue;
+      if (
+        !konsole.metadata.contentTargetSkipFlags.canProcessMediaName(mediaName)
+      )
+        continue;
 
       const projectConsoleMediaNameDiffFilePath =
         projectConsoleMediaDiffFilePaths[mediaName];

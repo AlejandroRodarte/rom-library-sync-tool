@@ -10,7 +10,7 @@ const buildSyncRomsOperations = (
   const ops: SyncRomsOperation[] = [];
 
   for (const [, konsole] of consoles) {
-    if (!konsole.metadata.canSyncRoms()) continue;
+    if (!konsole.metadata.contentTargetSkipFlags.canProcessRoms()) continue;
 
     const projectConsoleDiffRomsFilePath =
       paths.files.project.diffs.roms.consoles[konsole.name];

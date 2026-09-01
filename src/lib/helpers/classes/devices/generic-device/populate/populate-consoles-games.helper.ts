@@ -3,7 +3,10 @@ import Title from "../../../../../classes/entities/title.class.js";
 import type AppConversionError from "../../../../../classes/errors/app-conversion-error.class.js";
 import { DIR, FILE } from "../../../../../constants/fs/fs-types.constants.js";
 import { READ } from "../../../../../constants/rights/rights.constants.js";
-import { ES_DE_GAMELIST_NAME, ROM_FILENAME } from "../../../../../constants/roms/rom-title-name-build-strategies.constants.js";
+import {
+  ES_DE_GAMELIST_NAME,
+  ROM_FILENAME,
+} from "../../../../../constants/roms/rom-title-name-build-strategies.constants.js";
 import type { Rom } from "../../../../../interfaces/roms/rom.interface.js";
 import databasePaths from "../../../../../objects/database-paths.object.js";
 import logger from "../../../../../objects/logger.object.js";
@@ -33,12 +36,12 @@ const populateConsolesGames = async (
     );
 
     if (dbPathExistsError) {
-      konsole.metadata.skipGlobal();
+      konsole.metadata.contentTargetSkipFlags.skipAllContentTargets();
       continue;
     }
 
     if (!dbPathExistsResult.exists) {
-      konsole.metadata.skipGlobal();
+      konsole.metadata.contentTargetSkipFlags.skipAllContentTargets();
       continue;
     }
 
@@ -48,7 +51,7 @@ const populateConsolesGames = async (
     });
 
     if (readdirError) {
-      konsole.metadata.skipGlobal();
+      konsole.metadata.contentTargetSkipFlags.skipAllContentTargets();
       continue;
     }
 

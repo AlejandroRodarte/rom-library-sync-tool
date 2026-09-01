@@ -9,7 +9,8 @@ const buildWriteEsDeGamelistsDiffOperations = (
   const ops: WriteEsDeGamelistsDiffOperation[] = [];
 
   for (const [, konsole] of consoles) {
-    if (!konsole.metadata.canDiffEsDeGamelist()) continue;
+    if (!konsole.metadata.contentTargetSkipFlags.canProcessEsDeGamelist())
+      continue;
 
     const projectConsoleEsDeGamelistListFilePath =
       paths.files.project.lists["es-de-gamelists"].consoles[konsole.name];

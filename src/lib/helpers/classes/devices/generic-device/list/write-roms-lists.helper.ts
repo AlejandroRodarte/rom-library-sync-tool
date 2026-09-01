@@ -52,7 +52,7 @@ const writeRomsLists = async (
     const konsole = consoles.get(op.names.console);
     if (!konsole) continue;
 
-    konsole.metadata.skipGlobalRoms();
+    konsole.metadata.contentTargetSkipFlags.skipRoms();
   }
 };
 

@@ -9,7 +9,8 @@ const buildSyncEsDeGamelistsOperations = (
   const ops: SyncEsDeGamelistsOperation[] = [];
 
   for (const [, konsole] of consoles) {
-    if (!konsole.metadata.canSyncEsDeGamelist()) continue;
+    if (!konsole.metadata.contentTargetSkipFlags.canProcessEsDeGamelist())
+      continue;
 
     const projectConsoleEsDeGamelistDiffFilePath =
       paths.files.project.diffs["es-de-gamelists"].consoles[konsole.name];

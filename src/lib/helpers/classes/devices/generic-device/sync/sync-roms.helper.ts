@@ -52,7 +52,7 @@ const syncRoms = async (
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;
 
-    konsole.metadata.skipGlobalRoms();
+    konsole.metadata.contentTargetSkipFlags.skipRoms();
   }
 };
 

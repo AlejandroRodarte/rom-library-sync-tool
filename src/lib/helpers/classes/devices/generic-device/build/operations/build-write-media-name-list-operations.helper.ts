@@ -17,7 +17,10 @@ const buildWriteMediaNameListOperations = (
     if (!deviceConsoleMediaDirPaths || !projectConsoleMediaFilePaths) continue;
 
     for (const mediaName of konsole.metadata.mediaNames) {
-      if (!konsole.metadata.canListMediaName(mediaName)) continue;
+      if (
+        !konsole.metadata.contentTargetSkipFlags.canProcessMediaName(mediaName)
+      )
+        continue;
 
       const deviceConsoleMediaNameDir =
         deviceConsoleMediaDirPaths.names[mediaName];

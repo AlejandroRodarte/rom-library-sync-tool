@@ -17,7 +17,10 @@ const buildWriteMediaNameDiffOperations = (
       continue;
 
     for (const [mediaName, basenameMediaEntries] of konsole.medias) {
-      if (!konsole.metadata.canDiffMediaName(mediaName)) continue;
+      if (
+        !konsole.metadata.contentTargetSkipFlags.canProcessMediaName(mediaName)
+      )
+        continue;
 
       const projectConsoleMediaNameListFilePath =
         projectConsoleMediaListFilePaths[mediaName];

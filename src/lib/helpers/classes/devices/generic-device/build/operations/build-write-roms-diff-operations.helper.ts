@@ -9,7 +9,7 @@ const buildWriteRomsDiffOperations = (
   const ops: WriteRomsDiffOperation[] = [];
 
   for (const [, konsole] of consoles) {
-    if (!konsole.metadata.canDiffRoms()) continue;
+    if (!konsole.metadata.contentTargetSkipFlags.canProcessRoms()) continue;
 
     const projectConsoleListRomsFile =
       paths.files.project.lists.roms.consoles[konsole.name];

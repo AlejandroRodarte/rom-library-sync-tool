@@ -53,7 +53,7 @@ const syncEsDeGamelists = async (
     const konsole = consoles.get(op.console.name);
     if (!konsole) continue;
 
-    konsole.metadata.skipGlobalEsDeGamelist();
+    konsole.metadata.contentTargetSkipFlags.skipEsDeGamelists();
   }
 };
 

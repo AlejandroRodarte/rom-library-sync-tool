@@ -26,19 +26,19 @@ const populateConsolesMedias = async (consoles: Consoles): Promise<void> => {
       );
 
       if (dirExistsError) {
-        konsole.metadata.skipGlobalMediaName(mediaName);
+        konsole.metadata.contentTargetSkipFlags.skipMediaName(mediaName);
         continue;
       }
 
       if (!dirExistsResult.exists) {
-        konsole.metadata.skipGlobalMediaName(mediaName);
+        konsole.metadata.contentTargetSkipFlags.skipMediaName(mediaName);
         continue;
       }
 
       const [lsEntries, lsError] = await fsExtras.ls(dbPath);
 
       if (lsError) {
-        konsole.metadata.skipGlobalMediaName(mediaName);
+        konsole.metadata.contentTargetSkipFlags.skipMediaName(mediaName);
         continue;
       }
 

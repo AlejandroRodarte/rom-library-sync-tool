@@ -9,7 +9,7 @@ const buildWriteRomsListOperations = (
   const ops: WriteRomsListOperation[] = [];
 
   for (const [, konsole] of consoles) {
-    if (!konsole.metadata.canListRoms()) continue;
+    if (!konsole.metadata.contentTargetSkipFlags.canProcessRoms()) continue;
 
     const deviceConsoleRomsDir =
       paths.dirs["content-targets"].roms.consoles[konsole.name];

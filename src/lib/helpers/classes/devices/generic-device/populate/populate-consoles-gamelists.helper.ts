@@ -22,12 +22,12 @@ const populateConsolesGamelists = async (consoles: Consoles): Promise<void> => {
     );
 
     if (fileExistsError) {
-      konsole.metadata.skipGlobalEsDeGamelist();
+      konsole.metadata.contentTargetSkipFlags.skipEsDeGamelists();
       continue;
     }
 
     if (!fileExistsResult.exists) {
-      konsole.metadata.skipGlobalEsDeGamelist();
+      konsole.metadata.contentTargetSkipFlags.skipEsDeGamelists();
       continue;
     }
 
@@ -35,7 +35,7 @@ const populateConsolesGamelists = async (consoles: Consoles): Promise<void> => {
       await buildEsDeGamelistRootXmlNodeChildrenFromGamelistXmlFile(dbPath);
 
     if (xmlBuildError) {
-      konsole.metadata.skipGlobalEsDeGamelist();
+      konsole.metadata.contentTargetSkipFlags.skipEsDeGamelists();
       continue;
     }
 

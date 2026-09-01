@@ -35,11 +35,11 @@ import type {
 import logger from "../../objects/logger.object.js";
 import type { ConsoleName } from "../../types/consoles/console-name.type.js";
 import type { Consoles } from "../../types/consoles/consoles.type.js";
-import type { ContentTargetContent } from "../../types/content-targets/content-target-content.type.js";
 import type { DeepPartial } from "../../types/deep-partial.type.js";
 import type { RomTitleNameBuildStrategy } from "../../types/roms/rom-title-name-build-strategy.type.js";
 import ConsoleMetadata from "../entities/console-metadata.class.js";
 import Console from "../entities/console.class.js";
+import DeviceContentTargetsSkipFlags from "../entities/device-content-targets-skip-flags.class.js";
 import FileIONotFoundError from "../errors/file-io-not-found-error.class.js";
 import FileIOExtras from "../file-io/file-io-extras.class.js";
 import Fs from "../file-io/fs.class.js";
@@ -62,7 +62,7 @@ class GenericDevice implements Device, Debug {
   private _paths: GenericDevicePaths;
   private _registeredConsoleNames: ConsoleName[];
   private _consoles: Consoles;
-  private _contentTargetSkipFlags: ContentTargetContent<boolean>;
+  private _contentTargetSkipFlags: DeviceContentTargetsSkipFlags;
   private _titleNameBuildStrategy: RomTitleNameBuildStrategy;
   private _fileIOExtras: FileIOExtras;
 
@@ -136,11 +136,14 @@ class GenericDevice implements Device, Debug {
       ...new Set(envData.generic["content-targets"].names),
     ];
 
-    this._contentTargetSkipFlags = {
-      roms: !uniqueContentTargetNames.includes("roms"),
-      media: !uniqueContentTargetNames.includes("media"),
-      "es-de-gamelists": !uniqueContentTargetNames.includes("es-de-gamelists"),
-    };
+    this._contentTargetSkipFlags = new DeviceContentTargetsSkipFlags();
+
+    if (!uniqueContentTargetNames.includes("roms"))
+      this._contentTargetSkipFlags.skipRoms();
+    if (!uniqueContentTargetNames.includes("media"))
+      this._contentTargetSkipFlags.skipMedia();
+    if (!uniqueContentTargetNames.includes("es-de-gamelists"))
+      this._contentTargetSkipFlags.skipEsDeGamelists();
 
     logger.debug(this.debug());
   }
@@ -168,11 +171,11 @@ class GenericDevice implements Device, Debug {
 
     await populateConsolesGames(this._consoles, this._titleNameBuildStrategy);
 
-    if (!this._contentTargetSkipFlags.media)
+    if (this._contentTargetSkipFlags.canProcessMedia())
       await populateConsolesMedias(this._consoles);
 
     if (
-      !this._contentTargetSkipFlags["es-de-gamelists"] &&
+      this._contentTargetSkipFlags.canProcessEsDeGamelists() &&
       this._titleNameBuildStrategy !== ES_DE_GAMELIST_NAME
     )
       await populateConsolesGamelists(this._consoles);
@@ -184,95 +187,121 @@ class GenericDevice implements Device, Debug {
 
   write = {
     lists: async () => {
-      if (!this._contentTargetSkipFlags.roms) {
+      const [syncedFileExistsResult, syncedFileExistsError] =
+        await fsExtras.fileExists(this._paths.files.project.synced);
+
+      if (syncedFileExistsError) {
+        logger.error(syncedFileExistsError.reason);
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return;
+      }
+      if (
+        syncedFileExistsResult.error &&
+        !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+      ) {
+        logger.error(syncedFileExistsResult.error.reason);
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return;
+      }
+
+      if (syncedFileExistsResult.exists) {
+        const willListAllRegisteredConsoles =
+          this._consoles.size === this._registeredConsoleNames.length;
+
+        if (!willListAllRegisteredConsoles) {
+          logger.error(
+            `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again. Will "ban" this device (skip all content targets).`,
+          );
+          this._contentTargetSkipFlags.skipAllContentTargets();
+          return;
+        }
+      }
+
+      if (this._contentTargetSkipFlags.canProcessRoms()) {
         const pathsValidationError = await writeRomsLists(
           this._paths,
           this._consoles,
           this._fileIOExtras,
         );
-        if (pathsValidationError) this._skipRomsContentTarget();
+        if (pathsValidationError) this._contentTargetSkipFlags.skipRoms();
       }
 
-      if (!this._contentTargetSkipFlags.media) {
+      if (this._contentTargetSkipFlags.canProcessMedia()) {
         const pathsValidationError = await writeMediaLists(
           this._paths,
           this._consoles,
           this._fileIOExtras,
         );
-        if (pathsValidationError) this._skipMediaContentTarget();
+        if (pathsValidationError) this._contentTargetSkipFlags.skipMedia();
       }
 
-      if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-        const [syncedFileExistsResult, syncedFileExistsError] =
-          await fsExtras.fileExists(this._paths.files.project.synced);
-
-        if (syncedFileExistsError) {
-          logger.error(syncedFileExistsError.reason);
-          this._skipEsDeGamelistsContentTarget();
-          return;
-        }
-        if (
-          syncedFileExistsResult.error &&
-          !(syncedFileExistsResult.error instanceof FileIONotFoundError)
-        ) {
-          logger.error(syncedFileExistsResult.error.reason);
-          this._skipEsDeGamelistsContentTarget();
-          return;
-        }
-
-        if (syncedFileExistsResult.exists) {
-          const willListAllRegisteredConsoles =
-            this._consoles.size === this._registeredConsoleNames.length;
-
-          if (!willListAllRegisteredConsoles) {
-            logger.error(
-              `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again. Will skip the "es-de-gamelists" content target in general.`,
-            );
-            this._skipEsDeGamelistsContentTarget();
-            return;
-          }
-        }
-
+      if (this._contentTargetSkipFlags.canProcessEsDeGamelists()) {
         const pathsValidationError = await writeEsDeGamelistsLists(
           this._paths,
           this._consoles,
           this._fileIOExtras,
         );
-        if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
-
-        if (!syncedFileExistsResult.exists) return;
-
-        const canFullyProcessEsDeGamelistsForAllConsoles = this._consoles
-          .entries()
-          .every(([, konsole]) =>
-            konsole.metadata.canFullyProcessEsDeGamelist(),
-          );
-
-        if (!canFullyProcessEsDeGamelistsForAllConsoles) {
-          logger.error(
-            `Not all consoles for device ${this._name} had their gamelist file listed. Can't delete synced file until ALL gamelist files are listed properly.`,
-          );
-          return;
-        }
-
-        logger.info(
-          `All consoles for device ${this._name} has their gamelist file listed. Deleting "synced" file.`,
-        );
-
-        const deleteSyncedFileError = await fsExtras.deleteFile(
-          this._paths.files.project.synced,
-        );
-
-        if (deleteSyncedFileError) logger.error(deleteSyncedFileError.reason);
+        if (pathsValidationError)
+          this._contentTargetSkipFlags.skipEsDeGamelists();
       }
+
+      if (!syncedFileExistsResult.exists) return;
+
+      const canFullyProcessAllConsoles = this._consoles
+        .values()
+        .every((konsole) =>
+          konsole.metadata.contentTargetSkipFlags.canProcessAllContentTargets(),
+        );
+
+      if (!canFullyProcessAllConsoles) {
+        logger.error(
+          `Not all consoles for device ${this._name} were fully listed. Can't delete synced file until ALL are consoles are fully listed.`,
+        );
+        return;
+      }
+
+      logger.info(
+        `All consoles for device ${this._name} had their content targets fully listed. Deleting "synced" file.`,
+      );
+
+      const deleteSyncedFileError = await fsExtras.deleteFile(
+        this._paths.files.project.synced,
+      );
+
+      if (deleteSyncedFileError) logger.error(deleteSyncedFileError.reason);
     },
     diffs: async () => {
-      if (!this._contentTargetSkipFlags.roms) {
+      const [syncedFileExistsResult, syncedFileExistsError] =
+        await fsExtras.fileExists(this._paths.files.project.synced);
+
+      if (syncedFileExistsError) {
+        logger.error(syncedFileExistsError.reason);
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return;
+      }
+      if (
+        syncedFileExistsResult.error &&
+        !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+      ) {
+        logger.error(syncedFileExistsResult.error.reason);
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return;
+      }
+
+      if (syncedFileExistsResult.exists) {
+        logger.error(
+          `"Synced" file exists device ${this._name}. This means the last action you did against this device was to sync it. This also means that you haven't listed all consoles yet in "list mode". Please execute that mode before attempting to diff this device. Will "ban" this device (skip all content-targets).`,
+        );
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return;
+      }
+
+      if (this._contentTargetSkipFlags.canProcessRoms()) {
         const pathsValidationError = await writeRomsDiffs(
           this._paths,
           this._consoles,
         );
-        if (pathsValidationError) this._skipRomsContentTarget();
+        if (pathsValidationError) this._contentTargetSkipFlags.skipRoms();
 
         const writeDuplicatesError = await fsExtras.writeDuplicateRomsFile(
           this._consoles,
@@ -287,121 +316,100 @@ class GenericDevice implements Device, Debug {
         if (writeScrappedError) logger.error(writeScrappedError.toString());
       }
 
-      if (!this._contentTargetSkipFlags.media) {
+      if (this._contentTargetSkipFlags.canProcessMedia()) {
         const pathsValidationError = await writeMediaDiffs(
           this._paths,
           this._consoles,
         );
-        if (pathsValidationError) this._skipMediaContentTarget();
+        if (pathsValidationError) this._contentTargetSkipFlags.skipMedia();
       }
 
-      if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-        const [syncedFileExistsResult, syncedFileExistsError] =
-          await fsExtras.fileExists(this._paths.files.project.synced);
-
-        if (syncedFileExistsError) {
-          logger.error(syncedFileExistsError.reason);
-          this._skipEsDeGamelistsContentTarget();
-          return;
-        }
-        if (
-          syncedFileExistsResult.error &&
-          !(syncedFileExistsResult.error instanceof FileIONotFoundError)
-        ) {
-          logger.error(syncedFileExistsResult.error.reason);
-          this._skipEsDeGamelistsContentTarget();
-          return;
-        }
-
-        if (syncedFileExistsResult.exists) {
-          logger.error(
-            `"Synced" file exists device ${this._name}. This means the last action you did against this device was to sync it. This also means that you haven't listed all consoles yet in "list mode". Please execute that mode before attempting to diff es-de-gamelists (for data preservation). Will skip "es-de-gamelists" content target globally.`,
-          );
-          this._skipEsDeGamelistsContentTarget();
-          return;
-        }
-
+      if (this._contentTargetSkipFlags.canProcessEsDeGamelists()) {
         const pathsValidationError = await writeEsDeGamelistsDiffs(
           this._paths,
           this._consoles,
         );
-        if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
+        if (pathsValidationError)
+          this._contentTargetSkipFlags.skipEsDeGamelists();
       }
     },
   };
 
   sync: () => Promise<void> = async () => {
-    if (!this._contentTargetSkipFlags.roms) {
+    const [syncedFileExistsResult, syncedFileExistsError] =
+      await fsExtras.fileExists(this._paths.files.project.synced);
+
+    if (syncedFileExistsError) {
+      logger.error(syncedFileExistsError.reason);
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return;
+    }
+    if (
+      syncedFileExistsResult.error &&
+      !(syncedFileExistsResult.error instanceof FileIONotFoundError)
+    ) {
+      logger.error(syncedFileExistsResult.error.reason);
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return;
+    }
+
+    if (syncedFileExistsResult.exists) {
+      logger.error(
+        `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again. Will "ban" this device (skip all content-targets).`,
+      );
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return;
+    }
+
+    if (this._contentTargetSkipFlags.canProcessRoms()) {
       const pathsValidationError = await syncRoms(
         this._paths,
         this._consoles,
         this._fileIOExtras,
       );
-      if (pathsValidationError) this._skipRomsContentTarget();
+      if (pathsValidationError) this._contentTargetSkipFlags.skipRoms();
     }
 
-    if (!this._contentTargetSkipFlags.media) {
+    if (this._contentTargetSkipFlags.canProcessMedia()) {
       const pathsValidationError = await syncMedia(
         this._paths,
         this._consoles,
         this._fileIOExtras,
       );
-      if (pathsValidationError) this._skipMediaContentTarget();
+      if (pathsValidationError) this._contentTargetSkipFlags.skipMedia();
     }
 
-    if (!this._contentTargetSkipFlags["es-de-gamelists"]) {
-      const [syncedFileExistsResult, syncedFileExistsError] =
-        await fsExtras.fileExists(this._paths.files.project.synced);
-
-      if (syncedFileExistsError) {
-        logger.error(syncedFileExistsError.reason);
-        this._skipEsDeGamelistsContentTarget();
-        return;
-      }
-      if (
-        syncedFileExistsResult.error &&
-        !(syncedFileExistsResult.error instanceof FileIONotFoundError)
-      ) {
-        logger.error(syncedFileExistsResult.error.reason);
-        this._skipEsDeGamelistsContentTarget();
-        return;
-      }
-
-      if (syncedFileExistsResult.exists) {
-        logger.error(
-          `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again. Will skip the "es-de-gamelists" content target in general.`,
-        );
-        this._skipEsDeGamelistsContentTarget();
-        return;
-      }
-
+    if (this._contentTargetSkipFlags.canProcessEsDeGamelists()) {
       const pathsValidationError = await syncEsDeGamelists(
         this._paths,
         this._consoles,
         this._fileIOExtras,
       );
-      if (pathsValidationError) this._skipEsDeGamelistsContentTarget();
-
-      const canFullyProcessEsDeGamelistForAllConsoles = this._consoles
-        .entries()
-        .every(([, konsole]) => konsole.metadata.canFullyProcessEsDeGamelist());
-
-      if (!canFullyProcessEsDeGamelistForAllConsoles) {
-        logger.error(
-          `Some consoles from device ${this._name} failed to sync their gamelist file properly. Will NOT create "synced" file until ALL consoles have their es-de-gamelist file synced.`,
-        );
-        return;
-      }
-
-      const createSyncedFileError = await fsExtras.createEmptyFile(
-        this._paths.files.project.synced,
-      );
-      if (createSyncedFileError) logger.error(createSyncedFileError.reason);
-
-      logger.info(
-        `All consoles had their gamelist data synced successfully. Creating empty "synced" file to prohibit a new sync.`,
-      );
+      if (pathsValidationError)
+        this._contentTargetSkipFlags.skipEsDeGamelists();
     }
+
+    const canFullyProcessAllConsoles = this._consoles
+      .values()
+      .every((konsole) =>
+        konsole.metadata.contentTargetSkipFlags.canProcessAllContentTargets(),
+      );
+
+    if (!canFullyProcessAllConsoles) {
+      logger.error(
+        `Some consoles from device ${this._name} failed to sync their all of their content. Will NOT create "synced" file until ALL consoles have ALL their content synced.`,
+      );
+      return;
+    }
+
+    const createSyncedFileError = await fsExtras.createEmptyFile(
+      this._paths.files.project.synced,
+    );
+    if (createSyncedFileError) logger.error(createSyncedFileError.reason);
+
+    logger.info(
+      `All consoles had their content data synced successfully. Creating empty "synced" file to prohibit a new sync.`,
+    );
   };
 
   debug: () => string = () => {
@@ -419,18 +427,6 @@ class GenericDevice implements Device, Debug {
     content += "}";
     return content;
   };
-
-  private _skipRomsContentTarget() {
-    this._contentTargetSkipFlags.roms = true;
-  }
-
-  private _skipMediaContentTarget() {
-    this._contentTargetSkipFlags.media = true;
-  }
-
-  private _skipEsDeGamelistsContentTarget() {
-    this._contentTargetSkipFlags["es-de-gamelists"] = true;
-  }
 }
 
 export default GenericDevice;

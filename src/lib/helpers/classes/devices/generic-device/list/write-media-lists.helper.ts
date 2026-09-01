@@ -52,7 +52,7 @@ const writeMediaLists = async (
     const konsole = consoles.get(op.names.console);
     if (!konsole) continue;
 
-    konsole.metadata.skipGlobalMediaName(op.names.media);
+    konsole.metadata.contentTargetSkipFlags.skipMediaName(op.names.media);
   }
 };
 
