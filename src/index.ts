@@ -7,10 +7,7 @@ import {
   LIST_DIFF_SYNC,
   SYNC,
 } from "./lib/constants/modes/mode-names.constants.js";
-import modes from "./lib/helpers/modes/index.js";
 import type { GenericDeviceOpts } from "./lib/interfaces/classes/devices/generic-device/generic-device-opts.interface.js";
-import type { Debug } from "./lib/interfaces/debug.interface.js";
-import type { Device } from "./lib/interfaces/device.interface.js";
 import consolesGamesFilterFunctions from "./lib/objects/devices/consoles-games-filter-functions.object.js";
 import genericDevicePathsFromDeviceEnvDataBuilders from "./lib/objects/devices/generic-device-paths-from-device-env-data-builders.object.js";
 import environment from "./lib/objects/environment.object.js";
@@ -21,7 +18,7 @@ const main = async () => {
   const mode = environment.options.mode;
   logger.debug(`Mode: ${mode}`);
 
-  const devices: (Device & Debug)[] = [];
+  const genericDevices: GenericDevice[] = [];
 
   for (const deviceName of environment.device.names) {
     const deviceData = environment.device.data[deviceName];
@@ -42,14 +39,14 @@ const main = async () => {
         },
       };
 
-    devices.push(new GenericDevice(deviceName, deviceData, opts));
+    genericDevices.push(new GenericDevice(deviceName, deviceData, opts));
   }
 
-  logger.debug(`amount of devices to process: ${devices.length}`);
+  logger.debug(`amount of devices to process: ${genericDevices.length}`);
 
-  for (const device of devices) {
-    if (mode !== "diff") {
-      const connectionError = await device.connect();
+  for (const genericDevice of genericDevices) {
+    if (mode !== DIFF) {
+      const connectionError = await genericDevice.connect();
 
       if (connectionError) {
         logger.error(
@@ -62,32 +59,68 @@ const main = async () => {
     }
 
     switch (mode) {
-      case LIST:
-        await modes.list(device);
+      case LIST: {
+        const listError = await genericDevice.list();
+        if (listError) logger.error(listError.reason);
         break;
-      case DIFF:
-        await modes.diff(device);
+      }
+      case DIFF: {
+        const diffError = await genericDevice.diff();
+        if (diffError) logger.error(diffError.reason);
         break;
-      case SYNC:
-        await modes.sync(device);
+      }
+      case SYNC: {
+        const syncError = await genericDevice.sync();
+        if (syncError) logger.error(syncError.reason);
         break;
-      case LIST_DIFF:
-        await modes.list(device);
-        await modes.diff(device);
+      }
+      case LIST_DIFF: {
+        const listError = await genericDevice.list();
+
+        if (listError) {
+          logger.error(listError.reason);
+          break;
+        }
+
+        const diffError = await genericDevice.diff();
+        if (diffError) logger.error(diffError.reason);
         break;
-      case DIFF_SYNC:
-        await modes.diff(device);
-        await modes.sync(device);
+      }
+      case DIFF_SYNC: {
+        const diffError = await genericDevice.diff();
+
+        if (diffError) {
+          logger.error(diffError.reason);
+          break;
+        }
+
+        const syncError = await genericDevice.sync();
+        if (syncError) logger.error(syncError.reason);
         break;
-      case LIST_DIFF_SYNC:
-        await modes.list(device);
-        await modes.diff(device);
-        await modes.sync(device);
+      }
+      case LIST_DIFF_SYNC: {
+        const listError = await genericDevice.list();
+
+        if (listError) {
+          logger.error(listError.reason);
+          break;
+        }
+
+        const diffError = await genericDevice.diff();
+
+        if (diffError) {
+          logger.error(diffError.reason);
+          break;
+        }
+
+        const syncError = await genericDevice.sync();
+        if (syncError) logger.error(syncError.reason);
         break;
+      }
     }
 
-    if (mode !== "diff") {
-      const disconnectionError = await device.disconnect();
+    if (mode !== DIFF) {
+      const disconnectionError = await genericDevice.disconnect();
 
       if (disconnectionError)
         logger.error(
