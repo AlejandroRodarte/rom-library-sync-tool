@@ -1,3 +1,4 @@
+import AppFailedContentExistsError from "../../../../../classes/errors/app-failed-content-exists.error.class.js";
 import type { SyncRomsOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/sync-roms-operation.interface.js";
 import type { FileIO } from "../../../../../interfaces/file-io.interface.js";
 import logger from "../../../../../objects/logger.object.js";
@@ -28,7 +29,8 @@ export type SyncConsoleRomsError =
   | OpenFileForWritingError
   | ReadUTF8LinesError
   | UnlinkError
-  | WriteLinesError;
+  | WriteLinesError
+  | AppFailedContentExistsError;
 
 const syncConsoleRoms = async (
   op: SyncRomsOperation,
@@ -88,7 +90,7 @@ const syncConsoleRoms = async (
     return undefined;
   }
 
-  logger.info(
+  logger.warn(
     `Failures that occured during synchronization: ${failedDiffLines.length}. Will write them into failed file at ${op.paths.project.failed.file}.`,
   );
 
@@ -104,6 +106,10 @@ const syncConsoleRoms = async (
   }
 
   await failedFileHandle.close();
+
+  return new AppFailedContentExistsError(
+    `Console ${op.console.name} failed to synchronize some of its "roms" content. Please check file at ${op.paths.project.failed.file} to know exactly what operations failed.`,
+  );
 };
 
 export default syncConsoleRoms;

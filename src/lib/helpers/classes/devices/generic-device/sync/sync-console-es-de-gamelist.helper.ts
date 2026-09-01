@@ -1,3 +1,4 @@
+import AppFailedContentExistsError from "../../../../../classes/errors/app-failed-content-exists.error.class.js";
 import { FILE } from "../../../../../constants/fs/fs-types.constants.js";
 import type { SyncEsDeGamelistsOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/sync-es-de-gamelists-operation.interface.js";
 import type {
@@ -15,7 +16,9 @@ const fsExtras = {
   openFileForWriting,
 };
 
-export type SyncConsoleEsDeGamelistError = OpenFileForWritingError;
+export type SyncConsoleEsDeGamelistError =
+  | OpenFileForWritingError
+  | AppFailedContentExistsError;
 
 const syncConsoleEsDeGamelist = async (
   op: SyncEsDeGamelistsOperation,
@@ -48,6 +51,10 @@ const syncConsoleEsDeGamelist = async (
 
   if (failedFileError) return failedFileError;
   await failedFileHandle.close();
+
+  return new AppFailedContentExistsError(
+    `Console ${op.console.name} failed to synchronize its "es-de-gamelist" file. An empty file at ${op.paths.project.failed.file} was created to denote the failure.`,
+  );
 };
 
 export default syncConsoleEsDeGamelist;

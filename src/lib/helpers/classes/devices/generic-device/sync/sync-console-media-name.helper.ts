@@ -1,3 +1,4 @@
+import AppFailedContentExistsError from "../../../../../classes/errors/app-failed-content-exists.error.class.js";
 import type { SyncMediaOperation } from "../../../../../interfaces/classes/devices/generic-device/operations/sync-media-operation.interface.js";
 import type { FileIO } from "../../../../../interfaces/file-io.interface.js";
 import logger from "../../../../../objects/logger.object.js";
@@ -28,7 +29,8 @@ export type SyncConsoleMediaNameError =
   | OpenFileForWritingError
   | ReadUTF8LinesError
   | UnlinkError
-  | WriteLinesError;
+  | WriteLinesError
+  | AppFailedContentExistsError;
 
 const syncConsoleMediaName = async (
   op: SyncMediaOperation,
@@ -88,7 +90,7 @@ const syncConsoleMediaName = async (
     return undefined;
   }
 
-  logger.info(
+  logger.warn(
     `Failures that occured during synchronization: ${failedDiffLines.length}. Will write them into failed file at ${op.paths.project.failed.file}.`,
   );
 
@@ -104,6 +106,10 @@ const syncConsoleMediaName = async (
   }
 
   await failedFileHandle.close();
+
+  return new AppFailedContentExistsError(
+    `Console-media combo ${op.console.name}-${op.media.name} failed to synchronize some of its content. Please check for file at ${op.paths.project.failed.file} to know what exactly failed to synchronize.`,
+  );
 };
 
 export default syncConsoleMediaName;
