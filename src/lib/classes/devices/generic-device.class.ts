@@ -63,18 +63,14 @@ const fsExtras = {
   deleteFile,
 };
 
-type ListMethodError = WriteListsMethodError;
-type DiffMethodError = WriteDiffsMethodError;
-type SyncMethodError = WriteSyncMethodError;
-
-type WriteListsMethodError =
+type ListMethodError =
   | SyncedFileExistsMethodError
   | AppValidationError
   | DeleteFileError;
 
-type WriteDiffsMethodError = SyncedFileExistsMethodError | FileIOExistsError;
+type DiffMethodError = SyncedFileExistsMethodError | FileIOExistsError;
 
-type WriteSyncMethodError =
+type SyncMethodError =
   | SyncedFileExistsMethodError
   | FileIOExistsError
   | AppValidationError
@@ -191,20 +187,97 @@ class GenericDevice implements Device, Debug {
     };
 
   list: () => Promise<ListMethodError | undefined> = async () => {
-    const writeListsError = await this.write.lists();
-    return writeListsError;
+    const [syncedFileExists, syncedFileExistsError] =
+      await this.syncedFileExists();
+
+    if (syncedFileExistsError) {
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return syncedFileExistsError;
+    }
+
+    if (syncedFileExists) {
+      const willListAllRegisteredConsoles =
+        this._consoles.size === this._registeredConsoleNames.length;
+
+      if (!willListAllRegisteredConsoles) {
+        this._contentTargetSkipFlags.skipAllContentTargets();
+        return new AppValidationError(
+          `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again. Will "ban" this device (skip all content targets).`,
+        );
+      }
+    }
+
+    await this.write.lists();
+    if (!syncedFileExists) return undefined;
+
+    if (!this.canFullyProcessAllConsoles())
+      return new AppValidationError(
+        `Not all consoles for device ${this._name} were fully listed. Can't delete synced file until ALL are consoles are fully listed.`,
+      );
+
+    logger.info(
+      `All consoles for device ${this._name} had their content targets fully listed. Deleting "synced" file.`,
+    );
+
+    const deleteSyncedFileError = await fsExtras.deleteFile(
+      this._paths.files.project.synced,
+    );
+
+    if (deleteSyncedFileError) return deleteSyncedFileError;
   };
 
   diff: () => Promise<DiffMethodError | undefined> = async () => {
+    const [syncedFileExists, syncedFileExistsError] =
+      await this.syncedFileExists();
+
+    if (syncedFileExistsError) {
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return syncedFileExistsError;
+    }
+
+    if (syncedFileExists) {
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return new FileIOExistsError(
+        `"Synced" file exists device ${this._name}. This means the last action you did against this device was to sync it. This also means that you haven't listed all consoles yet in "list mode". Please execute that mode before attempting to diff this device. Will "ban" this device (skip all content-targets).`,
+      );
+    }
+
     await this.populate();
     this.filter();
-    const writeDiffsError = await this.write.diffs();
-    return writeDiffsError;
+    await this.write.diffs();
   };
 
   sync: () => Promise<SyncMethodError | undefined> = async () => {
-    const writeSyncError = await this.write.sync();
-    return writeSyncError;
+    const [syncedFileExists, syncedFileExistsError] =
+      await this.syncedFileExists();
+
+    if (syncedFileExistsError) {
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return syncedFileExistsError;
+    }
+
+    if (syncedFileExists) {
+      this._contentTargetSkipFlags.skipAllContentTargets();
+      return new FileIOExistsError(
+        `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again. Will "ban" this device (skip all content-targets).`,
+      );
+    }
+
+    await this.write.sync();
+
+    if (!this.canFullyProcessAllConsoles())
+      return new AppValidationError(
+        `Some consoles from device ${this._name} failed to sync their all of their content. Will NOT create "synced" file until ALL consoles have ALL their content synced.`,
+      );
+
+    logger.info(
+      `All consoles had their content data synced successfully. Creating empty "synced" file to prohibit a new sync until a successful "list mode" against ALL registered consoles is done.`,
+    );
+
+    const createSyncedFileError = await fsExtras.createEmptyFile(
+      this._paths.files.project.synced,
+    );
+    if (createSyncedFileError) return createSyncedFileError;
   };
 
   name: () => string = () => {
@@ -236,27 +309,7 @@ class GenericDevice implements Device, Debug {
   };
 
   write = {
-    lists: async (): Promise<WriteListsMethodError | undefined> => {
-      const [syncedFileExists, syncedFileExistsError] =
-        await this.syncedFileExists();
-
-      if (syncedFileExistsError) {
-        this._contentTargetSkipFlags.skipAllContentTargets();
-        return syncedFileExistsError;
-      }
-
-      if (syncedFileExists) {
-        const willListAllRegisteredConsoles =
-          this._consoles.size === this._registeredConsoleNames.length;
-
-        if (!willListAllRegisteredConsoles) {
-          this._contentTargetSkipFlags.skipAllContentTargets();
-          return new AppValidationError(
-            `"Synced" empty file exists on device ${this._name} folder. After syncing, this program will force you to run "list" mode against ALL consoles in order to avoid game metadata loss. On your environment.json file, please set device data field "consoles.names.list" to "all" and run this program again. Will "ban" this device (skip all content targets).`,
-          );
-        }
-      }
-
+    lists: async (): Promise<void> => {
       if (this._contentTargetSkipFlags.canProcessRoms()) {
         const pathsValidationError = await writeRomsLists(
           this._paths,
@@ -284,40 +337,8 @@ class GenericDevice implements Device, Debug {
         if (pathsValidationError)
           this._contentTargetSkipFlags.skipEsDeGamelists();
       }
-
-      if (!syncedFileExists) return undefined;
-
-      if (!this.canFullyProcessAllConsoles())
-        return new AppValidationError(
-          `Not all consoles for device ${this._name} were fully listed. Can't delete synced file until ALL are consoles are fully listed.`,
-        );
-
-      logger.info(
-        `All consoles for device ${this._name} had their content targets fully listed. Deleting "synced" file.`,
-      );
-
-      const deleteSyncedFileError = await fsExtras.deleteFile(
-        this._paths.files.project.synced,
-      );
-
-      if (deleteSyncedFileError) return deleteSyncedFileError;
     },
-    diffs: async (): Promise<WriteDiffsMethodError | undefined> => {
-      const [syncedFileExists, syncedFileExistsError] =
-        await this.syncedFileExists();
-
-      if (syncedFileExistsError) {
-        this._contentTargetSkipFlags.skipAllContentTargets();
-        return syncedFileExistsError;
-      }
-
-      if (syncedFileExists) {
-        this._contentTargetSkipFlags.skipAllContentTargets();
-        return new FileIOExistsError(
-          `"Synced" file exists device ${this._name}. This means the last action you did against this device was to sync it. This also means that you haven't listed all consoles yet in "list mode". Please execute that mode before attempting to diff this device. Will "ban" this device (skip all content-targets).`,
-        );
-      }
-
+    diffs: async (): Promise<void> => {
       if (this._contentTargetSkipFlags.canProcessRoms()) {
         const pathsValidationError = await writeRomsDiffs(
           this._paths,
@@ -355,22 +376,7 @@ class GenericDevice implements Device, Debug {
           this._contentTargetSkipFlags.skipEsDeGamelists();
       }
     },
-    sync: async (): Promise<WriteSyncMethodError | undefined> => {
-      const [syncedFileExists, syncedFileExistsError] =
-        await this.syncedFileExists();
-
-      if (syncedFileExistsError) {
-        this._contentTargetSkipFlags.skipAllContentTargets();
-        return syncedFileExistsError;
-      }
-
-      if (syncedFileExists) {
-        this._contentTargetSkipFlags.skipAllContentTargets();
-        return new FileIOExistsError(
-          `Empty "synced" file present in device ${this._name} directory. This means the last action you did against ${this._name} was to sync it. In order to avoid the loss of game metadata, it is highly recommended to run the "list" mode for all consoles before running the "sync" mode again. Will "ban" this device (skip all content-targets).`,
-        );
-      }
-
+    sync: async (): Promise<void> => {
       if (this._contentTargetSkipFlags.canProcessRoms()) {
         const pathsValidationError = await syncRoms(
           this._paths,
@@ -398,20 +404,6 @@ class GenericDevice implements Device, Debug {
         if (pathsValidationError)
           this._contentTargetSkipFlags.skipEsDeGamelists();
       }
-
-      if (!this.canFullyProcessAllConsoles())
-        return new AppValidationError(
-          `Some consoles from device ${this._name} failed to sync their all of their content. Will NOT create "synced" file until ALL consoles have ALL their content synced.`,
-        );
-
-      const createSyncedFileError = await fsExtras.createEmptyFile(
-        this._paths.files.project.synced,
-      );
-      if (createSyncedFileError) return createSyncedFileError;
-
-      logger.info(
-        `All consoles had their content data synced successfully. Creating empty "synced" file to prohibit a new sync.`,
-      );
     },
   };
 
